@@ -25,6 +25,6 @@ profile of the logged in user with:
        graph = Facebook::GraphAPI(user["oauth_access_token"])
        profile = graph.get_object("me")
        friends = graph.get_connections("me", "friends")
-		end
+    end
 
 You can see a full AppEngine example application in examples/appengine.
