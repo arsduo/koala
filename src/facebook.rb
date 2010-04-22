@@ -202,7 +202,7 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
     end
   end
   
-  def get_user_from_cookie(cookies, app_id, app_secret)
+  def self.get_user_from_cookie(cookies, app_id, app_secret)
 =begin
     Parses the cookie set by the official Facebook JavaScript SDK.
 
@@ -219,23 +219,18 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
     authentication at http://developers.facebook.com/docs/authentication/.
 =end
 
-    if fb_cookie = cookies["fbs_" + app_id]
+    if fb_cookie = cookies["fbs_" + app_id.to_s]
+      # remove the opening/closing quote
+      fb_cookie = fb_cookie.gsub(/\"/, "")
+      
       # since we no longer get individual cookies, we have to separate out the components ourselves
       components = {}
+      fb_cookie.split("&").map {|param| param = param.split("="); components[param[0]] = param[1]}
       
-      # split up the cookie, get the components for verification, and remove the sig before recombination 
-      auth_string = fb_cookie.split("&").collect { |parameter| 
-        # parameter is, e.g., expires=1260910800
-        key_and_value = parameter.split("=")
-        # save it to the hash
-        components[key_and_value[0]] = key_and_value[1]
-        
-        # add it back to the string for sig verification, as long as it's not the expected sig value itself
-        key_and_value[0] =~ /^sig=/ ? "" : parameter
-      }.join("&") # preserving the order of the string
-
+      auth_string = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
       sig = Digest::MD5.hexdigest(auth_string + app_secret)
-      if sig == components["sig"] && Time.now.to_i < int(args["expires"])
+      
+      if sig == components["sig"] && Time.now.to_i < components["expires"].to_i
         components
       else
         nil
