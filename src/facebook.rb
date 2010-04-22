@@ -84,7 +84,7 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       return self.request(id + "/" + connection_name, args)
     end
     
-    def put_object(parent_object, connection_name, get_args = nil, post_args = nil)
+    def put_object(parent_object, connection_name, get_args = {}, post_args = nil)
 =begin
         Writes the given object to the graph, connected to the given parent.
 
@@ -172,7 +172,7 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
         response, body = (post_args ? http.post(path, encode_params(post_args)) : http.get(path)) #Net::HTTP::Post.new(path) : Net::HTTP::Get.new(path))
         body
       }
-      
+
       response = JSON.parse(result)
       raise GraphAPIError.new(response["error"]["code"], response["error"]["message"]) if response["error"]
       
