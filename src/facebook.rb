@@ -154,33 +154,33 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       We translate args to a valid query string. If post_args is given,
       we send a POST request to the given path with the given arguments.
 =end
-      get_args = encode_params(get_args)
-      post_args = encode_params(post_args) if post_args
-      
       if self.access_token
         if post_args
-          post_args += "&access_token=#{self.access_token}"
+          post_args["access_token"] = self.access_token
         else
-          get_args += "&access_token=#{self.access_token}"
+          get_args["access_token"] = self.access_token
         end
       end
       
       http = Net::HTTP.new("graph.facebook.com", 443)
       http.use_ssl = true
-      path += "?#{get_args}" if get_args
+      # TODO we could turn off certificate validation to avoid the "warning: peer certificate won't be verified in this SSL session" warning
+      # not yet sure how best to handle that
+      path += "?#{encode_params(get_args)}" if get_args
       
       result = http.start { |http|
-        response, body = (post_args ? http.post(path, post_args) : http.get(path)) #Net::HTTP::Post.new(path) : Net::HTTP::Get.new(path))
+        response, body = (post_args ? http.post(path, encode_params(post_args)) : http.get(path)) #Net::HTTP::Post.new(path) : Net::HTTP::Get.new(path))
         body
       }
       
       response = JSON.parse(result)
-      raise GraphAPIError.new(response["error"].inspect) if response["error"]
+      raise GraphAPIError.new(response["error"]["code"], response["error"]["message"]) if response["error"]
       
       response
     end
 
     def encode_params(param_hash)
+      # TODO investigating whether a built-in method handles this
       # if no hash (e.g. no auth token) return empty string
       ((param_hash || {}).collect do |key_and_value| 
         key_and_value[1] = key_and_value[1].to_json if key_and_value[1].class != String
@@ -192,12 +192,11 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
 
   
   class GraphAPIError < Exception
-    #attr_accessor :code
-    #def initialize(code, message)
-    #  super(message)
-    #  self.code = code  
-    #  self
-    #end
+    attr_accessor :code
+    def initialize(code, message)
+      super(message)
+      self.code = code  
+    end
   end
   
   def get_user_from_cookie(cookies, app_id, app_secret)

@@ -17,14 +17,4 @@ Basic usage:
 If you are using the module within a web application with the
 [JavaScript SDK](http://github.com/facebook/connect-js), you can also use the
 module to use Facebook for login, parsing the cookie set by the JavaScript SDK
-for logged in users. For example, in Google AppEngine, you could get the
-profile of the logged in user with:
-
-    user = Facebook::get_user_from_cookie(self.request.cookies, key, secret)
-    if user
-       graph = Facebook::GraphAPI(user["oauth_access_token"])
-       profile = graph.get_object("me")
-       friends = graph.get_connections("me", "friends")
-    end
-
-You can see a full AppEngine example application in examples/appengine.
+for logged in users.
