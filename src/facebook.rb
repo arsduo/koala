@@ -173,8 +173,11 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
         body
       }
 
-      response = JSON.parse(result)
-      raise GraphAPIError.new(response["error"]["code"], response["error"]["message"]) if response["error"]
+      # Facebook sometimes sends results like "true" and "false", which -- not being objects -- cause the parser to fail
+      # so we account for that
+      # see http://redcorundum.blogspot.com/2008/03/ssl-certificates-and-nethttps.html
+      response = JSON.parse("[#{result}]")[0]
+      raise GraphAPIError.new(response["error"]["code"], response["error"]["message"]) if response.is_a?(Hash) && response["error"]
       
       response
     end
