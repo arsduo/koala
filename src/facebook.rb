@@ -108,7 +108,7 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
         extended permissions.
         
 =end
-        raise "Write operations require an access token" unless self.access_token
+        raise GraphAPIError.new(nil, "Write operations require an access token") unless self.access_token
         self.request(parent_object + "/" + connection_name, get_args, post_args)
     end
     
