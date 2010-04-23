@@ -143,8 +143,13 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
     end
     
     def delete_object(id)
-      #Deletes the object with the given ID from the graph.
+      # Deletes the object with the given ID from the graph.
       self.request(id, nil, {"method" => "delete"})
+    end
+    
+    def search(search_terms, args = {})
+      # Searches for a given term
+      self.request("search", args.merge({:q => search_terms}))
     end
     
     def request(path, get_args = {}, post_args = nil)
