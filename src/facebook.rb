@@ -44,7 +44,7 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
     token, this will fetch the profile of the active user and the list
     of the user's friends:
 
-       graph = Facebook::GraphAPI(access_token)
+       graph = Facebook::GraphAPI.new(access_token)
        user = graph.get_object("me")
        friends = graph.get_connections(user["id"], "friends")
 
@@ -76,12 +76,12 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       # Fetchs all of the given object from the graph.
       # We return a map from ID to object. If any of the IDs are invalid,
       # we raise an exception.
-      self.request(ids.join(","), args)
+      self.request("", args.merge("ids" => ids.join(",")))
     end
     
     def get_connections(id, connection_name, args = {})
-      #Fetchs the connections for given object.
-      return self.request(id + "/" + connection_name, args)
+      # Fetchs the connections for given object.
+      self.request(id + "/" + connection_name, args)
     end
     
     def put_object(parent_object, connection_name, get_args = {}, post_args = nil)
@@ -134,12 +134,12 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
     
     def put_comment(object_id, message)
       # Writes the given comment on the given post.
-      self.put_object(object_id, "comments", {:message => message})
+      self.put_object(object_id, "comments", nil, {:message => message})
     end
     
     def put_like(object_id)
       #Likes the given post.
-      self.put_object(object_id, "likes")
+      self.put_object(object_id, "likes", nil, {})
     end
     
     def delete_object(id)
@@ -169,20 +169,26 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       
       http = Net::HTTP.new("graph.facebook.com", 443)
       http.use_ssl = true
-      # TODO we could turn off certificate validation to avoid the "warning: peer certificate won't be verified in this SSL session" warning
+      # TODO we could turn off certificate validation to avoid the 
+      # "warning: peer certificate won't be verified in this SSL session" warning
       # not yet sure how best to handle that
       # see http://redcorundum.blogspot.com/2008/03/ssl-certificates-and-nethttps.html
       path += "?#{encode_params(get_args)}" if get_args
       
       result = http.start { |http|
-        response, body = (post_args ? http.post(path, encode_params(post_args)) : http.get(path)) #Net::HTTP::Post.new(path) : Net::HTTP::Get.new(path))
+        response, body = (post_args ? http.post(path, encode_params(post_args)) : http.get(path)) 
         body
       }
 
-      # Facebook sometimes sends results like "true" and "false", which -- not being objects -- cause the parser to fail
+      # Facebook sometimes sends results like "true" and "false", which aren't strictly object
+      # and cause JSON.parse to fail
       # so we account for that
       response = JSON.parse("[#{result}]")[0]
-      raise GraphAPIError.new(response["error"]["code"], response["error"]["message"]) if response.is_a?(Hash) && response["error"]
+
+      # check for errors
+      if response.is_a?(Hash) && error = response["error"]
+        raise GraphAPIError.new(error["code"], error["message"])
+      end
       
       response
     end
@@ -232,14 +238,10 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       components = {}
       fb_cookie.split("&").map {|param| param = param.split("="); components[param[0]] = param[1]}
       
-      auth_string = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
+      auth_components = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
       sig = Digest::MD5.hexdigest(auth_string + app_secret)
       
-      if sig == components["sig"] && Time.now.to_i < components["expires"].to_i
-        components
-      else
-        nil
-      end
+      sig == components["sig"] && Time.now.to_i < components["expires"].to_i ? components : nil
     end
   end
 end
