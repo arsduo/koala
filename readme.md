@@ -18,3 +18,7 @@ If you are using the module within a web application with the
 [JavaScript SDK](http://github.com/facebook/connect-js), you can also use the
 module to use Facebook for login, parsing the cookie set by the JavaScript SDK
 for logged in users.
+
+Testing:
+
+To test the Ruby SDK, replace the contests of the tests/access_token file with a valid Facebook access token with write permissions.

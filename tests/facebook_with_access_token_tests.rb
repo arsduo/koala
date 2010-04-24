@@ -16,13 +16,13 @@ class FacebookWithAccessTokenTests < Test::Unit::TestCase
     it "should get public data about a user" do
       result = @graph.get_object("koppel")
       # the results should have an ID and a name, among other things
-      (result["id"] && result["name"]).should
+      (result["id"] && result["name"]).should_not be_nil
     end
 
     it "should get private data about a user" do
       result = @graph.get_object("koppel")
       # updated_time should be a pretty fixed test case
-      result["updated_time"].should
+      result["updated_time"].should_not be_nil
     end
 
     it "should get public data about a Page" do
@@ -50,27 +50,27 @@ class FacebookWithAccessTokenTests < Test::Unit::TestCase
       result = @graph.get_connections("contextoptional", "likes")
       result["data"].should be_a(Array)
     end
-  
-    # DELETE
-    it "should not be able to delete posts" do 
-      result = @graph.put_object("me", "feed", :message => "Hello, world, from the test suite!")
-      object_id_to_delete = result["id"]
-      delete_result = @graph.delete_object(object_id_to_delete)
-      delete_result.should == true
-    end
     
     # PUT
     it "should be able to put an object" do
-      result = @graph.put_object("me", "feed", :message => "Hello, world, from the test suite!")
+      result = @graph.put_wall_post("Hello, world, from the test suite!")
       @temporary_object_id = result["id"]
-      @temporary_object_id.should
+      @temporary_object_id.should_not be_nil
+    end
+
+    # DELETE
+    it "should not be able to delete posts" do 
+      result = @graph.put_wall_post("Hello, world, from the test suite delete method!")
+      object_id_to_delete = result["id"]
+      delete_result = @graph.delete_object(object_id_to_delete)
+      delete_result.should == true
     end
 
     # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
     it "should be able to post to a feed" do
       result = @graph.put_wall_post("Hello, world, from the test suite again!", {:name => "Context Optional", :link => "http://www.contextoptional.com/"})
       @temporary_object_id = result["id"]
-      @temporary_object_id.should
+      @temporary_object_id.should_not be_nil
     end
 
     it "should be able to comment on an object" do
@@ -79,7 +79,7 @@ class FacebookWithAccessTokenTests < Test::Unit::TestCase
       
       # this will be deleted when the post gets deleted 
       comment_result = @graph.put_comment(@temporary_object_id, "it's my comment!")
-      comment_result.should
+      comment_result.should_not be_nil
     end
 
     it "should be able to like an object" do
