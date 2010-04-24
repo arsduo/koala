@@ -4,15 +4,26 @@ require 'spec/test/unit'
 
 require '../src/facebook'
 require 'facebook_no_access_token_tests'
-
+require 'facebook_with_access_token_tests'
 
 class FacebookTestSuite
   def self.suite
     suite = Test::Unit::TestSuite.new
     suite << FacebookNoAccessTokenTests.suite
-    #suite << FacebookAccessToken.suite
+    suite << FacebookWithAccessTokenTests.suite
     #suite << FacebookCookieTest.suite
     suite
   end
 end
+
+# load the access token if provided
+# I'm seeing a bug with spec and gets where the facebook_test_suite.rb file gets read in when gets is called
+# until that's solved, we'll need to store/update tokens in the access_token file
+if $access_token = File.read("access_token") rescue nil
+  puts "Got access token #{$access_token.inspect}"
+else
+  puts "Access token tests will fail until you store a valid token in the access_token file"
+end
+
+# run the tests
 Test::Unit::UI::Console::TestRunner.run(FacebookTestSuite)

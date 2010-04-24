@@ -169,10 +169,12 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       
       http = Net::HTTP.new("graph.facebook.com", 443)
       http.use_ssl = true
-      # TODO we could turn off certificate validation to avoid the 
+      # we turn off certificate validation to avoid the 
       # "warning: peer certificate won't be verified in this SSL session" warning
-      # not yet sure how best to handle that
+      # not sure if this is the right way to handle it
       # see http://redcorundum.blogspot.com/2008/03/ssl-certificates-and-nethttps.html
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
       path += "?#{encode_params(get_args)}" if get_args
       
       result = http.start { |http|
