@@ -240,7 +240,7 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       components = {}
       fb_cookie.split("&").map {|param| param = param.split("="); components[param[0]] = param[1]}
       
-      auth_components = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
+      auth_string = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
       sig = Digest::MD5.hexdigest(auth_string + app_secret)
       
       sig == components["sig"] && Time.now.to_i < components["expires"].to_i ? components : nil
