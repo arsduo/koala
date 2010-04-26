@@ -1,9 +1,12 @@
 require 'cgi'
 require 'digest/md5'
-require 'rubygems'
-require 'json'
 require 'net/http'
 require 'net/https'
+
+# rubygems is required to support json, how facebook returns data
+require 'rubygems'
+require 'json'
+
 
 module Facebook
 # Copyright 2010 Facebook
@@ -29,6 +32,8 @@ Facebook authentication. Read more about the Graph API at
 http://developers.facebook.com/docs/api. You can download the Facebook
 JavaScript SDK at http://github.com/facebook/connect-js/.
 =end
+
+  FACEBOOK_GRAPH_SERVER = "graph.facebook.com"
 
   class GraphAPI
 =begin  
@@ -64,27 +69,26 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
     
     def initialize(access_token = nil)
       self.access_token = access_token
-      self
     end
     
     def get_object(id, args = {})
-      #Fetchs the given object from the graph.
-      self.request(id, args)
+      # Fetchs the given object from the graph.
+      request(id, args)
     end
     
     def get_objects(ids, args = {})
       # Fetchs all of the given object from the graph.
       # We return a map from ID to object. If any of the IDs are invalid,
       # we raise an exception.
-      self.request("", args.merge("ids" => ids.join(",")))
+      request("", args.merge("ids" => ids.join(",")))
     end
     
     def get_connections(id, connection_name, args = {})
       # Fetchs the connections for given object.
-      self.request(id + "/" + connection_name, args)
+      request("#{id}/#{connection_name}", args)
     end
     
-    def put_object(parent_object, connection_name, get_args = {}, post_args = nil)
+    def put_object(parent_object, connection_name, args = {})
 =begin
         Writes the given object to the graph, connected to the given parent.
 
@@ -109,7 +113,7 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
         
 =end
         raise GraphAPIError.new(nil, "Write operations require an access token") unless self.access_token
-        self.request(parent_object + "/" + connection_name, get_args, post_args)
+        request("#{parent_object}/#{connection_name}", args, true)
     end
     
     def put_wall_post(message, attachment = {}, profile_id = "me")
@@ -129,45 +133,39 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
              "picture": "http://www.example.com/thumbnail.jpg"}
 
 =end
-        self.put_object(profile_id, "feed", {:message => message}, attachment)
+        self.put_object(profile_id, "feed", attachment.merge({:message => message}))
     end
     
     def put_comment(object_id, message)
       # Writes the given comment on the given post.
-      self.put_object(object_id, "comments", nil, {:message => message})
+      self.put_object(object_id, "comments", {:message => message})
     end
     
     def put_like(object_id)
       #Likes the given post.
-      self.put_object(object_id, "likes", nil, {})
+      self.put_object(object_id, "likes")
     end
     
     def delete_object(id)
       # Deletes the object with the given ID from the graph.
-      self.request(id, nil, {"method" => "delete"})
+      request(id, {"method" => "delete"}, true)
     end
     
     def search(search_terms, args = {})
       # Searches for a given term
-      self.request("search", args.merge({:q => search_terms}))
+      request("search", args.merge({:q => search_terms}))
     end
     
-    def request(path, get_args = {}, post_args = nil)
+    def request(path, args = {}, post = false)
 =begin
       Fetches the given path in the Graph API.
 
-      We translate args to a valid query string. If post_args is given,
+      We translate args to a valid query string. If post is specified,
       we send a POST request to the given path with the given arguments.
-=end
-      if self.access_token
-        if post_args
-          post_args["access_token"] = self.access_token
-        else
-          get_args["access_token"] = self.access_token
-        end
-      end
+=end    
+      args["access_token"] = self.access_token if self.access_token
       
-      http = Net::HTTP.new("graph.facebook.com", 443)
+      http = Net::HTTP.new(FACEBOOK_GRAPH_SERVER, 443)
       http.use_ssl = true
       # we turn off certificate validation to avoid the 
       # "warning: peer certificate won't be verified in this SSL session" warning
@@ -175,10 +173,8 @@ JavaScript SDK at http://github.com/facebook/connect-js/.
       # see http://redcorundum.blogspot.com/2008/03/ssl-certificates-and-nethttps.html
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-      path += "?#{encode_params(get_args)}" if get_args
-      
       result = http.start { |http|
-        response, body = (post_args ? http.post(path, encode_params(post_args)) : http.get(path)) 
+        response, body = (post ? http.post(path, encode_params(args)) : http.get("#{path}?#{encode_params(args)}")) 
         body
       }
 
