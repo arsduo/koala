@@ -24,6 +24,3 @@ if $access_token = File.read("access_token") rescue nil
 else
   puts "Access token tests will fail until you store a valid token in the access_token file"
 end
-
-# run the tests
-Test::Unit::UI::Console::TestRunner.run(FacebookTestSuite)

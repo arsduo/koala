@@ -1,7 +1,7 @@
 class FacebookNoAccessTokenTests < Test::Unit::TestCase
   describe "Facebook SDK without an access token" do
     before :each do
-      @graph = Facebook::GraphAPI.new
+      @graph = $service ? Facebook::GraphAPI.new(nil, $service) : Facebook::GraphAPI.new
     end
   
     it "should get public data about a user" do

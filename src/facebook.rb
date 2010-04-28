@@ -1,7 +1,5 @@
 require 'cgi'
 require 'digest/md5'
-require 'net/http'
-require 'net/https'
 
 # rubygems is required to support json, how facebook returns data
 require 'rubygems'
@@ -61,9 +59,13 @@ module Facebook
     
     # initialize with an access token 
     # and a service that provides a make_request(path, args, verb) interface
-    def initialize(access_token = nil, service = NetHTTPService)
+    def initialize(access_token = nil, service_module = NetHTTPService)
       @access_token = access_token
-      @service = service
+      if service_module.method_defined? :make_request 
+        self.class.send(:include, service_module)
+      else
+        raise TypeError, "Service module for Facebook must implement a make_request method!"
+      end
     end
     
     def get_object(id, args = {})
@@ -152,7 +154,7 @@ module Facebook
       args["access_token"] = @access_token if @access_token
         
       # make the request via the provided service
-      result = @service.make_request(path, args, verb)
+      result = make_request(path, args, verb)
       
       # Facebook sometimes sends results like "true" and "false", which aren't strictly object
       # and cause JSON.parse to fail
@@ -168,10 +170,16 @@ module Facebook
     end
   end
 
-  class NetHTTPService
+  module NetHTTPService
     # this service uses Net::HTTP to send requests to the graph
+    def self.included(base)
+      base.class_eval do
+        require 'net/http'
+        require 'net/https'
+      end
+    end
     
-    def self.make_request(path, args, verb)
+    def make_request(path, args, verb)
       # We translate args to a valid query string. If post is specified,
       # we send a POST request to the given path with the given arguments.
 
@@ -193,13 +201,29 @@ module Facebook
     end
 
     protected
-    def self.encode_params(param_hash)
+    def encode_params(param_hash)
       # TODO investigating whether a built-in method handles this
       # if no hash (e.g. no auth token) return empty string
       ((param_hash || {}).collect do |key_and_value| 
         key_and_value[1] = key_and_value[1].to_json if key_and_value[1].class != String
         "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
       end).join("&")
+    end
+  end
+
+  module TyphoeusService
+    # this service uses Typhoeus to send requests to the graph
+    def self.included(base)
+      base.class_eval do
+        require 'typhoeus'
+        include Typhoeus
+      end      
+    end
+
+    def make_request(path, args, verb)
+      # if the verb isn't get or post, send it as a post argument
+      args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
+      self.class.send(verb, "https://#{FACEBOOK_GRAPH_SERVER}/#{path}", :params => args).body
     end
   end
   
