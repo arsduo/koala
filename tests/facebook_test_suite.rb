@@ -2,7 +2,7 @@ require 'test/unit'
 require 'rubygems'
 require 'spec/test/unit'
 
-require '../src/facebook'
+require '../lib/facebook'
 require 'facebook_no_access_token_tests'
 require 'facebook_with_access_token_tests'
 

@@ -174,7 +174,7 @@ module Facebook
     # this service uses Net::HTTP to send requests to the graph
     def self.included(base)
       base.class_eval do
-        require 'net/http'
+        require 'net/http' unless defined?(Net::HTTP)
         require 'net/https'
       end
     end
@@ -215,7 +215,7 @@ module Facebook
     # this service uses Typhoeus to send requests to the graph
     def self.included(base)
       base.class_eval do
-        require 'typhoeus'
+        require 'typhoeus' unless defined?(Typhoeus)
         include Typhoeus
       end      
     end

@@ -9,10 +9,10 @@ about the Graph API at [http://developers.facebook.com/docs/api](http://develope
 
 Basic usage:
 
-    graph = Facebook::GraphAPI(oauth_access_token)
+    graph = Facebook::GraphAPI.new(oauth_access_token)
     profile = graph.get_object("me")
     friends = graph.get_connections("me", "friends")
-    graph.put_object("me", "feed", "I am writing on my wall!")
+    graph.put_object("me", "feed", :message => "I am writing on my wall!")
 
 If you are using the module within a web application with the
 [JavaScript SDK](http://github.com/facebook/connect-js), you can also use the
