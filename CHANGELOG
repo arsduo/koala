@@ -1,3 +1,6 @@
+v0.3.1
+-- Bug fixes.
+
 v0.3
 -- Renamed Graph API class from Facebook::GraphAPI to FacebookGraph::API
 -- Created FacebookGraph::OAuth class for tokens and OAuth URLs
