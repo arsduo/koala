@@ -1,8 +1,9 @@
 class FacebookWithAccessTokenTests < Test::Unit::TestCase
   describe "Facebook SDK with an access token" do
     before :each do
-      raise Exception, "Must supply access token to run FacebookWithAccessTokenTests!" unless $access_token
-      @graph = $service ? Facebook::GraphAPI.new($access_token, $service) : Facebook::GraphAPI.new($access_token)
+      token = $testing_data["oauth_token"]
+      raise Exception, "Must supply access token to run FacebookWithAccessTokenTests!" unless token
+      @graph = FacebookGraph::API.new(token)
     end
     
     after :each do 

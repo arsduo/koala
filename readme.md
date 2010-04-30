@@ -19,11 +19,11 @@ If you are using the module within a web application with the
 module to use Facebook for login, parsing the cookie set by the JavaScript SDK
 for logged in users.
 
-Testing:
+Testing
 -----
 
-Unit tests are provided for Graph API methods.  However, because the Graph API uses access tokens, which expire, you have to provide your own token with stream publishing permissions for the tests.  Insert the token value into the file test/fixtures/access_token, then run the test as follows:
+Unit tests are provided for Graph API methods.  However, because the Graph API uses access tokens, which expire, you have to provide your own token with stream publishing permissions for the tests.  Insert the token value into the file test/facebook_data.yml, then run the test as follows:
     spec facebook_tests.rb
     
-Unit tests for cookie validation will be provided shortly.
+Unit tests for cookie validation will be provided shortly.  (You'll also need to add that information into the yml.)
     

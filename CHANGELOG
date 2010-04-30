@@ -1,0 +1,17 @@
+v0.3
+-- Renamed Graph API class from Facebook::GraphAPI to FacebookGraph::API
+-- Created FacebookGraph::OAuth class for tokens and OAuth URLs
+-- Updated method for including HTTP service (think we've got it this time) 
+-- Updated tests
+-- Added CHANGELOG and gemspec
+
+v0.2
+-- Gemified the project
+-- Split out HTTP services into their own file, and adjusted inclusion method
+
+v0.1
+-- Added modular support for Typhoeus
+-- Added tests
+
+v0.0
+-- Hi from F8!  Basic read/write from the graph is working

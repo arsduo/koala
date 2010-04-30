@@ -1,7 +1,7 @@
 class FacebookNoAccessTokenTests < Test::Unit::TestCase
   describe "Facebook SDK without an access token" do
     before :each do
-      @graph = $service ? Facebook::GraphAPI.new(nil, $service) : Facebook::GraphAPI.new
+      @graph = FacebookGraph::API.new
     end
   
     it "should get public data about a user" do
@@ -26,7 +26,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     it "should not be able to get data about 'me'" do
       begin
         @graph.get_object("me")
-      rescue Facebook::GraphAPIError => @right_err
+      rescue FacebookGraph::GraphAPIError => @right_err
       rescue Exception => wrong_err
       end
       @right_err.should_not be_nil
@@ -40,7 +40,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     it "shouldn't be able to access connections from users" do
       begin
         @graph.get_connections("lukeshepard", "likes")
-      rescue Facebook::GraphAPIError => @right_err
+      rescue FacebookGraph::GraphAPIError => @right_err
       rescue Exception => wrong_err
       end
       @right_err.should_not be_nil
@@ -54,7 +54,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     it "should not be able to put an object" do
       begin
         @result = @graph.put_object("lukeshepard", "feed", :message => "Hello, world")
-      rescue Facebook::GraphAPIError => @right_err
+      rescue FacebookGraph::GraphAPIError => @right_err
       rescue Exception => wrong_err
       end
       @right_err.should_not be_nil
@@ -64,7 +64,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     it "should not be able to post to a feed" do
       begin
         @result = @graph.put_wall_post("Hello, world", {:name => "Context Optional", :link => "http://www.contextoptional.com/"}, "contextoptional")
-      rescue Facebook::GraphAPIError => @right_err
+      rescue FacebookGraph::GraphAPIError => @right_err
       rescue Exception => wrong_err
       end
       @right_err.should_not be_nil
@@ -74,7 +74,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
       begin
         # random public post on the ContextOptional wall
         @result = @graph.put_comment("7204941866_119776748033392", "The hackathon was great!")
-      rescue Facebook::GraphAPIError => @right_err
+      rescue FacebookGraph::GraphAPIError => @right_err
       rescue Exception => wrong_err
       end
       @right_err.should_not be_nil
@@ -83,7 +83,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     it "should not be able to like an object" do
       begin
         @result = @graph.put_like("7204941866_119776748033392")
-      rescue Facebook::GraphAPIError => @right_err
+      rescue FacebookGraph::GraphAPIError => @right_err
       rescue Exception => wrong_err
       end
       @right_err.should_not be_nil
@@ -95,7 +95,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
       begin
         # test post on the Ruby SDK Test application
         @result = @graph.delete_object("115349521819193_113815981982767")
-      rescue Facebook::GraphAPIError => @right_err
+      rescue FacebookGraph::GraphAPIError => @right_err
       rescue Exception => wrong_err
       end
       @right_err.should_not be_nil
