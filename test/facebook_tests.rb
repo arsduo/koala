@@ -2,9 +2,9 @@ require 'test/unit'
 require 'rubygems'
 require 'spec/test/unit'
 
-require '../lib/facebook'
-require 'facebook_no_access_token_tests'
-require 'facebook_with_access_token_tests'
+require 'facebook_graph'
+require 'facebook_graph/facebook_no_access_token_tests'
+require 'facebook_graph/facebook_with_access_token_tests'
 
 class FacebookTestSuite
   def self.suite
@@ -19,7 +19,7 @@ end
 # load the access token if provided
 # I'm seeing a bug with spec and gets where the facebook_test_suite.rb file gets read in when gets is called
 # until that's solved, we'll need to store/update tokens in the access_token file
-if $access_token = File.read("access_token") rescue nil
+if $access_token = File.read("fixtures/access_token") rescue nil
   puts "Got access token #{$access_token.inspect}"
 else
   puts "Access token tests will fail until you store a valid token in the access_token file"
