@@ -1,4 +1,4 @@
-Facebook Graph
+Koala
 ====
 
 This Ruby client library is designed to support the
@@ -9,7 +9,7 @@ about the Graph API at [http://developers.facebook.com/docs/api](http://develope
 
 Basic usage:
 
-    graph = Facebook::GraphAPI.new(oauth_access_token)
+    graph = Koala::GraphAPI.new(oauth_access_token)
     profile = graph.get_object("me")
     friends = graph.get_connections("me", "friends")
     graph.put_object("me", "feed", :message => "I am writing on my wall!")
@@ -25,5 +25,4 @@ Testing
 Unit tests are provided for Graph API methods.  However, because the Graph API uses access tokens, which expire, you have to provide your own token with stream publishing permissions for the tests.  Insert the token value into the file test/facebook_data.yml, then run the test as follows:
     spec facebook_tests.rb
     
-Unit tests for cookie validation will be provided shortly.  (You'll also need to add that information into the yml.)
-    
+Unit tests for cookie validation and other methods in the OAuth class will be provided shortly.  (You'll also need to add that information into the yml.)

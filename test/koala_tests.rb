@@ -2,9 +2,9 @@ require 'test/unit'
 require 'rubygems'
 require 'spec/test/unit'
 
-require '../lib/facebook_graph.rb'
-require 'facebook_graph/facebook_no_access_token_tests'
-require 'facebook_graph/facebook_with_access_token_tests'
+require 'koala'
+require 'koala/facebook_no_access_token_tests'
+require 'koala/facebook_with_access_token_tests'
 
 class FacebookTestSuite
   def self.suite
@@ -24,6 +24,8 @@ $testing_data = YAML.load_file("facebook_data.yml") rescue {}
 unless $testing_data["oauth_token"]
   puts "Access token tests will fail until you store a valid token in facebook_data.yml"
 end
-unless cookies = $testing_data["cookie_hash"]
-  puts "Cookie tests will fail until you store a valid token in facebook_data.yml"
-end
+
+# TODO finish tests for OAuth class
+# unless $testing_data["cookie_hash"] && $testing_data["app_id"] && $testing_data["secret"]
+#   puts "Cookie tests will fail until you store valid data for the cookie hash, app_id, and app secret in facebook_data.yml"
+# end

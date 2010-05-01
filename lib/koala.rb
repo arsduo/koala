@@ -8,7 +8,7 @@ require 'json'
 # include default http services
 require 'http_services'
 
-module FacebookGraph
+module Koala
   # Ruby client library for the Facebook Platform.
   # Copyright 2010 Facebook
   # Adapted from the Python library by Alex Koppel, Rafi Jacoby, and the team at Context Optional
@@ -32,7 +32,7 @@ module FacebookGraph
 
   FACEBOOK_GRAPH_SERVER = "graph.facebook.com"
 
-  class API
+  class GraphAPI
     # A client for the Facebook Graph API.
     # 
     # See http://developers.facebook.com/docs/api for complete documentation
@@ -45,7 +45,7 @@ module FacebookGraph
     # token, this will fetch the profile of the active user and the list
     # of the user's friends:
     # 
-    #    graph = Facebook::GraphAPI.new(access_token)
+    #    graph = Koala::GraphAPI.new(access_token)
     #    user = graph.get_object("me")
     #    friends = graph.get_connections(user["id"], "friends")
     # 
@@ -57,7 +57,7 @@ module FacebookGraph
     # for details.
     # 
     # If you are using the JavaScript SDK, you can use the
-    # Facebook::get_user_from_cookie() method below to get the OAuth access token
+    # Koala::OAuth.get_user_from_cookie() method below to get the OAuth access token
     # for the active user from the cookie saved by the SDK.
             
     # initialize with an access token 
@@ -167,7 +167,7 @@ module FacebookGraph
     end
     
     # set up the http service used to make requests
-    # you can use your own (for HTTParty, etc.) by calling FacebookGraph::API.http_service = YourModule
+    # you can use your own (for HTTParty, etc.) by calling Koala::GraphAPI.http_service = YourModule
     def self.http_service=(service)
       self.send(:include, service)
     end
@@ -175,9 +175,9 @@ module FacebookGraph
     # by default, try requiring Typhoeus -- if that works, use it
     begin
       require 'typhoeus'
-      FacebookGraph::API.http_service = TyphoeusService
+      Koala::GraphAPI.http_service = TyphoeusService
     rescue LoadError
-      FacebookGraph::API.http_service = NetHTTPService
+      Koala::GraphAPI.http_service = NetHTTPService
     end
   end
   
@@ -222,7 +222,7 @@ module FacebookGraph
         auth_string = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
         sig = Digest::MD5.hexdigest(auth_string + @app_secret)
 
-        sig == components["sig"] && Time.now.to_i < components["expires"].to_i ? components : nil
+        sig == components["sig"] && (components["expires"].to_i == 0 || Time.now.to_i < components["expires"].to_i) ? components : nil
       end
     end
     

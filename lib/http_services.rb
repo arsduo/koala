@@ -1,5 +1,5 @@
-module FacebookGraph
-  class API
+module Koala
+  class GraphAPI
     module NetHTTPService
       # this service uses Net::HTTP to send requests to the graph
       def self.included(base)

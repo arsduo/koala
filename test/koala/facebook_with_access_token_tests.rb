@@ -1,9 +1,9 @@
 class FacebookWithAccessTokenTests < Test::Unit::TestCase
-  describe "Facebook SDK with an access token" do
+  describe "Koala GraphAPI with an access token" do
     before :each do
       token = $testing_data["oauth_token"]
       raise Exception, "Must supply access token to run FacebookWithAccessTokenTests!" unless token
-      @graph = FacebookGraph::API.new(token)
+      @graph = Koala::GraphAPI.new(token)
     end
     
     after :each do 

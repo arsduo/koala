@@ -1,3 +1,8 @@
+v0.4.0
+-- Adopted the Koala name
+-- Updated readme and tests
+-- Fixed cookie verification bug for non-expiring OAuth tokens
+
 v0.3.1
 -- Bug fixes.
 
