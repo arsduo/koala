@@ -2,7 +2,6 @@ CHANGELOG
 Manifest
 Rakefile
 init.rb
-koala.gemspec
 lib/http_services.rb
 lib/koala.rb
 readme.md

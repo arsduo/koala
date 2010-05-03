@@ -1,3 +1,9 @@
+v0.4.1
+-- Encapsulated GraphAPI and OAuth classes in the Koala::Facebook module for clarity (and to avoid claiming the global Facebook class)
+-- Moved make_request method to Koala class from GraphAPI instance (for use by future OAuth class functionality)
+-- Renamed request method to api for consistancy with Javascript library
+-- Updated tests and readme
+
 v0.4.0
 -- Adopted the Koala name
 -- Updated readme and tests

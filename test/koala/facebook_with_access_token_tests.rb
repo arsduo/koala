@@ -3,7 +3,7 @@ class FacebookWithAccessTokenTests < Test::Unit::TestCase
     before :each do
       token = $testing_data["oauth_token"]
       raise Exception, "Must supply access token to run FacebookWithAccessTokenTests!" unless token
-      @graph = Koala::GraphAPI.new(token)
+      @graph = Koala::Facebook::GraphAPI.new(token)
     end
     
     after :each do 
@@ -95,11 +95,8 @@ class FacebookWithAccessTokenTests < Test::Unit::TestCase
       result["data"].should be_an(Array)
     end
 
-    # REQUEST
-    # the above tests test this already, but we should do it explicitly
-    it "should be able to send get and put requests" do
-      # to be written
-    end
+    # API
+    # the above tests test this already, but we should consider additional api tests
     
   end # describe
 

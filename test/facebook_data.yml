@@ -1,4 +1,8 @@
+# for testing the GraphAPI classs
+# OAuth token should have stream_publish permissions 
 oauth_token: 
+
+# for testing the OAuth class
 app_id: 
 secret: 
 callback_url: 
