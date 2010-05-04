@@ -1,6 +1,6 @@
 Koala
 ====
-Koala (<a href="http://github.com/arsduo/ruby-sdk" target="_blank">http://github.com/arsduo/ruby-sdk</a>) is a new Facebook Graph library for Ruby.  We wrote Koala with four goals: 
+Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.com/arsduo/koala</a>) is a new Facebook Graph library for Ruby.  We wrote Koala with four goals: 
 
 * Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, just over 300 lines of code.)
 * Fast: Koala should, out of the box, be quick. In addition to supporting the vanilla Ruby networking libraries, it natively supports Typhoeus, our preferred gem for making fast HTTP requests. Of course, That brings us to our next topic:
@@ -20,7 +20,7 @@ to parse the cookies set by the JavaScript SDK for logged in users.
 
 Examples and More Details 
 -----
-There's a very detailed description and walkthrough of Koala at http://blog.twoalex.com/2010/05/03/introducing-koala-a-new-gem-for-facebooks-new-graph-api/.
+There's a very detailed description and walkthrough of Koala at <a href="http://blog.twoalex.com/2010/05/03/introducing-koala-a-new-gem-for-facebooks-new-graph-api/">http://blog.twoalex.com/2010/05/03/introducing-koala-a-new-gem-for-facebooks-new-graph-api/</a>.
 
 
 Testing
