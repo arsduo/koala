@@ -28,17 +28,11 @@ You can easily generate OAuth access tokens and any other data needed to play wi
 Testing
 -----
 
-Unit tests are provided for Graph API methods.  However, because the Graph API uses access tokens, which expire, you have to provide your own token with stream publishing permissions for the tests.  Insert the token value into the file test/facebook_data.yml, then run the test as follows:
+Unit tests are provided for all of Koala's methods; however, because the OAuth access tokens and cookies expire, you have to provide some of your own data: a valid OAuth access token with publish_stream and read_stream permissions and an OAuth code that can be used to generate an access token.  (The file also provides valid values for other tests, which you're welcome to sub out for data specific to your own application.)
+
+Insert the required values into the file test/facebook_data.yml, then run the test as follows:
     spec koala_tests.rb
     
-Unit tests for cookie validation and other methods in the OAuth class will be provided shortly.  (You'll also need to add that information into the yml.)
-
-
-Coming Soon
------
-1. OAuth class methods to parse the results of the access token call
-2. OAuth class method to directly fetch the access token when given a code value
-
 
 Known Issues
 -----
