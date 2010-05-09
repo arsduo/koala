@@ -1,3 +1,10 @@
+v0.5.0
+-- Added several new OAuth methods for making and parsing access token requests
+-- Added test suite for the OAuth class
+-- Made second argument to url_for_access_token a hash (strings still work but trigger a deprecation warning)
+-- Added fields to facebook_data.yml
+-- Updated readme
+
 v0.4.1
 -- Encapsulated GraphAPI and OAuth classes in the Koala::Facebook module for clarity (and to avoid claiming the global Facebook class)
 -- Moved make_request method to Koala class from GraphAPI instance (for use by future OAuth class functionality)

@@ -1,2 +1,2 @@
 # init.rb
-require 'facebook_graph'
+require 'koala'

@@ -7,5 +7,6 @@ lib/koala.rb
 readme.md
 test/facebook_data.yml
 test/koala/facebook_no_access_token_tests.rb
+test/koala/facebook_oauth_tests.rb
 test/koala/facebook_with_access_token_tests.rb
 test/koala_tests.rb
