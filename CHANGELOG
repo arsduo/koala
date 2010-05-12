@@ -1,3 +1,6 @@
+v0.5.1
+-- Documentation is now on the wiki, updated readme accordingly.
+
 v0.5.0
 -- Added several new OAuth methods for making and parsing access token requests
 -- Added test suite for the OAuth class

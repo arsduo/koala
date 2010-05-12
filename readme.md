@@ -20,7 +20,7 @@ to parse the cookies set by the JavaScript SDK for logged in users.
 
 Examples and More Details 
 -----
-There's a very detailed description and walkthrough of Koala at <a href="http://blog.twoalex.com/2010/05/03/introducing-koala-a-new-gem-for-facebooks-new-graph-api/">http://blog.twoalex.com/2010/05/03/introducing-koala-a-new-gem-for-facebooks-new-graph-api/</a>.
+Complete Koala documentation can now be found <a href="http://wiki.github.com/arsduo/koala/">on the wiki</a>!
 
 You can easily generate OAuth access tokens and any other data needed to play with the Graph API or OAuth at the Koala-powered <a href="http://oauth.twoalex.com" target="_blank">OAuth Playground</a>.
 
@@ -33,6 +33,10 @@ Unit tests are provided for all of Koala's methods; however, because the OAuth a
 Insert the required values into the file test/facebook_data.yml, then run the test as follows:
     spec koala_tests.rb
     
+
+Coming Soon
+-----
+* Support for real-time updates
 
 Known Issues
 -----
