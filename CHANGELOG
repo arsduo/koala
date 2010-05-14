@@ -1,3 +1,8 @@
+v0.6.0
+-- Added support for the old REST API thanks to cbaclig's great work
+-- Updated tests to conform to RSpec standards
+-- Updated changelog, readme, etc.
+
 v0.5.1
 -- Documentation is now on the wiki, updated readme accordingly.
 

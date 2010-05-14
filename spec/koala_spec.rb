@@ -9,6 +9,8 @@ require 'koala'
 require 'koala/facebook_no_access_token_tests'
 require 'koala/facebook_with_access_token_tests'
 require 'koala/facebook_oauth_tests'
+require 'koala/facebook_rest_api_with_access_token_test'
+require 'koala/facebook_rest_api_no_access_token_test'
 
 class FacebookTestSuite
   def self.suite
@@ -16,6 +18,8 @@ class FacebookTestSuite
     suite << FacebookNoAccessTokenTests.suite
     suite << FacebookWithAccessTokenTests.suite
     suite << FacebookOAuthTests.suite
+    suite << FacebookRestAPIWithAccessTokenTests.suite
+    suite << FacebookRestAPINoAccessTokenTest.suite
     suite
   end
 end
@@ -29,7 +33,6 @@ unless $testing_data["oauth_token"]
   puts "Access token tests will fail until you store a valid token in facebook_data.yml"
 end
 
-# TODO finish tests for OAuth class
-# unless $testing_data["cookie_hash"] && $testing_data["app_id"] && $testing_data["secret"]
-#   puts "Cookie tests will fail until you store valid data for the cookie hash, app_id, and app secret in facebook_data.yml"
-# end
+unless $testing_data["oauth_test_data"] && $testing_data["oauth_test_data"]["code"] && $testing_data["oauth_test_data"]["secret"]
+  puts "Cookie tests will fail until you store valid data for the cookie hash, app_id, and app secret in facebook_data.yml"
+end

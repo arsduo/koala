@@ -18,6 +18,16 @@ If you're using Koala within a web application with the Facebook
 [JavaScript SDK](http://github.com/facebook/connect-js), you can use the Koala::Facebook::OAuth class 
 to parse the cookies set by the JavaScript SDK for logged in users.
 
+FQL and the old-school REST API
+-----
+Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls -- including fql.query -- that can't yet be done via the Graph.  
+
+Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the GraphAndRestAPI class:
+
+	api = Koala::Facebook::GraphAndRestAPI.new(oauth_access_token)
+
+The GraphAndRestAPI class provides access to all the Graph API methods, as well as an fql method that you can use to make FQL calls.  (You can pass the :rest\_api => true option to the api method to make REST API calls; check out lib/rest\_api.rb to see how it's done.)  We reserve the right to expand the built-in REST API coverage to additional methods in the future, depending on how fast Facebook moves to fill in the gaps.  
+
 Examples and More Details 
 -----
 Complete Koala documentation can now be found <a href="http://wiki.github.com/arsduo/koala/">on the wiki</a>!

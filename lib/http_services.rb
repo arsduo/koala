@@ -6,14 +6,15 @@ module Koala
         require 'net/http' unless defined?(Net::HTTP)
         require 'net/https'
 
-        def self.make_request(path, args, verb)
+        def self.make_request(path, args, verb, options = {})
           # We translate args to a valid query string. If post is specified,
           # we send a POST request to the given path with the given arguments.
 
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
-          http = Net::HTTP.new(Facebook::GRAPH_SERVER, 443)
+          server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
+          http = Net::HTTP.new(server, 443)
           http.use_ssl = true
           # we turn off certificate validation to avoid the 
           # "warning: peer certificate won't be verified in this SSL session" warning
@@ -47,12 +48,13 @@ module Koala
         require 'typhoeus' unless defined?(Typhoeus)
         include Typhoeus
 
-        def self.make_request(path, args, verb)
+        def self.make_request(path, args, verb, options = {})
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
-          self.send(verb, "https://#{Facebook::GRAPH_SERVER}/#{path}", :params => args).body
+          server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
+          self.send(verb, "https://#{server}/#{path}", :params => args).body
         end
-      end      
+      end # class_eval
     end
   end
 end

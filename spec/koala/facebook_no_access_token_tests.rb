@@ -25,12 +25,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     end
   
     it "should not be able to get data about 'me'" do
-      begin
-        @graph.get_object("me")
-      rescue Koala::Facebook::GraphAPIError => @right_err
-      rescue Exception => wrong_err
-      end
-      @right_err.should_not be_nil
+      lambda { @graph.get_object("me") }.should raise_error(Koala::Facebook::APIError)
     end
   
     it "should be able to get multiple objects" do
@@ -39,12 +34,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     end
   
     it "shouldn't be able to access connections from users" do
-      begin
-        @graph.get_connections("lukeshepard", "likes")
-      rescue Koala::Facebook::GraphAPIError => @right_err
-      rescue Exception => wrong_err
-      end
-      @right_err.should_not be_nil
+      lambda { @graph.get_connections("lukeshepard", "likes") }.should raise_error(Koala::Facebook::APIError)
     end
 
     it "should be able to access connections from public Pages" do
@@ -53,53 +43,34 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     end
   
     it "should not be able to put an object" do
-      begin
-        @result = @graph.put_object("lukeshepard", "feed", :message => "Hello, world")
-      rescue Koala::Facebook::GraphAPIError => @right_err
-      rescue Exception => wrong_err
-      end
-      @right_err.should_not be_nil
+      lambda { @result = @graph.put_object("lukeshepard", "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
+      puts "Error!  Object #{@result.inspect} somehow put onto Luke Shepard's wall!" if @result
     end
 
     # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
     it "should not be able to post to a feed" do
-      begin
-        @result = @graph.put_wall_post("Hello, world", {:name => "Context Optional", :link => "http://www.contextoptional.com/"}, "contextoptional")
-      rescue Koala::Facebook::GraphAPIError => @right_err
-      rescue Exception => wrong_err
-      end
-      @right_err.should_not be_nil
+      (lambda do
+        attachment = {:name => "Context Optional", :link => "http://www.contextoptional.com/"}
+        @result = @graph.put_wall_post("Hello, world", attachment, "contextoptional") 
+      end).should raise_error(Koala::Facebook::APIError)
+      puts "Error!  Object #{@result.inspect} somehow put onto Context Optional's wall!" if @result
     end
 
     it "should not be able to comment on an object" do
-      begin
-        # random public post on the ContextOptional wall
-        @result = @graph.put_comment("7204941866_119776748033392", "The hackathon was great!")
-      rescue Koala::Facebook::GraphAPIError => @right_err
-      rescue Exception => wrong_err
-      end
-      @right_err.should_not be_nil
+      # random public post on the ContextOptional wall
+      lambda { @result = @graph.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::APIError)
+      puts "Error!  Object #{@result.inspect} somehow commented on post 7204941866_119776748033392!" if @result    
     end
 
     it "should not be able to like an object" do
-      begin
-        @result = @graph.put_like("7204941866_119776748033392")
-      rescue Koala::Facebook::GraphAPIError => @right_err
-      rescue Exception => wrong_err
-      end
-      @right_err.should_not be_nil
+      lambda { @graph.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
     end
 
 
     # DELETE
     it "should not be able to delete posts" do 
-      begin
-        # test post on the Ruby SDK Test application
-        @result = @graph.delete_object("115349521819193_113815981982767")
-      rescue Koala::Facebook::GraphAPIError => @right_err
-      rescue Exception => wrong_err
-      end
-      @right_err.should_not be_nil
+      # test post on the Ruby SDK Test application
+      lambda { @result = @graph.delete_object("115349521819193_113815981982767") }.should raise_error(Koala::Facebook::APIError)
     end
 
     # SEARCH

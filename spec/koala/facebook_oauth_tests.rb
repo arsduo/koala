@@ -192,7 +192,7 @@ class FacebookOAuthTests < Test::Unit::TestCase
     it "should raise an error when get_access_token is called with a bad code" do
       begin
         result = @oauth.get_access_token("foo")
-      rescue Koala::Facebook::GraphAPIError => @right_err
+      rescue Koala::Facebook::APIError => @right_err
       rescue
       end
       @right_err.should

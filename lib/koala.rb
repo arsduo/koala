@@ -8,6 +8,8 @@ require 'json'
 # include default http services
 require 'http_services'
 
+# REST API included at the bottom
+
 module Koala
     
   module Facebook
@@ -106,7 +108,7 @@ module Koala
         # http://developers.facebook.com/docs/authentication/ for details about
         # extended permissions.
 
-        raise GraphAPIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
+        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
         api("#{parent_object}/#{connection_name}", args, "post")
       end
     
@@ -148,12 +150,12 @@ module Koala
         api("search", args.merge({:q => search_terms}))
       end
     
-      def api(path, args = {}, verb = "get")
+      def api(path, args = {}, verb = "get", options = {})
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token if @access_token
         
         # make the request via the provided service
-        result = Koala.make_request(path, args, verb)
+        result = Koala.make_request(path, args, verb, options)
       
         # Facebook sometimes sends results like "true" and "false", which aren't strictly object
         # and cause JSON.parse to fail
@@ -162,14 +164,14 @@ module Koala
 
         # check for errors
         if response.is_a?(Hash) && error_details = response["error"]
-          raise GraphAPIError.new(error_details)
+          raise APIError.new(error_details)
         end
       
         response
       end
     end
   
-    class GraphAPIError < Exception
+    class APIError < Exception
       attr_accessor :fb_error_type
       def initialize(details = {})
         self.fb_error_type = details["type"]  
@@ -281,3 +283,6 @@ module Koala
     Koala.http_service = NetHTTPService
   end
 end
+
+# add the REST API class
+require 'rest_api'

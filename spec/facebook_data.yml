@@ -2,14 +2,14 @@
 # Those values will work with the default settings in this yaml.
 # Of course, you can change this to work with your own app.
 # Just remember to update all fields!
-
+ 
 # You must supply this value yourself to test the GraphAPI class.
 # Your OAuth token should have publish_stream and read_stream permissions.
 oauth_token: 
 
 # for testing the OAuth class    
 # baseline app
-oauth_test_data:
+oauth_test_data: 
   # You must supply this value yourself, since they will expire.
   code: 
     

@@ -4,9 +4,12 @@ Rakefile
 init.rb
 lib/http_services.rb
 lib/koala.rb
+lib/rest_api.rb
 readme.md
-test/facebook_data.yml
-test/koala/facebook_no_access_token_tests.rb
-test/koala/facebook_oauth_tests.rb
-test/koala/facebook_with_access_token_tests.rb
-test/koala_tests.rb
+spec/facebook_data.yml
+spec/koala/facebook_no_access_token_tests.rb
+spec/koala/facebook_oauth_tests.rb
+spec/koala/facebook_rest_api_no_access_token_test.rb
+spec/koala/facebook_rest_api_with_access_token_test.rb
+spec/koala/facebook_with_access_token_tests.rb
+spec/koala_spec.rb
