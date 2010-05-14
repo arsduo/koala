@@ -5,13 +5,13 @@
  
 # You must supply this value yourself to test the GraphAPI class.
 # Your OAuth token should have publish_stream and read_stream permissions.
-oauth_token: 
+oauth_token: 119908831367602|2._DZXyXbImto8MgGutB6I_w__.3600.1273856400-2905623|KUC3-sltq2vnICUb9z5Ff_kauCc.
 
 # for testing the OAuth class    
 # baseline app
 oauth_test_data: 
   # You must supply this value yourself, since they will expire.
-  code: 
+  code: 2._DZXyXbImto8MgGutB6I_w__.3600.1273856400-2905623|HDZ88moLxLGZC5CaojucWomW15k.
     
   # These values will work out of the box
   app_id: 119908831367602

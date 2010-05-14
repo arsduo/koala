@@ -2,7 +2,7 @@ module Koala
   module Facebook
     REST_SERVER = "api.facebook.com"
     
-    class GraphAndRestAPI < GraphAPI
+    module RestAPIMethods
       def fql_query(fql)
         args = {
           "query" => fql,

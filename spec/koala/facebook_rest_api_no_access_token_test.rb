@@ -1,8 +1,8 @@
 class FacebookRestAPINoAccessTokenTest < Test::Unit::TestCase
   
-  describe "Koala GraphAndRestAPI without an access token" do
+  describe "Koala RestAPI without an access token" do
     before :each do
-      @graph = Koala::Facebook::GraphAndRestAPI.new
+      @graph = Koala::Facebook::RestAPI.new
     end
   
     # FQL

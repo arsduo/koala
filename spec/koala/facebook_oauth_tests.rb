@@ -190,8 +190,10 @@ class FacebookOAuthTests < Test::Unit::TestCase
     end
 
     it "should raise an error when get_access_token is called with a bad code" do
+      puts "this should be failing, since the method references GraphAPIError, not APIError -- why isn't it?" 
       begin
         result = @oauth.get_access_token("foo")
+        puts "Result: #{result}"
       rescue Koala::Facebook::APIError => @right_err
       rescue
       end
