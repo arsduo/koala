@@ -2,6 +2,7 @@ CHANGELOG
 Manifest
 Rakefile
 init.rb
+lib/graph_api.rb
 lib/http_services.rb
 lib/koala.rb
 lib/rest_api.rb
