@@ -165,7 +165,7 @@ module Koala
         result = fetch_token_string(code)
         
         # if we have an error, parse the error JSON and raise an error
-        raise GraphAPIError.new((JSON.parse(result)["error"] rescue nil) || {}) if result =~ /error/
+        raise APIError.new((JSON.parse(result)["error"] rescue nil) || {}) if result =~ /error/
         # otherwise, parse the access token
         parse_access_token(result)
       end

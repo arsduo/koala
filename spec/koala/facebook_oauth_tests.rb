@@ -123,13 +123,7 @@ class FacebookOAuthTests < Test::Unit::TestCase
 
     it "should raise an exception if no callback is given in initialization or the call" do 
       oauth2 = Koala::Facebook::OAuth.new(@app_id, @secret)
-      begin
-        url = oauth2.url_for_oauth_code
-      rescue ArgumentError => @right_err
-      rescue
-      end
-      
-      @right_err.should
+      lambda { oauth2.url_for_oauth_code }.should raise_error(ArgumentError)
     end
 
     # url_for_access_token
@@ -190,14 +184,7 @@ class FacebookOAuthTests < Test::Unit::TestCase
     end
 
     it "should raise an error when get_access_token is called with a bad code" do
-      puts "this should be failing, since the method references GraphAPIError, not APIError -- why isn't it?" 
-      begin
-        result = @oauth.get_access_token("foo")
-        puts "Result: #{result}"
-      rescue Koala::Facebook::APIError => @right_err
-      rescue
-      end
-      @right_err.should
+      lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
     end
   end # describe
 
