@@ -12,7 +12,7 @@ require 'mock_http_service'
 # Therefore, to be certain all specs pass with the current 
 # Facebook services, run koala_spec_without_mocks.rb.
 
-Koala.http_service = Koala::MockHTTPService 
 
+Koala.http_service = Koala::MockHTTPService
 
-$testing_data = {'oauth_token' => Koala::MockHTTPService::ACCESS_TOKEN}
+$testing_data = Koala::MockHTTPService::TEST_DATA
