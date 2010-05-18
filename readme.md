@@ -47,7 +47,3 @@ Insert the required values into the file test/facebook_data.yml, then run the te
 Coming Soon
 -----
 * Support for real-time updates
-
-Known Issues
------
-1. gem install koala produces "Could not find main page readme.md" message
