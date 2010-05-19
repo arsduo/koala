@@ -6,8 +6,12 @@ require 'spec/test/unit'
 require 'koala'
 
 # load the tests
-require 'koala/facebook_no_access_token_tests'
-require 'koala/facebook_with_access_token_tests'
-require 'koala/facebook_oauth_tests'
-require 'koala/facebook_rest_api_with_access_token_test'
-require 'koala/facebook_rest_api_no_access_token_test'
+require 'koala/api_base_tests'
+
+require 'koala/graph_api/graph_api_no_access_token_tests'
+require 'koala/graph_api/graph_api_with_access_token_tests'
+
+require 'koala/rest_api/rest_api_no_access_token_tests'
+require 'koala/rest_api/rest_api_with_access_token_tests'
+
+require 'koala/oauth/oauth_tests'
