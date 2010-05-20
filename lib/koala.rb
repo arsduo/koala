@@ -14,6 +14,8 @@ require 'graph_api'
 # add REST API methods
 require 'rest_api'
 
+require 'realtime_updates'
+
 module Koala
     
   module Facebook
@@ -73,6 +75,10 @@ module Koala
       include RestAPIMethods
     end
     
+    class RealtimeUpdates < API
+      include RealtimeUpdateMethods
+    end
+    
     class APIError < Exception
       attr_accessor :fb_error_type
       def initialize(details = {})
@@ -83,7 +89,7 @@ module Koala
     
     
     class OAuth
-      attr_accessor :app_id, :app_secret, :oauth_callback_url
+      attr_reader :app_id, :app_secret, :oauth_callback_url
       def initialize(app_id, app_secret, oauth_callback_url = nil)
         @app_id = app_id
         @app_secret = app_secret
@@ -144,6 +150,30 @@ module Koala
         "https://#{GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&redirect_uri=#{callback}&client_secret=#{@app_secret}&code=#{code}"
       end
       
+      def get_access_token(code)
+        # convenience method to get a parsed token from Facebook for a given code
+        # should this require an OAuth callback URL?
+        get_token_from_server(:code => code, :redirect_uri => @oauth_callback_url)
+      end
+      
+      def get_app_access_token
+        # convenience method to get a the application's sessionless access token 
+        get_token_from_server({:type => 'client_cred'}, true)
+      end
+      
+      protected
+      
+      def get_token_from_server(args, post = true)
+        # fetch the result from Facebook's servers
+        result = fetch_token_string(args, post)
+        
+        # if we have an error, parse the error JSON and raise an error
+        raise APIError.new((JSON.parse(result)["error"] rescue nil) || {}) if result =~ /error/
+
+        # otherwise, parse the access token
+        parse_access_token(result)       
+      end
+      
       def parse_access_token(response_text)
         components = response_text.split("&").inject({}) do |hash, bit|
           key, value = bit.split("=")
@@ -152,22 +182,11 @@ module Koala
         components 
       end
 
-      def fetch_token_string(code)
+      def fetch_token_string(args, post = false)
         Koala.make_request("oauth/access_token", {
           :client_id => @app_id, 
-          :redirect_uri => @oauth_callback_url, 
-          :client_secret => @app_secret, 
-          :code => code
-        }, "get")
-      end
-      
-      def get_access_token(code)
-        result = fetch_token_string(code)
-        
-        # if we have an error, parse the error JSON and raise an error
-        raise APIError.new((JSON.parse(result)["error"] rescue nil) || {}) if result =~ /error/
-        # otherwise, parse the access token
-        parse_access_token(result)
+          :client_secret => @app_secret
+        }.merge!(args), post ? "post" : "get")
       end
     end
   end

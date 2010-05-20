@@ -28,3 +28,9 @@ oauth_test_data:
   offline_access_cookies: 
     # note: I've revoked the offline access for security reasons, so you can't make calls against this :)
     fbs_119908831367602: '"access_token=119908831367602|08170230801eb225068e7a70-2905623|Q3LDCYYF8CX9cstxnZLsxiR0nwg.&expires=0&secret=78abaee300b392e275072a9f2727d436&session_key=08170230801eb225068e7a70-2905623&sig=423b8aa4b6fa1f9a571955f8e929d567&uid=2905623"'
+    
+subscription_data:
+  challenge: 
+    "hub.challenge": "1290024882"
+    "hub.verify_token": "myverifyhusband"
+    "hub.mode": "subscribe"

@@ -156,6 +156,26 @@ class FacebookOAuthTests < Test::Unit::TestCase
       url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&redirect_uri=#{callback}&client_secret=#{@secret}&code=#{@code}"
       out.should_not be_nil
     end
+
+    # START CODE THAT NEEDS MOCKING
+
+    # get_access_token
+    it "should properly get and parse an access token token results" do
+      result = @oauth.get_access_token(@code)
+      result["access_token"].should
+    end
+
+    it "should raise an error when get_access_token is called with a bad code" do
+      lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
+    end
+    
+    it "should properly get and parse an app's access token token results" do
+      result = @oauth.get_app_access_token
+      result["access_token"].should
+    end
+    
+    # protected methods
+    # since these are pretty fundamental and pretty testable, we want to test them
     
     # parse_access_token
     it "should properly parse access token results" do
@@ -169,23 +189,21 @@ class FacebookOAuthTests < Test::Unit::TestCase
       has_both_parts = result["access_token"] && !result["expires"]
       has_both_parts.should
     end
-
+    
     # fetch_token_string
-    # note -- we just test that this looks right, since get_access_token tests the parsing too
+    # somewhat duplicative with the tests for get_access_token and get_app_access_token
+    # but no harm in thoroughness
     it "should fetch a proper token string from Facebook when given a code" do
-      result = @oauth.fetch_token_string(@code)
+      result = @oauth.fetch_token_string(:code => @code)
+      result.should =~ /^access_token/
+    end
+
+    it "should fetch a proper token string from Facebook when asked for the app token" do
+      result = @oauth.fetch_token_string(:type => 'client_cred'}, true)
       result.should =~ /^access_token/
     end
     
-    # get_access_token
-    it "should properly get and parse an access token token results" do
-      result = @oauth.get_access_token(@code)
-      result["access_token"].should
-    end
-
-    it "should raise an error when get_access_token is called with a bad code" do
-      lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
-    end
+    # END CODE THAT NEEDS MOCKING
   end # describe
 
 end #class

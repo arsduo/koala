@@ -2,9 +2,11 @@ CHANGELOG
 Manifest
 Rakefile
 init.rb
+koala.gemspec
 lib/graph_api.rb
 lib/http_services.rb
 lib/koala.rb
+lib/realtime_updates.rb
 lib/rest_api.rb
 readme.md
 spec/facebook_data.yml
