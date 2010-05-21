@@ -10,7 +10,7 @@ class ApiBaseTests < Test::Unit::TestCase
         hash_not_including('access_token' => 1),
         anything,
         anything
-      )
+      ).and_return(Koala::Response.new(200, "", ""))
       
       @service.api('anything')
     end
@@ -24,16 +24,16 @@ class ApiBaseTests < Test::Unit::TestCase
         hash_including('access_token' => token),
         anything,
         anything
-      )
+      ).and_return(Koala::Response.new(200, "", ""))
       
       service.api('anything')
     end
     
     it "should handle rogue true/false as responses" do
-      Koala.should_receive(:make_request).and_return('true')
+      Koala.should_receive(:make_request).and_return(Koala::Response.new(200, 'true', {}))
       @service.api('anything').should be_true
       
-      Koala.should_receive(:make_request).and_return('false')
+      Koala.should_receive(:make_request).and_return(Koala::Response.new(200, 'false', {}))
       @service.api('anything').should be_false
     end
   end

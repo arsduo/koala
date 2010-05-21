@@ -43,7 +43,7 @@ class FacebookRestAPINoAccessTokenTest < Test::Unit::TestCase
         hash_including("query" => query), 
         "get",
         hash_including(:rest_api => true)
-      )
+      ).and_return(Koala::Response.new(200, "2", {}))
       
       @graph.fql_query(query)
     end

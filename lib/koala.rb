@@ -52,13 +52,16 @@ module Koala
         
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
-      
-        # Facebook sometimes sends results like "true" and "false", which aren't strictly object
-        # and cause JSON.parse to fail
-        # so we account for that
-        response = JSON.parse("[#{result}]")[0]
-
-        response
+        
+        # now return the desired information
+        if options[:http_component]
+          result.send(options[:http_component])
+        else
+          # Facebook sometimes sends results like "true" and "false", which aren't strictly object
+          # and cause JSON.parse to fail
+          # so we account for that
+          response = JSON.parse("[#{result.body}]")[0]
+        end
       end
     end
     
@@ -186,7 +189,7 @@ module Koala
         Koala.make_request("oauth/access_token", {
           :client_id => @app_id, 
           :client_secret => @app_secret
-        }.merge!(args), post ? "post" : "get")
+        }.merge!(args), post ? "post" : "get").body
       end
     end
   end

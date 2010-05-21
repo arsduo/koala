@@ -1,4 +1,13 @@
 module Koala
+  class Response
+    attr_reader :status, :body, :headers
+    def initialize(status, body, headers)
+      @status = status
+      @body = body
+      @headers = headers
+    end
+  end
+
   module NetHTTPService
     # this service uses Net::HTTP to send requests to the graph
     def self.included(base)
@@ -24,7 +33,7 @@ module Koala
 
           result = http.start { |http|
             response, body = (verb == "post" ? http.post(path, encode_params(args)) : http.get("#{path}?#{encode_params(args)}")) 
-            body
+            Koala::Response.new(response.code.to_i, body, response.to_hash)
           }
         end
 
@@ -52,7 +61,8 @@ module Koala
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
           server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
-          self.send(verb, "https://#{server}/#{path}", :params => args).body
+          response = self.send(verb, "https://#{server}/#{path}", :params => args)
+          Koala::Response.new(response.code, response.body, response.headers_hash)
         end
       end # class_eval
     end
