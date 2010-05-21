@@ -90,7 +90,7 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
         anything,
         anything,
         hash_not_including(:rest_api => true)
-      )
+      ).and_return(Koala::Response.new(200, "", {}))
       
       @graph.api("anything")
     end
