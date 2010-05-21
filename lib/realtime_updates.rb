@@ -4,18 +4,26 @@ module Koala
   module Facebook
     module RealtimeUpdateMethods
       # note: to subscribe to real-time updates, you must have an application access token
+      
+      def self.included(base)
+        # make the attributes readable
+        base.class_eval do
+          attr_reader :app_id, :app_access_token, :secret
+        end
+      end
+      
       def initialize(options = {})
         @app_id = options[:app_id]
-        @access_token = options[:access_token]
+        @app_access_token = options[:app_access_token]
         @secret = options[:secret]
-        unless @app_id && (@access_token || @secret) # make sure we have what we need
+        unless @app_id && (@app_access_token || @secret) # make sure we have what we need
           raise ArgumentError, "Initialize must receive a hash with :app_id and either :access_token or :secret! (received #{options.inspect})"
         end
         
         # fetch the access token if we're provided a secret
-        if @secret && !@access_token
+        if @secret && !@app_access_token
           oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
-          @access_token = oauth.get_app_access_token["access_token"]
+          @app_access_token = oauth.get_app_access_token["access_token"]
         end
       end
       
