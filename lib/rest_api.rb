@@ -4,12 +4,11 @@ module Koala
     
     module RestAPIMethods
       def fql_query(fql)
-        args = {
-          "query" => fql,
-          "format" => "json",
-        }
-
-        api('method/fql.query', args, 'get', :rest_api => true)
+        rest_call('fql.query', 'query' => fql)
+      end
+      
+      def rest_call(method, args = {})
+        api("method/#{method}", args.merge('format' => 'json'), 'get', :rest_api => true)
       end
       
       def api(*args)
