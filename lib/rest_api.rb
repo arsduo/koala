@@ -8,11 +8,7 @@ module Koala
       end
       
       def rest_call(method, args = {})
-        api("method/#{method}", args.merge('format' => 'json'), 'get', :rest_api => true)
-      end
-      
-      def api(*args)
-        response = super
+        response = api("method/#{method}", args.merge('format' => 'json'), 'get', :rest_api => true)
         
         # check for REST API-specific errors
         if response.is_a?(Hash) && response["error_code"]
