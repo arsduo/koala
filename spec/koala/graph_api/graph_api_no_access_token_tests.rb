@@ -80,7 +80,16 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
     end
 
     # API
-    # the above tests test this already, but we should consider additional api tests
+    it "should never use the rest api server" do
+      Koala.should_receive(:make_request).with(
+        anything,
+        anything,
+        anything,
+        hash_not_including(:rest_api => true)
+      )
+      
+      @graph.api("anything")
+    end
     
   end # describe
 

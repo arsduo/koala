@@ -22,28 +22,24 @@ FQL and the old-school REST API
 -----
 Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls -- including fql.query -- that can't yet be done via the Graph.  
 
-Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the GraphAndRestAPI class:
+Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the RestAPI class:
 
-	api = Koala::Facebook::GraphAndRestAPI.new(oauth_access_token)
+	api = Koala::Facebook::RestAPI.new(oauth_access_token)
 
-The GraphAndRestAPI class provides access to all the Graph API methods, as well as an fql method that you can use to make FQL calls.  (You can pass the :rest\_api => true option to the api method to make REST API calls; check out lib/rest\_api.rb to see how it's done.)  We reserve the right to expand the built-in REST API coverage to additional methods in the future, depending on how fast Facebook moves to fill in the gaps.  
+The RestAPI class provides an fql\_query method that you can use to make FQL calls, as well as a generic REST API accessor.  We reserve the right to expand the built-in REST API coverage to additional methods in the future, depending on how fast Facebook moves to fill in the gaps.  (If you want the power of both APIs in the palm of your hand, try out the GraphAndRestAPI class.)
 
-Examples and More Details 
+See examples, ask questions
 -----
-Complete Koala documentation can now be found <a href="http://wiki.github.com/arsduo/koala/">on the wiki</a>!
+Some resources to help you as you play with Koala and the Graph API:
 
-You can easily generate OAuth access tokens and any other data needed to play with the Graph API or OAuth at the Koala-powered <a href="http://oauth.twoalex.com" target="_blank">OAuth Playground</a>.
-
+* Complete Koala documentation <a href="http://wiki.github.com/arsduo/koala/">on the wiki</a>
+* The <a href="http://groups.google.com/group/koala-users">Koala users group</a> on Google Groups, the place for your Koala and API questions
+* The Koala-powered <a href="http://oauth.twoalex.com" target="_blank">OAuth Playground</a>, where you can easily generate OAuth access tokens and any other data needed to test out the APIs or OAuth
 
 Testing
 -----
 
-Unit tests are provided for all of Koala's methods; however, because the OAuth access tokens and cookies expire, you have to provide some of your own data: a valid OAuth access token with publish_stream and read_stream permissions and an OAuth code that can be used to generate an access token.  (The file also provides valid values for other tests, which you're welcome to sub out for data specific to your own application.)
+Unit tests are provided for all of Koala's methods; however, because the OAuth access tokens and cookies expire, you have to provide some of your own data: a valid OAuth access token with publish\_stream and read\_stream permissions and an OAuth code that can be used to generate an access token.  (The file also provides valid values for other tests, which you're welcome to sub out for data specific to your own application.)
 
 Insert the required values into the file test/facebook_data.yml, then run the test as follows:
     spec koala_tests.rb
-    
-
-Coming Soon
------
-* Support for real-time updates

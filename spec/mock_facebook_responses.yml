@@ -1,0 +1,160 @@
+# Responses by MockHTTPService are taken directly from 
+# this file.
+# 
+# Structure
+# ----------
+#
+# path:
+#   arguments:    # sorted by key
+#     method:     # HTTP method (GET, POST, DELETE, etc.)
+#       with_token:
+#       no_token:
+
+# ====== REST API ===== 
+rest_api:
+
+# -- Stubbed Responses --
+  method/fql.query:
+    query=select first_name from user where uid = 216743:
+      get: 
+        no_token: '[{"first_name":"Chris"}]'
+        with_token: '[{"first_name":"Chris"}]'
+    query=select read_stream from permissions where uid = 216743:
+      get:
+        with_token: '[{"read_stream":1}]' 
+        no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 216743"}]}'
+
+
+# ====== GRAPH API =====
+graph_api:
+
+# -- Common Responses --
+
+  # Error responses for when a token is required, but not given
+  token_required_responses: &token_required
+    no_token: '{"error":{"type":"OAuthAccessTokenException", "message":"An access token is required to request this resource."}}'
+  
+  # Common mock item responses
+  item_deleted: &item_deleted
+    delete:
+      with_token: 'true'
+
+  # OAuth error response
+  oauth_error: &oauth_error
+    no_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
+    
+# -- Stubbed Responses --
+  root:
+    ids=contextoptional,naitik: 
+      get:
+        with_token: '[{}, {}]'
+        no_token: '[{}, {}]'
+  me:
+    no_args:
+      get:
+        <<: *token_required
+        with_token: '{"updated_time": 1}'
+    fields=id:
+      get: 
+        with_token: '{"id": "216743"}'
+        
+  me/feed:
+    message=Hello, world, from the test suite!: 
+      post: 
+        with_token: '{"id": "MOCK_FEED_ITEM"}'
+    message=Hello, world, from the test suite, testing comments!:
+      post:
+        with_token: '{"id": "MOCK_FEED_ITEM"}'
+    message=the cats are asleep: 
+      post: 
+        with_token: '{"id": "FEED_ITEM_CATS"}'
+    message=Hello, world, from the test suite delete method!: 
+      post: 
+        with_token: '{"id": "FEED_ITEM_DELETE"}'
+    link=http://www.contextoptional.com/&message=Hello, world, from the test suite again!&name=Context Optional:
+      post:
+        with_token: '{"id": "FEED_ITEM_CONTEXT"}'
+        
+  koppel:
+    no_args:
+      get:
+        with_token: '{"id": 1, "name": 1, "updated_time": 1}'
+        no_token: '{"id": 1, "name": 1}'
+                
+  contextoptional:
+    no_args:
+      get:
+        with_token: '{"id": 1, "name": 1}'
+        no_token: '{"id": 1, "name": 1}'
+        
+  contextoptional/likes: 
+    no_args: 
+      get: 
+        with_token: '{"data": [{}]}'
+        no_token: '{"data": [{}]}'
+        
+  lukeshepard/likes: 
+    no_args: 
+      get: 
+        <<: *token_required
+        with_token: '{"data": [{}]}'
+        
+  search:
+    q=facebook:
+      get: 
+        with_token: '{"data": [{"id": "507731521_100412693339488"}]}'
+        no_token: '{"data": [{"id": "507731521_100412693339488"}]}'
+        
+  '115349521819193_113815981982767':
+    no_args:
+      delete:
+        <<: *token_required
+  
+  # -- OAuth responses --
+  oauth/access_token: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=<%= OAUTH_CODE %>&redirect_uri=http://oauth.twoalex.com/:
+      get:
+        no_token: access_token=1
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=foo&redirect_uri=http://oauth.twoalex.com/: 
+      get: 
+        <<: *oauth_error
+
+        
+
+# -- Mock Item Responses --
+
+  MOCK_FEED_ITEM/likes:
+    no_args:
+      post:
+        with_token: '{"id": "MOCK_LIKE"}'
+        
+  MOCK_FEED_ITEM/comments:
+    message=it's my comment!:
+      post:
+        with_token: '{"id": "MOCK_COMMENT"}'
+  
+  MOCK_FEED_ITEM:
+    no_args:
+      <<: *item_deleted
+  
+  FEED_ITEM_CONTEXT:
+    no_args: 
+      <<: *item_deleted
+      get:
+        with_token: '{"link":"http://www.contextoptional.com/", "name": "Context Optional"}'
+  
+  FEED_ITEM_CATS:
+    no_args:
+      <<: *item_deleted
+      get: 
+        with_token: '{"message": "the cats are asleep"}'
+  
+  FEED_ITEM_DELETE:
+    no_args:
+      <<: *item_deleted
+      
+  MOCK_COMMENT:
+    no_args:
+      <<: *item_deleted
+      get:
+        with_token: "{\"message\": \"it\'s my comment!\"}"
