@@ -42,7 +42,11 @@ graph_api:
   # OAuth error response
   oauth_error: &oauth_error
     no_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
-    
+
+  # Subscription error response
+  verification_error: &verification_error
+    with_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
+      
 # -- Stubbed Responses --
   root:
     ids=contextoptional,naitik: 
@@ -112,10 +116,10 @@ graph_api:
   
   # -- OAuth responses --
   oauth/access_token: 
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=<%= OAUTH_CODE %>&redirect_uri=http://oauth.twoalex.com/:
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=<%= OAUTH_CODE %>&redirect_uri=<%= OAUTH_DATA["callback_url"] %>:
       get:
         no_token: access_token=1
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=foo&redirect_uri=http://oauth.twoalex.com/: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=foo&redirect_uri=<%= OAUTH_DATA["callback_url"] %>: 
       get: 
         <<: *oauth_error
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&type=client_cred:
@@ -123,6 +127,14 @@ graph_api:
         no_token: access_token=1
         
 
+# -- Subscription Responses -- 
+  <%= APP_ID %>/subscriptions:
+    post: callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>
+      with_token: 'true'
+  <%= APP_ID %>/subscriptions:
+    post: callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %foo>&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>
+      with_token: 'true'
+      
 # -- Mock Item Responses --
 
   MOCK_FEED_ITEM/likes:

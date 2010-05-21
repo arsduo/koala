@@ -14,8 +14,10 @@ module Koala
     TEST_DATA['oauth_test_data'].merge!('code' => Koala::MockHTTPService::OAUTH_CODE)
     
     # Useful in mock_facebook_responses.yml
-    APP_ID = TEST_DATA['oauth_test_data']['app_id']
-    SECRET = TEST_DATA['oauth_test_data']['secret']
+    OAUTH_DATA = TEST_DATA['oauth_test_data']
+    APP_ID = OAUTH_DATA['app_id']
+    SECRET = OAUTH_DATA['secret']
+    SUBSCRIPTION_DATA = TEST_DATA["subscription_test_data"]
     
     # Loads the mock response data via ERB to substitue values for TEST_DATA (see oauth/access_token)
     mock_response_file_path = File.join(File.dirname(__FILE__), 'mock_facebook_responses.yml') 
