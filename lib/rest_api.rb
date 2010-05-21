@@ -4,11 +4,16 @@ module Koala
     
     module RestAPIMethods
       def fql_query(fql)
-        api("method/fql.query", { "query" => fql }, "get")
+        args = {
+          "query" => fql,
+          "format" => "json",
+        }
+
+        api('method/fql.query', args, 'get', :rest_api => true)
       end
       
-      def api(path, args = {}, verb = "get", options = {})
-        response = super(path, args.merge("format" => "json"), verb, options.merge(:rest_api => true))
+      def api(*args)
+        response = super
         
         # check for REST API-specific errors
         if response.is_a?(Hash) && response["error_code"]
