@@ -4,7 +4,12 @@ class FacebookRestAPINoAccessTokenTest < Test::Unit::TestCase
     before :each do
       @graph = Koala::Facebook::RestAPI.new
     end
-  
+=begin
+    # TODO: Create new rest_call method rather than 
+    # overriding api, since it doesn't allow
+    # the REST API module to be included into the
+    # same object as the Graph API module
+    
     # api
     it "should always use the rest api" do
       Koala.should_receive(:make_request).with(
@@ -27,6 +32,7 @@ class FacebookRestAPINoAccessTokenTest < Test::Unit::TestCase
       
       @graph.api("anything")
     end
+=end
 
     # fql_query
     it "should pass the proper arguments" do
@@ -35,7 +41,8 @@ class FacebookRestAPINoAccessTokenTest < Test::Unit::TestCase
       @graph.should_receive(:api).with(
         "method/fql.query", 
         hash_including("query" => query), 
-        "get"
+        "get",
+        hash_including(:rest_api => true)
       )
       
       @graph.fql_query(query)
