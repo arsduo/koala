@@ -15,3 +15,5 @@ require 'koala/rest_api/rest_api_no_access_token_tests'
 require 'koala/rest_api/rest_api_with_access_token_tests'
 
 require 'koala/oauth/oauth_tests'
+
+require 'koala/realtime_updates/realtime_updates_tests'

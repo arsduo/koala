@@ -179,13 +179,13 @@ class FacebookOAuthTests < Test::Unit::TestCase
     
     # parse_access_token
     it "should properly parse access token results" do
-      result = @oauth.parse_access_token(@raw_token_string)
+      result = @oauth.send(:parse_access_token, @raw_token_string)
       has_both_parts = result["access_token"] && result["expires"]
       has_both_parts.should
     end
     
     it "should properly parse offline access token results" do
-      result = @oauth.parse_access_token(@raw_offline_access_token_string)
+      result = @oauth.send(:parse_access_token, @raw_offline_access_token_string)
       has_both_parts = result["access_token"] && !result["expires"]
       has_both_parts.should
     end
@@ -194,12 +194,12 @@ class FacebookOAuthTests < Test::Unit::TestCase
     # somewhat duplicative with the tests for get_access_token and get_app_access_token
     # but no harm in thoroughness
     it "should fetch a proper token string from Facebook when given a code" do
-      result = @oauth.fetch_token_string(:code => @code)
+      result = @oauth.send(:fetch_token_string, :code => @code, :redirect_uri => @callback_url)
       result.should =~ /^access_token/
     end
 
     it "should fetch a proper token string from Facebook when asked for the app token" do
-      result = @oauth.fetch_token_string(:type => 'client_cred'}, true)
+      result = @oauth.send(:fetch_token_string, {:type => 'client_cred'}, true)
       result.should =~ /^access_token/
     end
     

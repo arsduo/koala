@@ -5,19 +5,19 @@
  
 # You must supply this value yourself to test the GraphAPI class.
 # Your OAuth token should have publish_stream and read_stream permissions.
-oauth_token: 119908831367602|2.7hkHoCqbJmyzNz8iPlhbiQ__.3600.1274230800-216743|BAf7480l3WUtNO3BSZ9N90oKgAc.
+oauth_token: 119908831367602|2.gGTGvkcYCXaF3Sx5bA1cKA__.3600.1274461200-2905623|xaI6U2-61U39dgtstUhO_xz-O0k.
 
 # for testing the OAuth class    
 # baseline app
 oauth_test_data: 
   # You must supply this value yourself, since they will expire.
-  code: 2.7hkHoCqbJmyzNz8iPlhbiQ__.3600.1274230800-216743|F4htfALzS0HrYqDoaUC0YAvzcAU.
+  code: 2.gGTGvkcYCXaF3Sx5bA1cKA__.3600.1274461200-2905623|d0-6QtHMLPH6MsxXj78S7Q8Af9o.
     
   # These values will work out of the box
   app_id: 119908831367602
   secret: e45e55a333eec232d4206d2703de1307
   callback_url: http://oauth.twoalex.com/
-  app_token: 
+  app_access_token: 119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.
   raw_token_string: "access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.&expires=6621"
   raw_offline_access_token_string: access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.
   valid_cookies: 
@@ -31,8 +31,9 @@ oauth_test_data:
     fbs_119908831367602: '"access_token=119908831367602|08170230801eb225068e7a70-2905623|Q3LDCYYF8CX9cstxnZLsxiR0nwg.&expires=0&secret=78abaee300b392e275072a9f2727d436&session_key=08170230801eb225068e7a70-2905623&sig=423b8aa4b6fa1f9a571955f8e929d567&uid=2905623"'
     
 subscription_test_data:
-  verify_token: "myverificationtoken|3aef60a0f0dd915d1caa5d7fe7a644be"
+  subscription_path: http://oauth.twoalex.com/subscriptions
+  verify_token: "myverificationtoken|1f54545d5f722733e17faae15377928f"
   challenge_data: 
     "hub.challenge": "1290024882"
-    "hub.verify_token": "myverificationtoken|3aef60a0f0dd915d1caa5d7fe7a644be"
+    "hub.verify_token": "myverificationtoken|1f54545d5f722733e17faae15377928f"
     "hub.mode": "subscribe"

@@ -43,6 +43,10 @@ class FacebookWithAccessTokenTests < Test::Unit::TestCase
       result.length.should == 2
     end
   
+    it "should be able to access a user's picture" do
+      @graph.get_connections("chris.baclig", "picture").should =~ /http\:\/\//
+    end
+  
     it "should be able to access connections from users" do
       result = @graph.get_connections("lukeshepard", "likes")
       result["data"].length.should > 0

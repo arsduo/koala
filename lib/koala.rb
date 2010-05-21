@@ -48,7 +48,7 @@ module Koala
       
       def api(path, args = {}, verb = "get", options = {})
         # Fetches the given path in the Graph API.
-        args["access_token"] = @access_token if @access_token
+        args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
         
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
@@ -163,7 +163,7 @@ module Koala
       
       protected
       
-      def get_token_from_server(args, post = true)
+      def get_token_from_server(args, post = false)
         # fetch the result from Facebook's servers
         result = fetch_token_string(args, post)
         

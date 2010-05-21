@@ -33,6 +33,10 @@ class FacebookNoAccessTokenTests < Test::Unit::TestCase
       results.length.should == 2
     end
   
+    it "should be able to access a user's picture" do
+      @graph.get_connections("chris.baclig", "picture").should =~ /http\:\/\//
+    end
+  
     it "shouldn't be able to access connections from users" do
       lambda { @graph.get_connections("lukeshepard", "likes") }.should raise_error(Koala::Facebook::APIError)
     end
