@@ -29,6 +29,7 @@ module Koala
         
         def self.make_request(path, args, verb, options = {})
           path = 'root' if path == ''
+          verb ||= 'get'
           server = options[:rest_api] ? 'rest_api' : 'graph_api'
           with_token = args.delete('access_token') == ACCESS_TOKEN ? 'with_token' : 'no_token'
           
