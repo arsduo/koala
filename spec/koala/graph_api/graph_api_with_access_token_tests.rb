@@ -28,7 +28,7 @@ it "should get public data about a user" do
     end
   
     it "should be able to access a user's picture" do
-      @graph.get_picture("chris.baclig").should =~ /http\:\/\//
+      @api.get_picture("chris.baclig").should =~ /http\:\/\//
     end
   
     it "should be able to access connections from users" do

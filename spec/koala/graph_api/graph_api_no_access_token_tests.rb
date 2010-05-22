@@ -11,7 +11,6 @@ shared_examples_for "Koala GraphAPI without an access token" do
     result["updated_time"].should be_nil
   end
 
-
   it "should get public data about a Page" do
     result = @api.get_object("contextoptional")
     # the results should have an ID and a name, among other things
@@ -29,6 +28,10 @@ shared_examples_for "Koala GraphAPI without an access token" do
 
   it "shouldn't be able to access connections from users" do
     lambda { @api.get_connections("lukeshepard", "likes") }.should raise_error(Koala::Facebook::APIError)
+  end
+
+  it "should be able to access a user's picture" do
+    @api.get_picture("chris.baclig").should =~ /http\:\/\//
   end
 
   it "should be able to access connections from public Pages" do

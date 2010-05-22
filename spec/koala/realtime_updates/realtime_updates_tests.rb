@@ -86,7 +86,6 @@ class FacebookRealtimeUpdatesTests < Test::Unit::TestCase
         result.should be_true
       end
       
-      
       it "should send a subscription request to an invalid path on a valid server" do
         lambda { result = @updates.subscribe("user", "name", @subscription_path + "foo", @verify_token) }.should raise_exception(Koala::Facebook::APIError)
       end

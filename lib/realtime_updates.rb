@@ -58,9 +58,10 @@ module Koala
           :callback_url => callback_url,
           :verify_token => verify_token
         }
-        api(subscription_path, args, 'post')
+        # a subscription is a success if Facebook returns a 200 (after hitting your server for verification)
+        api(subscription_path, args, 'post', :http_component => :status) == 200
       end
-            
+          
       # removes subscription for object
       # if object is nil, it will remove all subscriptions
       def unsubscribe(object = nil)
