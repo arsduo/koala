@@ -103,6 +103,17 @@ graph_api:
         <<: *token_required
         with_token: '{"data": [{}]}'
         
+  chris.baclig/picture:
+    no_args:
+      get:
+        no_token:
+          code: 302
+          headers:
+            Location: http://facebook.com/
+        with_token:
+          code: 302
+          headers:
+            Location: http://facebook.com/
   search:
     q=facebook:
       get: 
@@ -129,11 +140,13 @@ graph_api:
 
 # -- Subscription Responses -- 
   <%= APP_ID %>/subscriptions:
-    post: callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>
-      with_token: 'true'
+    callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>
+      post: 
+        with_token: 'true'
   <%= APP_ID %>/subscriptions:
-    post: callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %foo>&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>
-      with_token: 'true'
+    callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>
+      post: 
+        with_token: 'true'
       
 # -- Mock Item Responses --
 

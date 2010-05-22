@@ -47,6 +47,11 @@ module Koala
         api("#{id}/#{connection_name}", args)
       end
     
+      def get_picture(object)
+        result = api("#{object}/picture", {}, "get", :http_component => :headers)
+        result["Location"]
+      end
+    
       def put_object(parent_object, connection_name, args = {})
         # Writes the given object to the graph, connected to the given parent.
         # 
