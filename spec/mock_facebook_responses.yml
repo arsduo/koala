@@ -150,7 +150,25 @@ graph_api:
     callback_url=foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
       post: 
         with_token: '{"error":{"type":"Exception","message":"(#100) callback_url URL is not properly formatted"}}'
-        
+    object=user:
+      delete:
+        with_token:
+          code: 200
+    object=kittens:
+      delete:
+        with_token: '{"error":{"type":"Exception","message":"(#100) Invalid parameter"}}'
+    no_args:
+      delete: 
+        with_token:
+          code: 200
+      get:
+        with_token: '{"data":[{"callback_url":"http://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
+
+
+    callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>:
+      get:
+        with_token: '{"data":[{"callback_url":"http://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
+
 # -- Mock Item Responses --
 
   MOCK_FEED_ITEM/likes:

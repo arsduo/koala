@@ -101,8 +101,25 @@ class FacebookRealtimeUpdatesTests < Test::Unit::TestCase
       it "should fail to send a subscription request to an invalid server" do
         lambda { @updates.subscribe("user", "name", "foo", @verify_token) }.should raise_exception(Koala::Facebook::APIError)
       end
-    end
+    
+      it "should unsubscribe a valid individual object successfully" do 
+        @updates.unsubscribe("user").should be_true
+      end
 
+      it "should unsubscribe all subscriptions successfully" do 
+        @updates.unsubscribe.should be_true
+      end
+
+      it "should fail when an invalid object is provided to unsubscribe" do 
+        lambda { @updates.unsubscribe("kittens") }.should raise_error(Koala::Facebook::APIError)
+      end
+      
+      it "should is subscriptions properly" do
+        @updates.list_subscriptions["data"].should be_a(Array)
+      end
+ 
+    end # describe "when used"
+    
   end # describe
 
 end #class

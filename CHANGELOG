@@ -1,3 +1,13 @@
+v0.7.0
+-- Added RealtimeUpdates class, which can be used to manage subscriptions for user updates (see http://developers.facebook.com/docs/api/realtime)
+-- Added picture method to graph API, which fetches an object's picture from the redirect headers.
+-- Added _greatly_ improved testing with result mocking, which is now the default set of tests
+-- Renamed live testing spec to koala_spec_without_mocks.rb
+-- Added Koala::Response class, which encapsulates HTTP results since Facebook sometimes sends data in the status or headers
+-- Much internal refactoring
+-- Updated readme, changelog, etc.
+
+
 v0.6.0
 -- Added support for the old REST API thanks to cbaclig's great work
 -- Updated tests to conform to RSpec standards

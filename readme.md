@@ -1,6 +1,6 @@
 Koala
 ====
-Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.com/arsduo/koala</a>) is a new Facebook Graph library for Ruby.  We wrote Koala with four goals: 
+Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.com/arsduo/koala</a>) is a new Facebook library for Ruby, supporting the Graph API, the old REST API, realtime updates, and OAuth validation.  We wrote Koala with four goals: 
 
 * Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, just over 300 lines of code.)
 * Fast: Koala should, out of the box, be quick. In addition to supporting the vanilla Ruby networking libraries, it natively supports Typhoeus, our preferred gem for making fast HTTP requests. Of course, That brings us to our next topic:
@@ -39,7 +39,10 @@ Some resources to help you as you play with Koala and the Graph API:
 Testing
 -----
 
-Unit tests are provided for all of Koala's methods; however, because the OAuth access tokens and cookies expire, you have to provide some of your own data: a valid OAuth access token with publish\_stream and read\_stream permissions and an OAuth code that can be used to generate an access token.  (The file also provides valid values for other tests, which you're welcome to sub out for data specific to your own application.)
-
-Insert the required values into the file test/facebook_data.yml, then run the test as follows:
+Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box: 
     spec koala_tests.rb
+
+You can also run live tests against Facebook's servers:
+    spec koala\_tests\_without\_mocks.rb
+
+Important Note: to run the live tests, you have to provide some of your own data: a valid OAuth access token with publish\_stream and read\_stream permissions and an OAuth code that can be used to generate an access token.  You can get these data at the OAuth Playground; if you want to use your own app, remember to swap out the app ID, secret, and other values.  (The file also provides valid values for other tests, which you're welcome to swap out for data specific to your own application.)

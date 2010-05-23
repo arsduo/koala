@@ -67,7 +67,7 @@ module Koala
       def unsubscribe(object = nil)
         args = {}
         args[:object] = object if object
-        api(subscription_path, args, 'delete')
+        api(subscription_path, args, 'delete', :http_component => :status) == 200
       end
   
       def list_subscriptions
