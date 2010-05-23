@@ -10,4 +10,6 @@ class NetHTTPServiceTests < Test::Unit::TestCase
   end
   
   it "should use POST if verb is not GET"
+  
+  it "should return a Koala::Response object"
 end
