@@ -32,23 +32,23 @@ module Koala
             
       def get_object(id, args = {})
         # Fetchs the given object from the graph.
-        api(id, args)
+        graph_call(id, args)
       end
     
       def get_objects(ids, args = {})
         # Fetchs all of the given object from the graph.
         # We return a map from ID to object. If any of the IDs are invalid,
         # we raise an exception.
-        api("", args.merge("ids" => ids.join(",")))
+        graph_call("", args.merge("ids" => ids.join(",")))
       end
     
       def get_connections(id, connection_name, args = {})
         # Fetchs the connections for given object.
-        api("#{id}/#{connection_name}", args)
+        graph_call("#{id}/#{connection_name}", args)
       end
     
       def get_picture(object)
-        result = api("#{object}/picture", {}, "get", :http_component => :headers)
+        result = graph_call("#{object}/picture", {}, "get", :http_component => :headers)
         result["Location"]
       end
     
@@ -75,7 +75,7 @@ module Koala
         # extended permissions.
 
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
-        api("#{parent_object}/#{connection_name}", args, "post")
+        graph_call("#{parent_object}/#{connection_name}", args, "post")
       end
     
       def put_wall_post(message, attachment = {}, profile_id = "me")
@@ -108,16 +108,16 @@ module Koala
     
       def delete_object(id)
         # Deletes the object with the given ID from the graph.
-        api(id, {}, "delete")
+        graph_call(id, {}, "delete")
       end
     
       def search(search_terms, args = {})
         # Searches for a given term
-        api("search", args.merge({:q => search_terms}))
+        graph_call("search", args.merge({:q => search_terms}))
       end
     
-      def api(*args)
-        response = super(*args) do |response|
+      def graph_call(*args)
+        response = api(*args) do |response|
           # check for Graph API-specific errors
           if response.is_a?(Hash) && error_details = response["error"]
             raise APIError.new(error_details)
