@@ -29,6 +29,10 @@ class ApiBaseTests < Test::Unit::TestCase
       service.api('anything')
     end
     
+    it "should properly handle the http_component parameter"
+    
+    it "should execute a block to test for errors if passed one"
+    
     it "should handle rogue true/false as responses" do
       Koala.should_receive(:make_request).and_return(Koala::Response.new(200, 'true', {}))
       @service.api('anything').should be_true
