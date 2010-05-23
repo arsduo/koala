@@ -144,15 +144,12 @@ graph_api:
       post: 
         with_token:
           code: 200
-  <%= APP_ID %>/subscriptions:
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
       post: 
-        <<: *verification_error
-        with_token: *verification_error
-  <%= APP_ID %>/subscriptions:
+        with_token: '{"error":{"type":"Exception","message":"(#2200) subscription validation failed"}}'
     callback_url=foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
       post: 
-        <<: *verification_error      
+        with_token: '{"error":{"type":"Exception","message":"(#100) callback_url URL is not properly formatted"}}'
         
 # -- Mock Item Responses --
 

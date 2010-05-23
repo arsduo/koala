@@ -49,7 +49,6 @@ module Koala
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
-        puts "access token: #{args["access_token"]}"
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
 

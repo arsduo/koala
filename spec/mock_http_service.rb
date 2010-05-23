@@ -23,8 +23,7 @@ module Koala
     # Loads the mock response data via ERB to substitue values for TEST_DATA (see oauth/access_token)
     mock_response_file_path = File.join(File.dirname(__FILE__), 'mock_facebook_responses.yml') 
     RESPONSES = YAML.load(ERB.new(IO.read(mock_response_file_path)).result(binding))         
-    
-    
+
     def self.included(base)
       base.class_eval do
         

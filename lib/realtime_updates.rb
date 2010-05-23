@@ -75,14 +75,12 @@ module Koala
       end
       
       def api(*args) # same as GraphAPI
-        response = super
-        
-        if response.body && response.body.length > 0
-          result = JSON.parse(response.body)
-          # check for errors
+        response = super(*args) do |response|
+          # check for subscription errors
           if response.is_a?(Hash) && error_details = response["error"]
             raise APIError.new(error_details)
           end
+        end
       
         response
       end    

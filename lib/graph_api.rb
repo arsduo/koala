@@ -117,8 +117,8 @@ module Koala
       end
     
       def api(*args)
-        response = super do |response|
-          # check for errors
+        response = super(*args) do |response|
+          # check for Graph API-specific errors
           if response.is_a?(Hash) && error_details = response["error"]
             raise APIError.new(error_details)
           end
