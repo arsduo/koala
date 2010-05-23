@@ -9,10 +9,13 @@ lib/realtime_updates.rb
 lib/rest_api.rb
 readme.md
 spec/facebook_data.yml
-spec/http_services_spec.rb
 spec/koala/api_base_tests.rb
+spec/koala/graph_and_rest_api/graph_and_rest_api_no_token_tests.rb
+spec/koala/graph_and_rest_api/graph_and_rest_api_with_token_tests.rb
 spec/koala/graph_api/graph_api_no_access_token_tests.rb
 spec/koala/graph_api/graph_api_with_access_token_tests.rb
+spec/koala/live_testing_data_helper.rb
+spec/koala/net_http_service_tests.rb
 spec/koala/oauth/oauth_tests.rb
 spec/koala/realtime_updates/realtime_updates_tests.rb
 spec/koala/rest_api/rest_api_no_access_token_tests.rb

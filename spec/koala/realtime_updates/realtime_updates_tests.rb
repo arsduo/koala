@@ -61,22 +61,31 @@ class FacebookRealtimeUpdatesTests < Test::Unit::TestCase
       
       # init with secret / fetching the token
       it "should initialize properly with an app_id and a secret" do 
-        updates = Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @secret)
+        updates = Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
         updates.should be_a(Facebook::RealtimeUpdates)      
       end
 
       it "should fetch an app_token from Facebook when provided an app_id and a secret" do 
-        updates = Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @secret)
+        updates = Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
         updates.app_access_token.should_not be_nil
+      end
+      
+      it "should use the OAuth class to fetch a token when provided an app_id and a secret" do
+        oauth = Facebook::OAuth.new(@app_id, @secret)
+        token = oauth.get_app_access_token
+        oauth.should_receive(:get_app_access_token).and_return(token)
+        Facebook::OAuth.should_receive(:new).with(@app_id, @secret).and_return(oauth) 
+        updates = Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
       end
     end
   
     describe "when used" do
       before :each do 
-        @updates = Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
+        @updates = Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
       end
       
       it "should send a subscription request to a valid server" do
+        puts @updates.app_access_token
         result = @updates.subscribe("user", "name", @subscription_path, @verify_token)
         result.should be_true
       end

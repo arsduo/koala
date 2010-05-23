@@ -46,21 +46,26 @@ module Koala
         @access_token = access_token
       end
       
-      def api(path, args = {}, verb = "get", options = {})
+      def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
-        
+        puts "access token: #{args["access_token"]}"
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
+
+        # Parse the body as JSON and check for errors if provided a mechanism to do so 
+        # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
+        # and cause JSON.parse to fail -- so we account for that by wrapping the result in []
+        body = response = JSON.parse("[#{result.body.to_s}]")[0]
+        if error_checking_block
+          yield(body)
+        end
         
         # now return the desired information
         if options[:http_component]
           result.send(options[:http_component])
         else
-          # Facebook sometimes sends results like "true" and "false", which aren't strictly object
-          # and cause JSON.parse to fail
-          # so we account for that
-          response = JSON.parse("[#{result.body}]")[0]
+          body
         end
       end
     end

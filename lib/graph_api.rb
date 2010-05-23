@@ -117,11 +117,11 @@ module Koala
       end
     
       def api(*args)
-        response = super
-        
-        # check for errors
-        if response.is_a?(Hash) && error_details = response["error"]
-          raise APIError.new(error_details)
+        response = super do |response|
+          # check for errors
+          if response.is_a?(Hash) && error_details = response["error"]
+            raise APIError.new(error_details)
+          end
         end
       
         response
