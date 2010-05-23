@@ -85,7 +85,6 @@ class FacebookRealtimeUpdatesTests < Test::Unit::TestCase
       end
       
       it "should send a subscription request to a valid server" do
-        puts @updates.app_access_token
         result = @updates.subscribe("user", "name", @subscription_path, @verify_token)
         result.should be_true
       end
