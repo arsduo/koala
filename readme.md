@@ -43,6 +43,6 @@ Unit tests are provided for all of Koala's methods.  By default, these tests run
     spec koala_tests.rb
 
 You can also run live tests against Facebook's servers:
-    spec koala\_tests\_without\_mocks.rb
+    spec koala_tests_without_mocks.rb
 
 Important Note: to run the live tests, you have to provide some of your own data: a valid OAuth access token with publish\_stream and read\_stream permissions and an OAuth code that can be used to generate an access token.  You can get these data at the OAuth Playground; if you want to use your own app, remember to swap out the app ID, secret, and other values.  (The file also provides valid values for other tests, which you're welcome to swap out for data specific to your own application.)
