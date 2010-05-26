@@ -9,6 +9,8 @@ class NetHTTPServiceTests < Test::Unit::TestCase
     Bear.respond_to?(:make_request).should be_true
   end
   
+  it "should return a string for location header"
+
   it "should use POST if verb is not GET"
   
   it "should return a Koala::Response object"

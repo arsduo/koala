@@ -32,8 +32,8 @@ module Koala
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           result = http.start { |http|
-            response, body = (verb == "post" ? http.post(path, encode_params(args)) : http.get("#{path}?#{encode_params(args)}")) 
-            Koala::Response.new(response.code.to_i, body, response.to_hash)
+            response, body = (verb == "post" ? http.post(path, encode_params(args)) : http.get("#{path}?#{encode_params(args)}"))
+            Koala::Response.new(response.code.to_i, body, response)
           }
         end
 
