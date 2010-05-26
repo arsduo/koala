@@ -117,8 +117,70 @@ class FacebookRealtimeUpdatesTests < Test::Unit::TestCase
       it "should is subscriptions properly" do
         @updates.list_subscriptions["data"].should be_a(Array)
       end
- 
     end # describe "when used"
+    
+    describe "when meeting challenge" do
+      it "should return false if hub.mode isn't subscribe" do
+        params = {'hub.mode' => 'not subscribe'}
+        Facebook::RealtimeUpdates.meet_challenge(params).should be_false
+      end
+      
+      it "should return false if not given a verify_token or block" do
+        params = {'hub.mode' => 'subscribe'}
+        Facebook::RealtimeUpdates.meet_challenge(params).should be_false
+      end
+      
+      describe "and mode is 'subscribe'" do
+        before(:each) do 
+          @params = {'hub.mode' => 'subscribe'}
+        end
+        
+        describe "and a token is given" do
+          before(:each) do
+            @token = 'token'
+            @params['hub.verify_token'] = @token
+          end
+          
+          it "should return false if the given verify token doesn't match" do
+            Facebook::RealtimeUpdates.meet_challenge(@params, @token + '1').should be_false
+          end
+          
+          it "should return the challenge if the given verify token matches" do
+            @params['hub.challenge'] = 'challenge val'
+            Facebook::RealtimeUpdates.meet_challenge(@params, @token).should == @params['hub.challenge']
+          end
+        end
+        
+        describe "and a block is given" do
+          it "should give the block the token as a parameter" do
+            Facebook::RealtimeUpdates.meet_challenge(@params)do |token|
+              token.should == @token
+            end
+          end
+          
+          it "should return false if the given block return false" do
+            Facebook::RealtimeUpdates.meet_challenge(@params)do |token|
+              false
+            end.should be_false
+          end
+          
+          it "should return false if the given block returns nil" do
+            Facebook::RealtimeUpdates.meet_challenge(@params)do |token|
+              nil
+            end.should be_false
+          end
+          
+          it "should return the challenge if the given block returns true" do
+            @params['hub.challenge'] = 'challenge val'
+            Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
+              true
+            end.should be_true
+          end
+        end
+      
+      end # describe "and mode is subscribe"
+      
+    end # describe "when meeting challenge"
     
   end # describe
 
