@@ -50,6 +50,35 @@ You can also get your application's own access token, which can be used without 
 
 That's it!  It's pretty simple once you get the hang of it.  If you're new to OAuth, though, check out the wiki and the OAuth Playground example site (see below).
 
+
+Real-time Updates
+-----
+The Graph API now allows your application to subscribe to real-time updates for certain objects in the graph.
+
+Currently, Facebook only supports subscribing to users, permissions and errors.  On top of that, there are limitations on what attributes and connections for each of these objects you can subscribe to updates for.  Check the [official Facebook documentation](http://developers.facebook.com/docs/api/realtime) for more details.
+
+Koala makes it easy to interact with your applications using the RealTimeUpdates class:
+
+    @updates = Koala::Facebook::RealTimeUpdates.new(:app_id => app_id, :secret => secret)
+
+You can do just about anything with your real-time update subscriptions using the RealTimeUpdates class:
+
+    # Add/modify a subscription to updates for when the first_name or last_name fields of any of your users is changed
+    @updates.subscribe("user", "first_name, last_name", callback_token, verify_token)
+
+    # Get an array of your current subscriptions (one hash for each object you've subscribed to)
+    @updates.list_subscriptions
+
+    # Unsubscribe from updates for an object
+    @updates.unsubscribe("user")
+
+And to top it all off, RealTimeUpdates provides a static method to respond to Facebook servers' verification of your callback URLs:
+
+    # Returns the hub.challenge parameter in params if the verify token in params matches verify_token
+    Koala::Facebook::RealTimeUpdates.meet_challenge(params, your_verify_token)
+
+For more information about meet_challenge and the RealTimeUpdates class, check out the Real-Time Updates page on the wiki.
+
 See examples, ask questions
 -----
 Some resources to help you as you play with Koala and the Graph API:
