@@ -33,12 +33,12 @@ it "should get public data about a user" do
   
     it "should be able to access connections from users" do
       result = @api.get_connections("lukeshepard", "likes")
-      result["data"].length.should > 0
+      result.length.should > 0
     end
 
     it "should be able to access connections from public Pages" do
       result = @api.get_connections("contextoptional", "likes")
-      result["data"].should be_a(Array)
+      result.should be_a(Array)
     end
     
     # PUT

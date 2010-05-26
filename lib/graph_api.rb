@@ -44,7 +44,7 @@ module Koala
     
       def get_connections(id, connection_name, args = {})
         # Fetchs the connections for given object.
-        graph_call("#{id}/#{connection_name}", args)
+        graph_call("#{id}/#{connection_name}", args)["data"]
       end
     
       def get_picture(object)

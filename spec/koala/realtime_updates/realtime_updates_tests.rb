@@ -115,7 +115,7 @@ class FacebookRealtimeUpdatesTests < Test::Unit::TestCase
       end
       
       it "should is subscriptions properly" do
-        @updates.list_subscriptions["data"].should be_a(Array)
+        @updates.list_subscriptions.should be_a(Array)
       end
     end # describe "when used"
     

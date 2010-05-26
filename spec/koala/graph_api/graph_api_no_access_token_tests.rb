@@ -36,7 +36,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
 
   it "should be able to access connections from public Pages" do
     result = @api.get_connections("contextoptional", "likes")
-    result["data"].should be_a(Array)
+    result.should be_a(Array)
   end
 
   it "should not be able to put an object" do

@@ -71,7 +71,7 @@ module Koala
       end
   
       def list_subscriptions
-        api(subscription_path)
+        api(subscription_path)["data"]
       end
       
       def api(*args) # same as GraphAPI
