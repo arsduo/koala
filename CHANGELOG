@@ -1,3 +1,9 @@
+v0.7.1
+-- Updated RealtimeUpdates#list_subscriptions and GraphAPI#get_connections to now return an 
+array of results directly (rather than a hash with one key)
+-- Fixed a bug with Net::HTTP-based HTTP service in which the headers hash was improperly formatted
+-- Updated readme
+
 v0.7.0
 -- Added RealtimeUpdates class, which can be used to manage subscriptions for user updates (see http://developers.facebook.com/docs/api/realtime)
 -- Added picture method to graph API, which fetches an object's picture from the redirect headers.
