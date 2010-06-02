@@ -157,8 +157,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
       out.should_not be_nil
     end
 
-    # START CODE THAT NEEDS MOCKING
-
     # get_access_token
     it "should properly get and parse an access token token results" do
       result = @oauth.get_access_token(@code)
@@ -169,8 +167,35 @@ class FacebookOAuthTests < Test::Unit::TestCase
       lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
     end
     
+    # get_app_access_token
+    
     it "should properly get and parse an app's access token token results" do
       result = @oauth.get_app_access_token
+      result["access_token"].should
+    end
+
+    # get_tokens_from_session_keys
+    it "should get an array of session keys from Facebook when passed a single key" do
+      result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
+      result.should be_an(Array)
+      result.length.should == 1
+    end
+
+    it "should get an array of session keys from Facebook when passed multiple keys" do
+      result = @oauth.get_tokens_from_session_keys(@oauth_data["multiple_session_keys"])
+      result.should be_an(Array)
+      result.length.should == 2
+    end
+
+    # get_token_from_session_key
+    it "should call get_tokens_from_session_keys when the get_token_from_session_key is called" do
+      key = @oauth_data["session_key"]
+      @oauth.should_receive(:get_tokens_from_session_keys).with([key]).and_return([])
+      @oauth.get_token_from_session_key(key)
+    end
+    
+    it "should get back a hash from get_token_from_session_key" do
+      result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
       result["access_token"].should
     end
     

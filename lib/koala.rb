@@ -6,15 +6,15 @@ require 'rubygems'
 require 'json'
 
 # include default http services
-require 'http_services'
+require 'koala/http_services'
 
 # add Graph API methods
-require 'graph_api'
+require 'koala/graph_api'
 
 # add REST API methods
-require 'rest_api'
+require 'koala/rest_api'
 
-require 'realtime_updates'
+require 'koala/realtime_updates'
 
 module Koala
     
@@ -156,7 +156,7 @@ module Koala
         raise ArgumentError, "url_for_access_token must get a callback either from the OAuth object or in the parameters!" unless callback
         "https://#{GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&redirect_uri=#{callback}&client_secret=#{@app_secret}&code=#{code}"
       end
-      
+            
       def get_access_token(code)
         # convenience method to get a parsed token from Facebook for a given code
         # should this require an OAuth callback URL?
@@ -166,6 +166,27 @@ module Koala
       def get_app_access_token
         # convenience method to get a the application's sessionless access token 
         get_token_from_server({:type => 'client_cred'}, true)
+      end
+      
+      def get_tokens_from_session_keys(sessions)
+        # fetch the OAuth tokens from Facebook
+        response = fetch_token_string({
+          :type => 'client_cred',
+          :sessions => sessions.join(",")
+        }, true, "exchange_sessions")
+        
+        # get_token_from_session_key should return an empty body if an empty string or nil is provided
+        # if invalid tokens are provided, it returns an array of nulls, which is a valid result
+        if response == ""
+          raise APIError.new("ArgumentError", "get_token_from_session_key received an error (empty response body) for sessions #{sessions.inspect}!")
+        end
+        
+        JSON.parse(response)
+      end
+  
+      def get_token_from_session_key(session)
+        # convenience method for a single key
+        get_tokens_from_session_keys([session])[0]
       end
       
       protected
@@ -189,8 +210,8 @@ module Koala
         components 
       end
 
-      def fetch_token_string(args, post = false)
-        Koala.make_request("oauth/access_token", {
+      def fetch_token_string(args, post = false, endpoint = "access_token")
+        Koala.make_request("oauth/#{endpoint}", {
           :client_id => @app_id, 
           :client_secret => @app_secret
         }.merge!(args), post ? "post" : "get").body

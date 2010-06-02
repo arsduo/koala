@@ -15,7 +15,11 @@ module Koala
     
     # Useful in mock_facebook_responses.yml
     OAUTH_DATA = TEST_DATA['oauth_test_data']
-    OAUTH_DATA.merge!('app_access_token' => Koala::MockHTTPService::ACCESS_TOKEN)
+    OAUTH_DATA.merge!({
+      'app_access_token' => Koala::MockHTTPService::ACCESS_TOKEN,
+      'session_key' => "session_key",
+      'multiple_session_keys' => ["session_key", "session_key_2"]
+    })
     APP_ID = OAUTH_DATA['app_id']
     SECRET = OAUTH_DATA['secret']
     SUBSCRIPTION_DATA = TEST_DATA["subscription_test_data"]

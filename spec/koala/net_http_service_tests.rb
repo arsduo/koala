@@ -1,4 +1,4 @@
-require 'http_services'
+require 'koala/http_services'
   
 class NetHTTPServiceTests < Test::Unit::TestCase
   module Bear

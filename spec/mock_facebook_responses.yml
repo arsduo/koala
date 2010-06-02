@@ -136,7 +136,15 @@ graph_api:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&type=client_cred:
       post:
         no_token: access_token=<%= ACCESS_TOKEN %>
-        
+  oauth/exchange_sessions:
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["session_key"] %>&type=client_cred: 
+      post:
+        no_token: '[{"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["multiple_session_keys"].join(",") %>&type=client_cred: 
+      post:
+        no_token: '[{"access_token":"<%= ACCESS_TOKEN %>","expires":4315}, {"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
+
+
 
 # -- Subscription Responses -- 
   <%= APP_ID %>/subscriptions:
