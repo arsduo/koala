@@ -1,3 +1,8 @@
+v0.7.2
+-- Added support for exchanging session keys for OAuth access tokens (get_token_from_session_key for single keys, get_tokens_from_session_keys for multiple)
+-- Moved Koala files into a koala/ subdirectory to minimize risk of name collisions
+-- Updated tests
+
 v0.7.1
 -- Updated RealtimeUpdates#list_subscriptions and GraphAPI#get_connections to now return an 
 array of results directly (rather than a hash with one key)
