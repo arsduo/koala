@@ -114,6 +114,18 @@ graph_api:
           code: 302
           headers:
             Location: http://facebook.com/
+    type=large:
+      get:
+        no_token:
+          code: 302
+          headers:
+            Location: http://facebook.com/large
+        with_token:
+          code: 302
+          headers:
+            Location: http://facebook.com/large
+
+
   search:
     q=facebook:
       get: 

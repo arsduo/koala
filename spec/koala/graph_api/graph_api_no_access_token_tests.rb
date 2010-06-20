@@ -34,6 +34,10 @@ shared_examples_for "Koala GraphAPI without an access token" do
     @api.get_picture("chris.baclig").should =~ /http\:\/\//
   end
 
+  it "should be able to access a user's picture, given a picture type"  do
+    @api.get_picture("chris.baclig", {:type => 'large'}).should =~ /^http\:\/\//
+  end
+
   it "should be able to access connections from public Pages" do
     result = @api.get_connections("contextoptional", "likes")
     result.should be_a(Array)

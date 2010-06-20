@@ -1,4 +1,5 @@
 require 'erb'
+require 'yaml'
 
 module Koala
   module MockHTTPService

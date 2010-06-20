@@ -31,6 +31,10 @@ it "should get public data about a user" do
       @api.get_picture("chris.baclig").should =~ /http\:\/\//
     end
   
+    it "should be able to access a user's picture, given a picture type"  do
+      @api.get_picture("chris.baclig", {:type => 'large'}).should =~ /^http\:\/\//
+    end
+  
     it "should be able to access connections from users" do
       result = @api.get_connections("lukeshepard", "likes")
       result.length.should > 0

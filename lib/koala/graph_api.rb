@@ -47,11 +47,11 @@ module Koala
         graph_call("#{id}/#{connection_name}", args)["data"]
       end
     
-      def get_picture(object)
-        result = graph_call("#{object}/picture", {}, "get", :http_component => :headers)
+      def get_picture(object, args = {})
+        result = graph_call("#{object}/picture", args, "get", :http_component => :headers)
         result["Location"]
-      end
-    
+      end    
+      
       def put_object(parent_object, connection_name, args = {})
         # Writes the given object to the graph, connected to the given parent.
         # 
