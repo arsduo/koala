@@ -138,15 +138,8 @@ module Koala
         # icky ruby magic, but it's _really_ cool we can do this
         info = get_user_info_from_cookies(cookies)
         string = info["uid"]
-        command = <<-EOS
-          def [](index)
-            puts "WARNING: get_app_access_token now provides the access token as a string; use get_app_access_token_info if you want the hash with expirations.  Otherwise you no longer need to call [] to get the token itself."
-            hash = #{info.inspect}
-            hash[index]
-          end
-        EOS
-        (class << string; self; end).class_eval command
-        string
+
+        overload_as_hash(string, info)
       end
       alias_method :get_user_from_cookies, :get_user_from_cookie
     
@@ -185,18 +178,8 @@ module Koala
         info = get_access_token_info(code)
         # upstream methods will throw errors if needed
         string = info["access_token"]
-        # overload this to be backward compatible with older implementations
-        # icky ruby magic, but it's _really_ cool we can do this
-        command = <<-EOS
-          def [](index)
-            puts "WARNING: get_access_token now provides the access token as a string; use get_access_token_info if you want the hash with expirations.  Otherwise you no longer need to call [] to get the token itself."
-            hash = #{info.inspect}
-            hash[index]
-          end
-        EOS
-        (class << string; self; end).class_eval command
 
-        string          
+        overload_as_hash(string, info)          
       end
       
       def get_app_access_token_info
@@ -207,18 +190,8 @@ module Koala
       def get_app_access_token
         info = get_app_access_token_info
         string = info["access_token"]
-        # overload this to be backward compatible with older implementations
-        # icky ruby magic, but it's _really_ cool we can do this
-        command = <<-EOS
-          def [](index)
-            puts "WARNING: get_app_access_token now provides the access token as a string; use get_app_access_token_info if you want the hash with expirations.  Otherwise you no longer need to call [] to get the token itself."
-            hash = #{info.inspect}
-            hash[index]
-          end
-        EOS
-        (class << string; self; end).class_eval command
 
-        string
+        overload_as_hash(string, info)
       end
       
       # from session keys
@@ -245,17 +218,8 @@ module Koala
         # for easier use
         results.collect do |r|
           string = r["access_token"]
-          # icky ruby magic, but it's _really_ cool we can do this
-          command = <<-EOS
-            def [](index)
-              puts "WARNING: get_token_from_session_key and get_tokens_from_session_keys now provides the tokens as strings (individually or in an array).  Use get_token_info_from_session_keys if you want the hash with expirations; otherwise you no longer need to call [] to get the token itself."
-              hash = #{r.inspect}
-              hash[index]
-            end
-          EOS
-          (class << string; self; end).class_eval command
-          
-          string
+
+          overload_as_hash string, r
         end
       end
       
@@ -291,6 +255,23 @@ module Koala
           :client_id => @app_id, 
           :client_secret => @app_secret
         }.merge!(args), post ? "post" : "get").body
+      end
+
+      # overload the object to be accessible as a hash
+      # used to make get_*_token methods backward compatible
+      # icky ruby magic, but it's _really_ cool we can do this
+      def overload_as_hash(obj, hash)
+        command = <<-EOS
+          def [](index)
+            puts "WARNING: get_app_access_token now provides the access token as a string; use get_app_access_token_info if you want the hash with expirations.  Otherwise you no longer need to call [] to get the token itself."
+            hash = #{hash.inspect}
+            hash[index]
+          end
+        EOS
+        
+        (class << obj; self; end).class_eval command
+        
+        obj
       end
     end
   end
