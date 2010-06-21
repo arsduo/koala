@@ -103,11 +103,10 @@ module Koala
         @oauth_callback_url = oauth_callback_url 
       end
     
-      def get_user_from_cookie(cookie_hash)
+      def get_user_info_from_cookie(cookie_hash)
         # Parses the cookie set by the official Facebook JavaScript SDK.
         # 
-        # cookies should be a dictionary-like object mapping cookie names to
-        # cookie values.
+        # cookies should be a Hash, like the one Rails provides
         # 
         # If the user is logged in via Facebook, we return a dictionary with the
         # keys "uid" and "access_token". The former is the user's Facebook ID,
@@ -132,7 +131,26 @@ module Koala
           sig == components["sig"] && (components["expires"] == "0" || Time.now.to_i < components["expires"].to_i) ? components : nil
         end
       end
+      alias_method :get_user_info_from_cookies, :get_user_info_from_cookie
+    
+      def get_user_from_cookie(cookies)
+        # overload this to be backward compatible with older implementations
+        # icky ruby magic, but it's _really_ cool we can do this
+        info = get_user_info_from_cookies(cookies)
+        string = info["uid"]
+        command = <<-EOS
+          def [](index)
+            puts "WARNING: get_app_access_token now provides the access token as a string; use get_app_access_token_info if you want the hash with expirations.  Otherwise you no longer need to call [] to get the token itself."
+            hash = #{info.inspect}
+            hash[index]
+          end
+        EOS
+        (class << string; self; end).class_eval command
+        string
+      end
       alias_method :get_user_from_cookies, :get_user_from_cookie
+    
+      # URLs
     
       def url_for_oauth_code(options = {})
         # for permissions, see http://developers.facebook.com/docs/authentication/permissions
@@ -157,18 +175,54 @@ module Koala
         "https://#{GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&redirect_uri=#{callback}&client_secret=#{@app_secret}&code=#{code}"
       end
             
-      def get_access_token(code)
+      def get_access_token_info(code)
         # convenience method to get a parsed token from Facebook for a given code
         # should this require an OAuth callback URL?
         get_token_from_server(:code => code, :redirect_uri => @oauth_callback_url)
       end
       
-      def get_app_access_token
+      def get_access_token(code)
+        info = get_access_token_info(code)
+        # upstream methods will throw errors if needed
+        string = info["access_token"]
+        # overload this to be backward compatible with older implementations
+        # icky ruby magic, but it's _really_ cool we can do this
+        command = <<-EOS
+          def [](index)
+            puts "WARNING: get_access_token now provides the access token as a string; use get_access_token_info if you want the hash with expirations.  Otherwise you no longer need to call [] to get the token itself."
+            hash = #{info.inspect}
+            hash[index]
+          end
+        EOS
+        (class << string; self; end).class_eval command
+
+        string          
+      end
+      
+      def get_app_access_token_info
         # convenience method to get a the application's sessionless access token 
         get_token_from_server({:type => 'client_cred'}, true)
       end
       
-      def get_tokens_from_session_keys(sessions)
+      def get_app_access_token
+        info = get_app_access_token_info
+        string = info["access_token"]
+        # overload this to be backward compatible with older implementations
+        # icky ruby magic, but it's _really_ cool we can do this
+        command = <<-EOS
+          def [](index)
+            puts "WARNING: get_app_access_token now provides the access token as a string; use get_app_access_token_info if you want the hash with expirations.  Otherwise you no longer need to call [] to get the token itself."
+            hash = #{info.inspect}
+            hash[index]
+          end
+        EOS
+        (class << string; self; end).class_eval command
+
+        string
+      end
+      
+      # from session keys
+      def get_token_info_from_session_keys(sessions)
         # fetch the OAuth tokens from Facebook
         response = fetch_token_string({
           :type => 'client_cred',
@@ -184,8 +238,30 @@ module Koala
         JSON.parse(response)
       end
   
+      def get_tokens_from_session_keys(sessions)
+        # get the original hash results
+        results = get_token_info_from_session_keys(sessions)
+        # now recollect them as backward-compatible strings
+        # for easier use
+        results.collect do |r|
+          string = r["access_token"]
+          # icky ruby magic, but it's _really_ cool we can do this
+          command = <<-EOS
+            def [](index)
+              puts "WARNING: get_token_from_session_key and get_tokens_from_session_keys now provides the tokens as strings (individually or in an array).  Use get_token_info_from_session_keys if you want the hash with expirations; otherwise you no longer need to call [] to get the token itself."
+              hash = #{r.inspect}
+              hash[index]
+            end
+          EOS
+          (class << string; self; end).class_eval command
+          
+          string
+        end
+      end
+      
       def get_token_from_session_key(session)
         # convenience method for a single key
+        # gets the overlaoded strings automatically
         get_tokens_from_session_keys([session])[0]
       end
       

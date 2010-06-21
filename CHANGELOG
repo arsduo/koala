@@ -1,6 +1,12 @@
 v0.7.3
 -- Added support for picture sizes -- thanks thhermansen for the patch!
--- 
+-- Adjusted the return values for several methods (get_access_token, get_app_access_token, get_token_from_session_key, get_tokens_from_session_keys, get_user_from_cookies)
+  -- These methods now return strings, rather than hashes, which makes more sense
+  -- The strings are overloaded with an [] method for backwards compatibility (Ruby is truly amazing)
+    -- Using those methods triggers a deprecation warning
+    -- This will be removed by 1.0
+  -- There are new info methods (get_access_token_info, get_app_access_token_info, get_token_info_from_session_keys, and get_user_info_from_cookies) that natively return hashes, for when you want the expiration date
+-- Updated changelog
 
 v0.7.2
 -- Added support for exchanging session keys for OAuth access tokens (get_token_from_session_key for single keys, get_tokens_from_session_keys for multiple)

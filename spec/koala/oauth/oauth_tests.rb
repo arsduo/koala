@@ -51,41 +51,66 @@ class FacebookOAuthTests < Test::Unit::TestCase
         @oauth.oauth_callback_url == nil).should be_true
     end
     
-    # cookie parsing
-    it "should properly parse valid cookies" do
-      result = @oauth.get_user_from_cookie(@oauth_data["valid_cookies"])
-      result["uid"].should
-    end
+    describe "cookie parsing" do
+      describe "get_user_info_from_cookies" do
+        it "should properly parse valid cookies" do
+          result = @oauth.get_user_info_from_cookies(@oauth_data["valid_cookies"])
+          result.should be_a(Hash)
+        end
     
-    it "should return all the cookie components from valid cookie string" do
-      cookie_data = @oauth_data["valid_cookies"]
-      parsing_results = @oauth.get_user_from_cookie(cookie_data)
-      number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
-      parsing_results.length.should == number_of_components
-    end
+        it "should return all the cookie components from valid cookie string" do
+          cookie_data = @oauth_data["valid_cookies"]
+          parsing_results = @oauth.get_user_info_from_cookies(cookie_data)
+          number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
+          parsing_results.length.should == number_of_components
+        end
 
-    it "should properly parse valid offline access cookies (e.g. no expiration)" do 
-      result = @oauth.get_user_from_cookie(@oauth_data["offline_access_cookies"])
-      result["uid"].should      
-    end
+        it "should properly parse valid offline access cookies (e.g. no expiration)" do 
+          result = @oauth.get_user_info_from_cookies(@oauth_data["offline_access_cookies"])
+          result["uid"].should      
+        end
 
-    it "should return all the cookie components from offline access cookies" do
-      cookie_data = @oauth_data["offline_access_cookies"]
-      parsing_results = @oauth.get_user_from_cookie(cookie_data)
-      number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
-      parsing_results.length.should == number_of_components
-    end
+        it "should return all the cookie components from offline access cookies" do
+          cookie_data = @oauth_data["offline_access_cookies"]
+          parsing_results = @oauth.get_user_info_from_cookies(cookie_data)
+          number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
+          parsing_results.length.should == number_of_components
+        end
 
-    it "shouldn't parse expired cookies" do
-      result = @oauth.get_user_from_cookie(@oauth_data["expired_cookies"])
-      result.should be_nil
-    end
+        it "shouldn't parse expired cookies" do
+          result = @oauth.get_user_info_from_cookies(@oauth_data["expired_cookies"])
+          result.should be_nil
+        end
     
-    it "shouldn't parse invalid cookies" do
-      # make an invalid string by replacing some values
-      bad_cookie_hash = @oauth_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
-      result = @oauth.get_user_from_cookie(bad_cookie_hash)
-      result.should be_nil
+        it "shouldn't parse invalid cookies" do
+          # make an invalid string by replacing some values
+          bad_cookie_hash = @oauth_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
+          result = @oauth.get_user_info_from_cookies(bad_cookie_hash)
+          result.should be_nil
+        end
+      end
+      
+      describe "get_user_from_cookies" do
+        it "should use get_user_info_from_cookies to parse the cookies" do
+          data = @oauth_data["valid_cookies"]
+          @oauth.should_receive(:get_user_info_from_cookies).with(data).and_return({})
+          @oauth.get_user_from_cookies(data)
+        end
+
+        it "should use return a string" do
+          result = @oauth.get_user_from_cookies(@oauth_data["valid_cookies"])
+          result.should be_a(String)
+        end
+        
+        describe "backward compatibility" do
+          before :each do
+            @result = @oauth.get_user_from_cookies(@oauth_data["valid_cookies"])
+            @key = "uid"
+          end
+          
+          it_should_behave_like "methods that return overloaded strings"
+        end
+      end
     end
     
     # OAuth URLs
@@ -157,46 +182,149 @@ class FacebookOAuthTests < Test::Unit::TestCase
       out.should_not be_nil
     end
 
-    # get_access_token
-    it "should properly get and parse an access token token results" do
-      result = @oauth.get_access_token(@code)
-      result["access_token"].should
+    describe "get_access_token_info" do
+      it "should properly get and parse an access token token results into a hash" do
+        result = @oauth.get_access_token_info(@code)
+        result.should be_a(Hash)
+      end
+
+      it "should properly include the access token results" do
+        result = @oauth.get_access_token_info(@code)
+        result["access_token"].should
+      end
+
+      it "should raise an error when get_access_token is called with a bad code" do
+        lambda { @oauth.get_access_token_info("foo") }.should raise_error(Koala::Facebook::APIError) 
+      end
     end
 
-    it "should raise an error when get_access_token is called with a bad code" do
-      lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
+    describe "get_access_token" do
+      it "should use get_access_token_info to get and parse an access token token results" do
+        result = @oauth.get_access_token(@code)
+        result.should be_a(String)
+      end
+
+      it "should return the access token as a string" do
+        result = @oauth.get_access_token(@code)
+        original = @oauth.get_access_token_info(@code)
+        result.should == original["access_token"]
+      end
+
+      it "should raise an error when get_access_token is called with a bad code" do
+        lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
+      end
+
+      describe "backwards compatibility" do
+        before :each do
+          @result = @oauth.get_access_token(@code)
+        end
+
+        it_should_behave_like "methods that return overloaded strings"
+      end
+    end
+
+    describe "get_app_access_token_info" do
+      it "should properly get and parse an app's access token as a hash" do
+        result = @oauth.get_app_access_token_info
+        result.should be_a(Hash)
+      end
+    
+      it "should include the access token" do
+        result = @oauth.get_app_access_token_info
+        result["access_token"].should
+      end
     end
     
-    # get_app_access_token
-    
-    it "should properly get and parse an app's access token token results" do
-      result = @oauth.get_app_access_token
-      result["access_token"].should
+    describe "get_app_acess_token" do
+      it "should use get_access_token_info to get and parse an access token token results" do
+        result = @oauth.get_app_access_token
+        result.should be_a(String)
+      end
+
+      it "should return the access token as a string" do
+        result = @oauth.get_app_access_token
+        original = @oauth.get_app_access_token_info
+        result.should == original["access_token"]
+      end
+      
+      describe "backwards compatibility" do
+        before :each do
+          @result = @oauth.get_app_access_token    
+        end
+        
+        it_should_behave_like "methods that return overloaded strings"
+      end
     end
 
-    # get_tokens_from_session_keys
-    it "should get an array of session keys from Facebook when passed a single key" do
-      result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
-      result.should be_an(Array)
-      result.length.should == 1
-    end
+    describe "exchanging session keys" do
+      describe "with get_token_info_from_session_keys" do
+        it "should get an array of session keys from Facebook when passed a single key" do
+          result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
+          result.should be_an(Array)
+          result.length.should == 1
+        end
 
-    it "should get an array of session keys from Facebook when passed multiple keys" do
-      result = @oauth.get_tokens_from_session_keys(@oauth_data["multiple_session_keys"])
-      result.should be_an(Array)
-      result.length.should == 2
-    end
+        it "should get an array of session keys from Facebook when passed multiple keys" do
+          result = @oauth.get_tokens_from_session_keys(@oauth_data["multiple_session_keys"])
+          result.should be_an(Array)
+          result.length.should == 2
+        end
+        
+        it "should return the original hashes" do
+          result = @oauth.get_token_info_from_session_keys(@oauth_data["multiple_session_keys"])
+          result[0].should be_a(Hash)
+        end
+      end
+      
+      describe "with get_tokens_from_session_keys" do
+        it "should call get_token_info_from_session_keys" do
+          args = @oauth_data["multiple_session_keys"]
+          @oauth.should_receive(:get_token_info_from_session_keys).with(args).and_return([])
+          @oauth.get_tokens_from_session_keys(args)
+        end
+        
+        it "should return an array of strings" do
+          args = @oauth_data["multiple_session_keys"]
+          result = @oauth.get_tokens_from_session_keys(args)
+          result.each {|r| r.should be_a(String) }
+        end
+        
+        describe "backwards compatibility" do
+          before :each do
+            args = @oauth_data["multiple_session_keys"]
+            @result = @oauth.get_tokens_from_session_keys(args)[0]
+          end
 
-    # get_token_from_session_key
-    it "should call get_tokens_from_session_keys when the get_token_from_session_key is called" do
-      key = @oauth_data["session_key"]
-      @oauth.should_receive(:get_tokens_from_session_keys).with([key]).and_return([])
-      @oauth.get_token_from_session_key(key)
-    end
-    
-    it "should get back a hash from get_token_from_session_key" do
-      result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
-      result["access_token"].should
+          it_should_behave_like "methods that return overloaded strings"
+        end
+      end
+
+      describe "get_token_from_session_key" do
+        it "should call get_tokens_from_session_keys when the get_token_from_session_key is called" do
+          key = @oauth_data["session_key"]
+          @oauth.should_receive(:get_tokens_from_session_keys).with([key]).and_return([])
+          @oauth.get_token_from_session_key(key)
+        end
+
+        it "should get back the access token string from get_token_from_session_key" do
+          result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
+          result.should be_a(String)
+        end
+
+        it "should be the first value in the array" do
+          result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
+          array = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
+          result.should == array[0]
+        end
+        
+        describe "backwards compatibility" do
+          before :each do
+            @result = @oauth.get_token_from_session_key(@oauth_data["session_key"])       
+          end
+
+          it_should_behave_like "methods that return overloaded strings"
+        end
+      end    
     end
     
     # protected methods
