@@ -52,6 +52,11 @@ module Koala
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
 
+        # Check for any 500 errors before parsing the body
+        # since we're not guaranteed that the body is valid JSON
+        # in the case of a server error
+        raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status >= 500
+        
         # Parse the body as JSON and check for errors if provided a mechanism to do so 
         # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
         # and cause JSON.parse to fail -- so we account for that by wrapping the result in []

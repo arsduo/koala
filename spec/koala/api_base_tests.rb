@@ -32,9 +32,8 @@ class ApiBaseTests < Test::Unit::TestCase
     it "should get the attribute of a Koala::Response given by the http_component parameter" do
       http_component = :method_name
       
-      response = mock('Mock KoalaResponse')
+      response = mock('Mock KoalaResponse', :body => '', :status => 200)
       response.should_receive(http_component).and_return('')
-      response.stub(:body).and_return('')
       
       Koala.stub(:make_request).and_return(response)
       
@@ -42,7 +41,7 @@ class ApiBaseTests < Test::Unit::TestCase
     end
     
     it "should return the body of the request as JSON if no http_component is given" do
-      response = stub('response', :body => 'body')
+      response = stub('response', :body => 'body', :status => 200)
       Koala.stub(:make_request).and_return(response)
       
       json_body = mock('JSON body')
@@ -62,6 +61,12 @@ class ApiBaseTests < Test::Unit::TestCase
         yield_test.pass
         arg.should == JSON.parse(body)
       end
+    end
+    
+    it "should raise an API error if the HTTP response code is greater than or equal to 500" do
+      Koala.stub(:make_request).and_return(Koala::Response.new(500, 'response body', {}))
+      
+      lambda { @service.api('anything') }.should raise_exception(Koala::Facebook::APIError)
     end
     
     it "should handle rogue true/false as responses" do
