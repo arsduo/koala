@@ -1,3 +1,6 @@
+v0.7.4 
+-- Fixed bug with get_user_from_cookies
+
 v0.7.3
 -- Added support for picture sizes -- thanks thhermansen for the patch!
 -- Adjusted the return values for several methods (get_access_token, get_app_access_token, get_token_from_session_key, get_tokens_from_session_keys, get_user_from_cookies)

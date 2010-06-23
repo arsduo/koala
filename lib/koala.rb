@@ -139,12 +139,10 @@ module Koala
       alias_method :get_user_info_from_cookies, :get_user_info_from_cookie
     
       def get_user_from_cookie(cookies)
-        # overload this to be backward compatible with older implementations
-        # icky ruby magic, but it's _really_ cool we can do this
-        info = get_user_info_from_cookies(cookies)
-        string = info["uid"]
-
-        overload_as_hash(string, info)
+        if info = get_user_info_from_cookies(cookies)
+          string = info["uid"]
+          overload_as_hash(string, info)
+        end
       end
       alias_method :get_user_from_cookies, :get_user_from_cookie
     

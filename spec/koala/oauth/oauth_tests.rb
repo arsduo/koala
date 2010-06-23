@@ -97,9 +97,16 @@ class FacebookOAuthTests < Test::Unit::TestCase
           @oauth.get_user_from_cookies(data)
         end
 
-        it "should use return a string" do
+        it "should use return a string if the cookies are valid" do
           result = @oauth.get_user_from_cookies(@oauth_data["valid_cookies"])
           result.should be_a(String)
+        end
+        
+        it "should return nil if the cookies are invalid" do
+          # make an invalid string by replacing some values
+          bad_cookie_hash = @oauth_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
+          result = @oauth.get_user_from_cookies(bad_cookie_hash)
+          result.should be_nil
         end
         
         describe "backward compatibility" do
