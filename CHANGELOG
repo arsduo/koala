@@ -6,7 +6,9 @@ v0.7.3
     -- Using those methods triggers a deprecation warning
     -- This will be removed by 1.0
   -- There are new info methods (get_access_token_info, get_app_access_token_info, get_token_info_from_session_keys, and get_user_info_from_cookies) that natively return hashes, for when you want the expiration date
+-- Responses with HTTP status 500+ now properly throw errors under Net::HTTP 
 -- Updated changelog
+-- Added license
 
 v0.7.2
 -- Added support for exchanging session keys for OAuth access tokens (get_token_from_session_key for single keys, get_tokens_from_session_keys for multiple)

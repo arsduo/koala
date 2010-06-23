@@ -12,4 +12,5 @@ Echoe.new('koala', '0.7.3') do |p|
   p.email          = "alex@alexkoppel.com"
   p.ignore_pattern = ["tmp/*", "script/*", "pkg/*"]
   p.development_dependencies = []
+  p.retain_gemspec = true
 end
