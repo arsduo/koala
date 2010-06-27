@@ -44,7 +44,7 @@ module Koala
         # fetch the access token if we're provided a secret
         if @secret && !@app_access_token
           oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
-          @app_access_token = oauth.get_app_access_token["access_token"]
+          @app_access_token = oauth.get_app_access_token
         end
       end
       

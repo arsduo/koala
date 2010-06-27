@@ -78,34 +78,3 @@ class ApiBaseTests < Test::Unit::TestCase
     end
   end
 end
-
-shared_examples_for "methods that return overloaded strings" do
-  before :each do
-    @key ||= "access_token"
-  end
-  
-  it "should be overloaded to be backward compatible" do
-    @result.respond_to?(:[]).should be_true
-  end
-
-  it "should allow hash access to the access token info" do
-    @result[@key].should == @result
-  end
-
-  it "should output a deprecation warning when the result is used as a hash" do 
-    out = nil
-  
-    begin
-      # we want to capture the deprecation warning as well as the output
-      # credit to http://thinkingdigitally.com/archive/capturing-output-from-puts-in-ruby/ for the technique
-      out = StringIO.new
-      $stdout = out
-      @result[@key]
-    ensure
-      $stdout = STDOUT
-    end
-  
-    # ensure we got a warning
-    out.should_not be_nil
-  end
-end

@@ -107,16 +107,7 @@ class FacebookOAuthTests < Test::Unit::TestCase
           bad_cookie_hash = @oauth_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
           result = @oauth.get_user_from_cookies(bad_cookie_hash)
           result.should be_nil
-        end
-        
-        describe "backward compatibility" do
-          before :each do
-            @result = @oauth.get_user_from_cookies(@oauth_data["valid_cookies"])
-            @key = "uid"
-          end
-          
-          it_should_behave_like "methods that return overloaded strings"
-        end
+        end        
       end
     end
     
@@ -170,25 +161,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
       url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&redirect_uri=#{callback}&client_secret=#{@secret}&code=#{@code}"
     end
     
-    it "should output a deprecation warning but generate a properly formatted OAuth token URL when provided a callback in the deprecated fashion" do 
-      callback = "foo.com"
-      url = out = nil
-      
-      begin
-        # we want to capture the deprecation warning as well as the output
-        # credit to http://thinkingdigitally.com/archive/capturing-output-from-puts-in-ruby/ for the technique
-        out = StringIO.new
-        $stdout = out
-        url = @oauth.url_for_access_token(@code, callback)
-      ensure
-        $stdout = STDOUT
-      end
-      
-      # two assertions may be bad test writing, but this is for a deprecated method
-      url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&redirect_uri=#{callback}&client_secret=#{@secret}&code=#{@code}"
-      out.should_not be_nil
-    end
-
     describe "get_access_token_info" do
       it "should properly get and parse an access token token results into a hash" do
         result = @oauth.get_access_token_info(@code)
@@ -220,14 +192,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
       it "should raise an error when get_access_token is called with a bad code" do
         lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
       end
-
-      describe "backwards compatibility" do
-        before :each do
-          @result = @oauth.get_access_token(@code)
-        end
-
-        it_should_behave_like "methods that return overloaded strings"
-      end
     end
 
     describe "get_app_access_token_info" do
@@ -252,14 +216,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
         result = @oauth.get_app_access_token
         original = @oauth.get_app_access_token_info
         result.should == original["access_token"]
-      end
-      
-      describe "backwards compatibility" do
-        before :each do
-          @result = @oauth.get_app_access_token    
-        end
-        
-        it_should_behave_like "methods that return overloaded strings"
       end
     end
 
@@ -295,15 +251,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
           result = @oauth.get_tokens_from_session_keys(args)
           result.each {|r| r.should be_a(String) }
         end
-        
-        describe "backwards compatibility" do
-          before :each do
-            args = @oauth_data["multiple_session_keys"]
-            @result = @oauth.get_tokens_from_session_keys(args)[0]
-          end
-
-          it_should_behave_like "methods that return overloaded strings"
-        end
       end
 
       describe "get_token_from_session_key" do
@@ -322,14 +269,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
           result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
           array = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
           result.should == array[0]
-        end
-        
-        describe "backwards compatibility" do
-          before :each do
-            @result = @oauth.get_token_from_session_key(@oauth_data["session_key"])       
-          end
-
-          it_should_behave_like "methods that return overloaded strings"
         end
       end    
     end
