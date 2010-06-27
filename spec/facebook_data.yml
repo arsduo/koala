@@ -5,18 +5,18 @@
  
 # You must supply this value yourself to test the GraphAPI class.
 # Your OAuth token should have publish_stream and read_stream permissions.
-oauth_token: 119908831367602|2.yluAH7g12_ocFAHxhWWVZQ__.3600.1277661600-2905623|Yd5GFTBYpF8hTUAB6VyyCcIf9WQ.
+oauth_token: 
 
 # for testing the OAuth class    
 # baseline app
 oauth_test_data: 
   # You must supply this value yourself, since they will expire.
-  code: 2.yluAH7g12_ocFAHxhWWVZQ__.3600.1277661600-2905623|yPK7PPsRNCx3I0tJ6rgPd8oyN4I.
+  code: 
   # easiest way to get session keys: use multiple test accounts with the Javascript login at http://oauth.twoalex.com
-  session_key: 2.yluAH7g12_ocFAHxhWWVZQ__.3600.1277661600-2905623
+  session_key: 
   multiple_session_keys:
-    - 2.yluAH7g12_ocFAHxhWWVZQ__.3600.1277661600-2905623
-    - 2.yluAH7g12_ocFAHxhWWVZQ__.3600.1277661600-2905623
+    - 
+    - 
   
   # These values will work out of the box
   app_id: 119908831367602
