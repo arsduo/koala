@@ -5,6 +5,9 @@ require 'digest/md5'
 require 'rubygems'
 require 'json'
 
+# openssl is required to support signed_request
+require 'openssl'
+
 # include default http services
 require 'koala/http_services'
 
@@ -51,9 +54,6 @@ module Koala
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
-        
-        # make sure the path has a leading / for compatibility with some testing librariess
-        path = "/#{path}" unless path =~ /^\//
         
         # Check for any 500 errors before parsing the body
         # since we're not guaranteed that the body is valid JSON
@@ -192,6 +192,21 @@ module Koala
           string = info["access_token"] 
         end
       end
+      
+      # signed_request
+      def parse_signed_request(request)
+        # Facebook's signed requests come in two parts -- the signature and the data payload
+        encoded_sig, payload = request.split(".")
+        
+        sig = base64_url_decode(encoded_sig)
+
+        # if the signature matches, return the data, decoded and parsed as JSON
+        if OpenSSL::HMAC.digest("sha256", @app_secret, payload) == sig
+          JSON.parse(base64_url_decode(payload))
+        else
+          nil
+        end
+      end
 
       # from session keys
       def get_token_info_from_session_keys(sessions)
@@ -249,6 +264,14 @@ module Koala
           :client_id => @app_id, 
           :client_secret => @app_secret
         }.merge!(args), post ? "post" : "get").body
+      end
+      
+      # base 64
+      def base64_url_decode(string)
+        # to properly decode what Facebook provides, we need to add == to the end
+        # and translate certain characters to others before running the actual decoding
+        # see http://developers.facebook.com/docs/authentication/canvas 
+        "#{string}==".tr("-_", "+/").unpack("m")[0]
       end
     end
   end
