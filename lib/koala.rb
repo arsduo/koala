@@ -51,7 +51,10 @@ module Koala
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
-
+        
+        # make sure the path has a leading / for compatibility with some testing librariess
+        path = "/#{path}" unless path =~ /^\//
+        
         # Check for any 500 errors before parsing the body
         # since we're not guaranteed that the body is valid JSON
         # in the case of a server error
