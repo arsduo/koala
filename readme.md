@@ -60,11 +60,11 @@ The Graph API now allows your application to subscribe to real-time updates for 
 
 Currently, Facebook only supports subscribing to users, permissions and errors.  On top of that, there are limitations on what attributes and connections for each of these objects you can subscribe to updates for.  Check the [official Facebook documentation](http://developers.facebook.com/docs/api/realtime) for more details.
 
-Koala makes it easy to interact with your applications using the RealTimeUpdates class:
+Koala makes it easy to interact with your applications using the RealtimeUpdates class:
 
-    @updates = Koala::Facebook::RealTimeUpdates.new(:app_id => app_id, :secret => secret)
+    @updates = Koala::Facebook::RealtimeUpdates.new(:app_id => app_id, :secret => secret)
 
-You can do just about anything with your real-time update subscriptions using the RealTimeUpdates class:
+You can do just about anything with your real-time update subscriptions using the RealtimeUpdates class:
 
     # Add/modify a subscription to updates for when the first_name or last_name fields of any of your users is changed
     @updates.subscribe("user", "first_name, last_name", callback_token, verify_token)
@@ -75,12 +75,12 @@ You can do just about anything with your real-time update subscriptions using th
     # Unsubscribe from updates for an object
     @updates.unsubscribe("user")
 
-And to top it all off, RealTimeUpdates provides a static method to respond to Facebook servers' verification of your callback URLs:
+And to top it all off, RealtimeUpdates provides a static method to respond to Facebook servers' verification of your callback URLs:
 
     # Returns the hub.challenge parameter in params if the verify token in params matches verify_token
-    Koala::Facebook::RealTimeUpdates.meet_challenge(params, your_verify_token)
+    Koala::Facebook::RealtimeUpdates.meet_challenge(params, your_verify_token)
 
-For more information about meet_challenge and the RealTimeUpdates class, check out the Real-Time Updates page on the wiki.
+For more information about meet_challenge and the RealtimeUpdates class, check out the Real-Time Updates page on the wiki.
 
 See examples, ask questions
 -----
