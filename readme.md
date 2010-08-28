@@ -12,7 +12,7 @@ Graph API
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward: 
     graph = Koala::Facebook::GraphAPI.new(oauth_access_token)
     profile = graph.get_object("me")
-    friends = graph.get_connection("me", "friends")
+    friends = graph.get_connections("me", "friends")
     graph.put_object("me", "feed", :message => "I am writing on my wall!")
 
 Check out the wiki for more examples.
