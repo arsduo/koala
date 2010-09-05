@@ -18,23 +18,23 @@ module Koala
         super response["data"]
         @paging = response["paging"]
       end
-                  
-      def next_page(graph)
-        base,args = next_page_params
-        GraphCollection.new graph.graph_call(base, args)
-      end
       
-      def previous_page(graph)
-        base,args = previous_page_params
-        GraphCollection.new graph.graph_call(base, args)
-      end
-      
-      def next_page_params
-        parse_page_url(@paging["next"]) 
-      end
-      
-      def previous_page_params
-        parse_page_url(@paging["previous"]) 
+      # defines methods for NEXT and PREVIOUS pages
+      %w{next previous}.each do |this|
+        
+        # def next_page
+        # def previous_page
+        define_method "#{this.to_sym}_page" do |graph|
+          base, args = send("#{this}_page_params")
+          base ? GraphCollection.new(graph.graph_call(base, args)) : nil
+        end
+        
+        # def next_page_params
+        # def previous_page_params
+        define_method "#{this.to_sym}_page_params" do
+          return nil unless @paging and @paging[this]
+          parse_page_url(@paging[this])
+        end
       end
       
       def parse_page_url(url)
