@@ -52,6 +52,11 @@ module Koala
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
+
+        # add a leading /
+        #puts "\npath: #{path}"
+        path = "/#{path}" unless path =~ /^\//
+        #puts "Making request to #{path} with args #{args.inspect}\n"
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
         
@@ -196,6 +201,7 @@ module Koala
       # signed_request
       def parse_signed_request(request)
         # Facebook's signed requests come in two parts -- the signature and the data payload
+        # see http://developers.facebook.com/docs/authentication/canvas
         encoded_sig, payload = request.split(".")
         
         sig = base64_url_decode(encoded_sig)
@@ -260,7 +266,7 @@ module Koala
       end
 
       def fetch_token_string(args, post = false, endpoint = "access_token")
-        Koala.make_request("oauth/#{endpoint}", {
+        Koala.make_request("/oauth/#{endpoint}", {
           :client_id => @app_id, 
           :client_secret => @app_secret
         }.merge!(args), post ? "post" : "get").body

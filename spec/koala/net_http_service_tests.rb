@@ -74,7 +74,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         Bear.make_request('anything', {}, 'post')
       end
       
-      it "should go to the specified path" do
+      it "should go to the specified path adding a / if it doesn't exist" do
         path = mock('Path')
         @http_yield_mock.should_receive(:post).with(path, anything).and_return(@http_request_result)
         

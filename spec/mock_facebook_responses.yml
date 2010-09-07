@@ -14,7 +14,7 @@
 rest_api:
 
 # -- Stubbed Responses --
-  method/fql.query:
+  /method/fql.query:
     query=select first_name from user where uid = 216743:
       get: 
         no_token: '[{"first_name":"Chris"}]'
@@ -53,7 +53,7 @@ graph_api:
       get:
         with_token: '[{}, {}]'
         no_token: '[{}, {}]'
-  me:
+  /me:
     no_args:
       get:
         <<: *token_required
@@ -62,7 +62,7 @@ graph_api:
       get: 
         with_token: '{"id": "216743"}'
         
-  me/feed:
+  /me/feed:
     message=Hello, world, from the test suite!: 
       post: 
         with_token: '{"id": "MOCK_FEED_ITEM"}'
@@ -79,31 +79,31 @@ graph_api:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
         
-  koppel:
+  /koppel:
     no_args:
       get:
         with_token: '{"id": 1, "name": 1, "updated_time": 1}'
         no_token: '{"id": 1, "name": 1}'
                 
-  contextoptional:
+  /contextoptional:
     no_args:
       get:
         with_token: '{"id": 1, "name": 1}'
         no_token: '{"id": 1, "name": 1}'
         
-  contextoptional/likes: 
+  /contextoptional/likes: 
     no_args: 
       get: 
         with_token: '{"data": [{}]}'
         no_token: '{"data": [{}]}'
         
-  lukeshepard/likes: 
+  /lukeshepard/likes: 
     no_args: 
       get: 
         <<: *token_required
         with_token: '{"data": [{}]}'
         
-  chris.baclig/picture:
+  /chris.baclig/picture:
     no_args:
       get:
         no_token:
@@ -126,19 +126,19 @@ graph_api:
             Location: http://facebook.com/large
 
 
-  search:
+  /search:
     q=facebook:
       get: 
         with_token: '{"data": [{"id": "507731521_100412693339488"}]}'
         no_token: '{"data": [{"id": "507731521_100412693339488"}]}'
         
-  '115349521819193_113815981982767':
+  '/115349521819193_113815981982767':
     no_args:
       delete:
         <<: *token_required
   
   # -- OAuth responses --
-  oauth/access_token: 
+  /oauth/access_token: 
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=<%= OAUTH_CODE %>&redirect_uri=<%= OAUTH_DATA["callback_url"] %>:
       get:
         no_token: access_token=<%= ACCESS_TOKEN %>
@@ -148,7 +148,7 @@ graph_api:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&type=client_cred:
       post:
         no_token: access_token=<%= ACCESS_TOKEN %>
-  oauth/exchange_sessions:
+  /oauth/exchange_sessions:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["session_key"] %>&type=client_cred: 
       post:
         no_token: '[{"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
@@ -159,7 +159,7 @@ graph_api:
 
 
 # -- Subscription Responses -- 
-  <%= APP_ID %>/subscriptions:
+  /<%= APP_ID %>/subscriptions:
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
       post: 
         with_token:
@@ -191,37 +191,37 @@ graph_api:
 
 # -- Mock Item Responses --
 
-  MOCK_FEED_ITEM/likes:
+  /MOCK_FEED_ITEM/likes:
     no_args:
       post:
         with_token: '{"id": "MOCK_LIKE"}'
         
-  MOCK_FEED_ITEM/comments:
+  /MOCK_FEED_ITEM/comments:
     message=it's my comment!:
       post:
         with_token: '{"id": "MOCK_COMMENT"}'
   
-  MOCK_FEED_ITEM:
+  /MOCK_FEED_ITEM:
     no_args:
       <<: *item_deleted
   
-  FEED_ITEM_CONTEXT:
+  /FEED_ITEM_CONTEXT:
     no_args: 
       <<: *item_deleted
       get:
         with_token: '{"link":"http://www.contextoptional.com/", "name": "Context Optional"}'
   
-  FEED_ITEM_CATS:
+  /FEED_ITEM_CATS:
     no_args:
       <<: *item_deleted
       get: 
         with_token: '{"message": "the cats are asleep"}'
   
-  FEED_ITEM_DELETE:
+  /FEED_ITEM_DELETE:
     no_args:
       <<: *item_deleted
       
-  MOCK_COMMENT:
+  /MOCK_COMMENT:
     no_args:
       <<: *item_deleted
       get:

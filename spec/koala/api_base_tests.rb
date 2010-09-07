@@ -76,5 +76,20 @@ class ApiBaseTests < Test::Unit::TestCase
       Koala.should_receive(:make_request).and_return(Koala::Response.new(200, 'false', {}))
       @service.api('anything').should be_false
     end
+    
+    describe "with regard to leading slashes" do 
+      it "should add a leading / to the path if not present" do
+        path = "anything"
+        Koala.should_receive(:make_request).with("/#{path}", anything, anything, anything).and_return(Koala::Response.new(200, 'true', {}))
+        @service.api(path)      
+      end
+    
+      it "shouldn't change the path if a leading / is present" do
+        path = "/anything"
+        Koala.should_receive(:make_request).with(path, anything, anything, anything).and_return(Koala::Response.new(200, 'true', {}))
+        @service.api(path)              
+      end
+    end
+    
   end
 end

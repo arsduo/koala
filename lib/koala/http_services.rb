@@ -61,7 +61,8 @@ module Koala
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
           server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
-          response = self.send(verb, "https://#{server}/#{path}", :params => args)
+
+          response = self.send(verb, "https://#{server}#{path}", :params => args)
           Koala::Response.new(response.code, response.body, response.headers_hash)
         end
       end # class_eval
