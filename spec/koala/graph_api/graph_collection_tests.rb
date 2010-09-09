@@ -34,7 +34,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
         it "should return the previous page of results" do
           @result.should_receive(:previous_page_params).and_return([@base, @args])
           @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
-          Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page).and_return(@page_of_results)
+          Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
       
           @result.previous_page(@api).should == @page_of_results
         end
@@ -42,9 +42,9 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
         it "should return the next page of results" do
           @result.should_receive(:next_page_params).and_return([@base, @args])
           @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
-          Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page).and_return(@page_of_results)
+          Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
       
-          @result.next_page(@api).should == @page_of_results        
+          @result.next_page.should == @page_of_results        
         end
     
         it "should return nil it there are no other pages" do
@@ -57,7 +57,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
   
       describe "when parsing page paramters" do
         before(:each) do
-          @graph_collection = Koala::Facebook::GraphCollection.new({"data" => []})
+          @graph_collection = Koala::Facebook::GraphCollection.new({"data" => []}, Koala::Facebook::GraphAPI.new)
         end
     
         it "should return the base as the first array entry" do

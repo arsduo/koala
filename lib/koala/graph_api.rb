@@ -13,10 +13,12 @@ module Koala
       #ability to get the next/previous page in the collection
       #by calling next_page or previous_page.
       attr_reader :paging
+      attr_reader :api
       
-      def initialize(response)
+      def initialize(response, api)
         super response["data"]
         @paging = response["paging"]
+        @api = api
       end
       
       # defines methods for NEXT and PREVIOUS pages
@@ -24,9 +26,9 @@ module Koala
         
         # def next_page
         # def previous_page
-        define_method "#{this.to_sym}_page" do |graph|
+        define_method "#{this.to_sym}_page" do
           base, args = send("#{this}_page_params")
-          base ? GraphCollection.new(graph.graph_call(base, args)) : nil
+          base ? GraphCollection.new(@api.graph_call(base, args), @api) : nil
         end
         
         # def next_page_params
@@ -95,7 +97,7 @@ module Koala
     
       def get_connections(id, connection_name, args = {})
         # Fetchs the connections for given object.
-        GraphCollection.new(graph_call("#{id}/#{connection_name}", args))
+        GraphCollection.new(graph_call("#{id}/#{connection_name}", args), self)
       end
       
     
@@ -165,7 +167,7 @@ module Koala
     
       def search(search_terms, args = {})
         # Searches for a given term
-        GraphCollection.new(graph_call("search", args.merge({:q => search_terms})))
+        GraphCollection.new(graph_call("search", args.merge({:q => search_terms})), self)
       end
     
       def graph_call(*args)
