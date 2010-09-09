@@ -95,7 +95,7 @@ module Koala
     
       def get_connections(id, connection_name, args = {})
         # Fetchs the connections for given object.
-        GraphCollection.new graph_call("#{id}/#{connection_name}", args)
+        GraphCollection.new(graph_call("#{id}/#{connection_name}", args))
       end
       
     
@@ -165,7 +165,7 @@ module Koala
     
       def search(search_terms, args = {})
         # Searches for a given term
-        graph_call("search", args.merge({:q => search_terms}))
+        GraphCollection.new(graph_call("search", args.merge({:q => search_terms})))
       end
     
       def graph_call(*args)

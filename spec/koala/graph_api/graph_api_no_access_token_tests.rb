@@ -39,7 +39,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
   end
 
   it "should be able to access connections from public Pages" do
-    result = @api.get_connections("contextoptional", "likes")
+    result = @api.get_connections("contextoptional", "photos")
     result.should be_a(Array)
   end
 
@@ -66,70 +66,6 @@ shared_examples_for "Koala GraphAPI without an access token" do
   it "should not be able to like an object" do
     lambda { @api.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
   end
-
-  # GraphCollection
-  describe "when getting a collection" do
-    before(:each) do
-      @result = @api.get_connections("contextoptional", "likes")
-    end
-    
-    it "should get a GraphCollection when getting connections" do
-      @result.should be_a(Koala::Facebook::GraphCollection)
-    end
-    
-    it "should have a read-only paging attribute" do
-      lambda { @result.paging }.should_not raise_error
-      lambda { @result.paging = "paging" }.should raise_error(NoMethodError)
-    end
-    
-    describe "and getting a whole page" do
-      before(:each) do
-        @second_page = stub("page of Fb graph results")
-        @base = stub("base")
-        @args = stub("args")
-        @page_of_results = stub("page of results")
-      end
-      
-      it "should return the previous page of results" do
-        @result.should_receive(:previous_page_params).and_return([@base, @args])
-        @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
-        Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page).and_return(@page_of_results)
-        
-        @result.previous_page(@api).should == @page_of_results
-      end
-      
-      it "should return the next page of results" do
-        @result.should_receive(:next_page_params).and_return([@base, @args])
-        @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
-        Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page).and_return(@page_of_results)
-        
-        @result.next_page(@api).should == @page_of_results        
-      end
-      
-      it "should return nil it there are no other pages" do
-        %w{next previous}.each do |this|
-          @result.should_receive("#{this}_page_params".to_sym).and_return(nil)
-          @result.send("#{this}_page", @api).should == nil
-        end
-      end
-    end
-    
-    describe "and parsing page paramters" do
-      before(:each) do
-        @graph_collection = Koala::Facebook::GraphCollection.new({"data" => []})
-      end
-      
-      it "should return the base as the first array entry" do
-        base = "url_path"
-        @graph_collection.parse_page_url("anything.com/#{base}?anything").first.should == base 
-      end
-      
-      it "should return the arguments as a hash as the last array entry" do
-        args_hash = {"one" => "val_one", "two" => "val_two"}
-        @graph_collection.parse_page_url("anything.com/anything?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").last.should == args_hash
-      end
-    end
-  end   
   
   # DELETE
   it "should not be able to delete posts" do 
@@ -140,9 +76,11 @@ shared_examples_for "Koala GraphAPI without an access token" do
   # SEARCH
   it "should be able to search" do
     result = @api.search("facebook")
-    result["data"].should be_an(Array)
+    result.length.should be_an(Integer)
   end
 
+  it_should_behave_like "Koala GraphAPI with GraphCollection"
+  
   # API
   it "should never use the rest api server" do
     Koala.should_receive(:make_request).with(

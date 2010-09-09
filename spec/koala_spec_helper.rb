@@ -11,6 +11,7 @@ require 'koala/live_testing_data_helper'
 # API tests
 require 'koala/api_base_tests'
 
+require 'koala/graph_api/graph_collection_tests'
 require 'koala/graph_api/graph_api_no_access_token_tests'
 require 'koala/graph_api/graph_api_with_access_token_tests'
 
