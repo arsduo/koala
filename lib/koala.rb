@@ -216,9 +216,8 @@ module Koala
           :sessions => sessions.join(",")
         }, true, "exchange_sessions")
         
-        # get_token_from_session_key should return an empty body if an empty string or nil is provided
-        # if invalid tokens are provided, it returns an array of nulls, which is a valid result
-        if response == ""
+        # Facebook returns an empty body in certain error conditions
+        if response == "" 
           raise APIError.new("ArgumentError", "get_token_from_session_key received an error (empty response body) for sessions #{sessions.inspect}!")
         end
         
@@ -229,7 +228,7 @@ module Koala
         # get the original hash results
         results = get_token_info_from_session_keys(sessions)
         # now recollect them as just the access tokens
-        results.collect { |r| string = r["access_token"] }
+        results.collect { |r| r ? r["access_token"] : nil }
       end
       
       def get_token_from_session_key(session)
