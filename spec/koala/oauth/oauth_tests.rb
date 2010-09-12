@@ -247,7 +247,7 @@ class FacebookOAuthTests < Test::Unit::TestCase
         it "should properly handle a mix of valid and invalid session keys" do
           result = @oauth.get_token_info_from_session_keys(["foo"].concat(@oauth_data["multiple_session_keys"]))
           # it should return nil for each of the invalid ones
-          result.each_with_index {|r, index| index < 2 ? r.should(be_a(Hash)) : r.should(be_nil)}
+          result.each_with_index {|r, index| index > 0 ? r.should(be_a(Hash)) : r.should(be_nil)}
         end
       end
       
@@ -273,7 +273,7 @@ class FacebookOAuthTests < Test::Unit::TestCase
         it "should properly handle a mix of valid and invalid session keys" do
           result = @oauth.get_tokens_from_session_keys(["foo"].concat(@oauth_data["multiple_session_keys"]))
           # it should return nil for each of the invalid ones
-          result.each_with_index {|r, index| index < 2 ? r.should(be_a(String)) : r.should(be_nil)}
+          result.each_with_index {|r, index| index > 0 ? r.should(be_a(String)) : r.should(be_nil)}
         end
       end
 
