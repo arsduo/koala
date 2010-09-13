@@ -2,6 +2,59 @@ module Koala
   module Facebook
     GRAPH_SERVER = "graph.facebook.com"
 
+    class GraphCollection < Array
+      #This class is a light wrapper for collections returned
+      #from the Graph API.
+      #
+      #It extends Array to allow direct access to the data colleciton
+      #which should allow it to drop in seamlessly.
+      #
+      #It also allows access to paging information and the
+      #ability to get the next/previous page in the collection
+      #by calling next_page or previous_page.
+      attr_reader :paging
+      attr_reader :api
+      
+      def initialize(response, api)
+        super response["data"]
+        @paging = response["paging"]
+        @api = api
+      end
+      
+      # defines methods for NEXT and PREVIOUS pages
+      %w{next previous}.each do |this|
+        
+        # def next_page
+        # def previous_page
+        define_method "#{this.to_sym}_page" do
+          base, args = send("#{this}_page_params")
+          base ? GraphCollection.new(@api.graph_call(base, args), @api) : nil
+        end
+        
+        # def next_page_params
+        # def previous_page_params
+        define_method "#{this.to_sym}_page_params" do
+          return nil unless @paging and @paging[this]
+          parse_page_url(@paging[this])
+        end
+      end
+      
+      def parse_page_url(url)
+        match = url.match(/.com\/(.*)\?(.*)/)
+        base = match[1]
+        args = match[2]
+        params = CGI.parse(args)
+        new_params = {}
+        params.each_pair do |key,value|
+          new_params[key] = value.join ","
+        end
+        [base,new_params]
+      end
+      
+    end
+    
+    
+
     module GraphAPIMethods
       # A client for the Facebook Graph API.
       # 
@@ -44,8 +97,9 @@ module Koala
     
       def get_connections(id, connection_name, args = {})
         # Fetchs the connections for given object.
-        graph_call("#{id}/#{connection_name}", args)["data"]
+        GraphCollection.new(graph_call("#{id}/#{connection_name}", args), self)
       end
+      
     
       def get_picture(object, args = {})
         result = graph_call("#{object}/picture", args, "get", :http_component => :headers)
@@ -113,7 +167,7 @@ module Koala
     
       def search(search_terms, args = {})
         # Searches for a given term
-        graph_call("search", args.merge({:q => search_terms}))
+        GraphCollection.new(graph_call("search", args.merge({:q => search_terms})), self)
       end
     
       def graph_call(*args)

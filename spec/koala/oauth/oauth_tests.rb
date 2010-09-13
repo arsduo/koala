@@ -20,6 +20,7 @@ class FacebookOAuthTests < Test::Unit::TestCase
       @callback_url = @oauth_data["callback_url"]
       @raw_token_string = @oauth_data["raw_token_string"]
       @raw_offline_access_token_string = @oauth_data["raw_offline_access_token_string"]
+<<<<<<< HEAD:spec/koala/oauth/oauth_tests.rb
       
       # per Facebook's example:
       # http://developers.facebook.com/docs/authentication/canvas
@@ -28,6 +29,9 @@ class FacebookOAuthTests < Test::Unit::TestCase
       @signed_request = @oauth_data["signed_request"]
       @signed_request_result = @oauth_data["signed_request_result"]
       
+=======
+
+>>>>>>> integration:spec/koala/oauth/oauth_tests.rb
       # this should expanded to cover all variables
       raise Exception, "Must supply app data to run FacebookOAuthTests!" unless @app_id && @secret && @callback_url && 
                                                                                 @code && @raw_token_string && 
@@ -268,8 +272,13 @@ class FacebookOAuthTests < Test::Unit::TestCase
       end
     end
 
+<<<<<<< HEAD:spec/koala/oauth/oauth_tests.rb
     describe "for exchanging session keys" do
       describe "with get_token_info_from_session_keys" do
+=======
+    describe "exchanging session keys" do      
+      describe "with get_token_info_from_session_keys" do        
+>>>>>>> integration:spec/koala/oauth/oauth_tests.rb
         it "should get an array of session keys from Facebook when passed a single key" do
           result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
           result.should be_an(Array)
@@ -286,6 +295,18 @@ class FacebookOAuthTests < Test::Unit::TestCase
           result = @oauth.get_token_info_from_session_keys(@oauth_data["multiple_session_keys"])
           result[0].should be_a(Hash)
         end
+        
+        it "should properly handle invalid session keys" do
+          result = @oauth.get_token_info_from_session_keys(["foo", "bar"])
+          #it should return nil for each of the invalid ones
+          result.each {|r| r.should be_nil}
+        end
+        
+        it "should properly handle a mix of valid and invalid session keys" do
+          result = @oauth.get_token_info_from_session_keys(["foo"].concat(@oauth_data["multiple_session_keys"]))
+          # it should return nil for each of the invalid ones
+          result.each_with_index {|r, index| index > 0 ? r.should(be_a(Hash)) : r.should(be_nil)}
+        end
       end
       
       describe "with get_tokens_from_session_keys" do
@@ -299,6 +320,18 @@ class FacebookOAuthTests < Test::Unit::TestCase
           args = @oauth_data["multiple_session_keys"]
           result = @oauth.get_tokens_from_session_keys(args)
           result.each {|r| r.should be_a(String) }
+        end
+        
+        it "should properly handle invalid session keys" do
+          result = @oauth.get_tokens_from_session_keys(["foo", "bar"])
+          # it should return nil for each of the invalid ones
+          result.each {|r| r.should be_nil}
+        end
+        
+        it "should properly handle a mix of valid and invalid session keys" do
+          result = @oauth.get_tokens_from_session_keys(["foo"].concat(@oauth_data["multiple_session_keys"]))
+          # it should return nil for each of the invalid ones
+          result.each_with_index {|r, index| index > 0 ? r.should(be_a(String)) : r.should(be_nil)}
         end
       end
 
@@ -318,6 +351,11 @@ class FacebookOAuthTests < Test::Unit::TestCase
           result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
           array = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
           result.should == array[0]
+        end
+        
+        it "should properly handle an invalid session key" do
+          result = @oauth.get_token_from_session_key("foo")
+          result.should be_nil
         end
       end    
     end

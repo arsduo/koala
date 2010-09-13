@@ -39,7 +39,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
   end
 
   it "should be able to access connections from public Pages" do
-    result = @api.get_connections("contextoptional", "likes")
+    result = @api.get_connections("contextoptional", "photos")
     result.should be_a(Array)
   end
 
@@ -66,8 +66,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
   it "should not be able to like an object" do
     lambda { @api.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
   end
-
-
+  
   # DELETE
   it "should not be able to delete posts" do 
     # test post on the Ruby SDK Test application
@@ -77,9 +76,11 @@ shared_examples_for "Koala GraphAPI without an access token" do
   # SEARCH
   it "should be able to search" do
     result = @api.search("facebook")
-    result["data"].should be_an(Array)
+    result.length.should be_an(Integer)
   end
 
+  it_should_behave_like "Koala GraphAPI with GraphCollection"
+  
   # API
   it "should never use the rest api server" do
     Koala.should_receive(:make_request).with(

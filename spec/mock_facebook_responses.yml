@@ -91,11 +91,11 @@ graph_api:
         with_token: '{"id": 1, "name": 1}'
         no_token: '{"id": 1, "name": 1}'
         
-  /contextoptional/likes: 
+  /contextoptional/photos: 
     no_args: 
       get: 
-        with_token: '{"data": [{}]}'
-        no_token: '{"data": [{}]}'
+        with_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+        no_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         
   /lukeshepard/likes: 
     no_args: 
@@ -129,8 +129,8 @@ graph_api:
   /search:
     q=facebook:
       get: 
-        with_token: '{"data": [{"id": "507731521_100412693339488"}]}'
-        no_token: '{"data": [{"id": "507731521_100412693339488"}]}'
+        with_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+        no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         
   '/115349521819193_113815981982767':
     no_args:
@@ -155,6 +155,15 @@ graph_api:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["multiple_session_keys"].join(",") %>&type=client_cred: 
       post:
         no_token: '[{"access_token":"<%= ACCESS_TOKEN %>","expires":4315}, {"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= ["foo"].concat(OAUTH_DATA["multiple_session_keys"]).join(",") %>&type=client_cred: 
+      post:
+        no_token: '[null, {"access_token":"<%= ACCESS_TOKEN %>","expires":4315}, {"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=foo,bar&type=client_cred: 
+      post:
+        no_token: '[null, null]'
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=foo&type=client_cred: 
+      post:
+        no_token: '[null]'
 
 
 

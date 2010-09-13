@@ -1,5 +1,5 @@
 shared_examples_for "Koala GraphAPI with an access token" do
-it "should get public data about a user" do
+  it "should get public data about a user" do
       result = @api.get_object("koppel")
       # the results should have an ID and a name, among other things
       (result["id"] && result["name"]).should_not be_nil
@@ -41,7 +41,7 @@ it "should get public data about a user" do
     end
 
     it "should be able to access connections from public Pages" do
-      result = @api.get_connections("contextoptional", "likes")
+      result = @api.get_connections("contextoptional", "photos")
       result.should be_a(Array)
     end
     
@@ -120,11 +120,13 @@ it "should get public data about a user" do
     # SEARCH
     it "should be able to search" do
       result = @api.search("facebook")
-      result["data"].should be_an(Array)
+      result.length.should be_an(Integer)
     end
 
     # API
     # the above tests test this already, but we should consider additional api tests
+
+    it_should_behave_like "Koala GraphAPI with GraphCollection"
 end
 
 class FacebookWithAccessTokenTests < Test::Unit::TestCase
