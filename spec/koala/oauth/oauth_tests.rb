@@ -20,7 +20,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
       @callback_url = @oauth_data["callback_url"]
       @raw_token_string = @oauth_data["raw_token_string"]
       @raw_offline_access_token_string = @oauth_data["raw_offline_access_token_string"]
-<<<<<<< HEAD:spec/koala/oauth/oauth_tests.rb
       
       # per Facebook's example:
       # http://developers.facebook.com/docs/authentication/canvas
@@ -29,9 +28,6 @@ class FacebookOAuthTests < Test::Unit::TestCase
       @signed_request = @oauth_data["signed_request"]
       @signed_request_result = @oauth_data["signed_request_result"]
       
-=======
-
->>>>>>> integration:spec/koala/oauth/oauth_tests.rb
       # this should expanded to cover all variables
       raise Exception, "Must supply app data to run FacebookOAuthTests!" unless @app_id && @secret && @callback_url && 
                                                                                 @code && @raw_token_string && 
@@ -272,13 +268,8 @@ class FacebookOAuthTests < Test::Unit::TestCase
       end
     end
 
-<<<<<<< HEAD:spec/koala/oauth/oauth_tests.rb
     describe "for exchanging session keys" do
       describe "with get_token_info_from_session_keys" do
-=======
-    describe "exchanging session keys" do      
-      describe "with get_token_info_from_session_keys" do        
->>>>>>> integration:spec/koala/oauth/oauth_tests.rb
         it "should get an array of session keys from Facebook when passed a single key" do
           result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
           result.should be_an(Array)
