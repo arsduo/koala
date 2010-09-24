@@ -20,7 +20,7 @@ module Koala
         @paging = response["paging"]
         @api = api
       end
-      
+            
       # defines methods for NEXT and PREVIOUS pages
       %w{next previous}.each do |this|
         
@@ -28,7 +28,7 @@ module Koala
         # def previous_page
         define_method "#{this.to_sym}_page" do
           base, args = send("#{this}_page_params")
-          base ? GraphCollection.new(@api.graph_call(base, args), @api) : nil
+          base ? @api.get_page([base, args]) : nil
         end
         
         # def next_page_params
@@ -94,10 +94,16 @@ module Koala
         # we raise an exception.
         graph_call("", args.merge("ids" => ids.join(",")))
       end
+      
+      def get_page(params)
+        result = graph_call(*params)
+        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+      end
     
       def get_connections(id, connection_name, args = {})
         # Fetchs the connections for given object.
-        GraphCollection.new(graph_call("#{id}/#{connection_name}", args), self)
+        result = graph_call("#{id}/#{connection_name}", args)
+        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
       end
       
     
@@ -167,7 +173,8 @@ module Koala
     
       def search(search_terms, args = {})
         # Searches for a given term
-        GraphCollection.new(graph_call("search", args.merge({:q => search_terms})), self)
+        result = graph_call("search", args.merge({:q => search_terms}))
+        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
       end
     
       def graph_call(*args)

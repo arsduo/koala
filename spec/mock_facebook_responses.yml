@@ -96,7 +96,7 @@ graph_api:
       get: 
         with_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         no_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
-        
+    
   /lukeshepard/likes: 
     no_args: 
       get: 
@@ -131,7 +131,11 @@ graph_api:
       get: 
         with_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
-        
+    "limit=25&q=facebook&until=2010-09-23T21:17:33+0000":
+      get: 
+        with_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+        no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+      
   '/115349521819193_113815981982767':
     no_args:
       delete:

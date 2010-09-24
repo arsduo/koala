@@ -42,6 +42,14 @@ shared_examples_for "Koala GraphAPI without an access token" do
     result = @api.get_connections("contextoptional", "photos")
     result.should be_a(Array)
   end
+  
+  # paging
+  # see also graph_collection_tests
+  it "should make a request for a page when provided a specific set of page params" do
+    query = [1, 2]
+    @api.should_receive(:graph_call).with(*query)
+    @api.get_page(query)
+  end
 
   it "should not be able to put an object" do
     lambda { @result = @api.put_object("lukeshepard", "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)

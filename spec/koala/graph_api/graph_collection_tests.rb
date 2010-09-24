@@ -1,23 +1,52 @@
 # GraphCollection
 shared_examples_for "Koala GraphAPI with GraphCollection" do
+  
+  it "should create an array-like object" do
+    call = @api.graph_call("contextoptional/photos")
+    Koala::Facebook::GraphCollection.new(call, @api).should be_an(Array)
+  end
+  
   describe "when getting a collection" do
     # GraphCollection methods    
     it "should get a GraphCollection when getting connections" do
       @result = @api.get_connections("contextoptional", "photos")
       @result.should be_a(Koala::Facebook::GraphCollection)
     end
+    
+    it "should return nil if the get_collections call fails with nil" do
+      # this happens sometimes
+      @api.should_receive(:graph_call).and_return(nil)
+      @api.get_connections("contextoptional", "photos").should be_nil
+    end
 
     it "should get a GraphCollection when searching" do
       result = @api.search("facebook")
       result.should be_a(Koala::Facebook::GraphCollection)
     end
-  
+
+    it "should return nil if the search call fails with nil" do
+      # this happens sometimes
+      @api.should_receive(:graph_call).and_return(nil)
+      @api.search("facebook").should be_nil
+    end
+    
+    it "should get a GraphCollection when paging through results" do
+      @results = @api.get_page(["search", {"q"=>"facebook", "limit"=>"25", "until"=>"2010-09-23T21:17:33+0000"}])
+      @results.should be_a(Koala::Facebook::GraphCollection)
+    end
+    
+    it "should return nil if the page call fails with nil" do
+      # this happens sometimes
+      @api.should_receive(:graph_call).and_return(nil)
+      @api.get_page(["search", {"q"=>"facebook", "limit"=>"25", "until"=>"2010-09-23T21:17:33+0000"}]).should be_nil
+    end
+    
     # GraphCollection attributes
     describe "the GraphCollection" do
       before(:each) do
         @result = @api.get_connections("contextoptional", "photos")
       end
-    
+          
       it "should have a read-only paging attribute" do
         lambda { @result.paging }.should_not raise_error
         lambda { @result.paging = "paging" }.should raise_error(NoMethodError)

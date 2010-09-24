@@ -45,6 +45,15 @@ shared_examples_for "Koala GraphAPI with an access token" do
       result.should be_a(Array)
     end
     
+    # paging
+    # see also graph_collection_tests
+    it "should make a request for a page when provided a specific set of page params" do
+      query = [1, 2]
+      @api.should_receive(:graph_call).with(*query)
+      @api.get_page(query)
+    end
+    
+    
     # PUT
     it "should be able to write an object to the graph" do
       result = @api.put_wall_post("Hello, world, from the test suite!")

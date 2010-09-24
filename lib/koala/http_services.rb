@@ -39,7 +39,7 @@ module Koala
 
         protected
         def self.encode_params(param_hash)
-          # TODO investigating whether a built-in method handles this
+          # unfortunately, we can't use to_query because that's Rails, not Ruby
           # if no hash (e.g. no auth token) return empty string
           ((param_hash || {}).collect do |key_and_value| 
             key_and_value[1] = key_and_value[1].to_json if key_and_value[1].class != String

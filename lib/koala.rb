@@ -54,9 +54,8 @@ module Koala
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
 
         # add a leading /
-        #puts "\npath: #{path}"
         path = "/#{path}" unless path =~ /^\//
-        #puts "Making request to #{path} with args #{args.inspect}\n"
+
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
         
