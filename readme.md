@@ -10,10 +10,29 @@ Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.co
 Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward: 
+
     graph = Koala::Facebook::GraphAPI.new(oauth_access_token)
     profile = graph.get_object("me")
     friends = graph.get_connections("me", "friends")
     graph.put_object("me", "feed", :message => "I am writing on my wall!")
+
+The response of most requests is the JSON data returned from the Facebook servers as a Hash.  
+
+When retrieving data that returns an array of results (for example, when calling GraphAPI#get_connections or GraphAPI#search) a GraphCollection object (a sub-class of Array) will be returned, which contains added mehtods for getting the next and previous page of results:
+    
+    # Returns the feed items for the currently logged-in user as a GraphCollection
+    feed = graph.get_connections("me", "feed")
+    
+    # GraphCollection is a sub-class of Array, so you can use it as a usual Array
+    first_entry = feed[0]
+    last_entry = feed.last
+
+    # Returns the next page of results (also as a GraphCollection)
+    next_feed = feed.next_page
+
+    # Returns an array describing the URL for the next page: [path, arguments]
+    # This is useful for paging across multiple requests
+    next_path, next_args = feed.next_page_params
 
 Check out the wiki for more examples.
 
