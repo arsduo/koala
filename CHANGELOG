@@ -2,9 +2,11 @@ v0.9.0
 -- Added parse_signed_request to handle Facebook's new authentication scheme
   -- note: creates dependency on OpenSSL (OpenSSL::HMAC) for decryption
 -- Added GraphCollection class to provide paging support for GraphAPI get_connections and search methods (thanks to jagthedrummer)    
+-- Added get_page method to easily fetch pages of results from GraphCollections
 -- Exchanging sessions for tokens now works properly when provided invalid/expired session keys
 -- You can now include a :typhoeus_options key in TyphoeusService#make_request's options hash to control the Typhoeus call (for example, to set :disable_ssl_peer_verification => true) 
 -- All paths provided to HTTP services start with leading / to improve compatibility with stubbing libraries
+-- If Facebook returns nil for search or get_connections requests, Koala now returns nil rather than throwing an exception
 
 v0.8.0
 -- Breaking interface changes

@@ -18,7 +18,7 @@ The Graph API is the simple, slick new interface to Facebook's data.  Using it w
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.  
 
-When retrieving data that returns an array of results (for example, when calling GraphAPI#get_connections or GraphAPI#search) a GraphCollection object (a sub-class of Array) will be returned, which contains added mehtods for getting the next and previous page of results:
+When retrieving data that returns an array of results (for example, when calling GraphAPI#get_connections or GraphAPI#search) a GraphCollection object (a sub-class of Array) will be returned, which contains added methods for getting the next and previous page of results:
     
     # Returns the feed items for the currently logged-in user as a GraphCollection
     feed = graph.get_connections("me", "feed")
@@ -33,12 +33,15 @@ When retrieving data that returns an array of results (for example, when calling
     # Returns an array describing the URL for the next page: [path, arguments]
     # This is useful for paging across multiple requests
     next_path, next_args = feed.next_page_params
+    
+    # You can use those params to easily get the next (or prevous) page
+    page = graph.get_page(feed.next_page_params)
 
 Check out the wiki for more examples.
 
 The old-school REST API
 -----
-Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls -- including fql.query -- that can't yet be done via the Graph.  
+Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.  
 
 Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the RestAPI class:
 
@@ -59,15 +62,18 @@ If your application uses Koala and the Facebook [JavaScript SDK](http://github.c
     @oauth.get_user_from_cookie(cookies)
 
 And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
-	# generate authenticating URL
-	@oauth.url_for_oauth_code
-	# fetch the access token once you have the code
-	@oauth.get_access_token(code)
+	  # generate authenticating URL
+	  @oauth.url_for_oauth_code
+	  # fetch the access token once you have the code
+	  @oauth.get_access_token(code)
 
 You can also get your application's own access token, which can be used without a user session for subscriptions and certain other requests:
     @oauth.get_app_access_token
 
 That's it!  It's pretty simple once you get the hang of it.  If you're new to OAuth, though, check out the wiki and the OAuth Playground example site (see below).
+
+*Signed Requests:* Excited to try out the new signed request authentication scheme?  Good news!  Koala now supports parsing those parameters:
+    @oauth.parse_signed_request(request)
 
 *Exchanging session keys:* Stuck building tab applications on Facebook?  Wishing you had an OAuth token so you could use the Graph API?  You're in luck! Koala now allows you to exchange session keys for OAuth access tokens:
     @oauth.get_token_from_session_key(session_key)
