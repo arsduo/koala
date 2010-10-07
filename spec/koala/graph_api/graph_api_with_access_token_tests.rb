@@ -140,7 +140,7 @@ end
 
 class FacebookWithAccessTokenTests < Test::Unit::TestCase
   describe "Koala GraphAPI with an access token" do
-    it_should_behave_like "live testing examples"
+    include LiveTestingDataHelper
     it_should_behave_like "Koala GraphAPI with an access token"
     
     before :each do

@@ -1,6 +1,18 @@
-require 'test/unit'
-require 'rubygems'
-require 'spec/test/unit'
+if defined?(RUBY_VERSION) && RUBY_VERSION =~ /1\.9/
+  require 'test/unit'
+  require 'rspec'
+
+  Rspec.configure do |c|
+    c.mock_with :rspec
+  end
+  
+else
+  # Ruby 1.8.x
+  require 'test/unit'
+  require 'rubygems'
+
+  require 'spec/test/unit'
+end
 
 # load the libraries
 require 'koala'
@@ -29,3 +41,5 @@ require 'koala/realtime_updates/realtime_updates_tests'
 
 # Services tests
 require 'koala/net_http_service_tests'
+
+

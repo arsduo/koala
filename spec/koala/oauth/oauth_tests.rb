@@ -1,14 +1,3 @@
-# stub the Time class to always return a time for which the valid cookie is still valid
-class Time
-  def self.now
-    self
-  end
-  
-  def self.to_i
-    1273363199
-  end
-end
-
 class FacebookOAuthTests < Test::Unit::TestCase
   describe "Koala OAuth tests" do
     before :each do
@@ -34,6 +23,10 @@ class FacebookOAuthTests < Test::Unit::TestCase
                                                                                 @raw_offline_access_token_string
 
       @oauth = Koala::Facebook::OAuth.new(@app_id, @secret, @callback_url)
+
+      time = Time.now
+      Time.stub!(:now).and_return(time)
+      time.stub!(:to_i).and_return(1273363199)
     end
     
     # initialization

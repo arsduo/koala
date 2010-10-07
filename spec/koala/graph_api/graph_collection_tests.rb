@@ -65,7 +65,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
           @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
           Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
       
-          @result.previous_page(@api).should == @page_of_results
+          @result.previous_page.should == @page_of_results
         end
     
         it "should return the next page of results" do
@@ -79,7 +79,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
         it "should return nil it there are no other pages" do
           %w{next previous}.each do |this|
             @result.should_receive("#{this}_page_params".to_sym).and_return(nil)
-            @result.send("#{this}_page", @api).should == nil
+            @result.send("#{this}_page").should == nil
           end
         end
       end

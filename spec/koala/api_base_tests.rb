@@ -1,4 +1,5 @@
 class ApiBaseTests < Test::Unit::TestCase
+
   describe "Koala API base class" do
     before(:each) do
       @service = Koala::Facebook::API.new  
