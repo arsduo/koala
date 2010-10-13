@@ -1,5 +1,7 @@
 v0.9.1
 -- Tests are now compatible with Ruby 1.9.2
+-- Added JSON to runtime dependencies
+-- Removed examples directory (referenced from github instead)
 
 v0.9.0
 -- Added parse_signed_request to handle Facebook's new authentication scheme
