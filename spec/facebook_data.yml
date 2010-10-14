@@ -16,7 +16,7 @@ oauth_test_data:
   session_key: 
   multiple_session_keys:
     - 
-    -
+    - 
   
   # These values will work out of the box
   app_id: 119908831367602
