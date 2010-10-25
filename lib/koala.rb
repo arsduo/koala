@@ -223,7 +223,10 @@ module Koala
         
         # Facebook returns an empty body in certain error conditions
         if response == "" 
-          raise APIError.new("ArgumentError", "get_token_from_session_key received an error (empty response body) for sessions #{sessions.inspect}!")
+          raise APIError.new({
+            "type" => "ArgumentError", 
+            "message" => "get_token_from_session_key received an error (empty response body) for sessions #{sessions.inspect}!"
+          })
         end
         
         JSON.parse(response)
