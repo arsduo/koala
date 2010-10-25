@@ -1,3 +1,6 @@
+v0.9.2
+-- Fixed bug when raising APIError after Facebook fails to exchange session keys
+
 v0.9.1
 -- Tests are now compatible with Ruby 1.9.2
 -- Added JSON to runtime dependencies

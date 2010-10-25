@@ -291,6 +291,11 @@ class FacebookOAuthTests < Test::Unit::TestCase
           # it should return nil for each of the invalid ones
           result.each_with_index {|r, index| index > 0 ? r.should(be_a(Hash)) : r.should(be_nil)}
         end
+        
+        it "should throw an APIError if Facebook returns an empty body (as happens for instance when the API breaks)" do
+          @oauth.should_receive(:fetch_token_string).and_return("")
+          lambda { @oauth.get_token_info_from_session_keys(@oauth_data["multiple_session_keys"]) }.should raise_error(Koala::Facebook::APIError)
+        end
       end
       
       describe "with get_tokens_from_session_keys" do
