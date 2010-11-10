@@ -44,6 +44,7 @@ module Koala
     # JavaScript SDK at http://github.com/facebook/connect-js/.
 
     class API
+      attr_accessor :access_token
       # initialize with an access token 
       def initialize(access_token = nil)
         @access_token = access_token
