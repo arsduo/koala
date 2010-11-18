@@ -42,4 +42,7 @@ require 'koala/realtime_updates/realtime_updates_tests'
 # Services tests
 require 'koala/net_http_service_tests'
 
+# Test users tests
+require 'koala/test_users/test_users_tests'
+
 

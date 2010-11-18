@@ -17,7 +17,11 @@ require 'koala/graph_api'
 # add REST API methods
 require 'koala/rest_api'
 
+# add realtime update methods
 require 'koala/realtime_updates'
+
+# add test user methods
+require 'koala/test_users'
 
 module Koala
     
@@ -96,6 +100,10 @@ module Koala
     
     class RealtimeUpdates < API
       include RealtimeUpdateMethods
+    end
+    
+    class TestUsers < API
+      include TestUserMethods
     end
     
     class APIError < Exception
