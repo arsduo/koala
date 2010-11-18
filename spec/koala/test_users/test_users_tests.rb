@@ -100,6 +100,16 @@ class TestUsersTests < Test::Unit::TestCase
           (second_user["id"] && second_user["access_token"] && second_user["login_url"]).should
         end
         
+        it "should make two users into friends by id" do
+          result = @test_users.befriend(@user1['id'], @user2['id'])
+          result.should be_true
+        end
+        
+        it "should make two users into friends by hash" do
+          result = @test_users.befriend(@user1, @user2)
+          result.should be_true
+        end
+        
       end # with existing users
       
     end # when used

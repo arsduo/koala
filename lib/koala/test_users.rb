@@ -36,10 +36,16 @@ module Koala
         @graph_api.delete_object(test_user)
       end
       
+      def befriend(user1, user2)
+        user1 = user1["id"] if user1.is_a?(Hash)
+        user2 = user2["id"] if user2.is_a?(Hash)
+        @graph_api.graph_call("/#{user1}/friends/#{user2}") && @graph_api.graph_call("/#{user2}/friends/#{user1}")
+      end
+      
       protected
       
       def accounts_path
-        @accounts_path ||= "#{@app_id}/accounts/test_users"
+        @accounts_path ||= "/#{@app_id}/accounts/test_users"
       end
 
     end # TestUserMethods

@@ -266,6 +266,15 @@ graph_api:
  
   /888888888:
     no_args:
-      <<: *item_deleted       
-  
+      <<: *item_deleted   
+      
+  /999999999/friends/888888888:
+    no_args:
+      get:
+        with_token: 'true'
+      
+  /888888888/friends/999999999:
+    no_args:
+      get:
+        with_token: 'true'
   
