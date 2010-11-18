@@ -20,17 +20,21 @@ module Koala
         @graph_api = GraphAPI.new(@app_access_token)
       end
 
-      def create_test_user(installed, permissions)
+      def create(installed, permissions='')
         # Creates and returns a test user
         args = {'installed' => installed}
         args['permissions'] = permissions if installed
         result = @graph_api.graph_call(accounts_path, args, "post")
       end
       
-      def list_test_users
-        result = @graph_api.graph_call(accounts_path)
+      def list
+        @graph_api.graph_call(accounts_path)
       end
       
+      def delete(test_user)
+        test_user = test_user["id"] if test_user.is_a?(Hash)
+        @graph_api.delete_object(test_user)
+      end
       
       protected
       

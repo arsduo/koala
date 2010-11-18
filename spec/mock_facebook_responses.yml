@@ -46,6 +46,10 @@ graph_api:
   # Subscription error response
   verification_error: &verification_error
     with_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
+    
+  test_user_no_perms: &test_user_no_perms
+    post:
+      with_token: '{"id": "777777777", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}'
       
 # -- Stubbed Responses --
   root:
@@ -242,10 +246,26 @@ graph_api:
         
 # -- Mock Test User Responses --
   /<%= APP_ID %>/accounts/test_users:
+    installed=false:
+      <<: *test_user_no_perms
+    installed=false&permissions=read_stream:
+      <<: *test_user_no_perms                                                                                                                                                            
     installed=true&permissions=read_stream:
       post:
-        with_token: '{"id": "1231....", "access_token":"1223134...", "login_url":"https://www.facebook.com/platform/test_account.."}'
+        with_token: '{"id": "999999999", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}'
+    installed=true&permissions=read_stream,user_interests:
+      post:
+        with_token: '{"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}'
     no_args:
       get:
-        with_token: '{"data": [{"id": "1231....", "access_token":"1223134...", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "1231....", "access_token":"1223134...", "login_url":"https://www.facebook.com/platform/test_account.."}] }'
+        with_token: '{"data": [{"id": "999999999", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}] }'
+        
+  /999999999:
+    no_args:
+      <<: *item_deleted
+ 
+  /888888888:
+    no_args:
+      <<: *item_deleted       
+  
   

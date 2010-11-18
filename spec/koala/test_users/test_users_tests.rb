@@ -45,21 +45,62 @@ class TestUsersTests < Test::Unit::TestCase
       end
 
       # TEST USER MANAGEMENT
-      it "should create a test user" do
-        result = @test_users.create_test_user(true, "read_stream")
+      it "should create a test user when not given installed" do
+        result = @test_users.create(false)
         result.should be_a(Hash)
         (result["id"] && result["access_token"] && result["login_url"]).should
       end
       
-      it "should list test users" do
-        result = @test_users.list_test_users
+      it "should create a test user when not given installed, ignoring permissions" do
+        result = @test_users.create(false, "read_stream")
         result.should be_a(Hash)
-        data = result["data"]
-        data.should be_a(Array)
-        first_user, second_user = data[0], data[1]
-        (first_user["id"] && first_user["access_token"] && first_user["login_url"]).should
-        (second_user["id"] && second_user["access_token"] && second_user["login_url"]).should
+        (result["id"] && result["access_token"] && result["login_url"]).should
       end
+      
+      it "should create a test user when given installed and a permission" do
+        result = @test_users.create(true, "read_stream")
+        result.should be_a(Hash)
+        (result["id"] && result["access_token"] && result["login_url"]).should
+      end
+      
+      describe "with a user to delete" do
+        before :each do
+          @user1 = @test_users.create(true, "read_stream")
+          @user2 = @test_users.create(true, "read_stream,user_interests")
+        end
+        
+        it "should delete a user by id" do
+          @test_users.delete(@user1['id'])
+        end
+        
+        it "should delete a user by hash" do
+          @test_users.delete(@user2)
+        end
+        
+      end
+      
+      describe "with existing users" do
+        before :each do
+          @user1 = @test_users.create(true, "read_stream")
+          @user2 = @test_users.create(true, "read_stream,user_interests")
+        end
+        
+        after :each do
+          @test_users.delete(@user1)
+          @test_users.delete(@user2)
+        end
+      
+        it "should list test users" do
+          result = @test_users.list
+          result.should be_a(Hash)
+          data = result["data"]
+          data.should be_a(Array)
+          first_user, second_user = data[0], data[1]
+          (first_user["id"] && first_user["access_token"] && first_user["login_url"]).should
+          (second_user["id"] && second_user["access_token"] && second_user["login_url"]).should
+        end
+        
+      end # with existing users
       
     end # when used
 
