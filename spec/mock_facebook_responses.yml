@@ -244,5 +244,8 @@ graph_api:
   /<%= APP_ID %>/accounts/test_users:
     installed=true&permissions=read_stream:
       post:
-        with_token: '{"id": "216743000", "access_token":"11111111111111", "login_url":"https://www.facebook.com/platform/test_account.."}'
+        with_token: '{"id": "1231....", "access_token":"1223134...", "login_url":"https://www.facebook.com/platform/test_account.."}'
+    no_args:
+      get:
+        with_token: '{"data": [{"id": "1231....", "access_token":"1223134...", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "1231....", "access_token":"1223134...", "login_url":"https://www.facebook.com/platform/test_account.."}] }'
   

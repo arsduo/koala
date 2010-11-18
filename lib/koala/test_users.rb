@@ -20,11 +20,22 @@ module Koala
         @graph_api = GraphAPI.new(@app_access_token)
       end
 
-      def create_test_user(app_id, installed, permissions)
+      def create_test_user(installed, permissions)
         # Creates and returns a test user
         args = {'installed' => installed}
         args['permissions'] = permissions if installed
-        result = @graph_api.graph_call("#{app_id}/accounts/test_users", args, "post")
+        result = @graph_api.graph_call(accounts_path, args, "post")
+      end
+      
+      def list_test_users
+        result = @graph_api.graph_call(accounts_path)
+      end
+      
+      
+      protected
+      
+      def accounts_path
+        @accounts_path ||= "#{@app_id}/accounts/test_users"
       end
 
     end # TestUserMethods
