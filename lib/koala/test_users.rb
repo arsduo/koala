@@ -42,6 +42,21 @@ module Koala
         @graph_api.graph_call("/#{user1}/friends/#{user2}") && @graph_api.graph_call("/#{user2}/friends/#{user1}")
       end
       
+      def create_network(network_size, installed = true, permissions = '')
+        network_size = 50 if network_size > 50 # FB's max is 50
+        users = (0...network_size).collect {create(installed, permissions)}
+        friends = users.clone
+        users.each do |user|
+          # Remove this user from list of friends
+          friends.delete_at(0)
+          # befriend all the others
+          friends.each do |friend|
+            befriend(user, friend)
+          end
+        end
+        return users
+      end
+      
       protected
       
       def accounts_path

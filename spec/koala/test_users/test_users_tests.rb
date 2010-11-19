@@ -39,7 +39,7 @@ class TestUsersTests < Test::Unit::TestCase
       end
     end
     
-    describe "when used" do
+    describe "when used without network" do
       before :each do
         @test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
       end
@@ -112,7 +112,48 @@ class TestUsersTests < Test::Unit::TestCase
         
       end # with existing users
       
-    end # when used
+    end # when used without network
+    
+    describe "when creating a network of friends" do
+      before :each do
+        @test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
+        @network = []
+        
+        if Koala::IS_MOCK
+          id_counter = 999999900
+          @test_users.stub!(:create).and_return do
+            id_counter += 1
+            {"id" => id_counter, "access_token" => "119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url" => "https://www.facebook.com/platform/test_account.."}
+          end
+          @test_users.stub!(:befriend).and_return(true)
+          @test_users.stub!(:delete).and_return(true)
+        end
+      end
+      
+      after :each do
+        @network.each{|user| @test_users.delete(user)}
+      end
+      
+      it "should create a 2 person network" do
+        @network = @test_users.create_network(2)
+        @network.should be_a(Array)
+        @network.size.should == 2
+      end
+      
+      it "should create a 50 person network" do
+        @network = @test_users.create_network(50)
+        @network.should be_a(Array)
+        @network.size.should == 50
+      end
+      
+      it "should limit to a 50 person network" do
+        @network = @test_users.create_network(51)
+        @network.should be_a(Array)
+        @network.size.should == 50
+      end
+      
+      
+    end # when creating network
 
   end  # describe Koala TestUsers
 end # class
