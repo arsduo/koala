@@ -119,7 +119,7 @@ class TestUsersTests < Test::Unit::TestCase
         @test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
         @network = []
         
-        if Koala::IS_MOCK
+        if defined?(Koala::IS_MOCK) && Koala::IS_MOCK
           id_counter = 999999900
           @test_users.stub!(:create).and_return do
             id_counter += 1
