@@ -19,7 +19,7 @@ require 'koala'
 
 # load testing data libraries
 require 'koala/live_testing_data_helper'
-
+=begin
 # API tests
 require 'koala/api_base_tests'
 
@@ -41,6 +41,7 @@ require 'koala/realtime_updates/realtime_updates_tests'
 
 # Services tests
 require 'koala/net_http_service_tests'
+=end
 
 # Test users tests
 require 'koala/test_users/test_users_tests'

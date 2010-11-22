@@ -13,8 +13,14 @@ module LiveTestingDataHelper
       after :each do 
         # clean up any temporary objects
         if @temporary_object_id
-          puts "\nCleaning up temporary object #{@temporary_object_id.to_s}"
-          result = @api.delete_object(@temporary_object_id)
+          # get our API
+          api = @api || (@test_users ? @test_users.graph_api : nil)
+          raise "Unable to locate API when passed temporary object to delete!" unless api
+          
+          # delete the object
+          print "\nCleaning up temporary object #{@temporary_object_id.to_s}..."
+          result = api.delete_object(@temporary_object_id)
+          puts "done."
           raise "Unable to clean up temporary Graph object #{@temporary_object_id}!" unless result
         end
       end

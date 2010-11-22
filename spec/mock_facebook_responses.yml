@@ -245,7 +245,7 @@ graph_api:
         with_token: "{\"message\": \"it\'s my comment!\"}"
         
 # -- Mock Test User Responses --
-  /<%= APP_ID %>/accounts/test_users:
+  /<%= APP_ID %>/accounts/test-users:
     installed=false:
       <<: *test_user_no_perms
     installed=false&permissions=read_stream:
@@ -258,16 +258,25 @@ graph_api:
         with_token: '{"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}'
     no_args:
       get:
-        with_token: '{"data": [{"id": "999999999", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}] }'
+        with_token: '{"data":[{"id": "999999999", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}]}'
         
   /999999999:
     no_args:
       <<: *item_deleted
+
+  /9999999991:
+    no_args:
+      delete:
+        with_token: 'false' 
  
   /888888888:
     no_args:
       <<: *item_deleted   
-      
+
+  /777777777:
+    no_args:
+      <<: *item_deleted
+
   /999999999/friends/888888888:
     no_args:
       get:

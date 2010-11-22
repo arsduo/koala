@@ -3,7 +3,7 @@ require 'koala'
 module Koala
   module Facebook
     module TestUserMethods
-
+      
       def initialize(options = {})
         @app_id = options[:app_id]
         @app_access_token = options[:app_access_token]
@@ -20,15 +20,15 @@ module Koala
         @graph_api = GraphAPI.new(@app_access_token)
       end
 
-      def create(installed, permissions='')
+      def create(installed, permissions = nil)
         # Creates and returns a test user
         args = {'installed' => installed}
-        args['permissions'] = permissions if installed
+        args['permissions'] = (permissions.is_a?(Array) ? permissions.join(",") : permissions) if installed
         result = @graph_api.graph_call(accounts_path, args, "post")
       end
       
       def list
-        @graph_api.graph_call(accounts_path)
+        @graph_api.graph_call(accounts_path)["data"]
       end
       
       def delete(test_user)
@@ -44,7 +44,7 @@ module Koala
       
       def create_network(network_size, installed = true, permissions = '')
         network_size = 50 if network_size > 50 # FB's max is 50
-        users = (0...network_size).collect {create(installed, permissions)}
+        users = (0...network_size).collect { create(installed, permissions) }
         friends = users.clone
         users.each do |user|
           # Remove this user from list of friends
@@ -60,7 +60,7 @@ module Koala
       protected
       
       def accounts_path
-        @accounts_path ||= "/#{@app_id}/accounts/test_users"
+        @accounts_path ||= "/#{@app_id}/accounts/test-users"
       end
 
     end # TestUserMethods

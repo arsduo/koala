@@ -104,6 +104,8 @@ module Koala
     
     class TestUsers < API
       include TestUserMethods
+      # make the Graph API accessible in case someone wants to make other calls to interact with their users
+      attr_reader :graph_api
     end
     
     class APIError < Exception
