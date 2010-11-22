@@ -56,10 +56,11 @@ We reserve the right to expand the built-in REST API coverage to additional conv
 OAuth
 -----
 You can use the Graph and REST APIs without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
-    @oauth = Koala::Facebook::OAuth.new(app_id, code, callback_url)
+    @oauth = Koala::Facebook::OAuth.new(app_id, app_secret, callback_url)
 
 If your application uses Koala and the Facebook [JavaScript SDK](http://github.com/facebook/connect-js) (formerly Facebook Connect), you can use the OAuth class to parse the cookies:
-    @oauth.get_user_from_cookie(cookies)
+    @oauth.get_user_from_cookies(cookies) # gets the user's ID
+	@oauth.get_user_info_from_cookies(cookies) # parses and returns the entire hash
 
 And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
 	  # generate authenticating URL
