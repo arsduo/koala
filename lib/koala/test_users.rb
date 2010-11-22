@@ -36,6 +36,10 @@ module Koala
         @graph_api.delete_object(test_user)
       end
       
+      def delete_all
+        list.each {|u| delete u }
+      end
+      
       def befriend(user1, user2)
         user1 = user1["id"] if user1.is_a?(Hash)
         user2 = user2["id"] if user2.is_a?(Hash)

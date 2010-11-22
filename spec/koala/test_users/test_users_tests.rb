@@ -15,8 +15,36 @@ class TestUsersTests < Test::Unit::TestCase
       unless @app_id && @secret && @app_access_token
         raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!" 
       end
+      
+      @is_mock = defined?(Koala::IS_MOCK) && Koala::IS_MOCK
+      
+      unless @is_mock
+        begin
+          # clear all test users
+          print "Clearing all test users before test..."
+          test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
+          test_users.delete_all
+          puts "done!"
+        rescue Exception => e
+          puts "error occurred! #{e.message}"
+        end
+      end
     end
-        
+      
+    after :all do
+      unless @is_mock
+        begin
+          # clear all test users
+          print "Clearing all test users after test..."
+          test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
+          test_users.delete_all
+          puts "done!"
+        rescue Exception => e
+          puts "error occurred! #{e.message}"
+        end
+      end
+    end
+    
     describe "when initializing" do
       # basic initialization
       it "should initialize properly with an app_id and an app_access_token" do
@@ -84,21 +112,32 @@ class TestUsersTests < Test::Unit::TestCase
 
         after :each do
           print "\nCleaning up test users..."
-          @test_users.delete(@user1)
-          @test_users.delete(@user2)
+          @test_users.delete(@user1) if @user1
+          @test_users.delete(@user2) if @user2 
           puts "done."
         end
         
         it "should delete a user by id" do
           @test_users.delete(@user1['id']).should be_true
+          @user1 = nil
         end
         
         it "should delete a user by hash" do
           @test_users.delete(@user2).should be_true
+          @user2 = nil
         end
         
         it "should not delete users when provided a false ID" do
-          @test_users.delete("#{@user1['id']}1").should be_false
+          lambda { @test_users.delete("#{@user1['id']}1") }.should raise_exception(Koala::Facebook::APIError)
+        end
+      end
+      
+      describe "with delete_all" do
+        it "should delete all users found by the list commnand" do
+          array = [1, 2, 3]
+          @test_users.should_receive(:list).and_return(array)
+          array.each {|i| @test_users.should_receive(:delete).with(i) }
+          @test_users.delete_all
         end
       end
       
@@ -140,7 +179,7 @@ class TestUsersTests < Test::Unit::TestCase
         @test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
         @network = []
         
-        if defined?(Koala::IS_MOCK) && Koala::IS_MOCK
+        if @is_mock
           id_counter = 999999900
           @test_users.stub!(:create).and_return do
             id_counter += 1

@@ -267,7 +267,7 @@ graph_api:
   /9999999991:
     no_args:
       delete:
-        with_token: 'false' 
+        with_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
  
   /888888888:
     no_args:
