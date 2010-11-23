@@ -17,34 +17,8 @@ class TestUsersTests < Test::Unit::TestCase
       end
       
       @is_mock = defined?(Koala::IS_MOCK) && Koala::IS_MOCK
-      
-      unless @is_mock
-        begin
-          # clear all test users
-          print "Clearing all test users before test..."
-          test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
-          test_users.delete_all
-          puts "done!"
-        rescue Exception => e
-          puts "error occurred! #{e.message}"
-        end
-      end
     end
-      
-    after :all do
-      unless @is_mock
-        begin
-          # clear all test users
-          print "Clearing all test users after test..."
-          test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
-          test_users.delete_all
-          puts "done!"
-        rescue Exception => e
-          puts "error occurred! #{e.message}"
-        end
-      end
-    end
-    
+          
     describe "when initializing" do
       # basic initialization
       it "should initialize properly with an app_id and an app_access_token" do
@@ -174,7 +148,7 @@ class TestUsersTests < Test::Unit::TestCase
       
     end # when used without network
     
-    describe "when creating a network of friends" do
+    describe "when creating a network of friends" do    
       before :each do
         @test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
         @network = []
@@ -190,30 +164,50 @@ class TestUsersTests < Test::Unit::TestCase
         end
       end
       
-      after :each do
-        print "\nCleaning up test user network..."
-        @network.each{|user| @test_users.delete(user)}
-        puts "done."
-      end
+      describe "tests that create users" do
+        before :each do
+          print "\nCleaning up test user network..."
+          test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
+          test_users.delete_all
+          puts "done!"
+        end
+
+        after :each do
+          print "\nCleaning up test user network..."
+          test_users = Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
+          test_users.delete_all
+          puts "done!"
+        end
+        
+        it "should create a 2 person network" do
+          @network = @test_users.create_network(2)
+          @network.should be_a(Array)
+          @network.size.should == 2
+        end
       
-      it "should create a 2 person network" do
-        @network = @test_users.create_network(2)
-        @network.should be_a(Array)
-        @network.size.should == 2
-      end
-      
-      it "should create a 50 person network" do
-        @network = @test_users.create_network(50)
-        @network.should be_a(Array)
-        @network.size.should == 50
+        it "should create a 50 person network" do
+          puts "\nStarting 50-person network test (this may take several minutes)..."
+          @network = @test_users.create_network(50)
+          @network.should be_a(Array)
+          @network.size.should == 50
+          puts "done!"
+        end
       end
       
       it "should limit to a 50 person network" do
+        @test_users.should_receive(:create).exactly(50).times
+        @test_users.stub!(:befriend)
         @network = @test_users.create_network(51)
-        @network.should be_a(Array)
-        @network.size.should == 50
       end
-      
+
+      it "should pass on the installed and permissions parameters to create" do
+        perms = ["read_stream", "offline_access"]
+        installed = false
+        count = 25
+        @test_users.should_receive(:create).exactly(count).times.with(installed, perms)
+        @test_users.stub!(:befriend)
+        @network = @test_users.create_network(count, installed, perms)
+      end
       
     end # when creating network
 
