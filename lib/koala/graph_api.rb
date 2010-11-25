@@ -165,6 +165,11 @@ module Koala
         # Likes the given post.
         self.put_object(object_id, "likes")
       end
+
+      def remove_like(object_id)
+        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Unliking requires an access token"}) unless @access_token
+        graph_call("#{object_id}/likes", {}, "delete")
+      end
     
       def delete_object(id)
         # Deletes the object with the given ID from the graph.
