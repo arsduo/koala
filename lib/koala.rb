@@ -157,13 +157,14 @@ module Koala
       def url_for_oauth_code(options = {})
         # for permissions, see http://developers.facebook.com/docs/authentication/permissions
         permissions = options[:permissions]
+        display = options.has_key?(:display) ? options[:display] : "page"
         scope = permissions ? "&scope=#{permissions.is_a?(Array) ? permissions.join(",") : permissions}" : ""
-
+        
         callback = options[:callback] || @oauth_callback_url
         raise ArgumentError, "url_for_oauth_code must get a callback either from the OAuth object or in the options!" unless callback
 
         # Creates the URL for oauth authorization for a given callback and optional set of permissions
-        "https://#{GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{callback}#{scope}"    
+        "https://#{GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{callback}#{scope}&display=#{display}"    
       end
         
       def url_for_access_token(code, options = {})
