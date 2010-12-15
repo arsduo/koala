@@ -1,6 +1,7 @@
 v0.10.0
 -- Added test user module
 -- Fixed bug when raising APIError after Facebook fails to exchange session keys
+-- Made access_token accessible via the readonly access_token property on all our API classes
 
 v0.9.1
 -- Tests are now compatible with Ruby 1.9.2
