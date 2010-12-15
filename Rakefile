@@ -11,7 +11,7 @@ Echoe.new('koala', '0.10.0') do |p|
   p.author         = ["Alex Koppel", "Chris Baclig", "Rafi Jacoby", "Context Optional"]
   p.email          = "alex@alexkoppel.com"
   p.ignore_pattern = ["tmp/*", "script/*", "pkg/*"]
-  p.runtime_dependencies = ["json >= 1.0"]
+  p.runtime_dependencies = ["json >=1.0"]
   p.development_dependencies = []
   p.retain_gemspec = true
 end
