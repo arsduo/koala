@@ -52,6 +52,7 @@ module Koala
       def initialize(access_token = nil)
         @access_token = access_token
       end
+      attr_reader :access_token
       
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.

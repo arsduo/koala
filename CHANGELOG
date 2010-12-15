@@ -1,4 +1,4 @@
-v1.0
+v0.10.0
 -- Added test user module
 -- Fixed bug when raising APIError after Facebook fails to exchange session keys
 
