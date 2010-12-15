@@ -50,7 +50,6 @@ module Koala
       end
       
       def is_authenticated?
-        # Returns true if the graph has an access token
         !@access_token.nil?
       end
       
