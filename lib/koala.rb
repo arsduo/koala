@@ -49,6 +49,11 @@ module Koala
         @access_token = access_token
       end
       
+      def is_authenticated?
+        # Returns true if the graph has an access token
+        !@access_token.nil?
+      end
+      
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
