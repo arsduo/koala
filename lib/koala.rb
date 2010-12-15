@@ -17,7 +17,11 @@ require 'koala/graph_api'
 # add REST API methods
 require 'koala/rest_api'
 
+# add realtime update methods
 require 'koala/realtime_updates'
+
+# add test user methods
+require 'koala/test_users'
 
 module Koala
     
@@ -48,6 +52,7 @@ module Koala
       def initialize(access_token = nil)
         @access_token = access_token
       end
+      attr_reader :access_token
       
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
@@ -96,6 +101,12 @@ module Koala
     
     class RealtimeUpdates < API
       include RealtimeUpdateMethods
+    end
+    
+    class TestUsers < API
+      include TestUserMethods
+      # make the Graph API accessible in case someone wants to make other calls to interact with their users
+      attr_reader :graph_api
     end
     
     class APIError < Exception
