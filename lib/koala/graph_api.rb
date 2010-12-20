@@ -142,7 +142,7 @@ module Koala
         # Writes a wall post to the given profile's wall.
         # 
         # We default to writing to the authenticated user's wall if no
-        # profile_id is specified.
+        # profile_id is specified.  
         # 
         # attachment adds a structured attachment to the status message being
         # posted to the Wall. It should be a dictionary of the form:
@@ -155,7 +155,15 @@ module Koala
 
         self.put_object(profile_id, "feed", attachment.merge({:message => message}))
       end
-    
+      
+      def put_picture(file, args = {}, target_id = "me")
+        file = File.new(file) if file.kind_of? String
+        raise ApiError.new("type" => "KoalaInvalidPictureFormat", "message" => "pit_picture requires a string file name of a File object") unless file.kind_of? File
+        
+        args["source"] = file
+        self.put_object(target_id, "photos", args)
+      end
+      
       def put_comment(object_id, message)
         # Writes the given comment on the given post.
         self.put_object(object_id, "comments", {:message => message})
