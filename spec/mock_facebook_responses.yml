@@ -78,7 +78,15 @@ graph_api:
     link=http://www.contextoptional.com/&message=Hello, world, from the test suite again!&name=Context Optional:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
-        
+  /me/photos:
+    source=[FILE]:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO"}'
+    message=This is the test message&source=[FILE]:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO"}'
   /koppel:
     no_args:
       get:
@@ -239,3 +247,8 @@ graph_api:
       <<: *item_deleted
       get:
         with_token: "{\"message\": \"it\'s my comment!\"}"
+  /MOCK_PHOTO:
+    no_args:
+      <<: *item_deleted
+      get:
+        with_token: "{\"name\": \"This is the test message\"}"

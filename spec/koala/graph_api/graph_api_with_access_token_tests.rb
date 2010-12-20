@@ -126,12 +126,32 @@ shared_examples_for "Koala GraphAPI with an access token" do
       like_result = @api.put_like(@temporary_object_id)
     end
 
+    it "should be able to post photos to the user's wall" do
+      path_to_picture = File.expand_path(File.dirname(__FILE__) + "/../assets/beach.jpg")
+      
+      result = @api.put_picture(path_to_picture)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+    end
+    
+    it "should be able to verify a photo posted to a user's wall" do
+      path_to_picture = File.expand_path(File.dirname(__FILE__) + "/../assets/beach.jpg")
+      expected_message = "This is the test message"
+      
+      result = @api.put_picture(path_to_picture, :message => expected_message)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+      
+      get_result = @api.get_object(@temporary_object_id)
+      get_result["name"].should == expected_message
+    end
+    
     # SEARCH
     it "should be able to search" do
       result = @api.search("facebook")
       result.length.should be_an(Integer)
     end
-
+    
     # API
     # the above tests test this already, but we should consider additional api tests
 

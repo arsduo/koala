@@ -42,7 +42,7 @@ module Koala
           args.delete('format')
           
           # Create a hash key for the arguments
-          args = args.empty? ? 'no_args' : args.sort{|a,b| a[0].to_s <=> b[0].to_s }.map{|arr| arr.join('=')}.join('&')
+          args = create_params_key(args)
           
           begin
             response = RESPONSES[server][path][args][verb][with_token]
@@ -73,6 +73,18 @@ module Koala
           end
           
           response_object
+        end
+        
+        protected
+        def self.create_params_key(params_hash)
+          if params_hash.empty?
+            'no_args'
+          else
+            params_hash.sort{ |a,b| a[0].to_s <=> b[0].to_s}.map do |arr| 
+              arr[1] = '[FILE]' if arr[1].kind_of? File
+              arr.join('=')
+            end.join('&')
+          end
         end
         
       end # class_eval
