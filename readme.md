@@ -1,28 +1,28 @@
 Koala
 ====
-Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.com/arsduo/koala</a>) is a new Facebook library for Ruby, supporting the Graph API, the old REST API, realtime updates, and OAuth validation.  We wrote Koala with four goals: 
+Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.com/arsduo/koala</a>) is a new Facebook library for Ruby, supporting the Graph API, the old REST API, realtime updates, and OAuth validation.  We wrote Koala with four goals:
 
-* Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, just over 500 lines of code.)
+* Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, just over 750 lines of code.)
 * Fast: Koala should, out of the box, be quick. In addition to supporting the vanilla Ruby networking libraries, it natively supports Typhoeus, our preferred gem for making fast HTTP requests. Of course, That brings us to our next topic:
 * Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We have no dependencies beyond the JSON gem.  Koala also has a built-in mechanism for using whichever HTTP library you prefer to make requests against the graph.)
 * Tested: Koala should have complete test coverage, so you can rely on it.  (Our complete test coverage can be run against either mocked responses or the live Facebook servers.)
 
 Graph API
 ----
-The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward: 
+The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
 
     graph = Koala::Facebook::GraphAPI.new(oauth_access_token)
     profile = graph.get_object("me")
     friends = graph.get_connections("me", "friends")
     graph.put_object("me", "feed", :message => "I am writing on my wall!")
 
-The response of most requests is the JSON data returned from the Facebook servers as a Hash.  
+The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
 When retrieving data that returns an array of results (for example, when calling GraphAPI#get_connections or GraphAPI#search) a GraphCollection object (a sub-class of Array) will be returned, which contains added methods for getting the next and previous page of results:
-    
+
     # Returns the feed items for the currently logged-in user as a GraphCollection
     feed = graph.get_connections("me", "feed")
-    
+
     # GraphCollection is a sub-class of Array, so you can use it as a usual Array
     first_entry = feed[0]
     last_entry = feed.last
@@ -33,7 +33,7 @@ When retrieving data that returns an array of results (for example, when calling
     # Returns an array describing the URL for the next page: [path, arguments]
     # This is useful for paging across multiple requests
     next_path, next_args = feed.next_page_params
-    
+
     # You can use those params to easily get the next (or prevous) page
     page = graph.get_page(feed.next_page_params)
 
@@ -41,15 +41,15 @@ Check out the wiki for more examples.
 
 The old-school REST API
 -----
-Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.  
+Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.
 
 Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the RestAPI class:
 
 	@rest = Koala::Facebook::RestAPI.new(oauth_access_token)
 	@rest.fql_query(my_fql_query) # convenience method
 	@rest.rest_call("stream.publish", arguments_hash) # generic version
-	
-We reserve the right to expand the built-in REST API coverage to additional convenience methods in the future, depending on how fast Facebook moves to fill in the gaps.  
+
+We reserve the right to expand the built-in REST API coverage to additional convenience methods in the future, depending on how fast Facebook moves to fill in the gaps.
 
 (If you want the power of both APIs in the palm of your hand, try out the GraphAndRestAPI class.)
 
@@ -119,7 +119,7 @@ Some resources to help you as you play with Koala and the Graph API:
 Testing
 -----
 
-Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box: 
+Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box:
     # From the spec directory
     spec koala_spec.rb
 
