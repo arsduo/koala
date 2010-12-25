@@ -1,3 +1,9 @@
+v1.0
+-- Koala now uses http by default (v. https) for public requests
+  -- This can be overridden through Koala.always_use_ssl= or by passing :use_ssl => true in the options hash for an api call
+-- Replaced the 50-person network test, which often took 15+ minutes to run live, with a 5-person test
+-- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
+
 v0.10.0
 -- Added test user module
 -- Fixed bug when raising APIError after Facebook fails to exchange session keys
@@ -11,10 +17,10 @@ v0.9.1
 v0.9.0
 -- Added parse_signed_request to handle Facebook's new authentication scheme
   -- note: creates dependency on OpenSSL (OpenSSL::HMAC) for decryption
--- Added GraphCollection class to provide paging support for GraphAPI get_connections and search methods (thanks to jagthedrummer)    
+-- Added GraphCollection class to provide paging support for GraphAPI get_connections and search methods (thanks to jagthedrummer)
 -- Added get_page method to easily fetch pages of results from GraphCollections
 -- Exchanging sessions for tokens now works properly when provided invalid/expired session keys
--- You can now include a :typhoeus_options key in TyphoeusService#make_request's options hash to control the Typhoeus call (for example, to set :disable_ssl_peer_verification => true) 
+-- You can now include a :typhoeus_options key in TyphoeusService#make_request's options hash to control the Typhoeus call (for example, to set :disable_ssl_peer_verification => true)
 -- All paths provided to HTTP services start with leading / to improve compatibility with stubbing libraries
 -- If Facebook returns nil for search or get_connections requests, Koala now returns nil rather than throwing an exception
 
@@ -23,7 +29,7 @@ v0.8.0
   -- Removed string overloading for the methods, per 0.7.3, which caused Marshaling issues
   -- Removed ability to provide a string as the second argument to url_for_access_token, per 0.5.0
 
-v0.7.4 
+v0.7.4
 -- Fixed bug with get_user_from_cookies
 
 v0.7.3
@@ -34,18 +40,18 @@ v0.7.3
     -- Using those methods triggers a deprecation warning
     -- This will be removed by 1.0
   -- There are new info methods (get_access_token_info, get_app_access_token_info, get_token_info_from_session_keys, and get_user_info_from_cookies) that natively return hashes, for when you want the expiration date
--- Responses with HTTP status 500+ now properly throw errors under Net::HTTP 
+-- Responses with HTTP status 500+ now properly throw errors under Net::HTTP
 -- Updated changelog
 -- Added license
 
 v0.7.2
 -- Added support for exchanging session keys for OAuth access tokens (get_token_from_session_key for single keys, get_tokens_from_session_keys for multiple)
 -- Moved Koala files into a koala/ subdirectory to minimize risk of name collisions
--- Added OAuth Playground git submodule as an example 
+-- Added OAuth Playground git submodule as an example
 -- Updated tests, readme, and changelog
 
 v0.7.1
--- Updated RealtimeUpdates#list_subscriptions and GraphAPI#get_connections to now return an 
+-- Updated RealtimeUpdates#list_subscriptions and GraphAPI#get_connections to now return an
 array of results directly (rather than a hash with one key)
 -- Fixed a bug with Net::HTTP-based HTTP service in which the headers hash was improperly formatted
 -- Updated readme
@@ -92,7 +98,7 @@ v0.3.1
 v0.3
 -- Renamed Graph API class from Facebook::GraphAPI to FacebookGraph::API
 -- Created FacebookGraph::OAuth class for tokens and OAuth URLs
--- Updated method for including HTTP service (think we've got it this time) 
+-- Updated method for including HTTP service (think we've got it this time)
 -- Updated tests
 -- Added CHANGELOG and gemspec
 
