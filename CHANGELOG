@@ -1,6 +1,7 @@
 v1.0
--- Koala now uses http by default (v. https) for public requests
+-- For public requests, Koala now uses http by default (instead of https) to improve speed
   -- This can be overridden through Koala.always_use_ssl= or by passing :use_ssl => true in the options hash for an api call
+-- Read-only REST API requests now go through the faster api-read server
 -- Replaced the 50-person network test, which often took 15+ minutes to run live, with a 5-person test
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
 
