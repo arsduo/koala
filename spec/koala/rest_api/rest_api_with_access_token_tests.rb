@@ -8,7 +8,7 @@ shared_examples_for "Koala RestAPI with an access token" do
 
   it "should be able to access protected information via FQL" do
     # Tests agains the permissions fql table
-    
+
     # get the current user's ID
     # we're sneakily using the Graph API, which should be okay since it has its own tests
     g = Koala::Facebook::GraphAPI.new(@token)
@@ -27,10 +27,12 @@ end
 class FacebookRestAPIWithAccessTokenTests < Test::Unit::TestCase
   describe "Koala RestAPI with an access token" do
     include LiveTestingDataHelper
-    it_should_behave_like "Koala RestAPI with an access token"
-    
+
     before :each do
       @api = Koala::Facebook::RestAPI.new(@token)
     end
+
+    it_should_behave_like "Koala RestAPI"
+    it_should_behave_like "Koala RestAPI with an access token"
   end
 end
