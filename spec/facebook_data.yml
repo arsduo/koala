@@ -4,7 +4,7 @@
 # Just remember to update all fields!
  
 # You must supply this value yourself to test the GraphAPI class.
-# Your OAuth token should have publish_stream and read_stream permissions.
+# Your OAuth token should have publish_stream, read_stream, and user_photos permissions.
 oauth_token: 
 
 # for testing the OAuth class    

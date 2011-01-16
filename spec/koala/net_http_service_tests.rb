@@ -302,22 +302,28 @@ class NetHTTPServiceTests < Test::Unit::TestCase
     
     describe "when encoding multipart/form-data params" do
       it "should replace only File parameters with UploadIO objects" do
-        file_stub = stub("Stub File", "kind_of?" => true)
+        path = "/path/to/file"
+        file_stub = stub("Stub File", "kind_of?" => true, "path" => path)
         content_type_stub = stub("Stub Content Type")
-        uploadio_stub = stub("UploadIO Stub")
-        
+        # UploadIO 
+        # since this gets flattened with #to_ary, we need two values (one with #to_ary, and another to be returned)
+        uploadio_shell_stub = stub("UploadIO Shell Stub")
+        uploadio_content_stub = "content"
+  
         args = {
           "not_a_file" => "not a file",
           "file" => file_stub
         }
         
         Bear.should_receive(:infer_content_type).with(file_stub).and_return(content_type_stub)
-        UploadIO.stub(:new).with(file_stub, content_type_stub).and_return(uploadio_stub)
+        UploadIO.stub(:new).with(file_stub, content_type_stub, path).and_return(uploadio_shell_stub)
+        # Ruby 1.9 compatibility for #flatten
+        uploadio_shell_stub.stub(:to_ary).and_return([uploadio_content_stub])
         
         result = Bear.encode_multipart_params(args)
         
         result["not_a_file"] == args["not_a_file"]
-        result["file"] == uploadio_stub
+        result["file"] == uploadio_content_stub
       end
     end
   end
