@@ -4,6 +4,7 @@ require 'yaml'
 module Koala
   module MockHTTPService
     # Mocks all HTTP requests for with koala_spec_with_mocks.rb
+    IS_MOCK = true # this lets our tests figure out if we want to stub methods
 
     # Mocked values to be included in TEST_DATA used in specs
     ACCESS_TOKEN = '*'

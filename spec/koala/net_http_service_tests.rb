@@ -5,8 +5,17 @@ class NetHTTPServiceTests < Test::Unit::TestCase
   end
 
   describe "NetHTTPService module holder class Bear" do
+    before :each do
+      # reset the always_use_ssl parameter
+      Bear.always_use_ssl = nil
+    end
+
     it "should define a make_request static module method" do
       Bear.respond_to?(:make_request).should be_true
+    end
+
+    it "should include the Koala::HTTPService module defining common features" do
+      Bear.included_modules.include?(Koala::HTTPService).should be_true
     end
 
     describe "when making a request" do
@@ -16,7 +25,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         @mock_body = stub('Net::HTTPResponse body')
         @http_request_result = [@mock_http_response, @mock_body]
 
-        # to_ary is called in Ruby 1.9 to provide backwards compatibility 
+        # to_ary is called in Ruby 1.9 to provide backwards compatibility
         # with the response, body = http.get() syntax we use
         @mock_http_response.stub!(:to_ary).and_return(@http_request_result)
 
@@ -31,33 +40,102 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         Net::HTTP.stub(:new).and_return(@http_mock)
       end
 
-      it "should use POST if verb is not GET" do
-        @http_yield_mock.should_receive(:post).and_return(@mock_http_response)
-        @http_mock.should_receive(:start).and_yield(@http_yield_mock)
+      describe "the connection" do
+        it "should use POST if verb is not GET" do
+          @http_yield_mock.should_receive(:post).and_return(@mock_http_response)
+          @http_mock.should_receive(:start).and_yield(@http_yield_mock)
 
-        Bear.make_request('anything', {}, 'anything')
+          Bear.make_request('anything', {}, 'anything')
+        end
+
+        it "should use GET if that verb is specified" do
+          @http_yield_mock.should_receive(:get).and_return(@mock_http_response)
+          @http_mock.should_receive(:start).and_yield(@http_yield_mock)
+
+          Bear.make_request('anything', {}, 'get')
+        end
+
+        it "should add the method to the arguments if it's not get or post" do
+          args = {}
+          method = "telekenesis"
+          # since the arguments get encoded later, we'll test for merge!
+          # even though that's somewhat testing internal implementation
+          args.should_receive(:merge!).with(:method => method)
+
+          Bear.make_request('anything', args, method)
+        end
       end
 
-      it "should use port 443" do
-        Net::HTTP.should_receive(:new).with(anything, 443).and_return(@http_mock)
+      describe "if the request has an access token" do
+        before :each do
+          @args = {"access_token" => "123"}
+        end
 
-        Bear.make_request('anything', {}, 'anything')  
+        it "should use SSL" do
+          @http_mock.should_receive('use_ssl=').with(true)
+
+          Bear.make_request('anything', @args, 'anything')
+        end
+
+        it "should set the port to 443" do
+          Net::HTTP.should_receive(:new).with(anything, 443).and_return(@http_mock)
+
+          Bear.make_request('anything', @args, 'anything')
+        end
       end
 
-      it "should use SSL" do
-        @http_mock.should_receive('use_ssl=').with(true)
+      describe "if always_use_ssl is true" do
+        before :each do
+          Bear.always_use_ssl = true
+        end
 
-        Bear.make_request('anything', {}, 'anything')  
+        it "should use SSL" do
+          @http_mock.should_receive('use_ssl=').with(true)
+
+          Bear.make_request('anything', {}, 'anything')
+        end
+
+        it "should set the port to 443" do
+          Net::HTTP.should_receive(:new).with(anything, 443).and_return(@http_mock)
+
+          Bear.make_request('anything', {}, 'anything')
+        end
+      end
+
+      describe "if the use_ssl option is provided" do
+        it "should use SSL" do
+          @http_mock.should_receive('use_ssl=').with(true)
+
+          Bear.make_request('anything', {}, 'anything', :use_ssl => true)
+        end
+
+        it "should set the port to 443" do
+          Net::HTTP.should_receive(:new).with(anything, 443).and_return(@http_mock)
+
+          Bear.make_request('anything', {}, 'anything', :use_ssl => true)
+        end
+      end
+
+      describe "if there's no token and always_use_ssl isn't true" do
+        it "should not use SSL" do
+          @http_mock.should_not_receive('use_ssl=')
+          Bear.make_request('anything', {}, 'anything')
+        end
+
+        it "should not set the port" do
+          Net::HTTP.should_receive(:new).with(anything, nil).and_return(@http_mock)
+          Bear.make_request('anything', {}, 'anything')
+        end
       end
 
       it "should use the graph server by default" do
         Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
-        Bear.make_request('anything', {}, 'anything')  
+        Bear.make_request('anything', {}, 'anything')
       end
 
       it "should use the REST server if the :rest_api option is true" do
         Net::HTTP.should_receive(:new).with(Koala::Facebook::REST_SERVER, anything).and_return(@http_mock)
-        Bear.make_request('anything', {}, 'anything', :rest_api => true)  
+        Bear.make_request('anything', {}, 'anything', :rest_api => true)
       end
 
       it "should turn off vertificate validaiton warnings" do
@@ -82,7 +160,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           path = mock('Path')
           @http_yield_mock.should_receive(:post).with(path, anything).and_return(@http_request_result)
 
-          Bear.make_request(path, {}, 'post')        
+          Bear.make_request(path, {}, 'post')
         end
 
         it "should use encoded parameters" do
@@ -164,7 +242,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         end
 
         it "should return a Koala::Response with the right status" do
-          @response.status.should == @mock_http_response.code  
+          @response.status.should == @mock_http_response.code
         end
 
         it "should reutrn a Koala::Response with the right body" do

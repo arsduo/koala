@@ -15,5 +15,5 @@ unless $testing_data["oauth_token"]
 end
 
 unless $testing_data["oauth_test_data"] && $testing_data["oauth_test_data"]["code"] && $testing_data["oauth_test_data"]["secret"]
-  puts "Cookie tests will fail until you store valid data for the cookie hash, app_id, and app secret in facebook_data.yml"
+  puts "OAuth code tests will fail until you store valid data for the user's OAuth code and the app secret in facebook_data.yml"
 end

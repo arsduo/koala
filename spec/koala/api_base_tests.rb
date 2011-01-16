@@ -30,6 +30,12 @@ class ApiBaseTests < Test::Unit::TestCase
       service.api('anything')
     end
     
+    it "should have an attr_reader for access token" do
+      token = 'adfadf'
+      service = Koala::Facebook::API.new token
+      service.access_token.should == token
+    end
+    
     it "should get the attribute of a Koala::Response given by the http_component parameter" do
       http_component = :method_name
       
