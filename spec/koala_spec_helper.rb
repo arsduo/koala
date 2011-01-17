@@ -23,12 +23,10 @@ require 'koala/live_testing_data_helper'
 # API tests
 require 'koala/api_base_tests'
 
-require 'koala/graph_api/graph_api_tests'
 require 'koala/graph_api/graph_collection_tests'
 require 'koala/graph_api/graph_api_no_access_token_tests'
 require 'koala/graph_api/graph_api_with_access_token_tests'
 
-require 'koala/rest_api/rest_api_tests'
 require 'koala/rest_api/rest_api_no_access_token_tests'
 require 'koala/rest_api/rest_api_with_access_token_tests'
 
@@ -51,3 +49,4 @@ begin
 rescue LoadError
   puts "Typhoeus tests will not be run because Typhoeus is not installed."
 end
+
