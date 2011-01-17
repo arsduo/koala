@@ -4,6 +4,8 @@ v1.0
 -- Read-only REST API requests now go through the faster api-read server
 -- Replaced the 50-person network test, which often took 15+ minutes to run live, with a 5-person test
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
+-- Added a delete_like method (thanks to wassem)
+-- delete_object will raise an error if there's no access token (like put_object and delete_like)
 
 v0.10.0
 -- Added test user module

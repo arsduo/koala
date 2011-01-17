@@ -37,11 +37,15 @@ shared_examples_for "Koala GraphAPI without an access token" do
   it "should not be able to like an object" do
     lambda { @api.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
   end
-
+  
   # DELETE
   it "should not be able to delete posts" do
     # test post on the Ruby SDK Test application
     lambda { @result = @api.delete_object("115349521819193_113815981982767") }.should raise_error(Koala::Facebook::APIError)
+  end
+  
+  it "should not be able to delete a like" do
+    lambda { @api.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
   end
 end
 

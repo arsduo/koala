@@ -237,7 +237,13 @@ graph_api:
   /FEED_ITEM_DELETE:
     no_args:
       <<: *item_deleted
-      
+
+  /FEED_ITEM_DELETE/likes:
+    no_args:
+      <<: *item_deleted
+      post: 
+        with_token: 'true'
+            
   /MOCK_COMMENT:
     no_args:
       <<: *item_deleted

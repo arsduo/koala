@@ -34,6 +34,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
     delete_result = @api.delete_object(object_id_to_delete)
     delete_result.should == true
   end
+  
+  it "should be able to delete likes" do
+    result = @api.put_wall_post("Hello, world, from the test suite delete method!")
+    @temporary_object_id = result["id"]
+    @api.put_like(@temporary_object_id)
+    delete_like_result = @api.delete_like(@temporary_object_id)
+    delete_like_result.should == true
+  end
 
   # additional put tests
   it "should be able to verify messages posted to a wall" do
@@ -90,6 +98,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result = @api.put_wall_post("Hello, world, from the test suite, testing comments!")
     @temporary_object_id = result["id"]
     like_result = @api.put_like(@temporary_object_id)
+    like_result.should be_true
   end
 end
 
