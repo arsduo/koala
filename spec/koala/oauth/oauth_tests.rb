@@ -16,6 +16,10 @@ class FacebookOAuthTests < Test::Unit::TestCase
       @request_secret = @oauth_data["request_secret"] || @secret 
       @signed_request = @oauth_data["signed_request"]
       @signed_request_result = @oauth_data["signed_request_result"]
+      # for signed requests (http://developers.facebook.com/docs/authentication/canvas/encryption_proposal)
+      @signed_params_secret = @oauth_data["signed_params_secret"] || @secret 
+      @signed_params = @oauth_data["signed_params"]
+      @signed_params_result = @oauth_data["signed_params_result"]
       
       # this should expanded to cover all variables
       raise Exception, "Must supply app data to run FacebookOAuthTests!" unless @app_id && @secret && @callback_url && 
@@ -24,9 +28,9 @@ class FacebookOAuthTests < Test::Unit::TestCase
 
       @oauth = Koala::Facebook::OAuth.new(@app_id, @secret, @callback_url)
 
-      time = Time.now
-      Time.stub!(:now).and_return(time)
-      time.stub!(:to_i).and_return(1273363199)
+      @time = Time.now
+      Time.stub!(:now).and_return(@time)
+      @time.stub!(:to_i).and_return(1273363199)
     end
     
     # initialization
@@ -356,81 +360,48 @@ class FacebookOAuthTests < Test::Unit::TestCase
         @oauth = Koala::Facebook::OAuth.new(@app_id, @request_secret || @app_secret)
       end
 
-      it "should break the request into the encoded signature and the payload" do
-        @signed_request.should_receive(:split).with(".").and_return(["", ""])
-        @oauth.parse_signed_request(@signed_request)
+      # the signed request code comes directly from Facebook
+      # so we only need to test at a high level that it works      
+      # signed params refers to http://developers.facebook.com/docs/authentication/canvas
+      # signed request refers to http://developers.facebook.com/docs/authentication/canvas/encryption_proposal
+      it "should throw an error if the algorithm is unsupported" do
+        JSON.stub!(:parse).and_return("algorithm" => "my fun algorithm")
+        lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
       end
       
-      it "should base64 URL decode the signed request" do
-        sig = ""
-        @signed_request.should_receive(:split).with(".").and_return([sig, "1"])
-        @oauth.should_receive(:base64_url_decode).with(sig).and_return("4")
-        @oauth.parse_signed_request(@signed_request)
+      it "should throw an error if the signature is invalid" do
+        OpenSSL::HMAC.stub!(:hexdigest).and_return("i'm an invalid signature")
+        lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
       end
 
-      it "should base64 URL decode the signed request" do
-        sig = @signed_request.split(".")[0]
-        @oauth.should_receive(:base64_url_decode).with(sig).and_return(nil)
-        @oauth.parse_signed_request(@signed_request)        
-      end
-      
-      it "should get the sha64 encoded payload using proper arguments from OpenSSL::HMAC" do
-        payload = ""
-        @signed_request.should_receive(:split).with(".").and_return(["1", payload])
-        OpenSSL::HMAC.should_receive(:digest).with("sha256", @request_secret, payload)
-        @oauth.parse_signed_request(@signed_request)        
-      end
-      
-      it "should compare the encoded payload with the signature" do
-        sig = "2"
-        @oauth.should_receive(:base64_url_decode).and_return(sig)
-        encoded_payload = "1"
-        OpenSSL::HMAC.should_receive(:digest).with(anything, anything, anything).and_return(encoded_payload)
-        encoded_payload.should_receive(:==).with(sig)
-        @oauth.parse_signed_request(@signed_request)                
-      end
-        
-      describe "if the encoded payload matches the signature" do
-        before :each do
-          # set it up so the sig will match the encoded payload
-          raw_sig = ""
-          @sig = "2"
-          @payload = "1"
-          @signed_request.should_receive(:split).and_return([raw_sig, @payload])
-          @oauth.should_receive(:base64_url_decode).with(raw_sig).and_return(@sig)
-          OpenSSL::HMAC.should_receive(:digest).with(anything, anything, anything).and_return(@sig.dup)
-        end
-        
-        it "should base64_url_decode the payload" do
-          @oauth.should_receive(:base64_url_decode).with(@payload).ordered.and_return("{}")
-          @oauth.parse_signed_request(@signed_request)        
-        end
-        
-        it "should JSON decode the payload" do
-          result = "{}"
-          @oauth.should_receive(:base64_url_decode).with(@payload).and_return(result)
-          JSON.should_receive(:parse).with(result)
-          @oauth.parse_signed_request(@signed_request)        
-        end
-      end
-
-      describe "if the encoded payload does not match the signature" do
-        before :each do
-          sig = ""
-          @signed_request.should_receive(:split).and_return([sig, ""])
-          OpenSSL::HMAC.should_receive(:digest).with(anything, anything, anything).and_return("hi")
-        end
-        
-        it "should return nil" do
-          @oauth.parse_signed_request(@signed_request).should be_nil
-        end
-      end
-      
-      describe "run against data" do
+      describe "for signed params" do
         it "should work" do
           @oauth.parse_signed_request(@signed_request).should == @signed_request_result
-        end
+        end      
       end
+      
+      describe "for signed requests" do
+        it "should work" do
+          @oauth = Koala::Facebook::OAuth.new(@app_id, @signed_params_secret || @app_secret)
+          @oauth.parse_signed_request(@signed_params).should == @signed_params_result
+        end
+        
+        it "should throw an error if the params are too old" do
+          @time.stub!(:to_i).and_return(1287601988 + 4000)
+          @oauth = Koala::Facebook::OAuth.new(@app_id, @signed_params_secret || @app_secret)
+          
+          lambda { @oauth.parse_signed_request(@signed_params) }.should raise_error
+        end
+        
+        it "should let you specify the max age for a request" do
+          @time.stub!(:to_i).and_return(1287601988 + 4000)
+          @oauth = Koala::Facebook::OAuth.new(@app_id, @signed_params_secret || @app_secret)
+          
+          lambda { @oauth.parse_signed_request(@signed_params, 4001) }.should_not raise_error
+        end
+        
+      end
+      
     end
 
   end # describe

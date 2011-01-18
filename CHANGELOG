@@ -3,6 +3,8 @@ v1.0
   -- This can be overridden through Koala.always_use_ssl= or by passing :use_ssl => true in the options hash for an api call
 -- Read-only REST API requests now go through the faster api-read server
 -- Replaced the 50-person network test, which often took 15+ minutes to run live, with a 5-person test
+-- Replaced parse_signed_request with a version from Facebook that also supports the new signed params proposal
+  -- Note: invalid requests will now raise exceptions rather than return nil, in keeping with other SDKs
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
 -- Added a delete_like method (thanks to wassem)
 -- delete_object will raise an error if there's no access token (like put_object and delete_like)

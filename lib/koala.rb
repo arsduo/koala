@@ -5,8 +5,9 @@ require 'digest/md5'
 require 'rubygems'
 require 'json'
 
-# openssl is required to support signed_request
+# OpenSSL and Base64 are required to support signed_request
 require 'openssl'
+require 'base64'
 
 # include default http services
 require 'koala/http_services'
@@ -207,21 +208,38 @@ module Koala
           string = info["access_token"]
         end
       end
+    
+      # provided directly by Facebook
+      # see https://github.com/facebook/crypto-request-examples/blob/master/sample.rb
+      # and http://developers.facebook.com/docs/authentication/canvas/encryption_proposal
+      def parse_signed_request(input, max_age = 3600)
+        encoded_sig, encoded_envelope = input.split('.', 2)
+        envelope = JSON.parse(base64_url_decode(encoded_envelope))
+        algorithm = envelope['algorithm']
 
-      # signed_request
-      def parse_signed_request(request)
-        # Facebook's signed requests come in two parts -- the signature and the data payload
-        # see http://developers.facebook.com/docs/authentication/canvas
-        encoded_sig, payload = request.split(".")
+        raise 'Invalid request. (Unsupported algorithm.)' \
+          if algorithm != 'AES-256-CBC HMAC-SHA256' && algorithm != 'HMAC-SHA256'
 
-        sig = base64_url_decode(encoded_sig)
+        raise 'Invalid request. (Too old.)' \
+          if algorithm == "AES-256-CBC HMAC-SHA256" && envelope['issued_at'].to_i < Time.now.to_i - max_age
 
-        # if the signature matches, return the data, decoded and parsed as JSON
-        if OpenSSL::HMAC.digest("sha256", @app_secret, payload) == sig
-          JSON.parse(base64_url_decode(payload))
-        else
-          nil
-        end
+        raise 'Invalid request. (Invalid signature.)' \
+          if base64_url_decode(encoded_sig) !=
+              OpenSSL::HMAC.hexdigest(
+                'sha256', @app_secret, encoded_envelope).split.pack('H*')
+
+        # for requests that are signed, but not encrypted, we're done
+        return envelope if algorithm == 'HMAC-SHA256'
+
+        # otherwise, decrypt the payload
+        cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+        cipher.decrypt
+        cipher.key = @app_secret
+        cipher.iv = base64_url_decode(envelope['iv'])
+        cipher.padding = 0
+        decrypted_data = cipher.update(base64_url_decode(envelope['payload']))
+        decrypted_data << cipher.final
+        return JSON.parse(decrypted_data.strip)
       end
 
       # from session keys
@@ -285,11 +303,10 @@ module Koala
       end
 
       # base 64
-      def base64_url_decode(string)
-        # to properly decode what Facebook provides, we need to add == to the end
-        # and translate certain characters to others before running the actual decoding
-        # see http://developers.facebook.com/docs/authentication/canvas
-        "#{string}==".tr("-_", "+/").unpack("m")[0]
+      # directly from https://github.com/facebook/crypto-request-examples/raw/master/sample.rb
+      def base64_url_decode(str)
+        str += '=' * (4 - str.length.modulo(4))
+        Base64.decode64(str.gsub('-', '+').gsub('_', '/'))
       end
     end
   end
