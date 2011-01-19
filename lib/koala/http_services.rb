@@ -18,9 +18,28 @@ module Koala
         
         protected
         def self.params_require_multipart?(param_hash)
-          param_hash.any? { |key, value| value.kind_of? File }
+          param_hash.any? { |key, value| is_valid_file_hash?(value) }
         end
         
+        # A file hash can take two forms:
+        # - A hash with "content_type", "file_name" and "file" keys, where the "file" value
+        #   is an already-opened IO that responds to "read".
+        # - A hash with "content_type" and "path" keys where "path" is the local path
+        #   to the file to be uploaded.
+        #
+        # Valid inputs for a file to be posted via multipart/form-data
+        # are based on the criteria for an UploadIO to be created 
+        # See : https://github.com/nicksieger/multipart-post/blob/master/lib/composite_io.rb       
+        def self.is_valid_file_hash?(value)
+          value.kind_of?(Hash) and value.key?("content_type") and (
+            
+            # A file IO was given, then we need a file_name key as well
+            (value.key?("file") and value["file"].respond_to?(:read) and value.key?("file_name")) or
+            
+            # Otherwise, no file or file_name key should be present, but a path key should
+            (!value.key?("file") and !value.key?("file_name") and value.key?("path"))
+          )
+        end
       end
     end
   end
@@ -83,30 +102,16 @@ module Koala
         
         def self.encode_multipart_params(param_hash)
           Hash[*param_hash.collect do |key, value| 
-            [key, value.kind_of?(File) ? UploadIO.new(value, infer_content_type(value), value.path) : value]
+            if is_valid_file_hash?(value)
+              if value.key?("file")
+                value = UploadIO.new(value["file"], value["content_type"], value["file_name"])
+              else
+                value = UploadIO.new(value["path"], value['content_type'])
+              end
+            end
+            
+            [key, value]
           end.flatten]
-        end
-        
-        # These are accepted image content types, pulled from the
-        # Rest API photos.upload method.  If we begin to support
-        # more file types (like when we allow videos) we may want to
-        # consider refactoring this out into a separate class or
-        # even depend on a third-party gem to infer content types
-        def self.infer_content_type(file_or_name)
-          ext = File.extname(file_or_name.kind_of?(File) ? file_or_name.path : file_or_name).downcase
-          
-          case ext
-            when ".gif" then "image/gif"
-            when ".jpg", ".jpe", ".jpeg" then "image/jpeg"
-            when ".png" then "image/png"
-            when ".tiff", ".tif" then "image/tiff"
-            when ".xbm" then "image/x-xbitmap"
-            when ".wbmp" then "image/vnd.wap.wbmp"
-            when ".iff" then "image/iff"
-            when ".jp2" then "image/jp2"
-            when ".psd" then "image/psd"
-            else raise "#{ext} extension not supported by Koala::NetHTTPService"
-          end
         end
       end
     end
