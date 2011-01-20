@@ -1,4 +1,5 @@
 v1.0
+-- Photo and file upload now supported through #put_picture and general support for files 
 -- For public requests, Koala now uses http by default (instead of https) to improve speed
   -- This can be overridden through Koala.always_use_ssl= or by passing :use_ssl => true in the options hash for an api call
 -- Read-only REST API requests now go through the faster api-read server

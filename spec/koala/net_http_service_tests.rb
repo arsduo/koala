@@ -172,6 +172,45 @@ class NetHTTPServiceTests < Test::Unit::TestCase
 
           Bear.make_request('anything', args, 'post')
         end
+        
+        describe "with multipart/form-data" do
+          before(:each) do
+            Bear.stub(:encode_multipart_params)
+            Bear.stub("params_require_multipart?").and_return(true)
+            
+            @multipart_request_stub = stub('Stub Multipart Request')
+            Net::HTTP::Post::Multipart.stub(:new).and_return(@multipart_request_stub)
+            
+            @file_stub = stub('fake File', "kind_of?" => true, "path" => 'anypath.jpg')
+            
+            @http_yield_mock.stub(:request).with(@multipart_request_stub).and_return(@http_request_result)
+          end
+          
+          it "should use multipart/form-data if any parameter is a File" do
+            @http_yield_mock.should_receive(:request).with(@multipart_request_stub).and_return(@http_request_result)
+            
+            Bear.make_request('anything', {}, 'post')
+          end
+          
+          it "should use the given request path for the request" do
+            args = {"file" => @file_stub}
+            expected_path = 'expected/path'
+            
+            Net::HTTP::Post::Multipart.should_receive(:new).with(expected_path, anything).and_return(@multipart_request_stub)
+            
+            Bear.make_request(expected_path, {}, 'post')
+          end
+          
+          it "should use multipart encoded arguments for the request" do
+            args = {"file" => @file_stub}
+            expected_params = stub('Stub Multipart Params')
+            
+            Bear.should_receive(:encode_multipart_params).with(args).and_return(expected_params)
+            Net::HTTP::Post::Multipart.should_receive(:new).with(anything, expected_params).and_return(@multipart_request_stub)
+            
+            Bear.make_request('anything', args, 'post')
+          end
+        end
       end
 
       describe "via GET" do
@@ -258,6 +297,33 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           key, val = key_val.split('=')
           key.should == args.find{|key_val_arr| key_val_arr.last == val}.first.to_s
         end
+      end
+    end
+    
+    describe "when encoding multipart/form-data params" do
+      it "should replace only File parameters with UploadIO objects" do
+        path = "/path/to/file"
+        file_stub = stub("Stub File", "kind_of?" => true, "path" => path)
+        content_type_stub = stub("Stub Content Type")
+        # UploadIO 
+        # since this gets flattened with #to_ary, we need two values (one with #to_ary, and another to be returned)
+        uploadio_shell_stub = stub("UploadIO Shell Stub")
+        uploadio_content_stub = "content"
+  
+        args = {
+          "not_a_file" => "not a file",
+          "file" => file_stub
+        }
+        
+        Bear.should_receive(:infer_content_type).with(file_stub).and_return(content_type_stub)
+        UploadIO.stub(:new).with(file_stub, content_type_stub, path).and_return(uploadio_shell_stub)
+        # Ruby 1.9 compatibility for #flatten
+        uploadio_shell_stub.stub(:to_ary).and_return([uploadio_content_stub])
+        
+        result = Bear.encode_multipart_params(args)
+        
+        result["not_a_file"] == args["not_a_file"]
+        result["file"] == uploadio_content_stub
       end
     end
   end

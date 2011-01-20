@@ -19,7 +19,7 @@ module LiveTestingDataHelper
         errors = []
         
         if count > 0
-          print "\nCleaning up #{count} temporary #{count > 1 ? "objects" : "object"}..."
+          print "\nCleaning up #{count} temporary #{count > 1 ? "objects" : "object (#{@temporary_object_ids.first})"}..."
           @temporary_object_ids.each do |id|
             # get our API
             api = @api || (@test_users ? @test_users.graph_api : nil)
