@@ -156,11 +156,10 @@ module Koala
         self.put_object(profile_id, "feed", attachment.merge({:message => message}))
       end
       
-      def put_picture(file, args = {}, target_id = "me")
-        file = File.new(file) if file.kind_of? String
-        raise ApiError.new("type" => "KoalaInvalidPictureFormat", "message" => "pit_picture requires a string file name of a File object") unless file.kind_of? File
+      def put_picture(file_hash, args = {}, target_id = "me")
+        raise APIError.new("type" => "KoalaInvaliFileFormat", "message" => "put_picture requires a hash describing the File to upload (see HTTPService::is_valid_file_hash?") unless file_hash.kind_of?(Hash)
         
-        args["source"] = file
+        args["source"] = file_hash
         self.put_object(target_id, "photos", args)
       end
       
