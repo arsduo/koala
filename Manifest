@@ -13,6 +13,7 @@ lib/koala/test_users.rb
 readme.md
 spec/facebook_data.yml
 spec/koala/api_base_tests.rb
+spec/koala/assets/beach.jpg
 spec/koala/graph_and_rest_api/graph_and_rest_api_no_token_tests.rb
 spec/koala/graph_and_rest_api/graph_and_rest_api_with_token_tests.rb
 spec/koala/graph_api/graph_api_no_access_token_tests.rb
