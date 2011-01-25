@@ -66,7 +66,7 @@ module Koala
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
           server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
-          http = Net::HTTP.new(server, private_request ? 443 : nil)
+          http = create_http(server, private_request, options)
           http.use_ssl = true if private_request
 
           # we turn off certificate validation to avoid the
@@ -101,7 +101,7 @@ module Koala
         end
         
         def self.encode_multipart_params(param_hash)
-          Hash[*param_hash.collect do |key, value| 
+          Hash[*param_hash.collect do |key, value|
             if is_valid_file_hash?(value)
               if value.key?("file")
                 value = UploadIO.new(value["file"], value["content_type"], value["file_name"])
@@ -113,6 +113,22 @@ module Koala
             [key, value]
           end.flatten]
         end
+
+        def self.create_http(server, private_request, options)
+          if options[:proxy]
+            proxy = URI.parse(options[:proxy])
+            http  = Net::HTTP.new(server, private_request ? 443 : nil,
+                                  proxy.host, proxy.port, proxy.user, proxy.password)
+          else
+            http = Net::HTTP.new(server, private_request ? 443 : nil)
+          end
+          if options[:timeout]
+            http.open_timeout = options[:timeout]
+            http.read_timeout = options[:timeout]
+          end
+          http
+        end
+
       end
     end
   end
