@@ -60,18 +60,32 @@ shared_examples_for "Koala GraphAPI with an access token" do
     @temporary_object_id.should_not be_nil
   end
 
-  it "should be able to post photos to the user's wall" do
-    file_hash = stub("File Hash Stub")
-    file_hash.stub!("kind_of?").and_return(true)
-    
+  it "should be able to post photos to the user's wall with an open file object" do
+    file_hash = {
+      "content_type" => "image/jpg",
+      "path" => File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg"),
+      "file" => File.open(File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg"))
+    }
+    result = @api.put_picture(file_hash)
+    @temporary_object_id = result["id"] 
+    @temporary_object_id.should_not be_nil
+  end
+  
+  it "should be able to post photos to the user's wall without an open file object" do
+    file_hash = {
+      "content_type" => "image/jpg",
+      "path" => File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg")
+    }
     result = @api.put_picture(file_hash)
     @temporary_object_id = result["id"] 
     @temporary_object_id.should_not be_nil
   end
     
   it "should be able to verify a photo posted to a user's wall" do
-    file_hash = stub("File Hash Stub")
-    file_hash.stub!("kind_of?").and_return(true)
+    file_hash = {
+      "content_type" => "image/jpg",
+      "path" => File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg")
+    }
     expected_message = "This is the test message"
     
     result = @api.put_picture(file_hash, :message => expected_message)

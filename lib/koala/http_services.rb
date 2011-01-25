@@ -22,22 +22,18 @@ module Koala
         end
         
         # A file hash can take two forms:
-        # - A hash with "content_type", "file_name" and "file" keys, where the "file" value
-        #   is an already-opened IO that responds to "read".
         # - A hash with "content_type" and "path" keys where "path" is the local path
         #   to the file to be uploaded.
+        # - A hash with the "file" key containing an already-opened IO that responds to "read"
+        #   as well as "content_type" and the "path" key to the original file
+        #   ("path"" is required by multipart-post even for opened files)
         #
         # Valid inputs for a file to be posted via multipart/form-data
         # are based on the criteria for an UploadIO to be created 
         # See : https://github.com/nicksieger/multipart-post/blob/master/lib/composite_io.rb       
         def self.is_valid_file_hash?(value)
-          value.kind_of?(Hash) and value.key?("content_type") and (
-            
-            # A file IO was given, then we need a file_name key as well
-            (value.key?("file") and value["file"].respond_to?(:read) and value.key?("file_name")) or
-            
-            # Otherwise, no file or file_name key should be present, but a path key should
-            (!value.key?("file") and !value.key?("file_name") and value.key?("path"))
+          value.kind_of?(Hash) and value.key?("content_type") and value.key?("path") and (
+            !value.key?("file") or value["file"].respond_to?(:read)
           )
         end
       end
@@ -104,7 +100,7 @@ module Koala
           Hash[*param_hash.collect do |key, value| 
             if is_valid_file_hash?(value)
               if value.key?("file")
-                value = UploadIO.new(value["file"], value["content_type"], value["file_name"])
+                value = UploadIO.new(value["file"], value["content_type"], value["path"])
               else
                 value = UploadIO.new(value["path"], value['content_type'])
               end

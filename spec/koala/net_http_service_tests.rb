@@ -318,14 +318,10 @@ class NetHTTPServiceTests < Test::Unit::TestCase
       end
       
       describe "and looking at individual values" do
-        before(:each) do
-          @stub_file = stub('Stub IO File')
-          @stub_file.stub!("respond_to?").with(:read).and_return(true)
-          
+        before(:each) do          
           @valid_hash = {
             "content_type" => 1,
-            "file" => @stub_file,
-            "file_name" => 1
+            "path" => 1
           }
         end
         
@@ -341,41 +337,50 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           Bear.is_valid_file_hash?(@valid_hash).should be_false
         end
         
-        it "should require a file key and file_name key if the file key is a IO that responds to read" do
-          @stub_file.should_receive("respond_to?").with(:read).and_return(true)
-          
-          @valid_hash = { "content_type" => "Fake content type" }
+        it "should always require the path key" do
+          @valid_hash.delete("path")
           Bear.is_valid_file_hash?(@valid_hash).should be_false
-          
-          @valid_hash["file"] = @stub_file
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
-          
-          @valid_hash["file_name"] = "Fake file name"
-          Bear.is_valid_file_hash?(@valid_hash).should be_true
         end
         
-        it "should require a path key if a file key and file_name key are not present" do
-          @valid_hash = { "content_type" => "Fake content type" }
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
+        describe "with file IOs" do
+          before :each do
+            @stub_file = stub('Stub IO File')
+            @valid_hash["file"] = @stub_file
+          end
           
-          @valid_hash["path"] = "Fake path"
-          Bear.is_valid_file_hash?(@valid_hash).should be_true
+          it "should accept hashes with the file object that responds to read" do
+            @stub_file.should_receive("respond_to?").with(:read).and_return(true)
+          
+            @valid_hash["file"] = @stub_file
+            Bear.is_valid_file_hash?(@valid_hash).should be_true
+          end
+          
+          it "should not accept hashes with a file object that does not respond to read" do
+            @stub_file.should_receive("respond_to?").with(:read).and_return(false)
+          
+            @valid_hash["file"] = @stub_file
+            Bear.is_valid_file_hash?(@valid_hash).should be_false
+          end
+          
         end
       end
     end
     
     describe "when encoding multipart/form-data params" do
-      it "should replace only valid file hashes with UploadIO objects" do
+      it "should replace valid file hashes with file objects with UploadIO objects" do
         file_hash_stub = {
-          "file" => "Fake File IO",
-          "file_name" => "Fake File Name",
+          "path" => "Fake File Name",
           "content_type" => "Fake Content Type"
         }
         
         # UploadIO should be created
         uploadio_stub = stub("UploadIO Shell Stub")
-        UploadIO.should_receive("new").with(file_hash_stub["file"], file_hash_stub["content_type"], file_hash_stub["file_name"]).and_return(uploadio_stub)
-  
+        UploadIO.should_receive("new").with(file_hash_stub["path"], file_hash_stub["content_type"]).and_return(uploadio_stub)
+
+        # Ruby 1.9 test compatibility
+        content_stub = "UploadIOContent Stub"
+        uploadio_stub.stub(:to_ary).and_return([content_stub])
+        
         args = {
           "not_a_file" => "not a file",
           "file" => file_hash_stub
@@ -388,7 +393,37 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         result = Bear.encode_multipart_params(args)
         
         result["not_a_file"] == args["not_a_file"]
-        result["file"] == uploadio_stub
+        result["file"] == content_stub
+      end
+
+      it "should replace valid file hashes with file objects with UploadIO objects" do
+        file_hash_stub = {
+          "file" => "Fake File IO",
+          "path" => "Fake File Name",
+          "content_type" => "Fake Content Type"
+        }
+        
+        # UploadIO should be created
+        uploadio_stub = stub("UploadIO Shell Stub")
+        UploadIO.should_receive("new").with(file_hash_stub["file"], file_hash_stub["content_type"], file_hash_stub["path"]).and_return(uploadio_stub)
+
+        # Ruby 1.9 test compatibility
+        content_stub = "UploadIOContent Stub"
+        uploadio_stub.stub(:to_ary).and_return([content_stub])
+        
+        args = {
+          "not_a_file" => "not a file",
+          "file" => file_hash_stub
+        }
+        
+        # Check that is_valid_file_hash is called on the file_hash_stub
+        Bear.stub!("is_valid_file_hash?").and_return(false)
+        Bear.should_receive("is_valid_file_hash?").with(file_hash_stub).and_return(true)
+        
+        result = Bear.encode_multipart_params(args)
+        
+        result["not_a_file"] == args["not_a_file"]
+        result["file"] == content_stub
       end
     end
   end

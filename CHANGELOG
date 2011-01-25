@@ -8,7 +8,7 @@ Internal improvements:
 -- Read-only REST API requests now go through the faster api-read server
 -- Replaced parse_signed_request with a version from Facebook that also supports the new signed params proposal
   -- Note: invalid requests will now raise exceptions rather than return nil, in keeping with other SDKs
--- delete_object will raise an error if there's no access token (like put_object and delete_like)
+-- delete_object will now raise an error if there's no access token (like put_object and delete_like)
 Test improvements:
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
 -- Live tests now verify that the access token has the necessary permissions before starting
