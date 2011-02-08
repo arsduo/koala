@@ -81,6 +81,10 @@ module Koala
             else
               http.get("#{path}?#{encode_params(args)}")
             end
+            # hijack the location header for 302 requests
+            # http://developers.facebook.com/docs/reference/api/album/
+            # album connection to picture is a 302
+            body = {:data => [{ :thumb => response["location"] }]}.to_json if response.code.to_i == 302
             
             Koala::Response.new(response.code.to_i, body, response)
           end
