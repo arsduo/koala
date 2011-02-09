@@ -50,8 +50,8 @@ module Koala
         @u1_graph_api = GraphAPI.new(user1_token)
         @u2_graph_api = GraphAPI.new(user2_token)
         
-        @u1_graph_api.graph_call(:path => "/#{user1_id}/friends/#{user2}")
-        @u2_graph_api.graph_call(:path => "/#{user2_id}/friends/#{user1}")
+        @u1_graph_api.graph_call(:path => "/#{user1_id}/friends/#{user2_id}")
+        @u2_graph_api.graph_call(:path => "/#{user2_id}/friends/#{user1_id}")
         
         # This is the original Koala call, the one that doesn't work
         #@graph_api.graph_call(:path => "/#{user1}/friends/#{user2}") && @graph_api.graph_call(:path => "/#{user2}/friends/#{user1}")
