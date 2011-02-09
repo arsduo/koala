@@ -43,7 +43,7 @@ module Koala
       def befriend(user1, user2)
         user1 = user1["id"] if user1.is_a?(Hash)
         user2 = user2["id"] if user2.is_a?(Hash)
-        @graph_api.graph_call("/#{user1}/friends/#{user2}") && @graph_api.graph_call("/#{user2}/friends/#{user1}")
+        @graph_api.graph_call(:path => "/#{user1}/friends/#{user2}", :verb => "post") && @graph_api.graph_call(:path => "/#{user2}/friends/#{user1}", :verb => "post")
       end
       
       def create_network(network_size, installed = true, permissions = '')
