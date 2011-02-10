@@ -41,20 +41,22 @@ module Koala
       end
       
       def befriend(user1, user2)
-        user1_id = user1["id"] if user1.is_a?(Hash)
-        user2_id = user2["id"] if user2.is_a?(Hash)
-        
-        user1_token = user1["access_token"] if user1.is_a?(Hash)
-        user2_token = user2["access_token"] if user2.is_a?(Hash)
-        
-        @u1_graph_api = GraphAPI.new(user1_token)
-        @u2_graph_api = GraphAPI.new(user2_token)
-        
-        @u1_graph_api.graph_call(:path => "/#{user1_id}/friends/#{user2_id}")
-        @u2_graph_api.graph_call(:path => "/#{user2_id}/friends/#{user1_id}")
+        # user1_id = user1["id"] if user1.is_a?(Hash)
+        # user2_id = user2["id"] if user2.is_a?(Hash)
+        # 
+        # user1_token = user1["access_token"] if user1.is_a?(Hash)
+        # user2_token = user2["access_token"] if user2.is_a?(Hash)
+        # 
+        # u1_graph_api = GraphAPI.new(user1_token)
+        # u2_graph_api = GraphAPI.new(user2_token)
+        # 
+        # u1_graph_api.graph_call(:path => "/#{user1_id}/friends/#{user2_id}")
+        # u2_graph_api.graph_call(:path => "/#{user2_id}/friends/#{user1_id}")
         
         # This is the original Koala call, the one that doesn't work
-        #@graph_api.graph_call(:path => "/#{user1}/friends/#{user2}") && @graph_api.graph_call(:path => "/#{user2}/friends/#{user1}")
+        user1 = user1["id"] if user1.is_a?(Hash)
+        user2 = user2["id"] if user2.is_a?(Hash)
+        @graph_api.graph_call("/#{user1}/friends/#{user2}") && @graph_api.graph_call("/#{user2}/friends/#{user1}")
       end
       
       def create_network(network_size, installed = true, permissions = '')
