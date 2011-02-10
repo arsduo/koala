@@ -41,11 +41,18 @@ module Koala
       end
       
       def befriend(user1, user2)
-        user1 = user1["id"] if user1.is_a?(Hash)
-        user2 = user2["id"] if user2.is_a?(Hash)
-        @graph_api.graph_call("/#{user1}/friends/#{user2}", {}, "post") && @graph_api.graph_call("/#{user2}/friends/#{user1}", {}, "post")
+        user1_id = user1["id"] if user1.is_a?(Hash)
+        user2_id = user2["id"] if user2.is_a?(Hash)
+
+        user1_token = user1["access_token"] if user1.is_a?(Hash)
+        user2_token = user2["access_token"] if user2.is_a?(Hash)
+
+        u1_graph_api = GraphAPI.new(user1_token)
+        u2_graph_api = GraphAPI.new(user2_token)
+
+        u1_graph_api.graph_call("/#{user1_id}/friends/#{user2_id}", {}, "post") && u2_graph_api.graph_call("/#{user2_id}/friends/#{user1_id}", {}, "post")
       end
-      
+
       def create_network(network_size, installed = true, permissions = '')
         network_size = 50 if network_size > 50 # FB's max is 50
         users = (0...network_size).collect { create(installed, permissions) }
