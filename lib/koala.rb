@@ -110,7 +110,7 @@ module Koala
       attr_reader :graph_api
     end
 
-    class APIError < Exception
+    class APIError < StandardError
       attr_accessor :fb_error_type
       def initialize(details = {})
         self.fb_error_type = details["type"]
