@@ -319,8 +319,8 @@ module Koala
 
   # by default, try requiring Typhoeus -- if that works, use it
   begin
-    Koala.http_service = TyphoeusService
-  rescue LoadError
+  #   Koala.http_service = TyphoeusService
+  # rescue LoadError
     Koala.http_service = NetHTTPService
   end
 end
