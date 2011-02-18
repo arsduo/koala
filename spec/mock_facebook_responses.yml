@@ -49,8 +49,12 @@ graph_api:
     
   test_user_no_perms: &test_user_no_perms
     post:
-      with_token: '{"id": "777777777", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}'
-      
+      with_token: '{"id": "777777777", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
+  
+  test_user_befriended: &test_user_befriended
+    post:
+      with_token: 'true'
+  
 # -- Stubbed Responses --
   root:
     ids=contextoptional,naitik: 
@@ -271,17 +275,23 @@ graph_api:
       <<: *test_user_no_perms                                                                                                                                                            
     installed=true&permissions=read_stream:
       post:
-        with_token: '{"id": "999999999", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}'
+        with_token: '{"id": "999999999", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
     installed=true&permissions=read_stream,user_interests:
       post:
-        with_token: '{"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}'
+        with_token: '{"id": "888888888", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
     no_args:
       get:
-        with_token: '{"data":[{"id": "999999999", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}]}'
+        with_token: '{"data":[{"id": "999999999", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}]}'
         
   /999999999:
     no_args:
       <<: *item_deleted
+
+  /999999999/friends/888888888:
+    no_args:
+      post:
+        with_token: 'true'
+
 
   /9999999991:
     no_args:
@@ -292,16 +302,11 @@ graph_api:
     no_args:
       <<: *item_deleted   
 
+  /888888888/friends/999999999:
+    no_args:
+      <<: *test_user_befriended
+
+
   /777777777:
     no_args:
       <<: *item_deleted
-
-  /999999999/friends/888888888:
-    no_args:
-      get:
-        with_token: 'true'
-      
-  /888888888/friends/999999999:
-    no_args:
-      get:
-        with_token: 'true'

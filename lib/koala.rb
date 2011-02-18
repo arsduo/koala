@@ -318,9 +318,11 @@ module Koala
   end
 
   # by default, try requiring Typhoeus -- if that works, use it
+  # if you have Typheous and don't want to use it (or want another service),
+  # you can run Koala.http_service = NetHTTPService (or MyHTTPService)
   begin
-  #   Koala.http_service = TyphoeusService
-  # rescue LoadError
+     Koala.http_service = TyphoeusService
+  rescue LoadError
     Koala.http_service = NetHTTPService
   end
 end

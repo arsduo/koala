@@ -64,8 +64,7 @@ module Koala
             # Raises an error message with the place in the data YML
             # to place a mock as well as a URL to request from
             # Facebook's servers for the actual data
-            # (Don't forget to replace ACCESS_TOKEN with a real access token)  
-            
+            # (Don't forget to replace ACCESS_TOKEN with a real access token)              
             data_trace = [server, path, args, verb, with_token] * ': '
             
             args = args == 'no_args' ? '' : "#{args}&"

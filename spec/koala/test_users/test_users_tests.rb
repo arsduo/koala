@@ -133,17 +133,25 @@ class TestUsersTests < Test::Unit::TestCase
           (first_user["id"] && first_user["access_token"] && first_user["login_url"]).should
           (second_user["id"] && second_user["access_token"] && second_user["login_url"]).should
         end
-
-        it "should make two users into friends by id" do
-          result = @test_users.befriend(@user1['id'], @user2['id'])
-          result.should be_true
-        end
-
-        it "should make two users into friends by hash" do
+        
+        it "should make two users into friends with string hashes" do
           result = @test_users.befriend(@user1, @user2)
           result.should be_true
         end
-
+        
+        it "should make two users into friends with symbol hashes" do
+          new_user_1 = {}
+          @user1.each_pair {|k, v| new_user_1[k.to_sym] = v}
+          new_user_2 = {}
+          @user2.each_pair {|k, v| new_user_2[k.to_sym] = v}
+          
+          result = @test_users.befriend(new_user_1, new_user_2)
+          result.should be_true
+        end        
+        
+        it "should not accept user IDs anymore" do
+          lambda { @test_users.befriend(@user1["id"], @user2["id"]) }.should raise_exception(ArgumentError)
+        end
       end # with existing users
 
     end # when used without network
@@ -157,7 +165,7 @@ class TestUsersTests < Test::Unit::TestCase
           id_counter = 999999900
           @test_users.stub!(:create).and_return do
             id_counter += 1
-            {"id" => id_counter, "access_token" => "119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url" => "https://www.facebook.com/platform/test_account.."}
+            {"id" => id_counter, "access_token" => @token, "login_url" => "https://www.facebook.com/platform/test_account.."}
           end
           @test_users.stub!(:befriend).and_return(true)
           @test_users.stub!(:delete).and_return(true)

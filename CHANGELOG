@@ -2,6 +2,8 @@ v1.0
 New methods:
 -- Photo and file upload now supported through #put_picture and general support for file hashes (see documentation)
 -- Added a delete_like method (thanks to wassem)
+Changed methods:
+-- TestUser#befriend now requires user info hashes (id and access token) due to Facebook API changes (thanks to pulsd/kbighorse)
 Internal improvements: 
 -- For public requests, Koala now uses http by default (instead of https) to improve speed
   -- This can be overridden through Koala.always_use_ssl= or by passing :use_ssl => true in the options hash for an api call
