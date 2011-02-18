@@ -21,20 +21,26 @@ module Koala
           param_hash.any? { |key, value| is_valid_file_hash?(value) }
         end
         
-        # A file hash can take two forms:
-        # - A hash with "content_type" and "path" keys where "path" is the local path
-        #   to the file to be uploaded.
-        # - A hash with the "file" key containing an already-opened IO that responds to "read"
-        #   as well as "content_type" and the "path" key to the original file
-        #   ("path"" is required by multipart-post even for opened files)
+        # A file hash is one with "content_type" and "path" keys (string or symbol),
+        # where "path" is the local path to the file to be uploaded. (recommended)
+        # 
+        # The hash can also contain a "file" key containing an already-opened IO
+        # that responds to "read".  (This is due to the underlying gem used, and 
+        # confers no specific advantage.)
         #
         # Valid inputs for a file to be posted via multipart/form-data
         # are based on the criteria for an UploadIO to be created 
         # See : https://github.com/nicksieger/multipart-post/blob/master/lib/composite_io.rb       
         def self.is_valid_file_hash?(value)
-          value.kind_of?(Hash) and value.key?("content_type") and value.key?("path") and (
-            !value.key?("file") or value["file"].respond_to?(:read)
-          )
+          if value.kind_of?(Hash)
+            has_content_type = value.key?("content_type") || value.key?(:content_type)
+            has_path = value.key?("path") || value.key?(:path)
+            file = value["file"] || value[:file]
+            has_content_type && has_path && (!file || file.respond_to?(:read))
+          else
+            # if it's not a hash, it's not a valid file hash, obviously
+            false
+          end
         end
       end
     end
@@ -99,10 +105,13 @@ module Koala
         def self.encode_multipart_params(param_hash)
           Hash[*param_hash.collect do |key, value| 
             if is_valid_file_hash?(value)
-              if value.key?("file")
-                value = UploadIO.new(value["file"], value["content_type"], value["path"])
+              file = value["file"] || value[:file]
+              content_type = value["content_type"] || value[:content_type]
+              path = value["path"] || value[:path]
+              if file
+                value = UploadIO.new(file, content_type, path)
               else
-                value = UploadIO.new(value["path"], value['content_type'])
+                value = UploadIO.new(path, content_type)
               end
             end
             
