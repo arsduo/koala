@@ -15,7 +15,11 @@ module Koala
         class << self
           attr_accessor :always_use_ssl
         end
-        
+               
+        def self.server(options = {})
+          "#{options[:beta] ? "beta." : ""}#{options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER}"          
+        end
+                                      
         protected
         def self.params_require_multipart?(param_hash)
           param_hash.any? { |key, value| is_valid_file_hash?(value) }
@@ -67,8 +71,7 @@ module Koala
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
-          server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
-          http = Net::HTTP.new(server, private_request ? 443 : nil)
+          http = Net::HTTP.new(server(options), private_request ? 443 : nil)
           http.use_ssl = true if private_request
 
           # we turn off certificate validation to avoid the
@@ -141,7 +144,6 @@ module Koala
           unless params_require_multipart?(args)
             # if the verb isn't get or post, send it as a post argument
             args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
-            server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
 
             # you can pass arguments directly to Typhoeus using the :typhoeus_options key
             typhoeus_options = {:params => args}.merge(options[:typhoeus_options] || {})
@@ -150,7 +152,7 @@ module Koala
             # this makes public requests faster
             prefix = (args["access_token"] || @always_use_ssl || options[:use_ssl]) ? "https" : "http"
 
-            response = self.send(verb, "#{prefix}://#{server}#{path}", typhoeus_options)
+            response = self.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
             Koala::Response.new(response.code, response.body, response.headers_hash)
           else
             # we have to use NetHTTPService for multipart for file uploads
