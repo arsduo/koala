@@ -253,6 +253,27 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           @response.headers.should == @mock_http_response
         end
       end # describe return value
+
+      describe 'when options contains a proxy' do
+
+        it 'should create a HTTP Proxy object' do
+          Net::HTTP.should_receive(:new).with(anything, anything, 'proxy', 1234, 'user', 'pass').and_return(@http_mock)
+          @response = Bear.make_request('anything', {}, 'anything', {:proxy => 'http://user:pass@proxy:1234'})
+        end
+
+      end
+
+      describe 'when options contains a timeout' do
+
+        it 'should set both timeouts' do
+          @http_mock.should_receive(:open_timeout=).with(10)
+          @http_mock.should_receive(:read_timeout=).with(10)
+          Bear.make_request('anything', {}, 'anything', {:timeout => 10})
+        end
+
+      end
+
+
     end # describe when making a request
 
     describe "when encoding parameters" do
