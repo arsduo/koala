@@ -110,7 +110,7 @@ module Koala
       attr_reader :graph_api
     end
 
-    class APIError < Exception
+    class APIError < StandardError
       attr_accessor :fb_error_type
       def initialize(details = {})
         self.fb_error_type = details["type"]
@@ -318,8 +318,10 @@ module Koala
   end
 
   # by default, try requiring Typhoeus -- if that works, use it
+  # if you have Typheous and don't want to use it (or want another service),
+  # you can run Koala.http_service = NetHTTPService (or MyHTTPService)
   begin
-    Koala.http_service = TyphoeusService
+     Koala.http_service = TyphoeusService
   rescue LoadError
     Koala.http_service = NetHTTPService
   end
