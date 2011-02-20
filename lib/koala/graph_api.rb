@@ -97,11 +97,10 @@ module Koala
         result["Location"]
       end    
     
-      def put_picture(file_hash, args = {}, target_id = "me")
+      def put_picture(io_or_path, content_type, args = {}, target_id = "me")
         # Uploads a picture from a file hash
-        raise APIError.new("type" => "KoalaInvaliFileFormat", "message" => "put_picture requires a hash describing the File to upload (see HTTPService::is_valid_file_hash?") unless file_hash.kind_of?(Hash)
+        args["source"] = Koala::UploadableIO.new(io_or_path, content_type)
         
-        args["source"] = file_hash
         self.put_object(target_id, "photos", args)
       end
     
