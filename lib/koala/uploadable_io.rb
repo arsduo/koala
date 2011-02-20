@@ -2,8 +2,8 @@ require 'koala'
 
 module Koala
   class UploadableIO
-    def initialize(io_or_path, content_type = nil)
-      if content_type and (io_or_path.respond_to?(:read) or io_or_path.kind_of?(String))
+    def initialize(io_or_path, content_type)
+      if io_or_path.respond_to?(:read) or io_or_path.kind_of?(String)
         @io_or_path = io_or_path
         @content_type = content_type
       else
