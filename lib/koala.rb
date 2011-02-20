@@ -24,6 +24,9 @@ require 'koala/realtime_updates'
 # add test user methods
 require 'koala/test_users'
 
+# add KoalaIO class
+require 'koala/uploadable_io'
+
 module Koala
 
   module Facebook
@@ -310,6 +313,8 @@ module Koala
       end
     end
   end
+  
+  class KoalaError< StandardError; end
 
   # finally, set up the http service Koala methods used to make requests
   # you can use your own (for HTTParty, etc.) by calling Koala.http_service = YourModule
