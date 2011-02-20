@@ -302,164 +302,36 @@ class NetHTTPServiceTests < Test::Unit::TestCase
 
     describe "when detecting if multipart posting is needed" do
       it "should be true if any parameter value requires multipart post" do
-        valid_file_hash = stub("Stub Valid File Hash")
-
-        Bear.stub!("is_valid_file_hash?").and_return(false)
-        Bear.stub!("is_valid_file_hash?").with(valid_file_hash).and_return(true)
+        koala_io = mock("Koala::IO")
+        koala_io.should_receive(:kind_of?).with(Koala::UploadableIO).and_return(true)
 
         args = {
           "key1" => "val",
           "key2" => "val",
-          "key3" => valid_file_hash,
+          "key3" => koala_io,
           "key4" => "val"
         }
 
         Bear.params_require_multipart?(args).should be_true
       end
-
-      # we need to test against both :symbols and "strings"
-      # so we run it twice, with 
-      shared_examples_for "file values" do
-        it "should only accept hashes" do
-          Bear.is_valid_file_hash?(@valid_hash).should be_true
-
-          @valid_hash.stub!("kind_of?").with(Hash).and_return(false)
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
-        end
-
-        it "should always require a content_type key" do
-          @valid_hash.delete("content_type".send(@key_method))
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
-        end
-
-        it "should always require the path key" do
-          @valid_hash.delete("path".send(@key_method))
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
-        end
-
-        describe "with file IOs" do
-          before :each do
-            @stub_file = stub('Stub IO File')
-            @valid_hash["file".send(@key_method)] = @stub_file
-          end
-
-          it "should accept hashes with the file object that responds to read" do
-            @stub_file.should_receive("respond_to?").with(:read).and_return(true)
-            @valid_hash["file".send(@key_method)] = @stub_file
-            Bear.is_valid_file_hash?(@valid_hash).should be_true
-          end
-
-          it "should not accept hashes with a file object that does not respond to read" do
-            @stub_file.should_receive("respond_to?").with(:read).and_return(false)
-            @valid_hash["file".send(@key_method)] = @stub_file
-            Bear.is_valid_file_hash?(@valid_hash).should be_false
-          end
-        end
-      end
-
-      describe "and looking at individual values with strings" do
-        before(:each) do          
-          @valid_hash = {
-            "content_type" => 1,
-            "path" => 1
-          }
-          @key_method = "to_s"
-        end
-        
-        it_should_behave_like "file values"
-      end
-        
-      describe "and looking at individual values" do
-        before(:each) do          
-          @valid_hash = {
-            :content_type => 1,
-            :path => 1
-          }
-          @key_method = "to_sym"
-        end
-        
-        it_should_behave_like "file values"
-      end
-
-      shared_examples_for "encoding multipart data" do
-        it "should replace valid file hashes with file objects with UploadIO objects" do
-          path_key = "path".send(@key_method)
-          content_type_key = "content_type".send(@key_method)
-          file_hash_stub = {
-             path_key => "Fake File Name",
-             content_type_key => "Fake Content Type"
-          }
-          # UploadIO should be created
-          uploadio_stub = stub("UploadIO Shell Stub")
-          UploadIO.should_receive("new").with(file_hash_stub[path_key], file_hash_stub[content_type_key]).and_return(uploadio_stub)
-
-          # Ruby 1.9 test compatibility
-          content_stub = "UploadIOContent Stub"
-          uploadio_stub.stub(:to_ary).and_return([content_stub])
-
+      
+      describe "when encoding multipart/form-data params" do
+        it "should replace Koala::UploadableIO values with UploadIO values" do
+          upload_io = stub('UploadIO')
+          
+          uploadable_io = stub('Koala::UploadableIO')
+          uploadable_io.should_receive(:kind_of?).with(Koala::UploadableIO).and_return(true)
+          uploadable_io.should_receive(:to_upload_io).and_return(upload_io)
           args = {
             "not_a_file" => "not a file",
-            "file" => file_hash_stub
+            "file" => uploadable_io
           }
-
-          # Check that is_valid_file_hash is called on the file_hash_stub
-          Bear.stub!("is_valid_file_hash?").and_return(false)
-          Bear.should_receive("is_valid_file_hash?").with(file_hash_stub).and_return(true)
-
+          
           result = Bear.encode_multipart_params(args)
 
           result["not_a_file"] == args["not_a_file"]
-          result["file"] == content_stub
+          result["file"] == upload_io
         end
-
-        it "should replace valid file hashes with file objects with UploadIO objects" do
-          file_key = "file".send(@key_method)
-          path_key = "path".send(@key_method)
-          content_type_key = "content_type".send(@key_method)
-          file_hash_stub = {
-             file_key => "Fake File IO",
-             path_key => "Fake File Name",
-             content_type_key => "Fake Content Type"
-          }
-
-          # UploadIO should be created
-          uploadio_stub = stub("UploadIO Shell Stub")
-          UploadIO.should_receive("new").with(file_hash_stub[file_key], file_hash_stub[content_type_key], file_hash_stub[path_key]).and_return(uploadio_stub)
-
-          # Ruby 1.9 test compatibility
-          content_stub = "UploadIOContent Stub"
-          uploadio_stub.stub(:to_ary).and_return([content_stub])
-
-          args = {
-            "not_a_file" => "not a file",
-            "file" => file_hash_stub
-          }
-
-          # Check that is_valid_file_hash is called on the file_hash_stub
-          Bear.stub!("is_valid_file_hash?").and_return(false)
-          Bear.should_receive("is_valid_file_hash?").with(file_hash_stub).and_return(true)
-
-          result = Bear.encode_multipart_params(args)
-
-          result["not_a_file"] == args["not_a_file"]
-          result["file"] == content_stub
-        end
-      end
-      
-      describe "when encoding multipart/form-data params that are strings" do
-        before :each do
-          @key_method = "to_s"
-        end
-        
-        it_should_behave_like "encoding multipart data"
-      end
-      
-      describe "when encoding multipart/form-data params that are strings" do
-        before :each do 
-          @key_method = "to_sym"
-        end
-        
-        it_should_behave_like "encoding multipart data"
       end
       
     end
