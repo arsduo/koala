@@ -19,21 +19,30 @@ module Koala
     
     private
       PARSE_STRATEGIES = [
-        :parse_rails_3_post_param
+        :parse_rails_3_param,
+        :parse_sinatra_param
       ]
       
       def parse_init_mixed_param(mixed)
         PARSE_STRATEGIES.each do |method|
-          return if send(method, mixed) 
+          send(method, mixed)
+          return if @io_or_path && @content_type
         end
       end
       
       # Expects a parameter of type ActionDispatch::Http::UploadedFile
-      def parse_rails_3_post_param(uploaded_file)
+      def parse_rails_3_param(uploaded_file)
         if uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.tempfile.respond_to?(:path)
-          
           @io_or_path = uploaded_file.tempfile.path
           @content_type = uploaded_file.content_type
+        end
+      end
+      
+      # Expects a Sinatra hash of file info
+      def parse_sinatra_param(file_hash)
+        if file_hash.kind_of?(Hash) and file_hash.has_key?(:type) and file_hash.has_key?(:tempfile)
+          @io_or_path = file_hash[:tempfile]
+          @content_type = file_hash[:type]
         end
       end
   end

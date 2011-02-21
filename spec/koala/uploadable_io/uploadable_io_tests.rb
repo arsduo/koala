@@ -126,6 +126,35 @@ class UploadableIOTests < Test::Unit::TestCase
           UploadableIO.new(@uploaded_file).to_upload_io.should == upload_io          
         end
       end
+      
+      describe "when given a Sinatra file parameter hash" do
+        before(:each) do
+          @file_hash = {
+            :type => "type",
+            :tempfile => "Tempfile"
+          }
+        end
+        
+        it "should get the content type from the :type key" do
+          upload_io = stub('UploadIO')
+          expected_content_type = stub('Content Type')
+          @file_hash[:type] = expected_content_type
+          
+          UploadIO.should_receive(:new).with(anything, expected_content_type, anything).and_return(upload_io)
+          
+          UploadableIO.new(@file_hash).to_upload_io.should == upload_io          
+        end
+        
+        it "should get the file from the :tempfile key" do
+          upload_io = stub('UploadIO')
+          expected_file = stub('File')
+          @file_hash[:tempfile] = expected_file
+          
+          UploadIO.should_receive(:new).with(expected_file, anything  , anything).and_return(upload_io)
+          
+          UploadableIO.new(@file_hash).to_upload_io.should == upload_io          
+        end
+      end
     end
   end  # describe UploadableIO
 end # class
