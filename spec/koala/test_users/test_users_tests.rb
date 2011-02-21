@@ -150,7 +150,7 @@ class TestUsersTests < Test::Unit::TestCase
         end        
         
         it "should not accept user IDs anymore" do
-          lambda { @test_users.befriend(@user1["id"], @user2["id"]) }.should raise_exception(ArgumentError)
+          lambda { @test_users.befriend(@user1["id"], @user2["id"]) }.should raise_exception
         end
       end # with existing users
 
