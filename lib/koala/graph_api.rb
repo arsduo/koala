@@ -96,10 +96,35 @@ module Koala
         result = graph_call("#{object}/picture", args, "get", :http_component => :headers)
         result["Location"]
       end    
-    
-      def put_picture(io_or_path, content_type, args = {}, target_id = "me")
-        # Uploads a picture from a file hash
-        args["source"] = Koala::UploadableIO.new(io_or_path, content_type)
+      
+      def put_picture(*picture_args)
+        # Can be called in multiple ways:
+        #
+        #   put_picture(file, content_type)
+        #   put_picture(path_to_file, content_type)
+        #
+        # Koala also has support for directly taking the file input
+        # parameter supplied by some popular Ruby frameworks:  
+        #
+        #   put_picture(params[:file])
+        #
+        # (See lib/koala/uploadable_io.rb for supported frameworks)
+        #
+        # Optional parameters can be added to the end of the argument list:
+        # - args:       a hash of request parameters (default: {})
+        # - target_id:  ID of the target where to post the picture (default: "me")
+        #
+        #   put_picture(file, content_type, {:message => "Message"}, 01234560)
+        #   put_picture(params[:file], {:message => "Message"})
+        
+        raise KoalaError.new("Wrong number of arguments for put_picture") unless picture_args.size.between?(1, 4)
+        
+        args_offset = picture_args[1].kind_of?(Hash) || picture_args.size == 1 ? 0 : 1
+        
+        args      = picture_args[1 + args_offset] || {}
+        target_id = picture_args[2 + args_offset] || "me"
+        
+        args["source"] = Koala::UploadableIO.new(*picture_args.slice(0, 1 + args_offset))
         
         self.put_object(target_id, "photos", args)
       end
