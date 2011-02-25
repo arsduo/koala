@@ -34,7 +34,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     delete_result = @api.delete_object(object_id_to_delete)
     delete_result.should == true
   end
-  
+
   it "should be able to delete likes" do
     result = @api.put_wall_post("Hello, world, from the test suite delete method!")
     @temporary_object_id = result["id"]
@@ -63,39 +63,39 @@ shared_examples_for "Koala GraphAPI with an access token" do
   it "should be able to post photos to the user's wall with an open file object" do
     file_hash = {
       "content_type" => "image/jpg",
-      "path" => File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg"),
-      "file" => File.open(File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg"))
+      "path" => File.join(File.dirname(__FILE__), "..", "..", "fixtures", "beach.jpg"),
+      "file" => File.open(File.join(File.dirname(__FILE__), "..", "..", "fixtures", "beach.jpg"))
     }
     result = @api.put_picture(file_hash)
-    @temporary_object_id = result["id"] 
+    @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
-  
+
   it "should be able to post photos to the user's wall without an open file object" do
     file_hash = {
       "content_type" => "image/jpg",
-      "path" => File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg")
+      "path" => File.join(File.dirname(__FILE__), "..", "..", "fixtures", "beach.jpg")
     }
     result = @api.put_picture(file_hash)
-    @temporary_object_id = result["id"] 
+    @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
-    
+
   it "should be able to verify a photo posted to a user's wall" do
     file_hash = {
       "content_type" => "image/jpg",
       "path" => File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg")
     }
     expected_message = "This is the test message"
-    
+
     result = @api.put_picture(file_hash, :message => expected_message)
-    @temporary_object_id = result["id"] 
+    @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
-    
+
     get_result = @api.get_object(@temporary_object_id)
     get_result["name"].should == expected_message
   end
-        
+
   it "should be able to verify a message with an attachment posted to a feed" do
     attachment = {"name" => "Context Optional", "link" => "http://www.contextoptional.com/"}
     result = @api.put_wall_post("Hello, world, from the test suite again!", attachment)
@@ -136,8 +136,8 @@ shared_examples_for "Koala GraphAPI with an access token" do
     like_result = @api.put_like(@temporary_object_id)
     like_result.should be_true
   end
-  
-  
+
+
   # test all methods to make sure they pass data through to the API
   # we run the tests here (rather than in the common shared example group)
   # since some require access tokens
@@ -149,10 +149,10 @@ shared_examples_for "Koala GraphAPI with an access token" do
     # (Ruby 1.9's parameters method is perfect, but only in 1.9)
     # so we have to double-document
     {
-      :get_object => 3, :put_object => 4, :delete_object => 2, 
+      :get_object => 3, :put_object => 4, :delete_object => 2,
       :get_connections => 4, :put_connections => 4, :delete_connections => 4,
-      :put_wall_post => 4, 
-      :put_comment => 3, 
+      :put_wall_post => 4,
+      :put_comment => 3,
       :put_like => 2, :delete_like => 2,
       :search => 3,
       # methods that have special arguments
@@ -166,12 +166,12 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
         # if we supply args, use them (since some methods process params)
         # the method should receive as args n-1 anythings and then options
-        args = (params.is_a?(Integer) ? ([{}] * (params - 1)) : params) + [options] 
+        args = (params.is_a?(Integer) ? ([{}] * (params - 1)) : params) + [options]
 
         @api.send(method_name, *args)
       end
     end
-    
+
     # also test get_picture, which merges a parameter into options
     it "should pass http options through for get_picture" do
       options = {:a => 2}

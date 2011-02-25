@@ -6,7 +6,7 @@ require 'koala_spec_helper'
 # specs to run.  See facebook_data.yml for more information.
 
 # load testing data (see note in readme.md)
-$testing_data = YAML.load_file(File.join(File.dirname(__FILE__), 'facebook_data.yml')) rescue {}
+$testing_data = YAML.load_file(File.join(File.dirname(__FILE__), 'fixtures/facebook_data.yml')) rescue {}
 
 unless $testing_data["oauth_token"]
   puts "Access token tests will fail until you store a valid token in facebook_data.yml"
