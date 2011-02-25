@@ -1,6 +1,0 @@
-[submodule "example"]
-	path = example
-	url = git://github.com/arsduo/oauth_playground.git
-[submodule "examples/oauth_playground"]
-	path = examples/oauth_playground
-	url = git://github.com/arsduo/oauth_playground.git
