@@ -1,8 +1,6 @@
 require 'cgi'
 require 'digest/md5'
 
-# rubygems is required to support json, how facebook returns data
-require 'rubygems'
 require 'json'
 
 # OpenSSL and Base64 are required to support signed_request
