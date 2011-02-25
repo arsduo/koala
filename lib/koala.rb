@@ -7,19 +7,11 @@ require 'json'
 require 'openssl'
 require 'base64'
 
-# include default http services
+# include koala modules
 require 'koala/http_services'
-
-# add Graph API methods
 require 'koala/graph_api'
-
-# add REST API methods
 require 'koala/rest_api'
-
-# add realtime update methods
 require 'koala/realtime_updates'
-
-# add test user methods
 require 'koala/test_users'
 
 module Koala
@@ -47,7 +39,7 @@ module Koala
     # JavaScript SDK at http://github.com/facebook/connect-js/.
 
     class API
-      # initialize with an access token 
+      # initialize with an access token
       def initialize(access_token = nil)
         @access_token = access_token
       end
@@ -206,7 +198,7 @@ module Koala
           string = info["access_token"]
         end
       end
-    
+
       # provided directly by Facebook
       # see https://github.com/facebook/crypto-request-examples/blob/master/sample.rb
       # and http://developers.facebook.com/docs/authentication/canvas/encryption_proposal
