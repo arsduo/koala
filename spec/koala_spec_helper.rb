@@ -1,17 +1,7 @@
-if defined?(RUBY_VERSION) && RUBY_VERSION =~ /1\.9/
-  require 'test/unit'
-  require 'rspec'
-
-  Rspec.configure do |c|
-    c.mock_with :rspec
-  end
-
-else
-  # Ruby 1.8.x
-  require 'test/unit'
-  require 'rubygems'
-
-  require 'spec/test/unit'
+begin
+  require 'bundler/setup'
+rescue LoadError
+  puts 'although not required, bundler is recommened for running the tests'
 end
 
 # load the libraries
@@ -60,7 +50,7 @@ module KoalaTest
     api = Koala::Facebook::GraphAndRestAPI.new(token)
     uid = api.get_object("me")["id"]
     perms = api.fql_query("select read_stream, publish_stream, user_photos from permissions where uid = #{uid}")[0]
-    perms.each_pair do |perm, value| 
+    perms.each_pair do |perm, value|
       unless value == 1
         puts "failed!\n" # put a new line after the print above
         raise ArgumentError, "Your access token must have the read_stream, publish_stream, and user_photos permissions.  You have: #{perms.inspect}"
