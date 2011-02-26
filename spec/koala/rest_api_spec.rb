@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe "Koala::Facebook::RestAPI" do
   
   context "without an access token" do

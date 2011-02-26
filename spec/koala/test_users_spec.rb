@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe "Koala::Facebook::TestUsers" do
   context "with access token" do
     include LiveTestingDataHelper

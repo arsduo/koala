@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe "Koala::Facebook::API" do
   before(:each) do
     @service = Koala::Facebook::API.new

@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe "Koala::Facebook::OAuth" do
   before :each do
     # make the relevant test data easily accessible

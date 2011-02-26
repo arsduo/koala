@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe "Koala::Facebook::GraphAPI" do
   include LiveTestingDataHelper
   
