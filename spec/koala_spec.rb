@@ -1,5 +1,4 @@
-require 'koala_spec_helper'
-require 'mock_http_service'
+require 'spec_helper'
 
 # Runs Koala specs using stubs for HTTP requests
 #

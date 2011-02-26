@@ -1,4 +1,4 @@
-require 'koala_spec_helper'
+require 'spec_helper'
 
 # Runs Koala specs through the Facebook servers
 #

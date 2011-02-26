@@ -11,7 +11,7 @@ module Koala
     OAUTH_CODE = 'OAUTHCODE'
 
     # Loads testing data
-    TEST_DATA = YAML.load_file(File.join(File.dirname(__FILE__), 'fixtures/facebook_data.yml'))
+    TEST_DATA = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'fixtures', 'facebook_data.yml'))
     TEST_DATA.merge!('oauth_token' => Koala::MockHTTPService::ACCESS_TOKEN)
     TEST_DATA['oauth_test_data'].merge!('code' => Koala::MockHTTPService::OAUTH_CODE)
 
@@ -27,7 +27,7 @@ module Koala
     SUBSCRIPTION_DATA = TEST_DATA["subscription_test_data"]
 
     # Loads the mock response data via ERB to substitue values for TEST_DATA (see oauth/access_token)
-    mock_response_file_path = File.join(File.dirname(__FILE__), 'fixtures/mock_facebook_responses.yml')
+    mock_response_file_path = File.join(File.dirname(__FILE__), '..', 'fixtures', 'mock_facebook_responses.yml')
     RESPONSES = YAML.load(ERB.new(IO.read(mock_response_file_path)).result(binding))
 
     def self.included(base)
