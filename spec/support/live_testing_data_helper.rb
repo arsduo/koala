@@ -19,7 +19,6 @@ module LiveTestingDataHelper
         errors = []
 
         if count > 0
-          print "\nCleaning up #{count} temporary #{count > 1 ? "objects" : "object (#{@temporary_object_ids.first})"}..."
           @temporary_object_ids.each do |id|
             # get our API
             api = @api || (@test_users ? @test_users.graph_api : nil)
@@ -31,9 +30,7 @@ module LiveTestingDataHelper
             errors << id unless result
           end
 
-          if errors.length == 0
-            puts "done."
-          else
+          unless errors.length == 0
             puts "cleaned up #{count - errors.length} objects, but errored out on the following:\n #{errors.join(", ")}"
           end
         end

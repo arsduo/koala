@@ -85,10 +85,8 @@ describe "Koala::Facebook::TestUsers" do
         end
 
         after :each do
-          print "\nCleaning up test users..."
           @test_users.delete(@user1) if @user1
           @test_users.delete(@user2) if @user2
-          puts "done."
         end
 
         it "should delete a user by id" do
@@ -174,17 +172,13 @@ describe "Koala::Facebook::TestUsers" do
 
       describe "tests that create users" do
         before :each do
-          print "\nCleaning up test user network..."
           test_users = Koala::Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
           test_users.delete_all
-          puts "done!"
         end
 
         after :each do
-          print "\nCleaning up test user network..."
           test_users = Koala::Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
           test_users.delete_all
-          puts "done!"
         end
 
         it "should create a 5 person network" do
