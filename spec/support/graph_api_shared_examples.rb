@@ -151,7 +151,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     file_hash = {
       "content_type" => "image/jpg",
       "path" => File.join(File.dirname(__FILE__), "..", "..", "fixtures", "beach.jpg"),
-      "file" => File.open(File.join(File.dirname(__FILE__), "..", "..", "fixtures", "beach.jpg"))
+      "file" => File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
     }
     result = @api.put_picture(file_hash)
     @temporary_object_id = result["id"]
