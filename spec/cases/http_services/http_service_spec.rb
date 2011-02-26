@@ -10,10 +10,8 @@ describe "Koala::HTTPService" do
   describe "common methods" do
     describe "always_use_ssl accessor" do
       it "should be added" do
-        # converting method names to string is required for
-        # tests to pass on 1.8.7 and 1.9.2
-        Bear.methods.map(&:to_s).should include("always_use_ssl")
-        Bear.methods.map(&:to_s).should include("always_use_ssl=")
+        Bear.should respond_to("always_use_ssl")
+        Bear.should respond_to("always_use_ssl=")
       end
     end
     
