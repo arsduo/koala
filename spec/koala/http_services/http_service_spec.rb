@@ -1,8 +1,11 @@
-require 'koala/http_services'
-class HTTPServiceTests < Test::Unit::TestCase
-  class Bear
-    include Koala::HTTPService
-  end
+require 'spec_helper'
+
+
+class Bear
+  include Koala::HTTPService
+end
+
+describe "Koala::HTTPService" do
 
   describe "common methods" do
     describe "always_use_ssl accessor" do

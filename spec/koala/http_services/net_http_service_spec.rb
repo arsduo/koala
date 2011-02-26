@@ -1,21 +1,24 @@
-require 'koala/http_services'
-class NetHTTPServiceTests < Test::Unit::TestCase
-  module Bear
-    include Koala::NetHTTPService
-  end
+require 'spec_helper'
 
-  describe "NetHTTPService module holder class Bear" do
+
+module Horse
+  include Koala::NetHTTPService
+end
+
+describe "Koala::NetHTTPService" do
+
+  describe "NetHTTPService module holder class Horse" do
     before :each do
       # reset the always_use_ssl parameter
-      Bear.always_use_ssl = nil
+      Horse.always_use_ssl = nil
     end
 
     it "should define a make_request static module method" do
-      Bear.respond_to?(:make_request).should be_true
+      Horse.respond_to?(:make_request).should be_true
     end
 
     it "should include the Koala::HTTPService module defining common features" do
-      Bear.included_modules.include?(Koala::HTTPService).should be_true
+      Horse.included_modules.include?(Koala::HTTPService).should be_true
     end
 
     describe "when making a request" do
@@ -45,14 +48,14 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           @http_yield_mock.should_receive(:post).and_return(@mock_http_response)
           @http_mock.should_receive(:start).and_yield(@http_yield_mock)
 
-          Bear.make_request('anything', {}, 'anything')
+          Horse.make_request('anything', {}, 'anything')
         end
 
         it "should use GET if that verb is specified" do
           @http_yield_mock.should_receive(:get).and_return(@mock_http_response)
           @http_mock.should_receive(:start).and_yield(@http_yield_mock)
 
-          Bear.make_request('anything', {}, 'get')
+          Horse.make_request('anything', {}, 'get')
         end
 
         it "should add the method to the arguments if it's not get or post" do
@@ -62,7 +65,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           # even though that's somewhat testing internal implementation
           args.should_receive(:merge!).with(:method => method)
 
-          Bear.make_request('anything', args, method)
+          Horse.make_request('anything', args, method)
         end
       end
 
@@ -74,31 +77,31 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         it "should use SSL" do
           @http_mock.should_receive('use_ssl=').with(true)
 
-          Bear.make_request('anything', @args, 'anything')
+          Horse.make_request('anything', @args, 'anything')
         end
 
         it "should set the port to 443" do
           Net::HTTP.should_receive(:new).with(anything, 443).and_return(@http_mock)
 
-          Bear.make_request('anything', @args, 'anything')
+          Horse.make_request('anything', @args, 'anything')
         end
       end
 
       describe "if always_use_ssl is true" do
         before :each do
-          Bear.always_use_ssl = true
+          Horse.always_use_ssl = true
         end
 
         it "should use SSL" do
           @http_mock.should_receive('use_ssl=').with(true)
 
-          Bear.make_request('anything', {}, 'anything')
+          Horse.make_request('anything', {}, 'anything')
         end
 
         it "should set the port to 443" do
           Net::HTTP.should_receive(:new).with(anything, 443).and_return(@http_mock)
 
-          Bear.make_request('anything', {}, 'anything')
+          Horse.make_request('anything', {}, 'anything')
         end
       end
 
@@ -106,77 +109,77 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         it "should use SSL" do
           @http_mock.should_receive('use_ssl=').with(true)
 
-          Bear.make_request('anything', {}, 'anything', :use_ssl => true)
+          Horse.make_request('anything', {}, 'anything', :use_ssl => true)
         end
 
         it "should set the port to 443" do
           Net::HTTP.should_receive(:new).with(anything, 443).and_return(@http_mock)
 
-          Bear.make_request('anything', {}, 'anything', :use_ssl => true)
+          Horse.make_request('anything', {}, 'anything', :use_ssl => true)
         end
       end
 
       describe "if there's no token and always_use_ssl isn't true" do
         it "should not use SSL" do
           @http_mock.should_not_receive('use_ssl=')
-          Bear.make_request('anything', {}, 'anything')
+          Horse.make_request('anything', {}, 'anything')
         end
 
         it "should not set the port" do
           Net::HTTP.should_receive(:new).with(anything, nil).and_return(@http_mock)
-          Bear.make_request('anything', {}, 'anything')
+          Horse.make_request('anything', {}, 'anything')
         end
       end
 
       it "should use the graph server by default" do
         Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
-        Bear.make_request('anything', {}, 'anything')
+        Horse.make_request('anything', {}, 'anything')
       end
 
       it "should use the REST server if the :rest_api option is true" do
         Net::HTTP.should_receive(:new).with(Koala::Facebook::REST_SERVER, anything).and_return(@http_mock)
-        Bear.make_request('anything', {}, 'anything', :rest_api => true)
+        Horse.make_request('anything', {}, 'anything', :rest_api => true)
       end
 
       it "should turn off vertificate validaiton warnings" do
         @http_mock.should_receive('verify_mode=').with(OpenSSL::SSL::VERIFY_NONE)
 
-        Bear.make_request('anything', {}, 'anything')
+        Horse.make_request('anything', {}, 'anything')
       end
 
       it "should start an HTTP connection" do
         @http_mock.should_receive(:start).and_yield(@http_yield_mock)
-        Bear.make_request('anything', {}, 'anything')
+        Horse.make_request('anything', {}, 'anything')
       end
 
       describe "via POST" do
         it "should use Net::HTTP to make a POST request" do
           @http_yield_mock.should_receive(:post).and_return(@http_request_result)
 
-          Bear.make_request('anything', {}, 'post')
+          Horse.make_request('anything', {}, 'post')
         end
 
         it "should go to the specified path adding a / if it doesn't exist" do
           path = mock('Path')
           @http_yield_mock.should_receive(:post).with(path, anything).and_return(@http_request_result)
 
-          Bear.make_request(path, {}, 'post')
+          Horse.make_request(path, {}, 'post')
         end
 
         it "should use encoded parameters" do
           args = {}
           params = mock('Encoded parameters')
-          Bear.should_receive(:encode_params).with(args).and_return(params)
+          Horse.should_receive(:encode_params).with(args).and_return(params)
 
           @http_yield_mock.should_receive(:post).with(anything, params).and_return(@http_request_result)
 
-          Bear.make_request('anything', args, 'post')
+          Horse.make_request('anything', args, 'post')
         end
 
         describe "with multipart/form-data" do
           before(:each) do
-            Bear.stub(:encode_multipart_params)
-            Bear.stub("params_require_multipart?").and_return(true)
+            Horse.stub(:encode_multipart_params)
+            Horse.stub("params_require_multipart?").and_return(true)
 
             @multipart_request_stub = stub('Stub Multipart Request')
             Net::HTTP::Post::Multipart.stub(:new).and_return(@multipart_request_stub)
@@ -189,7 +192,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           it "should use multipart/form-data if any parameter is a valid file hash" do
             @http_yield_mock.should_receive(:request).with(@multipart_request_stub).and_return(@http_request_result)
 
-            Bear.make_request('anything', {}, 'post')
+            Horse.make_request('anything', {}, 'post')
           end
 
           it "should use the given request path for the request" do
@@ -198,17 +201,17 @@ class NetHTTPServiceTests < Test::Unit::TestCase
 
             Net::HTTP::Post::Multipart.should_receive(:new).with(expected_path, anything).and_return(@multipart_request_stub)
 
-            Bear.make_request(expected_path, {}, 'post')
+            Horse.make_request(expected_path, {}, 'post')
           end
 
           it "should use multipart encoded arguments for the request" do
             args = {"file" => @file_stub}
             expected_params = stub('Stub Multipart Params')
 
-            Bear.should_receive(:encode_multipart_params).with(args).and_return(expected_params)
+            Horse.should_receive(:encode_multipart_params).with(args).and_return(expected_params)
             Net::HTTP::Post::Multipart.should_receive(:new).with(anything, expected_params).and_return(@multipart_request_stub)
 
-            Bear.make_request('anything', args, 'post')
+            Horse.make_request('anything', args, 'post')
           end
         end
       end
@@ -217,7 +220,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         it "should use Net::HTTP to make a GET request" do
           @http_yield_mock.should_receive(:get).and_return(@http_request_result)
 
-          Bear.make_request('anything', {}, 'get')
+          Horse.make_request('anything', {}, 'get')
         end
 
         it "should use the correct path, including arguments" do
@@ -225,16 +228,16 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           params = mock('Encoded parameters')
           args = {}
 
-          Bear.should_receive(:encode_params).with(args).and_return(params)
+          Horse.should_receive(:encode_params).with(args).and_return(params)
           @http_yield_mock.should_receive(:get).with("#{path}?#{params}").and_return(@http_request_result)
 
-          Bear.make_request(path, args, 'get')
+          Horse.make_request(path, args, 'get')
         end
       end
 
       describe "the returned value" do
         before(:each) do
-          @response = Bear.make_request('anything', {}, 'anything')
+          @response = Horse.make_request('anything', {}, 'anything')
         end
 
         it "should return a Koala::Response object" do
@@ -257,7 +260,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
 
     describe "when encoding parameters" do
       it "should return an empty string if param_hash evaluates to false" do
-        Bear.encode_params(nil).should == ''
+        Horse.encode_params(nil).should == ''
       end
 
       it "should convert values to JSON if the value is not a String" do
@@ -273,7 +276,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           string => string
         }
 
-        result = Bear.encode_params(args)
+        result = Horse.encode_params(args)
         result.split('&').find do |key_and_val|
           key_and_val.match("#{not_a_string}=#{val}")
         end.should be_true
@@ -282,7 +285,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
       it "should escape all values" do
         args = Hash[*(1..4).map {|i| [i.to_s, "Value #{i}($"]}.flatten]
 
-        result = Bear.encode_params(args)
+        result = Horse.encode_params(args)
         result.split('&').each do |key_val|
           key, val = key_val.split('=')
           val.should == CGI.escape(args[key])
@@ -292,7 +295,7 @@ class NetHTTPServiceTests < Test::Unit::TestCase
       it "should convert all keys to Strings" do
         args = Hash[*(1..4).map {|i| [i, "val#{i}"]}.flatten]
 
-        result = Bear.encode_params(args)
+        result = Horse.encode_params(args)
         result.split('&').each do |key_val|
           key, val = key_val.split('=')
           key.should == args.find{|key_val_arr| key_val_arr.last == val}.first.to_s
@@ -304,8 +307,8 @@ class NetHTTPServiceTests < Test::Unit::TestCase
       it "should be true if any parameter value requires multipart post" do
         valid_file_hash = stub("Stub Valid File Hash")
 
-        Bear.stub!("is_valid_file_hash?").and_return(false)
-        Bear.stub!("is_valid_file_hash?").with(valid_file_hash).and_return(true)
+        Horse.stub!("is_valid_file_hash?").and_return(false)
+        Horse.stub!("is_valid_file_hash?").with(valid_file_hash).and_return(true)
 
         args = {
           "key1" => "val",
@@ -314,27 +317,27 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           "key4" => "val"
         }
 
-        Bear.params_require_multipart?(args).should be_true
+        Horse.params_require_multipart?(args).should be_true
       end
 
       # we need to test against both :symbols and "strings"
       # so we run it twice, with 
       shared_examples_for "file values" do
         it "should only accept hashes" do
-          Bear.is_valid_file_hash?(@valid_hash).should be_true
+          Horse.is_valid_file_hash?(@valid_hash).should be_true
 
           @valid_hash.stub!("kind_of?").with(Hash).and_return(false)
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
+          Horse.is_valid_file_hash?(@valid_hash).should be_false
         end
 
         it "should always require a content_type key" do
           @valid_hash.delete("content_type".send(@key_method))
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
+          Horse.is_valid_file_hash?(@valid_hash).should be_false
         end
 
         it "should always require the path key" do
           @valid_hash.delete("path".send(@key_method))
-          Bear.is_valid_file_hash?(@valid_hash).should be_false
+          Horse.is_valid_file_hash?(@valid_hash).should be_false
         end
 
         describe "with file IOs" do
@@ -346,13 +349,13 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           it "should accept hashes with the file object that responds to read" do
             @stub_file.should_receive("respond_to?").with(:read).and_return(true)
             @valid_hash["file".send(@key_method)] = @stub_file
-            Bear.is_valid_file_hash?(@valid_hash).should be_true
+            Horse.is_valid_file_hash?(@valid_hash).should be_true
           end
 
           it "should not accept hashes with a file object that does not respond to read" do
             @stub_file.should_receive("respond_to?").with(:read).and_return(false)
             @valid_hash["file".send(@key_method)] = @stub_file
-            Bear.is_valid_file_hash?(@valid_hash).should be_false
+            Horse.is_valid_file_hash?(@valid_hash).should be_false
           end
         end
       end
@@ -403,10 +406,10 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           }
 
           # Check that is_valid_file_hash is called on the file_hash_stub
-          Bear.stub!("is_valid_file_hash?").and_return(false)
-          Bear.should_receive("is_valid_file_hash?").with(file_hash_stub).and_return(true)
+          Horse.stub!("is_valid_file_hash?").and_return(false)
+          Horse.should_receive("is_valid_file_hash?").with(file_hash_stub).and_return(true)
 
-          result = Bear.encode_multipart_params(args)
+          result = Horse.encode_multipart_params(args)
 
           result["not_a_file"] == args["not_a_file"]
           result["file"] == content_stub
@@ -436,10 +439,10 @@ class NetHTTPServiceTests < Test::Unit::TestCase
           }
 
           # Check that is_valid_file_hash is called on the file_hash_stub
-          Bear.stub!("is_valid_file_hash?").and_return(false)
-          Bear.should_receive("is_valid_file_hash?").with(file_hash_stub).and_return(true)
+          Horse.stub!("is_valid_file_hash?").and_return(false)
+          Horse.should_receive("is_valid_file_hash?").with(file_hash_stub).and_return(true)
 
-          result = Bear.encode_multipart_params(args)
+          result = Horse.encode_multipart_params(args)
 
           result["not_a_file"] == args["not_a_file"]
           result["file"] == content_stub
