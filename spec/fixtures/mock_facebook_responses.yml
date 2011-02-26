@@ -260,7 +260,7 @@ graph_api:
     no_args:
       <<: *item_deleted
       get:
-        with_token: "{\"message\": \"it\'s my comment!\"}"
+        with_token: "{\"message\": \"it's my comment!\"}"
   /MOCK_PHOTO:
     no_args:
       <<: *item_deleted
