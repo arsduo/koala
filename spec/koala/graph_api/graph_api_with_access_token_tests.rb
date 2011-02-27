@@ -132,6 +132,50 @@ shared_examples_for "Koala GraphAPI with an access token" do
     like_result = @api.put_like(@temporary_object_id)
     like_result.should be_true
   end
+  
+  
+  # test all methods to make sure they pass data through to the API
+  # we run the tests here (rather than in the common shared example group)
+  # since some require access tokens
+  describe "HTTP options" do
+    # Each of the below methods should take an options hash as their last argument
+    # ideally we'd use introspection to determine how many arguments a method has
+    # but some methods require specially formatted arguments for processing
+    # (and anyway, Ruby 1.8's arity method fails (for this) for methods w/ 2+ optional arguments)
+    # (Ruby 1.9's parameters method is perfect, but only in 1.9)
+    # so we have to double-document
+    {
+      :get_object => 3, :put_object => 4, :delete_object => 2, 
+      :get_connections => 4, :put_connections => 4, :delete_connections => 4,
+      :put_wall_post => 4, 
+      :put_comment => 3, 
+      :put_like => 2, :delete_like => 2,
+      :search => 3,
+      # methods that have special arguments
+      :put_picture => [{"path" => "x", "content_type" => "y"}, {}, "me"],
+      :get_objects => [["x"], {}]
+    }.each_pair do |method_name, params|
+      it "should pass http options through for #{method_name}" do
+        options = {:a => 2}
+        # graph call should ultimately receive options as the fourth argument
+        @api.should_receive(:graph_call).with(anything, anything, anything, options)
+
+        # if we supply args, use them (since some methods process params)
+        # the method should receive as args n-1 anythings and then options
+        args = (params.is_a?(Integer) ? ([{}] * (params - 1)) : params) + [options] 
+
+        @api.send(method_name, *args)
+      end
+    end
+    
+    # also test get_picture, which merges a parameter into options
+    it "should pass http options through for get_picture" do
+      options = {:a => 2}
+      # graph call should ultimately receive options as the fourth argument
+      @api.should_receive(:graph_call).with(anything, anything, anything, hash_including(options)).and_return({})
+      @api.send(:get_picture, "x", {}, options)
+    end
+  end
 end
 
 class FacebookWithAccessTokenTests < Test::Unit::TestCase

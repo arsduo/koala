@@ -7,8 +7,8 @@ class HTTPServiceTests < Test::Unit::TestCase
   describe "common methods" do
     describe "always_use_ssl accessor" do
       it "should be added" do
-        Bear.methods.should include("always_use_ssl")
-        Bear.methods.should include("always_use_ssl=")        
+        Bear.methods.should include(:always_use_ssl)
+        Bear.methods.should include(:always_use_ssl=)
       end
     end
     

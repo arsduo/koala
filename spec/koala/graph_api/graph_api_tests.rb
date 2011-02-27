@@ -1,6 +1,6 @@
 shared_examples_for "Koala GraphAPI" do
   # all Graph API instances should pass these tests, regardless of configuration
-
+  
   # API
   it "should never use the rest api server" do
     Koala.should_receive(:make_request).with(
@@ -34,10 +34,11 @@ shared_examples_for "Koala GraphAPI" do
     result = @api.search("facebook")
     result.length.should be_an(Integer)
   end
-
+  
   # DATA
   # access public info
 
+  # get_object
   it "should get public data about a user" do
     result = @api.get_object("koppel")
     # the results should have an ID and a name, among other things
@@ -81,6 +82,4 @@ shared_examples_for "Koala GraphAPI" do
     @api.should_receive(:graph_call).with(*query)
     @api.get_page(query)
   end
-
-
 end

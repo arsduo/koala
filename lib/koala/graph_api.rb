@@ -31,19 +31,19 @@ module Koala
          
       # Objects
 
-      def get_object(id, args = {})
+      def get_object(id, args = {}, options = {})
         # Fetchs the given object from the graph.
-        graph_call(id, args)
+        graph_call(id, args, "get", options)
       end
     
-      def get_objects(ids, args = {})
+      def get_objects(ids, args = {}, options = {})
         # Fetchs all of the given object from the graph.
         # We return a map from ID to object. If any of the IDs are invalid,
         # we raise an exception.
-        graph_call("", args.merge("ids" => ids.join(",")))
+        graph_call("", args.merge("ids" => ids.join(",")), "get", options)
       end
       
-      def put_object(parent_object, connection_name, args = {})
+      def put_object(parent_object, connection_name, args = {}, options = {})
         # Writes the given object to the graph, connected to the given parent.
         # See http://developers.facebook.com/docs/api#publishing for all of
         # the supported writeable objects.
@@ -58,42 +58,42 @@ module Koala
         # extended permissions.
     
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
-        graph_call("#{parent_object}/#{connection_name}", args, "post")
+        graph_call("#{parent_object}/#{connection_name}", args, "post", options)
       end
-      
-      def delete_object(id)
+
+      def delete_object(id, options = {})
         # Deletes the object with the given ID from the graph.
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Delete requires an access token"}) unless @access_token
-        graph_call(id, {}, "delete")
+        graph_call(id, {}, "delete", options)
       end
       
       # Connections
           
-      def get_connections(id, connection_name, args = {})
+      def get_connections(id, connection_name, args = {}, options = {})
         # Fetchs the connections for given object.
-        result = graph_call("#{id}/#{connection_name}", args)
+        result = graph_call("#{id}/#{connection_name}", args, "get", options)
         result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
       end
 
-      def put_connections(id, connection_name, args = {})
+      def put_connections(id, connection_name, args = {}, options = {})
         # Posts a certain connection
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
-        graph_call("#{id}/#{connection_name}", args, "post")
+        graph_call("#{id}/#{connection_name}", args, "post", options)
       end
 
-      def delete_connections(id, connection_name, args = {})
+      def delete_connections(id, connection_name, args = {}, options = {})
         # Deletes a given connection
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Delete requires an access token"}) unless @access_token
-        graph_call("#{id}/#{connection_name}", args, "delete")
+        graph_call("#{id}/#{connection_name}", args, "delete", options)
       end
 
       # Pictures
       # to delete pictures, use delete_object(photo_id)
       # note: you'll need the user_photos permission to actually access photos after uploading them 
     
-      def get_picture(object, args = {})
+      def get_picture(object, args = {}, options = {})
         # Gets a picture object, returning the URL (which Facebook sends as a header)
-        result = graph_call("#{object}/picture", args, "get", :http_component => :headers)
+        result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers))
         result["Location"]
       end    
       
@@ -123,17 +123,18 @@ module Koala
         
         args      = picture_args[1 + args_offset] || {}
         target_id = picture_args[2 + args_offset] || "me"
+        options   = picture_args[3 + args_offset] || {} 
         
         args["source"] = Koala::UploadableIO.new(*picture_args.slice(0, 1 + args_offset))
         
-        self.put_object(target_id, "photos", args)
+        self.put_object(target_id, "photos", args, options)
       end
     
       # Wall posts
       # To get wall posts, use get_connections(user, "feed")
       # To delete a wall post, just use delete_object(post_id)
     
-      def put_wall_post(message, attachment = {}, profile_id = "me")
+      def put_wall_post(message, attachment = {}, profile_id = "me", options = {})
         # attachment is a hash describing the wall post
         # (see X for more details)
         # For instance, 
@@ -144,37 +145,37 @@ module Koala
         #      "description" => "This is a longer description of the attachment",
         #      "picture" => "http://www.example.com/thumbnail.jpg"}
 
-        self.put_object(profile_id, "feed", attachment.merge({:message => message}))
+        self.put_object(profile_id, "feed", attachment.merge({:message => message}), options)
       end
       
       # Comments
       # to delete comments, use delete_object(comment_id)
       # to get comments, use get_connections(object, "likes")
       
-      def put_comment(object_id, message)
+      def put_comment(object_id, message, options = {})
         # Writes the given comment on the given post.
-        self.put_object(object_id, "comments", {:message => message})
+        self.put_object(object_id, "comments", {:message => message}, options)
       end
         
       # Likes
       # to get likes, use get_connections(user, "likes")
       
-      def put_like(object_id)
+      def put_like(object_id, options = {})
         # Likes the given post.
-        self.put_object(object_id, "likes")
+        self.put_object(object_id, "likes", {}, options)
       end
 
-      def delete_like(object_id)
+      def delete_like(object_id, options = {})
         # Unlikes a given object for the logged-in user
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Unliking requires an access token"}) unless @access_token
-        graph_call("#{object_id}/likes", {}, "delete")
+        graph_call("#{object_id}/likes", {}, "delete", options)
       end
 
       # Search
-      
-      def search(search_terms, args = {})
+            
+      def search(search_terms, args = {}, options = {})
         # Searches for a given term among posts visible to the current user (or public posts if no token)
-        result = graph_call("search", args.merge({:q => search_terms}))
+        result = graph_call("search", args.merge(:q => search_terms), "get", options)
         result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
       end      
       
