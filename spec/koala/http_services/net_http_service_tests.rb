@@ -318,8 +318,6 @@ class NetHTTPServiceTests < Test::Unit::TestCase
       describe "when encoding multipart/form-data params" do
         it "should replace Koala::UploadableIO values with UploadIO values" do
           upload_io = UploadIO.new(__FILE__, "fake type")
-          #upload_io_response = ["stub1", "stub2"]
-          #upload_io.stub!(:to_ary).and_return(upload_io_response)
           
           uploadable_io = stub('Koala::UploadableIO')
           uploadable_io.should_receive(:kind_of?).with(Koala::UploadableIO).and_return(true)
