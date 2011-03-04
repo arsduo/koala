@@ -5,7 +5,7 @@ module Koala
     def initialize(io_or_path_or_mixed, content_type = nil)
       if content_type.nil?
         parse_init_mixed_param io_or_path_or_mixed
-      elsif !content_type.nil? && (io_or_path_or_mixed.respond_to?(:read) or io_or_path_or_mixed.kind_of?(String))
+      elsif !content_type.nil? && (io_or_path_or_mixed.respond_to?(:read) || io_or_path_or_mixed.kind_of?(String))
         @io_or_path = io_or_path_or_mixed
         @content_type = content_type
       else
@@ -32,7 +32,7 @@ module Koala
       
       # Expects a parameter of type ActionDispatch::Http::UploadedFile
       def parse_rails_3_param(uploaded_file)
-        if uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.tempfile.respond_to?(:path)
+        if uploaded_file.respond_to?(:content_type) && uploaded_file.respond_to?(:tempfile) && uploaded_file.tempfile.respond_to?(:path)
           @io_or_path = uploaded_file.tempfile.path
           @content_type = uploaded_file.content_type
         end
@@ -40,7 +40,7 @@ module Koala
       
       # Expects a Sinatra hash of file info
       def parse_sinatra_param(file_hash)
-        if file_hash.kind_of?(Hash) and file_hash.has_key?(:type) and file_hash.has_key?(:tempfile)
+        if file_hash.kind_of?(Hash) && file_hash.has_key?(:type) && file_hash.has_key?(:tempfile)
           @io_or_path = file_hash[:tempfile]
           @content_type = file_hash[:type]
         end
