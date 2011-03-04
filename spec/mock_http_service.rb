@@ -33,6 +33,8 @@ module Koala
     def self.included(base)
       base.class_eval do
         
+        include Koala::HTTPService
+        
         def self.make_request(path, args, verb, options = {})
           path = 'root' if path == '' || path == '/'
           verb ||= 'get'
@@ -62,8 +64,7 @@ module Koala
             # Raises an error message with the place in the data YML
             # to place a mock as well as a URL to request from
             # Facebook's servers for the actual data
-            # (Don't forget to replace ACCESS_TOKEN with a real access token)  
-            
+            # (Don't forget to replace ACCESS_TOKEN with a real access token)              
             data_trace = [server, path, args, verb, with_token] * ': '
             
             args = args == 'no_args' ? '' : "#{args}&"
@@ -82,7 +83,7 @@ module Koala
             'no_args'
           else
             params_hash.sort{ |a,b| a[0].to_s <=> b[0].to_s}.map do |arr| 
-              arr[1] = '[FILE]' if arr[1].kind_of? File
+              arr[1] = '[FILE]' if arr[1].kind_of?(File) || is_valid_file_hash?(arr[1])
               arr.join('=')
             end.join('&')
           end

@@ -51,6 +51,8 @@ end
 
 class FacebookNoAccessTokenTests < Test::Unit::TestCase
   describe "Koala GraphAPI without an access token" do
+    include LiveTestingDataHelper
+
     before :each do
       @api = Koala::Facebook::GraphAPI.new
     end

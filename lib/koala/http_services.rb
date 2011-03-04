@@ -15,30 +15,36 @@ module Koala
         class << self
           attr_accessor :always_use_ssl
         end
-        
+               
+        def self.server(options = {})
+          "#{options[:beta] ? "beta." : ""}#{options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER}"          
+        end
+                                      
         protected
         def self.params_require_multipart?(param_hash)
           param_hash.any? { |key, value| is_valid_file_hash?(value) }
         end
         
-        # A file hash can take two forms:
-        # - A hash with "content_type", "file_name" and "file" keys, where the "file" value
-        #   is an already-opened IO that responds to "read".
-        # - A hash with "content_type" and "path" keys where "path" is the local path
-        #   to the file to be uploaded.
+        # A file hash is one with "content_type" and "path" keys (string or symbol),
+        # where "path" is the local path to the file to be uploaded. (recommended)
+        # 
+        # The hash can also contain a "file" key containing an already-opened IO
+        # that responds to "read".  (This is due to the underlying gem used, and 
+        # confers no specific advantage.)
         #
         # Valid inputs for a file to be posted via multipart/form-data
         # are based on the criteria for an UploadIO to be created 
         # See : https://github.com/nicksieger/multipart-post/blob/master/lib/composite_io.rb       
         def self.is_valid_file_hash?(value)
-          value.kind_of?(Hash) and value.key?("content_type") and (
-            
-            # A file IO was given, then we need a file_name key as well
-            (value.key?("file") and value["file"].respond_to?(:read) and value.key?("file_name")) or
-            
-            # Otherwise, no file or file_name key should be present, but a path key should
-            (!value.key?("file") and !value.key?("file_name") and value.key?("path"))
-          )
+          if value.kind_of?(Hash)
+            has_content_type = value.key?("content_type") || value.key?(:content_type)
+            has_path = value.key?("path") || value.key?(:path)
+            file = value["file"] || value[:file]
+            has_content_type && has_path && (!file || file.respond_to?(:read))
+          else
+            # if it's not a hash, it's not a valid file hash, obviously
+            false
+          end
         end
       end
     end
@@ -65,8 +71,7 @@ module Koala
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
-          server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
-          http = create_http(server, private_request, options)
+          http = create_http(private_request, options)
           http.use_ssl = true if private_request
 
           # we turn off certificate validation to avoid the
@@ -103,10 +108,13 @@ module Koala
         def self.encode_multipart_params(param_hash)
           Hash[*param_hash.collect do |key, value|
             if is_valid_file_hash?(value)
-              if value.key?("file")
-                value = UploadIO.new(value["file"], value["content_type"], value["file_name"])
+              file = value["file"] || value[:file]
+              content_type = value["content_type"] || value[:content_type]
+              path = value["path"] || value[:path]
+              if file
+                value = UploadIO.new(file, content_type, path)
               else
-                value = UploadIO.new(value["path"], value['content_type'])
+                value = UploadIO.new(path, content_type)
               end
             end
             
@@ -114,7 +122,8 @@ module Koala
           end.flatten]
         end
 
-        def self.create_http(server, private_request, options)
+        def self.create_http(private_request, options)
+          server = server(options)
           if options[:proxy]
             proxy = URI.parse(options[:proxy])
             http  = Net::HTTP.new(server, private_request ? 443 : nil,
@@ -152,7 +161,6 @@ module Koala
           unless params_require_multipart?(args)
             # if the verb isn't get or post, send it as a post argument
             args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
-            server = options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER
 
             # you can pass arguments directly to Typhoeus using the :typhoeus_options key
             typhoeus_options = {:params => args}.merge(options[:typhoeus_options] || {})
@@ -161,7 +169,7 @@ module Koala
             # this makes public requests faster
             prefix = (args["access_token"] || @always_use_ssl || options[:use_ssl]) ? "https" : "http"
 
-            response = self.send(verb, "#{prefix}://#{server}#{path}", typhoeus_options)
+            response = self.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
             Koala::Response.new(response.code, response.body, response.headers_hash)
           else
             # we have to use NetHTTPService for multipart for file uploads
