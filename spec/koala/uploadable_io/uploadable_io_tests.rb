@@ -1,3 +1,13 @@
+# fake MIME::Types
+module Koala::MIME
+  module Types
+    def self.type_for(type)
+      # this should be faked out in tests
+      nil
+    end
+  end
+end
+
 class UploadableIOTests < Test::Unit::TestCase
   include Koala
 
@@ -31,6 +41,24 @@ class UploadableIOTests < Test::Unit::TestCase
         lambda { UploadableIO.new({}) }.should_not raise_exception(Exception)
         lambda { UploadableIO.new({}) }.should_not raise_exception(KoalaError)
       end 
+      
+      describe "for files with with recognizable MIME types" do
+        # what that means is tested below
+        
+        it "should accept a file object alone" do
+          params = [
+            File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg")
+          ]
+          lambda { UploadableIO.new(*params) }.should_not raise_exception(KoalaError)
+        end
+        
+        it "should accept a file path alone" do
+          params = [
+            File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg")
+          ]
+          lambda { UploadableIO.new(*params) }.should_not raise_exception(KoalaError)
+        end
+      end
     end
     
     describe "getting an UploadIO" do
@@ -91,6 +119,64 @@ class UploadableIOTests < Test::Unit::TestCase
           
           UploadableIO.new(*@koala_io_params).to_upload_io.should == @upload_io          
         end
+      end
+      
+      describe "when not given a content type" do
+        shared_examples_for "UploadableIO determining a content type" do
+          describe "if MIME::Types is available" do
+            it "should return an UploadIO with MIME::Types-determined type if the type exists" do
+              type_result = ["type"]
+              Koala::MIME::Types.stub(:type_for).and_return(type_result)
+              UploadableIO.new("myfilename.txt").content_type.should == type_result.first          
+            end
+          end
+          
+          shared_examples_for "MIME::Types can't return results" do
+            {
+              "jpg" => "image/jpeg",
+              "jpeg" => "image/jpeg",
+              "png" => "image/png", 
+              "gif" => "image/gif"
+            }.each_pair do |extension, mime_type|
+              it "should properly get content types for #{extension} using basic analysis" do
+                UploadableIO.new("filename.#{extension}").content_type.should == mime_type
+              end
+            end
+            
+            it "should throw an exception if the MIME type can't be determined" do
+              lambda { UploadableIO.new("badfile.badextension") }.should raise_exception(KoalaError)  
+            end
+          end  
+          
+          describe "if MIME::Types is unavailable" do
+            before :each do
+              # fake that MIME::Types doesn't exist
+              Koala::MIME::Types.stub(:type_for).and_raise(NameError)
+            end
+            it_should_behave_like "MIME::Types can't return results"
+          end 
+
+          describe "if MIME::Types can't find the result" do
+            before :each do
+              # fake that MIME::Types doesn't exist
+              Koala::MIME::Types.stub(:type_for).and_return([])
+            end
+            
+            it_should_behave_like "MIME::Types can't return results"
+          end
+        end # shared example group
+  
+        describe "for paths" do
+          before :each do
+            @koala_io_params = [
+              "filename.abcd"
+            ]
+          end
+          
+          it_should_behave_like "UploadableIO determining a content type"
+          
+        end
+  
       end
       
       describe "when given a Rails 3 ActionDispatch::Http::UploadedFile" do
