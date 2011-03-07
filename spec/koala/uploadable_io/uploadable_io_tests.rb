@@ -141,6 +141,10 @@ class UploadableIOTests < Test::Unit::TestCase
               it "should properly get content types for #{extension} using basic analysis" do
                 UploadableIO.new("filename.#{extension}").content_type.should == mime_type
               end
+              
+              it "should get content types for #{extension} using basic analysis with file names with more than one dot" do
+                UploadableIO.new("path/to/file.name.#{extension}").content_type.should == mime_type
+              end
             end
             
             it "should throw an exception if the MIME type can't be determined" do

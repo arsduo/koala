@@ -95,7 +95,7 @@ module Koala
       def use_simple_detection(filename)
         # very rudimentary extension analysis for images
         # first, get the downcased extension, or an empty string if it doesn't exist
-        extension = ((filename.match(/\.([a-zA-Z0-9]+)/) || [])[1] || "").downcase
+        extension = ((filename.match(/\.([a-zA-Z0-9]+)$/) || [])[1] || "").downcase
         if extension == ""
           nil
         elsif extension == "jpg" || extension == "jpeg"
