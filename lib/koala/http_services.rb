@@ -111,6 +111,9 @@ module Koala
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
+          # switch any UploadableIOs to the files Typhoeus expects 
+          args.each_pair {|key, value| args[key] = value.to_file if value.is_a?(UploadableIO)}
+
           # you can pass arguments directly to Typhoeus using the :typhoeus_options key
           typhoeus_options = {:params => args}.merge(options[:typhoeus_options] || {})
 
