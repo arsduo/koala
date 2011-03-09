@@ -152,7 +152,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :put_like => 2, :delete_like => 2,
       :search => 3,
       # methods that have special arguments
-      :put_picture => [{"path" => "x", "content_type" => "y"}, {}, "me"],
+      :put_picture => ["x.jpg", "image/jpg", {}, "me"],
       :get_objects => [["x"], {}]
     }.each_pair do |method_name, params|
       it "should pass http options through for #{method_name}" do

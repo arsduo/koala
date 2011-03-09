@@ -21,8 +21,13 @@ module Koala
         end
                                       
         protected
+        
         def self.params_require_multipart?(param_hash)
           param_hash.any? { |key, value| value.kind_of?(Koala::UploadableIO) }
+        end
+    
+        def self.multipart_requires_content_type?
+          true
         end
       end
     end
@@ -115,6 +120,11 @@ module Koala
 
           response = self.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
           Koala::Response.new(response.code, response.body, response.headers_hash)
+        end
+        
+        private
+        def self.multipart_requires_content_type?
+          false # Typhoeus handles multipart file types, we don't have to require it
         end
       end # class_eval
     end

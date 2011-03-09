@@ -100,24 +100,21 @@ module Koala
       def put_picture(*picture_args)
         # Can be called in multiple ways:
         #
-        #   put_picture(file, content_type)
-        #   put_picture(path_to_file, content_type)
+        #   put_picture(file, [content_type], ...)
+        #   put_picture(path_to_file, [content_type], ...)
         #
-        # Koala also has support for directly taking the file input
-        # parameter supplied by some popular Ruby frameworks:  
-        #
-        #   put_picture(params[:file])
-        #
+        # You can pass in uploaded files directly from Rails or Sinatra.
         # (See lib/koala/uploadable_io.rb for supported frameworks)
         #
         # Optional parameters can be added to the end of the argument list:
         # - args:       a hash of request parameters (default: {})
         # - target_id:  ID of the target where to post the picture (default: "me")
-        #
+        # - options:    a hash of http options passed to the HTTPService module
+        # 
         #   put_picture(file, content_type, {:message => "Message"}, 01234560)
         #   put_picture(params[:file], {:message => "Message"})
         
-        raise KoalaError.new("Wrong number of arguments for put_picture") unless picture_args.size.between?(1, 4)
+        raise KoalaError.new("Wrong number of arguments for put_picture") unless picture_args.size.between?(1, 5)
         
         args_offset = picture_args[1].kind_of?(Hash) || picture_args.size == 1 ? 0 : 1
         

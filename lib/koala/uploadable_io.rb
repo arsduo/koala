@@ -11,15 +11,20 @@ module Koala
       elsif !content_type.nil? && (io_or_path_or_mixed.respond_to?(:read) or io_or_path_or_mixed.kind_of?(String))
         @io_or_path = io_or_path_or_mixed
         @content_type = content_type
-      else
-        raise KoalaError.new("Invalid arguments to initialize an UploadableIO")
       end
+      
+      raise KoalaError.new("Invalid arguments to initialize an UploadableIO") unless @io_or_path
+      raise KoalaError.new("Unable to determine MIME type for UploadableIO") if !@content_type && Koala.multipart_requires_content_type?
     end
     
     def to_upload_io
       UploadIO.new(@io_or_path, @content_type, "koala-io-file.dum")
     end
     
+    def to_file
+      @io_or_path.is_a?(String) ? File.open(@io_or_path) : @io_or_path
+    end
+
     private
       PARSE_STRATEGIES = [
         :parse_rails_3_param,
@@ -37,7 +42,7 @@ module Koala
       
       # Expects a parameter of type ActionDispatch::Http::UploadedFile
       def parse_rails_3_param(uploaded_file)
-        if uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.tempfile.respond_to?(:path)
+        if uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.respond_to?(:path)
           @io_or_path = uploaded_file.tempfile.path
           @content_type = uploaded_file.content_type
         end
@@ -78,7 +83,7 @@ module Koala
             return result if result
           end
         end
-        raise KoalaError, "UploadableIO unable to determine MIME type for #{filename}"
+        nil # if we can't find anything
       end
       
       def use_mime_module(filename)
