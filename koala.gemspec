@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{koala}
-  s.version = "1.0.0.beta"
+  s.version = "1.0.0.beta2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alex Koppel, Chris Baclig, Rafi Jacoby, Context Optional"]
-  s.date = %q{2011-03-09}
+  s.date = %q{2011-03-10}
   s.description = %q{Koala is a lightweight, flexible Ruby SDK for Facebook.  It allows read/write access to the social graph via the Graph API and the older REST API, as well as support for realtime updates and OAuth and Facebook Connect authentication.  Koala is fully tested and supports Net::HTTP and Typhoeus connections out of the box and can accept custom modules for other services.}
   s.email = %q{alex@alexkoppel.com}
   s.extra_rdoc_files = ["CHANGELOG", "LICENSE", "lib/koala.rb", "lib/koala/graph_api.rb", "lib/koala/http_services.rb", "lib/koala/realtime_updates.rb", "lib/koala/rest_api.rb", "lib/koala/test_users.rb", "lib/koala/uploadable_io.rb"]
