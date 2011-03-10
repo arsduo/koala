@@ -132,13 +132,31 @@ class TyphoeusServiceTests < Test::Unit::TestCase
     end
     
     describe "with file upload" do
-      it "should pass any files directly on to Typhoues" do
-        args = {:file => File.new(__FILE__, "r")}
-        Bear.should_receive(:post).with(anything, hash_including(:params => args)).and_return(Typhoeus::Response.new)
-        Bear.make_request("anything", args, :post)
+      it "should include an interface to NetHTTPService called NetHTTPInterface" do
+        # we should be able to access it
+        lambda { Koala::TyphoeusService::NetHTTPInterface }.should_not raise_exception(Exception)
+        Koala::TyphoeusService::NetHTTPInterface.included_modules.include?(Koala::NetHTTPService).should be_true
       end
       
+      it "should call the NetHTTPInterface if multipart is required" do
+        method = "any_method"
+        args = {}
+        verb = "get"
+        options = {}
+
+        Bear.stub(:params_require_multipart?).and_return(true)
+        Koala::TyphoeusService::NetHTTPInterface.should_receive(:make_request).with(method, args, verb, options)
+
+        Bear.make_request(method, args, verb, options)
+      end
+      
+      # Typhoeus file uploads currently don't work
       # for live tests, run the Graph API tests with Typhoues, which will run file uploads
+      # it "should pass any files directly on to Typhoues" do
+      #  args = {:file => File.new(__FILE__, "r")}
+      #  Bear.should_receive(:post).with(anything, hash_including(:params => args)).and_return(Typhoeus::Response.new)
+      #  Bear.make_request("anything", args, :post)
+      # end
     end
   end
 end
