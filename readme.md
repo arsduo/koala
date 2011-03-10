@@ -9,7 +9,7 @@ Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.co
 
 1.0 beta
 ---
-We've just released a beta of 1.0, chock-full of great new features.  To download the beta, just add --pre when installing the gem:
+Version 1.0 is currently in beta, chock-full of great new features.  To download the beta, just add --pre when installing the gem:
     
     sudo gem install koala --pre
 
