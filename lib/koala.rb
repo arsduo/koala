@@ -14,6 +14,9 @@ require 'koala/rest_api'
 require 'koala/realtime_updates'
 require 'koala/test_users'
 
+# add KoalaIO class
+require 'koala/uploadable_io'
+
 module Koala
 
   module Facebook
@@ -300,6 +303,8 @@ module Koala
       end
     end
   end
+  
+  class KoalaError< StandardError; end
 
   # finally, set up the http service Koala methods used to make requests
   # you can use your own (for HTTParty, etc.) by calling Koala.http_service = YourModule
@@ -311,7 +316,7 @@ module Koala
   # if you have Typheous and don't want to use it (or want another service),
   # you can run Koala.http_service = NetHTTPService (or MyHTTPService)
   begin
-     Koala.http_service = TyphoeusService
+    Koala.http_service = TyphoeusService
   rescue LoadError
     Koala.http_service = NetHTTPService
   end

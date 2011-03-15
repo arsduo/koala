@@ -10,8 +10,10 @@ describe "Koala::HTTPService" do
   describe "common methods" do
     describe "always_use_ssl accessor" do
       it "should be added" do
-        Bear.should respond_to("always_use_ssl")
-        Bear.should respond_to("always_use_ssl=")
+        # in Ruby 1.8, .methods returns strings
+        # in Ruby 1.9, .method returns symbols 
+        Bear.methods.collect {|m| m.to_sym}.should include(:always_use_ssl)
+        Bear.methods.collect {|m| m.to_sym}.should include(:always_use_ssl=)
       end
     end
     

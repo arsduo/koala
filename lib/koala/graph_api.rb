@@ -96,12 +96,34 @@ module Koala
         result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers))
         result["Location"]
       end    
-    
-      def put_picture(file_hash, args = {}, target_id = "me", options = {})
-        # Uploads a picture from a file hash
-        raise APIError.new("type" => "KoalaInvaliFileFormat", "message" => "put_picture requires a hash describing the File to upload (see HTTPService::is_valid_file_hash?") unless file_hash.kind_of?(Hash)
+      
+      def put_picture(*picture_args)
+        # Can be called in multiple ways:
+        #
+        #   put_picture(file, [content_type], ...)
+        #   put_picture(path_to_file, [content_type], ...)
+        #
+        # You can pass in uploaded files directly from Rails or Sinatra.
+        # (See lib/koala/uploadable_io.rb for supported frameworks)
+        #
+        # Optional parameters can be added to the end of the argument list:
+        # - args:       a hash of request parameters (default: {})
+        # - target_id:  ID of the target where to post the picture (default: "me")
+        # - options:    a hash of http options passed to the HTTPService module
+        # 
+        #   put_picture(file, content_type, {:message => "Message"}, 01234560)
+        #   put_picture(params[:file], {:message => "Message"})
         
-        args["source"] = file_hash
+        raise KoalaError.new("Wrong number of arguments for put_picture") unless picture_args.size.between?(1, 5)
+        
+        args_offset = picture_args[1].kind_of?(Hash) || picture_args.size == 1 ? 0 : 1
+        
+        args      = picture_args[1 + args_offset] || {}
+        target_id = picture_args[2 + args_offset] || "me"
+        options   = picture_args[3 + args_offset] || {} 
+        
+        args["source"] = Koala::UploadableIO.new(*picture_args.slice(0, 1 + args_offset))
+        
         self.put_object(target_id, "photos", args, options)
       end
     

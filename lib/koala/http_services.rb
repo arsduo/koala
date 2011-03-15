@@ -21,30 +21,13 @@ module Koala
         end
                                       
         protected
-        def self.params_require_multipart?(param_hash)
-          param_hash.any? { |key, value| is_valid_file_hash?(value) }
-        end
         
-        # A file hash is one with "content_type" and "path" keys (string or symbol),
-        # where "path" is the local path to the file to be uploaded. (recommended)
-        # 
-        # The hash can also contain a "file" key containing an already-opened IO
-        # that responds to "read".  (This is due to the underlying gem used, and 
-        # confers no specific advantage.)
-        #
-        # Valid inputs for a file to be posted via multipart/form-data
-        # are based on the criteria for an UploadIO to be created 
-        # See : https://github.com/nicksieger/multipart-post/blob/master/lib/composite_io.rb       
-        def self.is_valid_file_hash?(value)
-          if value.kind_of?(Hash)
-            has_content_type = value.key?("content_type") || value.key?(:content_type)
-            has_path = value.key?("path") || value.key?(:path)
-            file = value["file"] || value[:file]
-            has_content_type && has_path && (!file || file.respond_to?(:read))
-          else
-            # if it's not a hash, it's not a valid file hash, obviously
-            false
-          end
+        def self.params_require_multipart?(param_hash)
+          param_hash.any? { |key, value| value.kind_of?(Koala::UploadableIO) }
+        end
+    
+        def self.multipart_requires_content_type?
+          true
         end
       end
     end
@@ -107,18 +90,7 @@ module Koala
         
         def self.encode_multipart_params(param_hash)
           Hash[*param_hash.collect do |key, value| 
-            if is_valid_file_hash?(value)
-              file = value["file"] || value[:file]
-              content_type = value["content_type"] || value[:content_type]
-              path = value["path"] || value[:path]
-              if file
-                value = UploadIO.new(file, content_type, path)
-              else
-                value = UploadIO.new(path, content_type)
-              end
-            end
-            
-            [key, value]
+            [key, value.kind_of?(Koala::UploadableIO) ? value.to_upload_io : value]
           end.flatten]
         end
       end
@@ -145,6 +117,9 @@ module Koala
             # if the verb isn't get or post, send it as a post argument
             args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
+            # switch any UploadableIOs to the files Typhoeus expects 
+            # args.each_pair {|key, value| args[key] = value.to_file if value.is_a?(UploadableIO)}
+
             # you can pass arguments directly to Typhoeus using the :typhoeus_options key
             typhoeus_options = {:params => args}.merge(options[:typhoeus_options] || {})
 
@@ -160,6 +135,12 @@ module Koala
             Koala::TyphoeusService::NetHTTPInterface.make_request(path, args, verb, options)
           end
         end
+        
+        private
+        # Typhoeus file uploads are not currently supported; this will be added when we can get them working
+        #def self.multipart_requires_content_type?
+        #  false # Typhoeus handles multipart file types, we don't have to require it
+        #end
       end # class_eval
     end
   end

@@ -83,7 +83,7 @@ module Koala
             'no_args'
           else
             params_hash.sort{ |a,b| a[0].to_s <=> b[0].to_s}.map do |arr|
-              arr[1] = '[FILE]' if arr[1].kind_of?(File) || is_valid_file_hash?(arr[1])
+              arr[1] = '[FILE]' if arr[1].kind_of?(Koala::UploadableIO)
               arr.join('=')
             end.join('&')
           end

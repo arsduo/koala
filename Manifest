@@ -10,6 +10,7 @@ lib/koala/http_services.rb
 lib/koala/realtime_updates.rb
 lib/koala/rest_api.rb
 lib/koala/test_users.rb
+lib/koala/uploadable_io.rb
 readme.md
 spec/facebook_data.yml
 spec/koala/api_base_tests.rb
@@ -30,6 +31,7 @@ spec/koala/rest_api/rest_api_no_access_token_tests.rb
 spec/koala/rest_api/rest_api_tests.rb
 spec/koala/rest_api/rest_api_with_access_token_tests.rb
 spec/koala/test_users/test_users_tests.rb
+spec/koala/uploadable_io/uploadable_io_tests.rb
 spec/koala_spec.rb
 spec/koala_spec_helper.rb
 spec/koala_spec_without_mocks.rb
