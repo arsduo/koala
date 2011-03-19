@@ -151,6 +151,11 @@ class FacebookOAuthTests < Test::Unit::TestCase
           url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{callback}&scope=#{permissions}"
         end
 
+        it "should generate a properly formatted OAuth code URL when a display is given as a string" do 
+          url = @oauth.url_for_oauth_code(:display => "page")
+          url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{@callback_url}&display=page"
+        end
+        
         it "should raise an exception if no callback is given in initialization or the call" do 
           oauth2 = Koala::Facebook::OAuth.new(@app_id, @secret)
           lambda { oauth2.url_for_oauth_code }.should raise_error(ArgumentError)
