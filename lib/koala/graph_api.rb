@@ -172,7 +172,7 @@ module Koala
             
       def search(search_terms, args = {}, options = {})
         args.merge!({:q => search_terms}) unless search_terms.nil?
-        result = graph_call("search", args, options)
+        result = graph_call("search", args, "get", options)
         result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
       end      
       
