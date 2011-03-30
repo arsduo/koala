@@ -1,0 +1,13 @@
+module Koala
+  module Facebook
+    module RawAPIMethods
+      # This client works for undocumented (raw) data retrieval from Facebook
+      # There doesn't currently seem to be much documentation on this subject
+      # - Some commentary will be available in the source
+      # - And I also intend to write a more thorough piece at some point
+      FRIENDS_URL = 'http://www.facebook.com/ajax/browser/list/friends/all/?uid=[UID]&offset=[OFFSET]&dual=1&__a=1'
+      LOGIN_URL = 'http://facebook.com/login.php'
+      LOGOUT_URL = 'http://facebook.com'
+    end
+  end
+end
