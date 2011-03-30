@@ -27,6 +27,9 @@ require 'koala/test_users'
 # add KoalaIO class
 require 'koala/uploadable_io'
 
+# add raw API methods
+require 'koala/raw_api'
+
 module Koala
 
   module Facebook
@@ -53,10 +56,11 @@ module Koala
 
     class API
       # initialize with an access token 
-      def initialize(access_token = nil)
+      def initialize(access_token = nil, raw_session = nil)
         @access_token = access_token
+        @raw_session = raw_session
       end
-      attr_reader :access_token
+      attr_reader :access_token, :agent
 
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
@@ -101,6 +105,10 @@ module Koala
     class GraphAndRestAPI < API
       include GraphAPIMethods
       include RestAPIMethods
+    end
+
+    class RawAPI < API
+      include RawAPIMethods
     end
 
     class RealtimeUpdates < API
@@ -310,6 +318,40 @@ module Koala
       def base64_url_decode(str)
         str += '=' * (4 - str.length.modulo(4))
         Base64.decode64(str.gsub('-', '+').gsub('_', '/'))
+      end
+    end
+
+    class RawSession
+      require 'mechanize'
+
+      LOGIN_PAGE = 'http://facebook.com/login.php'
+      LOGOUT_PAGE = 'http://facebook.com'
+      LOGIN_ACTION = /https:\/\/www\.facebook.com\/login\.php\?/
+      LOGOUT_ACTION = /\/logout\.php/
+
+      attr_reader :email, :password, :agent
+      def initialize(email, password)
+        @email = email
+        @password = password
+        @agent = Mechanize.new
+        login
+      end    
+
+      def login
+        login_page = @agent.get(LOGIN_PAGE)
+        login_form = login_page.form_with(:action => LOGIN_ACTION)
+        if login_form
+          login_form.field_with(:name => 'email').value = @email
+          login_form.field_with(:name => 'pass').value = @password
+          @agent.submit(login_form)
+        else
+          nil
+        end
+      end
+
+      def close
+        logout_form = @agent.get(LOGOUT_PAGE).form_with(:action=>LOGOUT_ACTION)
+        logout_form ? @agent.submit(logout_form) : nil
       end
     end
   end
