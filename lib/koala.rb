@@ -52,7 +52,7 @@ module Koala
     # JavaScript SDK at http://github.com/facebook/connect-js/.
 
     class API
-      # initialize with an access token 
+      # initialize with an access token
       def initialize(access_token = nil)
         @access_token = access_token
       end
@@ -211,7 +211,7 @@ module Koala
           string = info["access_token"]
         end
       end
-    
+
       # provided directly by Facebook
       # see https://github.com/facebook/crypto-request-examples/blob/master/sample.rb
       # and http://developers.facebook.com/docs/authentication/canvas/encryption_proposal
@@ -313,7 +313,7 @@ module Koala
       end
     end
   end
-  
+
   class KoalaError< StandardError; end
 
   # finally, set up the http service Koala methods used to make requests
