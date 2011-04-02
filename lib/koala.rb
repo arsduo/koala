@@ -212,37 +212,23 @@ module Koala
         end
       end
 
-      # provided directly by Facebook
-      # see https://github.com/facebook/crypto-request-examples/blob/master/sample.rb
-      # and http://developers.facebook.com/docs/authentication/canvas/encryption_proposal
+      # Originally provided directly by Facebook, however this has changed
+      # as their concept of crypto changed. For historic purposes, this is their proposal:
+      # https://developers.facebook.com/docs/authentication/canvas/encryption_proposal/
+      # Currently see https://github.com/facebook/php-sdk/blob/master/src/facebook.php#L758
+      # for a more accurate reference implementation strategy.
       def parse_signed_request(input, max_age = 3600)
         encoded_sig, encoded_envelope = input.split('.', 2)
+        signature = base64_url_decode(encoded_sig).unpack("H*").to_s
         envelope = JSON.parse(base64_url_decode(encoded_envelope))
-        algorithm = envelope['algorithm']
 
-        raise 'Invalid request. (Unsupported algorithm.)' \
-          if algorithm != 'AES-256-CBC HMAC-SHA256' && algorithm != 'HMAC-SHA256'
+        raise 'SignedRequest: Unsupported algorithm' if envelope['algorithm'] != 'HMAC-SHA256'
 
-        raise 'Invalid request. (Too old.)' \
-          if algorithm == "AES-256-CBC HMAC-SHA256" && envelope['issued_at'].to_i < Time.now.to_i - max_age
+        # now see if the signature is valid (digest, key, data)
+        hmac = OpenSSL::HMAC.hexdigest('sha256', @app_secret, encoded_envelope.tr("-_", "+/"))
+        raise 'SignedRequest: Invalid signature' if (signature != hmac)
 
-        raise 'Invalid request. (Invalid signature.)' \
-          if base64_url_decode(encoded_sig) !=
-              OpenSSL::HMAC.hexdigest(
-                'sha256', @app_secret, encoded_envelope).split.pack('H*')
-
-        # for requests that are signed, but not encrypted, we're done
-        return envelope if algorithm == 'HMAC-SHA256'
-
-        # otherwise, decrypt the payload
-        cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
-        cipher.decrypt
-        cipher.key = @app_secret
-        cipher.iv = base64_url_decode(envelope['iv'])
-        cipher.padding = 0
-        decrypted_data = cipher.update(base64_url_decode(envelope['payload']))
-        decrypted_data << cipher.final
-        return JSON.parse(decrypted_data.strip)
+        return envelope
       end
 
       # from session keys
@@ -309,7 +295,7 @@ module Koala
       # directly from https://github.com/facebook/crypto-request-examples/raw/master/sample.rb
       def base64_url_decode(str)
         str += '=' * (4 - str.length.modulo(4))
-        Base64.decode64(str.gsub('-', '+').gsub('_', '/'))
+        Base64.decode64(str.tr('-_', '+/'))
       end
     end
   end
