@@ -10,8 +10,6 @@ else
   # Ruby 1.8.x
   require 'test/unit'
   require 'rubygems'
-
-  require 'spec/test/unit'
 end
 
 # load the libraries
