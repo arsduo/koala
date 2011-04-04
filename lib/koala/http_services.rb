@@ -107,34 +107,28 @@ module Koala
         include Koala::HTTPService
 
         def self.make_request(path, args, verb, options = {})
-          unless params_require_multipart?(args)
-            # if the verb isn't get or post, send it as a post argument
-            args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
+          # if the verb isn't get or post, send it as a post argument
+          args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
-            # switch any UploadableIOs to the files Typhoeus expects 
-            # args.each_pair {|key, value| args[key] = value.to_file if value.is_a?(UploadableIO)}
+          # switch any UploadableIOs to the files Typhoeus expects 
+          args.each_pair {|key, value| args[key] = value.to_file if value.is_a?(UploadableIO)}
 
-            # you can pass arguments directly to Typhoeus using the :typhoeus_options key
-            typhoeus_options = {:params => args}.merge(options[:typhoeus_options] || {})
+          # you can pass arguments directly to Typhoeus using the :typhoeus_options key
+          typhoeus_options = {:params => args}.merge(options[:typhoeus_options] || {})
 
-            # by default, we use SSL only for private requests (e.g. with access token)
-            # this makes public requests faster
-            prefix = (args["access_token"] || @always_use_ssl || options[:use_ssl]) ? "https" : "http"
+          # by default, we use SSL only for private requests (e.g. with access token)
+          # this makes public requests faster
+          prefix = (args["access_token"] || @always_use_ssl || options[:use_ssl]) ? "https" : "http"
 
-            response = self.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
-            Koala::Response.new(response.code, response.body, response.headers_hash)
-          else
-            # we have to use NetHTTPService for multipart for file uploads
-            # until Typhoeus integrates support
-            Koala::TyphoeusService::NetHTTPInterface.make_request(path, args, verb, options)
-          end
+          response = self.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
+          Koala::Response.new(response.code, response.body, response.headers_hash)
         end
         
         private
         # Typhoeus file uploads are not currently supported; this will be added when we can get them working
-        #def self.multipart_requires_content_type?
-        #  false # Typhoeus handles multipart file types, we don't have to require it
-        #end
+        def self.multipart_requires_content_type?
+          false # Typhoeus handles multipart file types, we don't have to require it
+        end
       end # class_eval
     end
   end
