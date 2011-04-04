@@ -57,12 +57,6 @@ module Koala
           http = Net::HTTP.new(server(options), private_request ? 443 : nil)
           http.use_ssl = true if private_request
 
-          # we turn off certificate validation to avoid the
-          # "warning: peer certificate won't be verified in this SSL session" warning
-          # not sure if this is the right way to handle it
-          # see http://redcorundum.blogspot.com/2008/03/ssl-certificates-and-nethttps.html
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
           result = http.start do |http|
             response, body = if verb == "post"
               if params_require_multipart? args

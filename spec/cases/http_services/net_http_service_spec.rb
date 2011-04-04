@@ -84,7 +84,7 @@ describe "NetHTTPService module holder class Horse" do
         Horse.make_request('anything', @args, 'anything')
       end
     end
-
+    
     describe "if always_use_ssl is true" do
       before :each do
         Horse.always_use_ssl = true
@@ -139,8 +139,8 @@ describe "NetHTTPService module holder class Horse" do
       Horse.make_request('anything', {}, 'anything', :rest_api => true)
     end
 
-    it "should turn off vertificate validaiton warnings" do
-      @http_mock.should_receive('verify_mode=').with(OpenSSL::SSL::VERIFY_NONE)
+    it "no longer sets verify_mode to no verification" do
+      @http_mock.should_not_receive('verify_mode=')
 
       Horse.make_request('anything', {}, 'anything')
     end
