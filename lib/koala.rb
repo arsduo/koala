@@ -217,12 +217,12 @@ module Koala
       # https://developers.facebook.com/docs/authentication/canvas/encryption_proposal/
       # Currently see https://github.com/facebook/php-sdk/blob/master/src/facebook.php#L758
       # for a more accurate reference implementation strategy.
-      def parse_signed_request(input, max_age = 3600)
+      def parse_signed_request(input)
         encoded_sig, encoded_envelope = input.split('.', 2)
         signature = base64_url_decode(encoded_sig).unpack("H*").to_s
         envelope = JSON.parse(base64_url_decode(encoded_envelope))
 
-        raise 'SignedRequest: Unsupported algorithm' if envelope['algorithm'] != 'HMAC-SHA256'
+        raise "SignedRequest: Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
 
         # now see if the signature is valid (digest, key, data)
         hmac = OpenSSL::HMAC.hexdigest('sha256', @app_secret, encoded_envelope.tr("-_", "+/"))

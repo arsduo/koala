@@ -35,23 +35,21 @@ oauth_test_data:
     # note: I've revoked the offline access for security reasons, so you can't make calls against this :)
     fbs_119908831367602: '"access_token=119908831367602|08170230801eb225068e7a70-2905623|Q3LDCYYF8CX9cstxnZLsxiR0nwg.&expires=0&secret=78abaee300b392e275072a9f2727d436&session_key=08170230801eb225068e7a70-2905623&sig=423b8aa4b6fa1f9a571955f8e929d567&uid=2905623"'
 
-  # These values will work out of the box
-  # They're from Facebook's example at http://developers.facebook.com/docs/authentication/canvas
+  # These values from the OAuth Playground (see above) will work out of the box
   # You can update this to live data if desired
   # request_secret is optional and will fall back to the secret above if absent
-  request_secret: "secret"
-  signed_request: "vlXgu64BQGFSQrY0ZcJBZASMvYvTHu9GQ0YM9rjPSso.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsIjAiOiJwYXlsb2FkIn0"
-  signed_request_result:
-      "0": payload
-      algorithm: HMAC-SHA256
-  # signed params
-  # examples from http://developers.facebook.com/docs/authentication/canvas/encryption_proposal
-  signed_params: t63pZQ4Q3ZTHJt0hOsKrY2pb28xRlduW0pg4lL_Zhl4.eyJhbGdvcml0aG0iOiJBRVMtMjU2LUNCQyBITUFDLVNIQTI1NiIsImlzc3VlZF9hdCI6MTI4NzYwMTk4OCwiaXYiOiJmRExKQ1cteWlYbXVOYTI0ZVNhckpnIiwicGF5bG9hZCI6IllHeW00cG9Rbk1UckVnaUFPa0ZUVkk4NWxsNVJ1VWlFbC1JZ3FmeFRPVEhRTkl2VlZJOFk4a1Z1T29lS2FXT2Vhc3NXRlRFdjBRZ183d0NDQkVlbjdsVUJCemxGSjFWNjNISjNBZjBTSW5nY3hXVEo3TDZZTGF0TW13WGdEQXZXbjVQc2ZxeldrNG1sOWg5RExuWXB0V0htREdMNmlCaU9oTjdXeUk3cDZvRXBWcmlGdUp3X2NoTG9QYjhhM3ZHRG5vVzhlMlN4eDA2QTJ4MnhraWFwdmcifQ
-  signed_params_secret: 13750c9911fec5865d01f3bd00bdf4db
+  signed_params: "zWRm0gd5oHW_jzXP_WA9CirO7c5CLHotn-SKRqH2NmU.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEzMDE5MjIwMDAsImlzc3VlZF9hdCI6MTMwMTkxNzI5OSwib2F1dGhfdG9rZW4iOiIxMTk5MDg4MzEzNjc2MDJ8Mi56VkZfNk5yTUVMSHVKYTRnSVU5dEt3X18uMzYwMC4xMzAxOTIyMDAwLTI5MDU2MjN8emdxUHNyMkJHOUxvT0s5a2VrR2dSVVJaeDBrIiwidXNlciI6eyJjb3VudHJ5IjoiZGUiLCJsb2NhbGUiOiJkZV9ERSIsImFnZSI6eyJtaW4iOjIxfX0sInVzZXJfaWQiOiIyOTA1NjIzIn0"
   signed_params_result:
-    access_token: "101244219942650|2.wdrSr7KyE_VwQ0fjwOfW9A__.3600.1287608400-499091902|XzxMQd-_4tjlC2VEgide4rmg6LI"
-    expires_in: 6412
-    user_id: "499091902"
+      expires: 1301922000
+      algorithm: HMAC-SHA256
+      user_id: "2905623"
+      oauth_token: 119908831367602|2.zVF_6NrMELHuJa4gIU9tKw__.3600.1301922000-2905623|zgqPsr2BG9LoOK9kekGgRURZx0k
+      user: 
+        country: de
+        locale: de_DE
+        age: 
+          min: 21
+      issued_at: 1301917299
 
 subscription_test_data:
   subscription_path: http://oauth.twoalex.com/subscriptions
