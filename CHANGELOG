@@ -21,6 +21,7 @@ Internal improvements:
 -- Beta 2: Added KoalaError for non-API errors
 -- Beta 3: Updated parse_signed_request to match Facebook's current implementation (thanks, imajes!)
 Test improvements:
+-- Beta 3: Incorporated joshk's awesome rewrite of the entire Koala test suite
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
 -- Live tests now verify that the access token has the necessary permissions before starting
 -- Replaced the 50-person network test, which often took 15+ minutes to run live, with a 5-person test
