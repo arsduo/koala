@@ -55,7 +55,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "should be able to post a message with an attachment to a feed" do
-    result = @api.put_wall_post("Hello, world, from the test suite again!", {:name => "Context Optional", :link => "http://www.contextoptional.com/"})
+    result = @api.put_wall_post("Hello, world, from the test suite again!", {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"})
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
@@ -93,7 +93,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
         
   it "should be able to verify a message with an attachment posted to a feed" do
-    attachment = {"name" => "Context Optional", "link" => "http://www.contextoptional.com/"}
+    attachment = {"name" => "OAuth Playground", "link" => "http://oauth.twoalex.com/"}
     result = @api.put_wall_post("Hello, world, from the test suite again!", attachment)
     @temporary_object_id = result["id"]
     get_result = @api.get_object(@temporary_object_id)

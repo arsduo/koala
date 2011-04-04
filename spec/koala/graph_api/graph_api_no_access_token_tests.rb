@@ -22,7 +22,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
   # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
   it "should not be able to post to a feed" do
     (lambda do
-      attachment = {:name => "Context Optional", :link => "http://www.contextoptional.com/"}
+      attachment = {:name => "OAuth Playground", :link => "http://www.oauth.twoalex.com/"}
       @result = @api.put_wall_post("Hello, world", attachment, "contextoptional")
     end).should raise_error(Koala::Facebook::APIError)
     puts "Error!  Object #{@result.inspect} somehow put onto Context Optional's wall!" if @result
