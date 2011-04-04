@@ -51,7 +51,7 @@ module Koala
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
-
+        
         # add a leading /
         path = "/#{path}" unless path =~ /^\//
 

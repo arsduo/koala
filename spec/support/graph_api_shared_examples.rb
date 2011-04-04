@@ -109,21 +109,21 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
   # PUT
   it "should be able to write an object to the graph" do
-    result = @api.put_wall_post("Hello, world, from the test suite!")
+    result = @api.put_wall_post("Hello, world, from the test suite at #{Time.now.to_i}!")
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
 
   # DELETE
   it "should be able to delete posts" do
-    result = @api.put_wall_post("Hello, world, from the test suite delete method!")
+    result = @api.put_wall_post("Hello, world, from the test suite delete method at #{Time.now.to_i}!")
     object_id_to_delete = result["id"]
     delete_result = @api.delete_object(object_id_to_delete)
     delete_result.should == true
   end
 
   it "should be able to delete likes" do
-    result = @api.put_wall_post("Hello, world, from the test suite delete method!")
+    result = @api.put_wall_post("Hello, world, again, from the test suite delete method at #{Time.now.to_i}!")
     @temporary_object_id = result["id"]
     @api.put_like(@temporary_object_id)
     delete_like_result = @api.delete_like(@temporary_object_id)
@@ -132,7 +132,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
   # additional put tests
   it "should be able to verify messages posted to a wall" do
-    message = "the cats are asleep"
+    message = "the cats are asleep at #{Time.now.to_i}"
     put_result = @api.put_wall_post(message)
     @temporary_object_id = put_result["id"]
     get_result = @api.get_object(@temporary_object_id)
@@ -142,7 +142,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "should be able to post a message with an attachment to a feed" do
-    result = @api.put_wall_post("Hello, world, from the test suite again!", {:name => "Context Optional", :link => "http://www.contextoptional.com/"})
+    result = @api.put_wall_post("Hello, world, from the test suite again at #{Time.now.to_i}!", {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"})
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
@@ -180,7 +180,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "should be able to verify a message with an attachment posted to a feed" do
-    attachment = {"name" => "Context Optional", "link" => "http://www.contextoptional.com/"}
+    attachment = {"name" => "OAuth Playground", "link" => "http://oauth.twoalex.com/"}
     result = @api.put_wall_post("Hello, world, from the test suite again!", attachment)
     @temporary_object_id = result["id"]
     get_result = @api.get_object(@temporary_object_id)
@@ -396,7 +396,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
   # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
   it "should not be able to post to a feed" do
     (lambda do
-      attachment = {:name => "Context Optional", :link => "http://www.contextoptional.com/"}
+      attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
       @result = @api.put_wall_post("Hello, world", attachment, "contextoptional")
     end).should raise_error(Koala::Facebook::APIError)
     puts "Error!  Object #{@result.inspect} somehow put onto Context Optional's wall!" if @result
