@@ -1,27 +1,17 @@
 require 'cgi'
 require 'digest/md5'
 
-# rubygems is required to support json, how facebook returns data
-require 'rubygems'
 require 'json'
 
 # OpenSSL and Base64 are required to support signed_request
 require 'openssl'
 require 'base64'
 
-# include default http services
+# include koala modules
 require 'koala/http_services'
-
-# add Graph API methods
 require 'koala/graph_api'
-
-# add REST API methods
 require 'koala/rest_api'
-
-# add realtime update methods
 require 'koala/realtime_updates'
-
-# add test user methods
 require 'koala/test_users'
 
 # add KoalaIO class

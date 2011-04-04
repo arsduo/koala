@@ -116,3 +116,46 @@ shared_examples_for "Koala RestAPI" do
     end
   end
 end
+
+
+shared_examples_for "Koala RestAPI with an access token" do
+  # FQL
+  it "should be able to access public information via FQL" do
+    result = @api.fql_query('select first_name from user where uid = 216743')
+    result.size.should == 1
+    result.first['first_name'].should == 'Chris'
+  end
+
+  it "should be able to access protected information via FQL" do
+    # Tests agains the permissions fql table
+
+    # get the current user's ID
+    # we're sneakily using the Graph API, which should be okay since it has its own tests
+    g = Koala::Facebook::GraphAPI.new(@token)
+    id = g.get_object("me", :fields => "id")["id"]
+
+    # now send a query about your permissions
+    result = @api.fql_query("select read_stream from permissions where uid = #{id}")
+
+    result.size.should == 1
+    # we assume that you have read_stream permissions, so we can test against that
+    # (should we keep this?)
+    result.first["read_stream"].should == 1
+  end
+end
+
+
+shared_examples_for "Koala RestAPI without an access token" do
+  # FQL_QUERY
+  describe "when making a FQL request" do
+    it "should be able to access public information via FQL" do
+      @result = @api.fql_query("select first_name from user where uid = 216743")
+      @result.size.should == 1
+      @result.first["first_name"].should == "Chris"
+    end
+
+    it "should not be able to access protected information via FQL" do
+      lambda { @api.fql_query("select read_stream from permissions where uid = 216743") }.should raise_error(Koala::Facebook::APIError)
+    end
+  end
+end
