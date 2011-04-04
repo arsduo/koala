@@ -19,6 +19,7 @@ Internal improvements:
 -- Beta 2: photo and file uploads now accept symbols as well as strings overall
 -- Beta 2: APIError is now < StandardError, not Exception
 -- Beta 2: Added KoalaError for non-API errors
+-- Beta 3: Updated parse_signed_request to match Facebook's current implementation (thanks, imajes!)
 Test improvements:
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
 -- Live tests now verify that the access token has the necessary permissions before starting
