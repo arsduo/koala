@@ -138,8 +138,8 @@ class NetHTTPServiceTests < Test::Unit::TestCase
         Bear.make_request('anything', {}, 'anything', :rest_api => true)
       end
 
-      it "should turn off vertificate validaiton warnings" do
-        @http_mock.should_receive('verify_mode=').with(OpenSSL::SSL::VERIFY_NONE)
+      it "no longer turns off vertificate validaiton warnings" do
+        @http_mock.should_not_receive('verify_mode=')
 
         Bear.make_request('anything', {}, 'anything')
       end
