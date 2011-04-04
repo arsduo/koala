@@ -148,37 +148,33 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "should be able to post photos to the user's wall with an open file object" do
-    file_hash = {
-      "content_type" => "image/jpg",
-      "path" => File.join(File.dirname(__FILE__), "..", "..", "fixtures", "beach.jpg"),
-      "file" => File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
-    }
-    result = @api.put_picture(file_hash)
-    @temporary_object_id = result["id"]
+    content_type = "image/jpg"      
+    file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+    
+    result = @api.put_picture(file, content_type)
+    @temporary_object_id = result["id"] 
     @temporary_object_id.should_not be_nil
   end
-
+  
   it "should be able to post photos to the user's wall without an open file object" do
-    file_hash = {
-      "content_type" => "image/jpg",
-      "path" => File.join(File.dirname(__FILE__), "..", "..", "fixtures", "beach.jpg")
-    }
-    result = @api.put_picture(file_hash)
-    @temporary_object_id = result["id"]
+    content_type = "image/jpg",
+    file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
+    
+    result = @api.put_picture(file_path, content_type)
+    @temporary_object_id = result["id"] 
     @temporary_object_id.should_not be_nil
   end
-
+    
   it "should be able to verify a photo posted to a user's wall" do
-    file_hash = {
-      "content_type" => "image/jpg",
-      "path" => File.join(File.dirname(__FILE__), "..", "assets", "beach.jpg")
-    }
+    content_type = "image/jpg",
+    file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
+    
     expected_message = "This is the test message"
-
-    result = @api.put_picture(file_hash, :message => expected_message)
-    @temporary_object_id = result["id"]
+    
+    result = @api.put_picture(file_path, content_type, :message => expected_message)
+    @temporary_object_id = result["id"] 
     @temporary_object_id.should_not be_nil
-
+    
     get_result = @api.get_object(@temporary_object_id)
     get_result["name"].should == expected_message
   end
@@ -243,7 +239,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :put_like => 2, :delete_like => 2,
       :search => 3,
       # methods that have special arguments
-      :put_picture => [{"path" => "x", "content_type" => "y"}, {}, "me"],
+      :put_picture => ["x.jpg", "image/jpg", {}, "me"],
       :get_objects => [["x"], {}]
     }.each_pair do |method_name, params|
       it "should pass http options through for #{method_name}" do

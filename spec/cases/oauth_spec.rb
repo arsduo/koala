@@ -11,14 +11,7 @@ describe "Koala::Facebook::OAuth" do
     @raw_token_string = @oauth_data["raw_token_string"]
     @raw_offline_access_token_string = @oauth_data["raw_offline_access_token_string"]
     
-    # per Facebook's example:
-    # http://developers.facebook.com/docs/authentication/canvas
-    # this allows us to use Facebook's example data while running the other live data
-    @request_secret = @oauth_data["request_secret"] || @secret 
-    @signed_request = @oauth_data["signed_request"]
-    @signed_request_result = @oauth_data["signed_request_result"]
     # for signed requests (http://developers.facebook.com/docs/authentication/canvas/encryption_proposal)
-    @signed_params_secret = @oauth_data["signed_params_secret"] || @secret 
     @signed_params = @oauth_data["signed_params"]
     @signed_params_result = @oauth_data["signed_params_result"]
     
@@ -355,16 +348,8 @@ describe "Koala::Facebook::OAuth" do
   end
   
   describe "for parsing signed requests" do
-    before :each do 
-      # you can test against live data by updating the YML, or you can use the default data
-      # which tests against Facebook's example on http://developers.facebook.com/docs/authentication/canvas
-      @oauth = Koala::Facebook::OAuth.new(@app_id, @request_secret || @app_secret)
-    end
-
-    # the signed request code comes directly from Facebook
+    # the signed request code is ported directly from Facebook
     # so we only need to test at a high level that it works      
-    # signed params refers to http://developers.facebook.com/docs/authentication/canvas
-    # signed request refers to http://developers.facebook.com/docs/authentication/canvas/encryption_proposal
     it "should throw an error if the algorithm is unsupported" do
       JSON.stub!(:parse).and_return("algorithm" => "my fun algorithm")
       lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
@@ -375,34 +360,10 @@ describe "Koala::Facebook::OAuth" do
       lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
     end
 
-    describe "for signed params" do
-      it "should work" do
-        @oauth.parse_signed_request(@signed_request).should == @signed_request_result
-      end      
+    it "properly parses requests" do
+      @oauth = Koala::Facebook::OAuth.new(@app_id, @secret || @app_secret)
+      @oauth.parse_signed_request(@signed_params).should == @signed_params_result
     end
-    
-    describe "for signed requests" do
-      it "should work" do
-        @oauth = Koala::Facebook::OAuth.new(@app_id, @signed_params_secret || @app_secret)
-        @oauth.parse_signed_request(@signed_params).should == @signed_params_result
-      end
-      
-      it "should throw an error if the params are too old" do
-        @time.stub!(:to_i).and_return(1287601988 + 4000)
-        @oauth = Koala::Facebook::OAuth.new(@app_id, @signed_params_secret || @app_secret)
-        
-        lambda { @oauth.parse_signed_request(@signed_params) }.should raise_error
-      end
-      
-      it "should let you specify the max age for a request" do
-        @time.stub!(:to_i).and_return(1287601988 + 4000)
-        @oauth = Koala::Facebook::OAuth.new(@app_id, @signed_params_secret || @app_secret)
-        
-        lambda { @oauth.parse_signed_request(@signed_params, 4001) }.should_not raise_error
-      end
-      
-    end
-    
   end
 
 end # describe
