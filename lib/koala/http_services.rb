@@ -94,11 +94,6 @@ module Koala
   module TyphoeusService
     # this service uses Typhoeus to send requests to the graph
 
-    # used for multipart file uploads (see below)
-    class NetHTTPInterface
-      include NetHTTPService
-    end
-
     def self.included(base)
       base.class_eval do
         require "typhoeus" unless defined?(Typhoeus)
@@ -125,7 +120,7 @@ module Koala
         end
         
         private
-        # Typhoeus file uploads are not currently supported; this will be added when we can get them working
+        
         def self.multipart_requires_content_type?
           false # Typhoeus handles multipart file types, we don't have to require it
         end
