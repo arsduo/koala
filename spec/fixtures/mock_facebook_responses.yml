@@ -83,7 +83,7 @@ graph_api:
     message=Hello, world, from the test suite delete method!: 
       post: 
         with_token: '{"id": "FEED_ITEM_DELETE"}'
-    link=http://www.contextoptional.com/&message=Hello, world, from the test suite again!&name=Context Optional:
+    link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
   /me/photos:
@@ -238,7 +238,7 @@ graph_api:
     no_args: 
       <<: *item_deleted
       get:
-        with_token: '{"link":"http://www.contextoptional.com/", "name": "Context Optional"}'
+        with_token: '{"link":"http://oauth.twoalex.com/", "name": "OAuth Playground"}'
   
   /FEED_ITEM_CATS:
     no_args:
