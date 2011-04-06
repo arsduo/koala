@@ -12,6 +12,8 @@ else
   require 'rubygems'
 end
 
+require 'yaml'
+
 # load the libraries
 require 'koala'
 
