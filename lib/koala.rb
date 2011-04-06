@@ -209,7 +209,7 @@ module Koala
       # for a more accurate reference implementation strategy.
       def parse_signed_request(input)
         encoded_sig, encoded_envelope = input.split('.', 2)
-        signature = base64_url_decode(encoded_sig).unpack("H*").to_s
+        signature = base64_url_decode(encoded_sig).unpack("H*").first
         envelope = JSON.parse(base64_url_decode(encoded_envelope))
 
         raise "SignedRequest: Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
