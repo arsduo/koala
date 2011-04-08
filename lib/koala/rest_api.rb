@@ -6,7 +6,11 @@ module Koala
       def fql_query(fql)
         rest_call('fql.query', 'query' => fql)
       end
-
+      
+      def fql_multiquery(fql)
+        rest_call('fql.multiquery', 'queries' => fql.is_a?(Hash) ? fql.to_json : fql)
+      end
+            
       def rest_call(method, args = {}, options = {})
         options = options.merge!(:rest_api => true, :read_only => READ_ONLY_METHODS.include?(method))
 
