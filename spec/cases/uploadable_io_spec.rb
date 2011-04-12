@@ -63,15 +63,12 @@ describe "Koala::UploadableIO" do
 
     describe "when given a Rails 3 ActionDispatch::Http::UploadedFile" do
       before(:each) do
-        @tempfile = stub('Tempfile', :path => true)
+        @tempfile = stub('Tempfile', :path => "foo")
         @uploaded_file = stub('ActionDispatch::Http::UploadedFile',
           :content_type => true,
           :tempfile => @tempfile
         )
 
-        @uploaded_file.stub!(:respond_to?).with(:path).and_return(true)
-        @uploaded_file.stub!(:respond_to?).with(:content_type).and_return(true)
-        @uploaded_file.stub!(:respond_to?).with(:tempfile).and_return(@tempfile)
         @tempfile.stub!(:respond_to?).with(:path).and_return(true)
       end
 

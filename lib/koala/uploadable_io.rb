@@ -42,7 +42,7 @@ module Koala
       
       # Expects a parameter of type ActionDispatch::Http::UploadedFile
       def parse_rails_3_param(uploaded_file)
-        if uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.respond_to?(:path)
+        if uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.tempfile.respond_to?(:path)
           @io_or_path = uploaded_file.tempfile.path
           @content_type = uploaded_file.content_type
         end
