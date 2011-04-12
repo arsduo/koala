@@ -62,12 +62,12 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       it "should accept permissions as a string" do
-        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything)
+        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
         result = @test_users.create(true, "read_stream,publish_stream")
       end
 
       it "should accept permissions as an array" do
-        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything)
+        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
         result = @test_users.create(true, ["read_stream", "publish_stream"])
       end
 
@@ -76,6 +76,18 @@ describe "Koala::Facebook::TestUsers" do
         @temporary_object_id = result["id"]
         result.should be_a(Hash)
         (result["id"] && result["access_token"] && result["login_url"]).should
+      end
+
+      it "lets you specify other graph arguments, like uid and access token" do
+        args = {:uid => "some test user ID", :owner_access_token => "some owner access token"}
+        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including(args), anything, anything)
+        @test_users.create(true, nil, args)
+      end
+      
+      it "lets you specify http options that get passed through to the graph call" do
+        options = {:some_http_option => true}
+        @test_users.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
+        @test_users.create(true, nil, {}, options)
       end
 
       describe "with a user to delete" do

@@ -20,11 +20,11 @@ module Koala
         @graph_api = GraphAPI.new(@app_access_token)
       end
 
-      def create(installed, permissions = nil)
+      def create(installed, permissions = nil, args = {}, options = {})
         # Creates and returns a test user
-        args = {'installed' => installed}
+        args['installed'] = installed
         args['permissions'] = (permissions.is_a?(Array) ? permissions.join(",") : permissions) if installed
-        result = @graph_api.graph_call(accounts_path, args, "post")
+        result = @graph_api.graph_call(accounts_path, args, "post", options)
       end
       
       def list
@@ -49,7 +49,7 @@ module Koala
           # we explicitly raise an error here to minimize the risk of confusing output
           # if you pass in a string (as was previously supported) no local exception would be raised
           # but the Facebook call would fail
-          raise ArgumentError, "TestUsers#befriend requires hash arguments with id and access_token"
+          raise ArgumentError, "TestUsers#befriend requires hash arguments for both users with id and access_token"
         end
         
         u1_graph_api = GraphAPI.new(user1_token)
