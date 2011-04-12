@@ -149,6 +149,17 @@ describe "NetHTTPService module holder class Horse" do
       @http_mock.should_receive(:start).and_yield(@http_yield_mock)
       Horse.make_request('anything', {}, 'anything')
     end
+    
+    it 'creates a HTTP Proxy object when options contain a proxy' do
+      Net::HTTP.should_receive(:new).with(anything, anything, 'proxy', 1234, 'user', 'pass').and_return(@http_mock)
+      Horse.make_request('anything', {}, 'anything', {:proxy => 'http://user:pass@proxy:1234'})
+    end
+
+    it 'sets both timeouts when options contains a timeout' do
+      @http_mock.should_receive(:open_timeout=).with(10)
+      @http_mock.should_receive(:read_timeout=).with(10)
+      Horse.make_request('anything', {}, 'anything', {:timeout => 10})
+    end
 
     describe "via POST" do
       it "should use Net::HTTP to make a POST request" do
