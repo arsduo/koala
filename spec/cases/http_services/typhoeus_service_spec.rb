@@ -103,6 +103,13 @@ describe "TyphoeusService" do
 
         Deer.make_request("anything", {}, "post", :typhoeus_options => t_options)
       end
+      
+      # for live tests, run the Graph API tests with Typhoues, which will run file uploads
+      it "should pass any files directly on to Typhoues" do
+        args = {:file => File.new(__FILE__, "r")}
+        Deer.should_receive(:post).with(anything, hash_including(:params => args)).and_return(Typhoeus::Response.new)
+        Deer.make_request("anything", args, :post)
+      end
 
       it "should include the path in the request" do
         path = "/a/b/c/1"
@@ -128,38 +135,10 @@ describe "TyphoeusService" do
           @response.body.should == @mock_body
         end
 
-        it "should return a Koala::Response with the Net::HTTPResponse object as headers" do
+        it "should return a Koala::Response with the Typhoeus headers as headers" do
           @response.headers.should == @mock_headers_hash
         end
       end # describe return value
-    end
-    
-    describe "with file upload" do
-      it "should include an interface to NetHTTPService called NetHTTPInterface" do
-        # we should be able to access it
-        lambda { Koala::TyphoeusService::NetHTTPInterface }.should_not raise_exception(Exception)
-        Koala::TyphoeusService::NetHTTPInterface.included_modules.include?(Koala::NetHTTPService).should be_true
-      end
-      
-      it "should call the NetHTTPInterface if multipart is required" do
-        method = "any_method"
-        args = {}
-        verb = "get"
-        options = {}
-
-        Deer.stub(:params_require_multipart?).and_return(true)
-        Koala::TyphoeusService::NetHTTPInterface.should_receive(:make_request).with(method, args, verb, options)
-
-        Deer.make_request(method, args, verb, options)
-      end
-      
-      # Typhoeus file uploads currently don't work
-      # for live tests, run the Graph API tests with Typhoues, which will run file uploads
-      # it "should pass any files directly on to Typhoues" do
-      #  args = {:file => File.new(__FILE__, "r")}
-      #  Bear.should_receive(:post).with(anything, hash_including(:params => args)).and_return(Typhoeus::Response.new)
-      #  Bear.make_request("anything", args, :post)
-      # end
     end
   end
 end
