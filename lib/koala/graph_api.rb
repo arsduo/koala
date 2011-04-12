@@ -171,8 +171,8 @@ module Koala
       # Search
             
       def search(search_terms, args = {}, options = {})
-        # Searches for a given term among posts visible to the current user (or public posts if no token)
-        result = graph_call("search", args.merge(:q => search_terms), "get", options)
+        args.merge!({:q => search_terms}) unless search_terms.nil?
+        result = graph_call("search", args, "get", options)
         result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
       end      
       

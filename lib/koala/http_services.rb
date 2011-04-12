@@ -54,7 +54,7 @@ module Koala
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
-          http = Net::HTTP.new(server(options), private_request ? 443 : nil)
+          http = create_http(server(options), private_request, options)
           http.use_ssl = true if private_request
 
           result = http.start do |http|
@@ -87,6 +87,22 @@ module Koala
             [key, value.kind_of?(Koala::UploadableIO) ? value.to_upload_io : value]
           end.flatten]
         end
+
+        def self.create_http(server, private_request, options)
+          if options[:proxy]
+            proxy = URI.parse(options[:proxy])
+            http  = Net::HTTP.new(server, private_request ? 443 : nil,
+                                  proxy.host, proxy.port, proxy.user, proxy.password)
+          else
+            http = Net::HTTP.new(server, private_request ? 443 : nil)
+          end
+          if options[:timeout]
+            http.open_timeout = options[:timeout]
+            http.read_timeout = options[:timeout]
+          end
+          http
+        end
+
       end
     end
   end
