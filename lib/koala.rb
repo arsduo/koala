@@ -179,15 +179,15 @@ module Koala
         "https://#{GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&redirect_uri=#{callback}&client_secret=#{@app_secret}&code=#{code}"
       end
 
-      def get_access_token_info(code)
+      def get_access_token_info(code, options = {})
         # convenience method to get a parsed token from Facebook for a given code
         # should this require an OAuth callback URL?
-        get_token_from_server(:code => code, :redirect_uri => @oauth_callback_url)
+        get_token_from_server({:code => code, :redirect_uri => @oauth_callback_url}, false, options)
       end
 
-      def get_access_token(code)
+      def get_access_token(code, options = {})
         # upstream methods will throw errors if needed
-        if info = get_access_token_info(code)
+        if info = get_access_token_info(code, options)
           string = info["access_token"]
         end
       end
@@ -256,9 +256,9 @@ module Koala
 
       protected
 
-      def get_token_from_server(args, post = false)
+      def get_token_from_server(args, post = false, options = {})
         # fetch the result from Facebook's servers
-        result = fetch_token_string(args, post)
+        result = fetch_token_string(args, post, "access_token", options)
 
         # if we have an error, parse the error JSON and raise an error
         raise APIError.new((JSON.parse(result)["error"] rescue nil) || {}) if result =~ /error/
@@ -275,11 +275,11 @@ module Koala
         components
       end
 
-      def fetch_token_string(args, post = false, endpoint = "access_token")
+      def fetch_token_string(args, post = false, endpoint = "access_token", options = {})
         Koala.make_request("/oauth/#{endpoint}", {
           :client_id => @app_id,
           :client_secret => @app_secret
-        }.merge!(args), post ? "post" : "get", :use_ssl => true).body
+        }.merge!(args), post ? "post" : "get", {:use_ssl => true}.merge!(options)).body
       end
 
       # base 64
