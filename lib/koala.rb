@@ -22,25 +22,9 @@ module Koala
 
   module Facebook
     # Ruby client library for the Facebook Platform.
-    # Copyright 2010 Facebook
-    # Adapted from the Python library by Alex Koppel, Rafi Jacoby, and the team at Context Optional
-    #
-    # Licensed under the Apache License, Version 2.0 (the "License"); you may
-    # not use this file except in compliance with the License. You may obtain
-    # a copy of the License at
-    #     http://www.apache.org/licenses/LICENSE-2.0
-    #
-    # Unless required by applicable law or agreed to in writing, software
-    # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-    # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-    # License for the specific language governing permissions and limitations
-    # under the License.
-    #
-    # This client library is designed to support the Graph API and the official
-    # Facebook JavaScript SDK, which is the canonical way to implement
-    # Facebook authentication. Read more about the Graph API at
-    # http://developers.facebook.com/docs/api. You can download the Facebook
-    # JavaScript SDK at http://github.com/facebook/connect-js/.
+    # Copyright 2010-2011 Alex Koppel
+    # Contributors: Alex Koppel, Chris Baclig, Rafi Jacoby, and the team at Context Optional
+    # http://github.com/arsduo/koala
 
     class API
       # initialize with an access token

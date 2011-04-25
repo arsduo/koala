@@ -5,32 +5,29 @@ v1.1
 v1.0
 New methods:
 -- Photo and file upload now supported through #put_picture
-  -- RC: now supported natively through Typhoeus
-  -- Beta 2: support for Rails 3, Sinatra, File objects, and paths (see documentation)
-  -- Beta 2: Added UploadableIO class to manage file uploads
+  -- Added UploadableIO class to manage file uploads
 -- Added a delete_like method (thanks to wassem)
--- Beta 2: Added put_connection and delete_connection convenience methods
+-- Added put_connection and delete_connection convenience methods
 Updated methods:
--- RC: url_for_oauth_code can now take a :display option (thanks, netbe!)
--- RC: Net::HTTP can now accept :timeout and :proxy options (thanks, gilles!)
--- RC: search can now search places, checkins, etc. (thanks, rickyc!)
--- RC: test users now supports using test accounts across multiple apps
--- Beta 2: TestUser#befriend now requires user info hashes (id and access token) due to Facebook API changes (thanks to pulsd/kbighorse)
--- Beta 2: all methods now accept an http_options hash as their optional last parameter
--- Beta 2: You can now pass :beta => true in the http options to use Facebook's beta tier.
+-- search can now search places, checkins, etc. (thanks, rickyc!)
+-- You can now pass :beta => true in the http options to use Facebook's beta tier.
+-- TestUser#befriend now requires user info hashes (id and access token) due to Facebook API changes (thanks to pulsd/kbighorse)
+-- All methods now accept an http_options hash as their optional last parameter
+-- url_for_oauth_code can now take a :display option (thanks, netbe!)
+-- Net::HTTP can now accept :timeout and :proxy options (thanks, gilles!)
+-- Test users now supports using test accounts across multiple apps
 Internal improvements: 
 -- For public requests, Koala now uses http by default (instead of https) to improve speed
   -- This can be overridden through Koala.always_use_ssl= or by passing :use_ssl => true in the options hash for an api call
 -- Read-only REST API requests now go through the faster api-read server
 -- Replaced parse_signed_request with a version from Facebook that also supports the new signed params proposal
   -- Note: invalid requests will now raise exceptions rather than return nil, in keeping with other SDKs
--- delete_object will now raise an error if there's no access token (like put_object and delete_like)
--- Beta 2.1: Updated parse_signed_request to match Facebook's current implementation (thanks, imajes!)
--- Beta 2: photo and file uploads now accept symbols as well as strings overall
--- Beta 2: APIError is now < StandardError, not Exception
--- Beta 2: Added KoalaError for non-API errors
+-- Delete methods will now raise an error if there's no access token (like put_object and delete_like)
+-- Updated parse_signed_request to match Facebook's current implementation (thanks, imajes!)
+-- APIError is now < StandardError, not Exception
+-- Added KoalaError for non-API errors
 Test improvements:
--- RC: Incorporated joshk's awesome rewrite of the entire Koala test suite (thanks, joshk!)
+-- Incorporated joshk's awesome rewrite of the entire Koala test suite (thanks, joshk!)
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
 -- Live tests now verify that the access token has the necessary permissions before starting
 -- Replaced the 50-person network test, which often took 15+ minutes to run live, with a 5-person test
