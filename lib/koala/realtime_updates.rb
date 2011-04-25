@@ -46,6 +46,8 @@ module Koala
           oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
           @app_access_token = oauth.get_app_access_token
         end
+        
+        @graph_api = GraphAPI.new(@app_access_token)
       end
       
       # subscribes for realtime updates
@@ -59,7 +61,7 @@ module Koala
           :verify_token => verify_token
         }
         # a subscription is a success if Facebook returns a 200 (after hitting your server for verification)
-        api(subscription_path, args, 'post', :http_component => :status) == 200
+        @graph_api.graph_call(subscription_path, args, 'post', :http_component => :status) == 200
       end
           
       # removes subscription for object
@@ -67,23 +69,12 @@ module Koala
       def unsubscribe(object = nil)
         args = {}
         args[:object] = object if object
-        api(subscription_path, args, 'delete', :http_component => :status) == 200
+        @graph_api.graph_call(subscription_path, args, 'delete', :http_component => :status) == 200
       end
   
       def list_subscriptions
-        api(subscription_path)["data"]
+        @graph_api.graph_call(subscription_path)["data"]
       end
-      
-      def api(*args) # same as GraphAPI
-        response = super(*args) do |response|
-          # check for subscription errors
-          if response.is_a?(Hash) && error_details = response["error"]
-            raise APIError.new(error_details)
-          end
-        end
-      
-        response
-      end    
       
       protected
       
