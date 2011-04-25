@@ -14,6 +14,7 @@ Updated methods:
 -- RC: url_for_oauth_code can now take a :display option (thanks, netbe!)
 -- RC: Net::HTTP can now accept :timeout and :proxy options (thanks, gilles!)
 -- RC: search can now search places, checkins, etc. (thanks, rickyc!)
+-- RC: test users now supports using test accounts across multiple apps
 -- Beta 2: TestUser#befriend now requires user info hashes (id and access token) due to Facebook API changes (thanks to pulsd/kbighorse)
 -- Beta 2: all methods now accept an http_options hash as their optional last parameter
 -- Beta 2: You can now pass :beta => true in the http options to use Facebook's beta tier.
