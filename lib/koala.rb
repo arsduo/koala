@@ -9,6 +9,7 @@ require 'base64'
 
 # include koala modules
 require 'koala/http_services'
+require 'koala/oauth'
 require 'koala/graph_api'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
