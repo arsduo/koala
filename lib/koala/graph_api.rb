@@ -71,8 +71,9 @@ module Koala
           
       def get_connections(id, connection_name, args = {}, options = {})
         # Fetchs the connections for given object.
-        result = graph_call("#{id}/#{connection_name}", args, "get", options)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        graph_call("#{id}/#{connection_name}", args, "get", options) do |result|
+          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        end
       end
 
       def put_connections(id, connection_name, args = {}, options = {})
@@ -93,8 +94,9 @@ module Koala
     
       def get_picture(object, args = {}, options = {})
         # Gets a picture object, returning the URL (which Facebook sends as a header)
-        result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers))
-        result["Location"]
+        result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
+          result["Location"]
+        end
       end    
       
       def put_picture(*picture_args)
@@ -172,23 +174,26 @@ module Koala
             
       def search(search_terms, args = {}, options = {})
         args.merge!({:q => search_terms}) unless search_terms.nil?
-        result = graph_call("search", args, "get", options)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        graph_call("search", args, "get", options) do |result|
+          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        end
       end      
       
       # API access
     
-      def graph_call(*args)
+      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
         # Direct access to the Facebook API
         # see any of the above methods for example invocations
-        response = api(*args) do |response|
+        
+        # set up error checking for Graph API issues
+        options[:error_checking_block] = lambda { |response|
           # check for Graph API-specific errors
           if response.is_a?(Hash) && error_details = response["error"]
             raise APIError.new(error_details)
           end
-        end
-      
-        response
+        }
+        
+        api(path, args, verb, options, &post_processing) 
       end 
       
       # GraphCollection support
@@ -196,23 +201,24 @@ module Koala
       def get_page(params)
         # Pages through a set of results stored in a GraphCollection
         # Used for connections and search results
-        result = graph_call(*params)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        result = graph_call(*params) do |result|
+          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        end
       end
       
     end
     
     
     class GraphCollection < Array
-      #This class is a light wrapper for collections returned
-      #from the Graph API.
+      # This class is a light wrapper for collections returned
+      # from the Graph API.
       #
-      #It extends Array to allow direct access to the data colleciton
-      #which should allow it to drop in seamlessly.
+      # It extends Array to allow direct access to the data colleciton
+      # which should allow it to drop in seamlessly.
       #
-      #It also allows access to paging information and the
-      #ability to get the next/previous page in the collection
-      #by calling next_page or previous_page.
+      # It also allows access to paging information and the
+      # ability to get the next/previous page in the collection
+      # by calling next_page or previous_page.
       attr_reader :paging
       attr_reader :api
       

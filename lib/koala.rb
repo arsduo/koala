@@ -49,7 +49,7 @@ module Koala
       end
       attr_reader :access_token
 
-      def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
+      def api(path, args = {}, verb = "get", options = {}, &post_processing)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
         
@@ -64,20 +64,18 @@ module Koala
         # in the case of a server error
         raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status >= 500
 
-        # Parse the body as JSON and check for errors if provided a mechanism to do so
+        # parse the body as JSON and run it through the error checker (if provided)
         # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
         # and cause JSON.parse to fail -- so we account for that by wrapping the result in []
-        body = response = JSON.parse("[#{result.body.to_s}]")[0]
-        if error_checking_block
-          yield(body)
+        body = JSON.parse("[#{result.body.to_s}]")[0]
+        if error_checking_block = options[:error_checking_block]
+          error_checking_block.call(body)
         end
-
-        # now return the desired information
-        if options[:http_component]
-          result.send(options[:http_component])
-        else
-          body
-        end
+        
+        # if we want a compontent other than the body (e.g. redirect header for images), return that
+        output = options[:http_component] ? result.send(options[:http_component]) : body
+        
+        post_processing ? post_processing.call(output) : output
       end
     end
 

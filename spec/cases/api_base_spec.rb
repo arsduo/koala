@@ -57,17 +57,17 @@ describe "Koala::Facebook::API" do
     @service.api('anything').should == json_body
   end
 
-  it "should execute a block with the response body if passed one" do
+  it "should execute an error checking block passed as options[:error_checking_block] if provided" do
     body = '{}'
     Koala.stub(:make_request).and_return(Koala::Response.new(200, body, {}))
 
     yield_test = mock('Yield Tester')
     yield_test.should_receive(:pass)
 
-    @service.api('anything') do |arg|
+    @service.api('anything', {}, "get", :error_checking_block => lambda { |arg|
       yield_test.pass
       arg.should == JSON.parse(body)
-    end
+    })
   end
 
   it "should raise an API error if the HTTP response code is greater than or equal to 500" do

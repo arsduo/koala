@@ -1,3 +1,7 @@
+v1.1
+-- api, graph_call, and rest_call now take post-processing blocks (error checking is passed in options hash)
+-- RealtimeUpdates now uses a GraphAPI object instead of its own API
+
 v1.0
 New methods:
 -- Photo and file upload now supported through #put_picture
