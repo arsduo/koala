@@ -63,6 +63,8 @@ module Koala
       end
     end
 
+    # APIs
+
     class GraphAPI < API
       include GraphAPIMethods
     end
@@ -86,6 +88,17 @@ module Koala
       attr_reader :graph_api
     end
 
+    # Batch processing
+    
+    class BatchOperation
+      def initialize(&action)
+        raise KoalaError, "BatchOperation requires a proc containing the code to be executed in the batch!" unless action
+        @action = action
+      end
+    end
+
+    # Errors
+
     class APIError < StandardError
       attr_accessor :fb_error_type
       def initialize(details = {})
@@ -93,7 +106,6 @@ module Koala
         super("#{fb_error_type}: #{details["message"]}")
       end
     end
-
 
   end
 
