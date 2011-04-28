@@ -9,7 +9,6 @@ require 'base64'
 
 # include koala modules
 require 'koala/http_services'
-require 'koala/oauth'
 require 'koala/graph_api'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
@@ -177,13 +176,13 @@ module Koala
         end
       end
 
-      def get_app_access_token_info
+      def get_app_access_token_info(options = {})
         # convenience method to get a the application's sessionless access token
-        get_token_from_server({:type => 'client_cred'}, true)
+        get_token_from_server({:type => 'client_cred'}, true, options)
       end
 
-      def get_app_access_token
-        if info = get_app_access_token_info
+      def get_app_access_token(options = {})
+        if info = get_app_access_token_info(options)
           string = info["access_token"]
         end
       end
@@ -208,12 +207,12 @@ module Koala
       end
 
       # from session keys
-      def get_token_info_from_session_keys(sessions)
+      def get_token_info_from_session_keys(sessions, options = {})
         # fetch the OAuth tokens from Facebook
         response = fetch_token_string({
           :type => 'client_cred',
           :sessions => sessions.join(",")
-        }, true, "exchange_sessions")
+        }, true, "exchange_sessions", options)
 
         # Facebook returns an empty body in certain error conditions
         if response == ""
@@ -226,17 +225,17 @@ module Koala
         JSON.parse(response)
       end
 
-      def get_tokens_from_session_keys(sessions)
+      def get_tokens_from_session_keys(sessions, options = {})
         # get the original hash results
-        results = get_token_info_from_session_keys(sessions)
+        results = get_token_info_from_session_keys(sessions, options)
         # now recollect them as just the access tokens
         results.collect { |r| r ? r["access_token"] : nil }
       end
 
-      def get_token_from_session_key(session)
+      def get_token_from_session_key(session, options = {})
         # convenience method for a single key
         # gets the overlaoded strings automatically
-        get_tokens_from_session_keys([session])[0]
+        get_tokens_from_session_keys([session], options)[0]
       end
 
       protected
