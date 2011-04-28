@@ -57,11 +57,11 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   it "should be able to access a user's picture" do
-    @api.get_picture("chris.baclig").should =~ /http\:\/\//
+    @api.get_picture("chris.baclig").should =~ /http[s]*\:\/\//
   end
 
   it "should be able to access a user's picture, given a picture type"  do
-    @api.get_picture("chris.baclig", {:type => 'large'}).should =~ /^http\:\/\//
+    @api.get_picture("lukeshepard", {:type => 'large'}).should =~ /^http[s]*\:\/\//
   end
 
   it "should be able to access connections from public Pages" do
