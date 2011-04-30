@@ -2,7 +2,7 @@ v1.0
 New methods:
 -- Photo and file upload now supported through #put_picture
   -- Added UploadableIO class to manage file uploads
--- Added a delete_like method (thanks to wassem)
+-- Added a delete_like method (thanks to waseem)
 -- Added put_connection and delete_connection convenience methods
 Updated methods:
 -- Search can now search places, checkins, etc. (thanks, rickyc!)
