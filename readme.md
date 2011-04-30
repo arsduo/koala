@@ -7,12 +7,16 @@ Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.co
 * Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We have no dependencies beyond the JSON gem.  Koala also has a built-in mechanism for using whichever HTTP library you prefer to make requests against the graph.)
 * Tested: Koala should have complete test coverage, so you can rely on it.  (Our complete test coverage can be run against either mocked responses or the live Facebook servers.)
 
-1.0 beta
+1.0 
 ---
-Version 1.0 is currently in beta, chock-full of great new features.  To download the beta, just add --pre when installing the gem:
+Version 1.0 is due out on May 1st, 2011 with a ton of great features.  
     
-    sudo gem install koala --pre
+    sudo gem install koala
 
+Until then, you can install the release candidate like so:
+  
+    sudo gem install koala --pre
+  
 Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
@@ -126,11 +130,14 @@ Testing
 -----
 
 Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box:
-    # From the spec directory
-    spec koala_spec.rb
+    
+    # From anywhere in the project directory:
+    rake spec
+    
 
 You can also run live tests against Facebook's servers:
-    # Again from the spec directory
-    spec koala_spec_without_mocks.rb
+    
+    # Again from anywhere in the project directory:
+    LIVE=true rake spec
 
-Important Note: to run the live tests, you have to provide some of your own data: a valid OAuth access token with publish\_stream, read\_stream, and user\_photos permissions and an OAuth code that can be used to generate an access token.  You can get these data at the OAuth Playground; if you want to use your own app, remember to swap out the app ID, secret, and other values.  (The file also provides valid values for other tests, which you're welcome to swap out for data specific to your own application.)
+Important Note: to run the live tests, you have to provide some of your own data in spec/fixtures/facebook_data.yml: a valid OAuth access token with publish\_stream, read\_stream, and user\_photos permissions and an OAuth code that can be used to generate an access token.  You can get thisdata at the OAuth Playground; if you want to use your own app, remember to swap out the app ID, secret, and other values.  (The file also provides valid values for other tests, which you're welcome to swap out for data specific to your own application.)
