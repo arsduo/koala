@@ -40,6 +40,7 @@ module Koala
         # Fetchs all of the given object from the graph.
         # We return a map from ID to object. If any of the IDs are invalid,
         # we raise an exception.
+        return [] if ids.empty?
         graph_call("", args.merge("ids" => ids.join(",")), "get", options)
       end
       
