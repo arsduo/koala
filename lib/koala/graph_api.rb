@@ -222,8 +222,9 @@ module Koala
       def get_page(params)
         # Pages through a set of results stored in a GraphCollection
         # Used for connections and search results
-        result = graph_call(*params)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        graph_call(*params) do |result|
+          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        end
       end
       
     end

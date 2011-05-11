@@ -355,7 +355,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
         it "should return the previous page of results" do
           @result.should_receive(:previous_page_params).and_return([@base, @args])
-          @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
+          @api.should_receive(:graph_call).with(@base, @args).and_yield(@second_page)
           Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
 
           @result.previous_page.should == @page_of_results
@@ -363,7 +363,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
         it "should return the next page of results" do
           @result.should_receive(:next_page_params).and_return([@base, @args])
-          @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
+          @api.should_receive(:graph_call).with(@base, @args).and_yield(@second_page)
           Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
 
           @result.next_page.should == @page_of_results
