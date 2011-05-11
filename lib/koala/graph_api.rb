@@ -181,6 +181,7 @@ module Koala
       
       # API access
 
+      # Make a call which may or may not be batched
       def graph_call(*args, &process)
         if @batch_mode
           args[3][:process] = process
@@ -191,6 +192,7 @@ module Koala
         end
       end
 
+      # Wrap a block of calls in a batch, execute when finished and return results as an array
       def batch(&block)
         @batch_mode = true
         @batch_calls = []
