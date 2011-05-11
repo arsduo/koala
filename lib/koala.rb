@@ -81,8 +81,8 @@ module Koala
         # Raise an error if we get a 500
         raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status != 200
 
+        # Map the results with post-processing included
         idx = 0 # keep compat with ruby 1.8 - no with_index for map
-        puts result.body
         JSON.parse(result.body.to_s).map do |result|
           # Get the options hash
           options = batch_calls[idx][3]
