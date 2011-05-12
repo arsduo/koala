@@ -51,9 +51,14 @@ shared_examples_for "Koala GraphAPI" do
     (result["id"] && result["name"]).should
   end
 
+  it "should return [] from get_objects if passed an empty array" do
+    results = @api.get_objects([])
+    results.should == []
+  end
+  
   it "should be able to get multiple objects" do
     results = @api.get_objects(["contextoptional", "naitik"])
-    results.length.should == 2
+    results.should have(2).items
   end
 
   it "should be able to access a user's picture" do
