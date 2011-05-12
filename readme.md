@@ -47,15 +47,6 @@ When retrieving data that returns an array of results (for example, when calling
     # You can use those params to easily get the next (or prevous) page
     page = graph.get_page(feed.next_page_params)
 
-You can make multiple calls at once using Facebook's batch API:
-
-    # Returns an array of results as if they were called non-batch
-    graph.batch do
-      graph.get_connections('me', 'friends')
-      graph.get_object('me')
-      graph.get_picture('me')
-    end
-
 Check out the wiki for more examples.
 
 The old-school REST API

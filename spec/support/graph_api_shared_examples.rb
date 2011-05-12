@@ -103,31 +103,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result["updated_time"].should
   end
 
-  it 'should be able to get data about a user and me at the same time' do
-    me, koppel = @api.batch do
-      @api.get_object('me')
-      @api.get_object('koppel')
-    end
-    me['id'].should_not be_nil
-    koppel['id'].should_not be_nil
-  end
-
-  it 'should be able to make a get_picture call inside of a batch' do
-    pictures = @api.batch do
-      @api.get_picture('me')
-    end
-    pictures.first.should_not be_empty
-  end
-
-  it 'should be able to make mixed calls inside of a batch' do
-    me, friends = @api.batch do
-      @api.get_object('me')
-      @api.get_connections('me', 'friends')
-    end
-    me['id'].should_not be_nil
-    friends.should be_a(Array)
-  end
-
   it "should be able to get multiple objects" do
     result = @api.get_objects(["contextoptional", "naitik"])
     result.length.should == 2
@@ -360,7 +335,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
         it "should return the previous page of results" do
           @result.should_receive(:previous_page_params).and_return([@base, @args])
-          @api.should_receive(:graph_call).with(@base, @args).and_yield(@second_page)
+          @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
           Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
 
           @result.previous_page.should == @page_of_results
@@ -368,7 +343,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
         it "should return the next page of results" do
           @result.should_receive(:next_page_params).and_return([@base, @args])
-          @api.should_receive(:graph_call).with(@base, @args).and_yield(@second_page)
+          @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
           Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
 
           @result.next_page.should == @page_of_results
