@@ -182,48 +182,31 @@ module Koala
       
       # API access
 
-=begin
       # Make a call which may or may not be batched
-      def graph_call(*args, &process)
-        if @batch_mode
-          args[3][:process] = process
-          @batch_calls << args
-        else
-          result = non_batch_graph_call(*args)
-          process ? process.call(result) : result
-        end
-      end
-=end
-      # Wrap a block of calls in a batch, execute when finished and return results as an array
-      def batch(&block)
-        @batch_mode = true
-        @batch_calls = []
-        yield
-        begin
-          results = batch_api(@batch_calls)
-        ensure
-          @batch_mode = false
-        end
-        results
-      end
-
-      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
+      def graph_call(*args, &post_processing)
         # Direct access to the Facebook API
         # see any of the above methods for example invocations
         
-        # set up error checking for Graph API issues
-        options[:error_checking_block] = lambda { |response|
-          # check for Graph API-specific errors
-          if response.is_a?(Hash) && error_details = response["error"]
-            raise APIError.new(error_details)
+        unless GraphAPI.batch_mode?
+          result = api(*args) do |response|
+            # check for Graph API-specific errors
+            if response.is_a?(Hash) && error_details = response["error"]
+              raise APIError.new(error_details) 
+            end
           end
-        }
-        
-        api(path, args, verb, options, &post_processing) 
-      end 
-      
+          
+          # now process as appropriate (get picture header, make GraphCollection, etc.)
+          post_processing ? post_processing.call(result) : result
+        else
+          # for batch APIs, we queue up the call details (incl. post-processing)
+          args[3][:post_processing] = post_processing
+          args[1][:access_token] = @access_token
+          GraphAPI.batch_calls << args
+        end
+      end
+
+
       # GraphCollection support
-      
       def get_page(params)
         # Pages through a set of results stored in a GraphCollection
         # Used for connections and search results

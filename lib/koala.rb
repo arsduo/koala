@@ -33,7 +33,12 @@ module Koala
       end
       attr_reader :access_token
 
-      def api(path, args = {}, verb = "get", options = {}, &post_processing)
+      # only the Graph API can use batch mode
+      def self.batch_mode?
+        false
+      end
+
+      def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
         
@@ -52,14 +57,10 @@ module Koala
         # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
         # and cause JSON.parse to fail -- so we account for that by wrapping the result in []
         body = JSON.parse("[#{result.body.to_s}]")[0]
-        if error_checking_block = options[:error_checking_block]
-          error_checking_block.call(body)
-        end
-        
-        # if we want a compontent other than the body (e.g. redirect header for images), return that
-        output = options[:http_component] ? result.send(options[:http_component]) : body
-        
-        post_processing ? post_processing.call(output) : output
+        yield body if error_checking_block
+
+        # if we want a component other than the body (e.g. redirect header for images), return that
+        options[:http_component] ? result.send(options[:http_component]) : body
       end
 
       def batch_api(batch_calls)
@@ -102,11 +103,32 @@ module Koala
     end
 
     # APIs
-
+    
     class GraphAPI < API
       include GraphAPIMethods
-    end
 
+      # batch mode flags
+      def self.batch_mode?
+        !!@batch_mode
+      end
+
+      def self.batch_calls
+        raise KoalaError, "GraphAPI.batch_calls accessed when not in batch block!" unless batch_mode?
+        @batch_calls ||= []
+      end
+
+      def self.batch(&block)
+        @batch_mode = true
+        yield
+        begin
+          results = batch_api(@batch_calls)
+        ensure
+          @batch_mode = false
+        end
+        results
+      end
+    end
+    
     class RestAPI < API
       include RestAPIMethods
     end

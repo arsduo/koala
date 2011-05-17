@@ -103,7 +103,9 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result["updated_time"].should
   end
 
-  it 'should be able to get data about a user and me at the same time' do
+  it "supports batch api"
+=begin
+  it 'should be able to get data about a user and me at the same time'
     me, koppel = @api.batch do
       @api.get_object('me')
       @api.get_object('koppel')
@@ -127,6 +129,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     me['id'].should_not be_nil
     friends.should be_a(Array)
   end
+=end
 
   it "should be able to get multiple objects" do
     result = @api.get_objects(["contextoptional", "naitik"])
