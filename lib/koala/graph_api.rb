@@ -199,7 +199,7 @@ module Koala
         else
           # for batch APIs, we queue up the call details (incl. post-processing)
           args[3][:post_processing] = post_processing
-          args[1][:access_token] = @access_token
+          args[1][:access_token] = @access_token if @access_token
           GraphAPI.batch_calls << args
         end
       end
