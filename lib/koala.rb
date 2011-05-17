@@ -8,11 +8,12 @@ require 'openssl'
 require 'base64'
 
 # include koala modules
-require 'koala/http_services'
+require 'koala/oauth'
 require 'koala/graph_api'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
 require 'koala/test_users'
+require 'koala/http_services'
 
 # add KoalaIO class
 require 'koala/uploadable_io'
@@ -62,7 +63,6 @@ module Koala
       end
 
       def batch_api(batch_calls)
-
         # Get the access token for the user and start building a hash to store params
         args = {}
         args['access_token'] = @access_token || @app_access_token if @access_token || @app_access_token
@@ -97,7 +97,6 @@ module Koala
           process_block = options[:process]
           process_block ? process_block.call(data) : data
         end
-
       end
 
     end
