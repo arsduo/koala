@@ -72,7 +72,17 @@ graph_api:
     batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"me/friends", "body"=>"access_token=*"}].to_json %>:
       post:
         no_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
-    
+    batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"koppel", "body"=>""}].to_json %>:
+      post:
+        no_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me/picture", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"koppel/picture", "body"=>""}].to_json %>:
+      post:
+        no_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"lukeshepard/likes", "body"=>""}].to_json %>:
+      post:
+        no_token: '[{"body":"{\"id\":\"123\"}"}, {"body": "{\"error\":{\"type\":\"OAuthAccessTokenException\", \"message\":\"An access token is required to request this resource.\"}}"}]'
+
+
   /me:
     no_args:
       get:

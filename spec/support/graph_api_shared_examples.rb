@@ -102,31 +102,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result["updated_time"].should
   end
 
-  it 'should be able to get data about a user and me at the same time' do
-    me, koppel = Koala::Facebook::GraphAPI.batch do
-      @api.get_object('me')
-      @api.get_object('koppel')
-    end
-    me['id'].should_not be_nil
-    koppel['id'].should_not be_nil
-  end
-
-  it 'should be able to make a get_picture call inside of a batch' do
-    pictures = Koala::Facebook::GraphAPI.batch do
-      @api.get_picture('me')
-    end
-    pictures.first.should_not be_empty
-  end
-
-  it 'should be able to make mixed calls inside of a batch' do
-    me, friends = Koala::Facebook::GraphAPI.batch do
-      @api.get_object('me')
-      @api.get_connections('me', 'friends')
-    end
-    me['id'].should_not be_nil
-    friends.should be_a(Array)
-  end
-
   it "should be able to get multiple objects" do
     result = @api.get_objects(["contextoptional", "naitik"])
     result.length.should == 2
