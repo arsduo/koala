@@ -61,15 +61,17 @@ graph_api:
       get:
         with_token: '[{}, {}]'
         no_token: '[{}, {}]'
-    batch=[{"method":"get","relative_url":"me","body":""},{"method":"get","relative_url":"koppel","body":""}]:
+    # Batch requests are considered 'no token', since the tokens (if any) are supplied w/ each request
+    # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here 
+    batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"koppel", "body"=>"access_token=*"}].to_json %>:
       post:
-        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
-    batch=[{"method":"get","relative_url":"me/picture","body":""}]:
+        no_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me/picture", "body"=>"access_token=*"}].to_json %>:
       post:
-        with_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
-    batch=[{"method":"get","relative_url":"me","body":""},{"method":"get","relative_url":"me/friends","body":""}]:
+        no_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"me/friends", "body"=>"access_token=*"}].to_json %>:
       post:
-        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+        no_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
     
   /me:
     no_args:
