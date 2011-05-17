@@ -157,7 +157,6 @@ describe "Koala::Facebook::OAuth" do
     end
   
     describe "for access token URLs" do
-
       # url_for_access_token
       it "should generate a properly formatted OAuth token URL when provided a code" do 
         url = @oauth.url_for_access_token(@code)
@@ -204,6 +203,12 @@ describe "Koala::Facebook::OAuth" do
       it "should raise an error when get_access_token is called with a bad code" do
         lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError) 
       end
+
+      it "should pass on any options provided to make_request" do
+        options = {:a => 2}
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "", {}))
+        @oauth.get_access_token(@code, options)
+      end
     end
 
     describe "get_app_access_token_info" do
@@ -211,10 +216,16 @@ describe "Koala::Facebook::OAuth" do
         result = @oauth.get_app_access_token_info
         result.should be_a(Hash)
       end
-  
+        
       it "should include the access token" do
         result = @oauth.get_app_access_token_info
         result["access_token"].should
+      end
+      
+      it "should pass on any options provided to make_request" do
+        options = {:a => 2}
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "", {}))
+        @oauth.get_app_access_token_info(options)
       end
     end
   
@@ -228,6 +239,12 @@ describe "Koala::Facebook::OAuth" do
         result = @oauth.get_app_access_token
         original = @oauth.get_app_access_token_info
         result.should == original["access_token"]
+      end
+      
+      it "should pass on any options provided to make_request" do
+        options = {:a => 2}
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "", {}))
+        @oauth.get_app_access_token(options)
       end
     end
     
@@ -299,12 +316,18 @@ describe "Koala::Facebook::OAuth" do
         @oauth.should_receive(:fetch_token_string).and_return("")
         lambda { @oauth.get_token_info_from_session_keys(@oauth_data["multiple_session_keys"]) }.should raise_error(Koala::Facebook::APIError)
       end
+      
+      it "should pass on any options provided to make_request" do
+        options = {:a => 2}
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+        @oauth.get_token_info_from_session_keys([], options)
+      end
     end
     
     describe "with get_tokens_from_session_keys" do
       it "should call get_token_info_from_session_keys" do
         args = @oauth_data["multiple_session_keys"]
-        @oauth.should_receive(:get_token_info_from_session_keys).with(args).and_return([])
+        @oauth.should_receive(:get_token_info_from_session_keys).with(args, anything).and_return([])
         @oauth.get_tokens_from_session_keys(args)
       end
       
@@ -325,12 +348,18 @@ describe "Koala::Facebook::OAuth" do
         # it should return nil for each of the invalid ones
         result.each_with_index {|r, index| index > 0 ? r.should(be_a(String)) : r.should(be_nil)}
       end
+      
+      it "should pass on any options provided to make_request" do
+        options = {:a => 2}
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+        @oauth.get_tokens_from_session_keys([], options)
+      end
     end
 
     describe "get_token_from_session_key" do
       it "should call get_tokens_from_session_keys when the get_token_from_session_key is called" do
         key = @oauth_data["session_key"]
-        @oauth.should_receive(:get_tokens_from_session_keys).with([key]).and_return([])
+        @oauth.should_receive(:get_tokens_from_session_keys).with([key], anything).and_return([])
         @oauth.get_token_from_session_key(key)
       end
 
@@ -348,6 +377,12 @@ describe "Koala::Facebook::OAuth" do
       it "should properly handle an invalid session key" do
         result = @oauth.get_token_from_session_key("foo")
         result.should be_nil
+      end
+      
+      it "should pass on any options provided to make_request" do
+        options = {:a => 2}
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+        @oauth.get_token_from_session_key("", options)
       end
     end    
   end

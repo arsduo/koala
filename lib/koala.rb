@@ -9,7 +9,6 @@ require 'base64'
 
 # include koala modules
 require 'koala/http_services'
-require 'koala/oauth'
 require 'koala/graph_api'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
@@ -61,6 +60,46 @@ module Koala
         
         post_processing ? post_processing.call(output) : output
       end
+
+      def batch_api(batch_calls)
+
+        # Get the access token for the user and start building a hash to store params
+        args = {}
+        args['access_token'] = @access_token || @app_access_token if @access_token || @app_access_token
+
+        # Turn the call args collected into what facebook expects
+        calls = batch_calls.map do |call|
+          { 'method' => call[2], 'relative_url' => call[0], 'body' => call[1].map { |k, v| "#{k}=#{v}" }.join('&') }
+        end
+        args['batch'] = calls.to_json
+
+        # Make the POST request for the batch call
+        result = Koala.make_request('/', args, 'post')
+
+        # Raise an error if we get a 500
+        raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status != 200
+
+        # Map the results with post-processing included
+        idx = 0 # keep compat with ruby 1.8 - no with_index for map
+        JSON.parse(result.body.to_s).map do |result|
+          # Get the options hash
+          options = batch_calls[idx][3]
+          idx += 1
+          # Get the HTTP component they want
+          if options[:http_component] == :headers
+            data = {}
+            result['headers'].each { |h| data[h['name']] = h['value'] }
+          else
+            body = result['body']
+            data = body ? JSON::parse(body) : {}
+          end
+          # Process it if we are given a block to process with
+          process_block = options[:process]
+          process_block ? process_block.call(data) : data
+        end
+
+      end
+
     end
 
     # APIs
@@ -106,7 +145,6 @@ module Koala
         super("#{fb_error_type}: #{details["message"]}")
       end
     end
-
   end
 
   class KoalaError< StandardError; end

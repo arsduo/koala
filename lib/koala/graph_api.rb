@@ -28,7 +28,7 @@ module Koala
       # If you are using the JavaScript SDK, you can use the
       # Koala::Facebook::OAuth.get_user_from_cookie() method below to get the OAuth access token
       # for the active user from the cookie saved by the SDK.
-         
+
       # Objects
 
       def get_object(id, args = {}, options = {})
@@ -40,6 +40,7 @@ module Koala
         # Fetchs all of the given object from the graph.
         # We return a map from ID to object. If any of the IDs are invalid,
         # we raise an exception.
+        return [] if ids.empty?
         graph_call("", args.merge("ids" => ids.join(",")), "get", options)
       end
       
@@ -94,7 +95,7 @@ module Koala
     
       def get_picture(object, args = {}, options = {})
         # Gets a picture object, returning the URL (which Facebook sends as a header)
-        result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
+        graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
           result["Location"]
         end
       end    
@@ -180,7 +181,32 @@ module Koala
       end      
       
       # API access
-    
+
+=begin
+      # Make a call which may or may not be batched
+      def graph_call(*args, &process)
+        if @batch_mode
+          args[3][:process] = process
+          @batch_calls << args
+        else
+          result = non_batch_graph_call(*args)
+          process ? process.call(result) : result
+        end
+      end
+=end
+      # Wrap a block of calls in a batch, execute when finished and return results as an array
+      def batch(&block)
+        @batch_mode = true
+        @batch_calls = []
+        yield
+        begin
+          results = batch_api(@batch_calls)
+        ensure
+          @batch_mode = false
+        end
+        results
+      end
+
       def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
         # Direct access to the Facebook API
         # see any of the above methods for example invocations
@@ -201,7 +227,7 @@ module Koala
       def get_page(params)
         # Pages through a set of results stored in a GraphCollection
         # Used for connections and search results
-        result = graph_call(*params) do |result|
+        graph_call(*params) do |result|
           result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
         end
       end

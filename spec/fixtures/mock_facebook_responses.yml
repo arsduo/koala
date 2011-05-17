@@ -61,6 +61,16 @@ graph_api:
       get:
         with_token: '[{}, {}]'
         no_token: '[{}, {}]'
+    batch=[{"method":"get","relative_url":"me","body":""},{"method":"get","relative_url":"koppel","body":""}]:
+      post:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
+    batch=[{"method":"get","relative_url":"me/picture","body":""}]:
+      post:
+        with_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
+    batch=[{"method":"get","relative_url":"me","body":""},{"method":"get","relative_url":"me/friends","body":""}]:
+      post:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+    
   /me:
     no_args:
       get:
@@ -118,7 +128,20 @@ graph_api:
       get: 
         <<: *token_required
         with_token: '{"data": [{}]}'
-        
+  
+  /lukeshepard/picture:
+    type=large:
+      get:
+        no_token:
+          code: 302
+          headers:
+            Location: https://facebook.com/large
+        with_token:
+          code: 302
+          headers:
+            Location: https://facebook.com/large
+    
+   
   /chris.baclig/picture:
     no_args:
       get:
@@ -130,17 +153,6 @@ graph_api:
           code: 302
           headers:
             Location: http://facebook.com/
-    type=large:
-      get:
-        no_token:
-          code: 302
-          headers:
-            Location: http://facebook.com/large
-        with_token:
-          code: 302
-          headers:
-            Location: http://facebook.com/large
-
 
   /search:
     q=facebook:

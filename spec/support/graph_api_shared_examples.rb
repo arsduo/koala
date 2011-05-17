@@ -51,17 +51,22 @@ shared_examples_for "Koala GraphAPI" do
     (result["id"] && result["name"]).should
   end
 
+  it "should return [] from get_objects if passed an empty array" do
+    results = @api.get_objects([])
+    results.should == []
+  end
+  
   it "should be able to get multiple objects" do
     results = @api.get_objects(["contextoptional", "naitik"])
-    results.length.should == 2
+    results.should have(2).items
   end
 
   it "should be able to access a user's picture" do
-    @api.get_picture("chris.baclig").should =~ /http\:\/\//
+    @api.get_picture("chris.baclig").should =~ /http[s]*\:\/\//
   end
 
   it "should be able to access a user's picture, given a picture type"  do
-    @api.get_picture("chris.baclig", {:type => 'large'}).should =~ /^http\:\/\//
+    @api.get_picture("lukeshepard", {:type => 'large'}).should =~ /^http[s]*\:\/\//
   end
 
   it "should be able to access connections from public Pages" do
@@ -96,6 +101,31 @@ shared_examples_for "Koala GraphAPI with an access token" do
   it "should get data about 'me'" do
     result = @api.get_object("me")
     result["updated_time"].should
+  end
+
+  it 'should be able to get data about a user and me at the same time' do
+    me, koppel = @api.batch do
+      @api.get_object('me')
+      @api.get_object('koppel')
+    end
+    me['id'].should_not be_nil
+    koppel['id'].should_not be_nil
+  end
+
+  it 'should be able to make a get_picture call inside of a batch' do
+    pictures = @api.batch do
+      @api.get_picture('me')
+    end
+    pictures.first.should_not be_empty
+  end
+
+  it 'should be able to make mixed calls inside of a batch' do
+    me, friends = @api.batch do
+      @api.get_object('me')
+      @api.get_connections('me', 'friends')
+    end
+    me['id'].should_not be_nil
+    friends.should be_a(Array)
   end
 
   it "should be able to get multiple objects" do
