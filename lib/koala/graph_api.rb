@@ -189,9 +189,8 @@ module Koala
         
         unless GraphAPI.batch_mode?
           result = api(*args) do |response|
-            # check for Graph API-specific errors
-            if response.is_a?(Hash) && error_details = response["error"]
-              raise APIError.new(error_details) 
+            if error = GraphAPI.check_response(response)
+              raise error
             end
           end
           

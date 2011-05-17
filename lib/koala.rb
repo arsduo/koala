@@ -64,6 +64,15 @@ module Koala
     class GraphAPI < API
       include GraphAPIMethods
 
+      def self.check_response(response)
+        # check for Graph API-specific errors
+        # this returns an error, which is immediately raised (non-batch)
+        # or added to the list of batch results (batch)
+        if response.is_a?(Hash) && error_details = response["error"]
+          APIError.new(error_details) 
+        end
+      end
+
       # batch mode flags
       def self.batch_mode?
         !!@batch_mode
@@ -98,10 +107,8 @@ module Koala
           body = call[1].map { |k, v| use_ssl ||= (k.to_s == "access_token"); "#{k}=#{v}" }.join('&')
           { 'method' => call[2], 'relative_url' => call[0], 'body' => body}
         }
-        puts args['batch'].inspect
         args['batch'] = args['batch'].to_json
         
-
         # Make the POST request for the batch call
         result = Koala.make_request('/', args, 'post', :use_ssl => use_ssl)
 
@@ -114,18 +121,21 @@ module Koala
           # Get the options hash
           options = batch_calls[index][3]
           index += 1
-          # Get the HTTP component they want
+
           # (see note in API about JSON parsing)
-          data = if options[:http_component] == :headers
-            # facebook returns the headers as an array of k/v pairs, but we want a regular hash
-            result['headers'].inject({}) { |headers, h| headers[h['name']] = h['value']; headers}
-          else
-            JSON.parse("[#{result['body'].to_s}]")[0]
-          end
+          body = JSON.parse("[#{result['body'].to_s}]")[0]
+          unless error = check_response(body)
+            # Get the HTTP component they want
+            data = options[:http_component] != :headers ? body : \
+              # facebook returns the headers as an array of k/v pairs, but we want a regular hash
+              result['headers'].inject({}) { |headers, h| headers[h['name']] = h['value']; headers}
           
-          # process it if we are given a block to process with
-          post_processing = options[:post_processing]
-          post_processing ? post_processing.call(data) : data
+            # process it if we are given a block to process with
+            post_processing = options[:post_processing]
+            post_processing ? post_processing.call(data) : data
+          else
+            error
+          end
         end
       end
     end
