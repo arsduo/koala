@@ -13,7 +13,7 @@ module Koala
     def self.included(base)
       base.class_eval do
         class << self
-          attr_accessor :always_use_ssl
+          attr_accessor :always_use_ssl, :proxy, :timeout
         end
                
         def self.server(options = {})
@@ -50,7 +50,11 @@ module Koala
           # by default, we use SSL only for private requests
           # this makes public requests faster
           private_request = args["access_token"] || @always_use_ssl || options[:use_ssl]
-
+          
+          # if proxy/timeout options aren't passed, check if defaults are set
+          options[:proxy] ||= proxy
+          options[:timeout] ||= timeout
+          
           # if the verb isn't get or post, send it as a post argument
           args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
