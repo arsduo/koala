@@ -176,10 +176,75 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         :http_options => http_options,
         :post_processing => post_processing
       ).and_return(op)
-      
       Koala::Facebook::GraphAPI.batch do
         Koala::Facebook::GraphAPI.new(access_token).graph_call(url, args, method, http_options, &post_processing)
       end
+    end
+
+    describe "#batch_api" do
+      before :each do
+        @fake_response = Koala::Response.new(200, "[]", {})
+        Koala.stub(:make_request).and_return(@fake_response)
+      end
+      describe "making the request" do
+        context "with no calls" do
+          it "does not make any requests if batch_calls is empty" do
+            Koala.should_not_receive(:make_request)
+            Koala::Facebook::GraphAPI.batch {}
+          end
+
+          it "returns []" do
+            Koala::Facebook::GraphAPI.batch {}.should == []        
+          end
+        end
+      
+        it "includes the first operation's access token as the main one in the args" do
+          access_token = "foo"
+          Koala.should_receive(:make_request).with(anything, hash_including("access_token" => access_token), anything, anything).and_return(@fake_response)
+          Koala::Facebook::GraphAPI.batch do
+            Koala::Facebook::GraphAPI.new(access_token).get_object('me')
+            Koala::Facebook::GraphAPI.new("bar").get_object('me')
+          end
+        end
+
+        it "sets args['batch'] to a json'd map of all the batch params" do
+          access_token = "bar"
+          op = Koala::Facebook::BatchOperation.new(:access_token => access_token, :method => :get, :url => "/")
+          op.stub(:to_batch_params).and_return({:a => 2})
+          Koala::Facebook::BatchOperation.stub(:new).and_return(op)
+        
+          # two requests should generate two batch operations
+          expected = [op.to_batch_params(access_token), op.to_batch_params(access_token)].to_json
+          Koala.should_receive(:make_request).with(anything, hash_including("batch" => expected), anything, anything).and_return(@fake_response)
+          Koala::Facebook::GraphAPI.batch do
+            Koala::Facebook::GraphAPI.new(access_token).get_object('me')
+            Koala::Facebook::GraphAPI.new(access_token).get_object('me')
+          end        
+        end
+      
+        it "makes a POST request" do
+          Koala.should_receive(:make_request).with(anything, anything, "post", anything).and_return(@fake_response)
+          Koala::Facebook::GraphAPI.batch do
+            Koala::Facebook::GraphAPI.new("foo").get_object('me')
+          end
+        end
+      
+        it "makes a request to /" do
+          Koala.should_receive(:make_request).with("/", anything, anything, anything).and_return(@fake_response)
+          Koala::Facebook::GraphAPI.batch do
+            Koala::Facebook::GraphAPI.new("foo").get_object('me')
+          end
+        end
+      
+        it "includes any http options specified at the top level" do
+          http_options = {"a" => "baz"}
+          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(http_options)).and_return(@fake_response)
+          Koala::Facebook::GraphAPI.batch(http_options) do
+            Koala::Facebook::GraphAPI.new("foo").get_object('me')
+          end
+        end
+      end
+      
     end
   end
     
@@ -187,16 +252,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 =begin
   # making requests
   describe "making requests" do
-    context "with no calls" do
-      it "does not make any requests if batch_calls is empty" do
-        Koala.should_not_receive(:make_request)
-        Koala::Facebook::GraphAPI.batch {}
-      end
-      
-      it "returns []" do
-        Koala::Facebook::GraphAPI.batch {}.should == []        
-      end
-    end
+
     
     context "with a token" do
       it 'should be able to get data about a user and me at the same time' do

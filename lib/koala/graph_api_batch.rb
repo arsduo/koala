@@ -55,8 +55,9 @@ module Koala
             @batch_calls
           end
 
-          def self.batch(&block)
+          def self.batch(http_options = {}, &block)
             @batch_mode = true
+            @batch_http_options = http_options
             @batch_calls = []
             yield
             begin
@@ -74,12 +75,13 @@ module Koala
             # Get the access token for the user and start building a hash to store params
             # Turn the call args collected into what facebook expects
             args = {}
-            access_token = args[:access_token] = batch_calls.first.access_token
+            access_token = args["access_token"] = batch_calls.first.access_token
             # need to support binary files
-            args['batch'] = batch_calls.map { |batch_op| batch_op.to_batch_params(access_token) }
+            args['batch'] = batch_calls.map { |batch_op| batch_op.to_batch_params(access_token) }.to_json
 
             # Make the POST request for the batch call
-            result = Koala.make_request('/', args, 'post', :use_ssl => true) # we always have to use SSL with batch
+            # batch operations have to go over SSL, but since there's an access token, that secures that
+            result = Koala.make_request('/', args, 'post', @batch_http_options) 
 
             # Raise an error if we get a 500
             raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status != 200
