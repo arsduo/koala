@@ -29,6 +29,19 @@ module Koala
       # Koala::Facebook::OAuth.get_user_from_cookie() method below to get the OAuth access token
       # for the active user from the cookie saved by the SDK.
 
+      def self.included(base)
+        base.class_eval do
+          def self.check_response(response)
+            # check for Graph API-specific errors
+            # this returns an error, which is immediately raised (non-batch)
+            # or added to the list of batch results (batch)
+            if response.is_a?(Hash) && error_details = response["error"]
+              APIError.new(error_details) 
+            end
+          end
+        end
+      end
+
       # Objects
 
       def get_object(id, args = {}, options = {})
@@ -198,13 +211,17 @@ module Koala
           post_processing ? post_processing.call(result) : result
         else
           # for batch APIs, we queue up the call details (incl. post-processing)
-          args[3][:post_processing] = post_processing
-          args[1][:access_token] = @access_token if @access_token
-          GraphAPI.batch_calls << args
+          GraphAPI.batch_calls << BatchOperation.new(
+            :url => args[0],
+            :args => args[1],
+            :method => args[2],
+            :access_token => @access_token,
+            :http_options => args[3],
+            :post_processing => post_processing
+          )
         end
       end
-
-
+      
       # GraphCollection support
       def get_page(params)
         # Pages through a set of results stored in a GraphCollection
