@@ -61,23 +61,22 @@ graph_api:
       get:
         with_token: '[{}, {}]'
         no_token: '[{}, {}]'
-    # Batch requests are considered 'no token', since the tokens (if any) are supplied w/ each request
     # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here 
-    access_token=*&batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"koppel", "body"=>"access_token=*"}].to_json %>:
+    batch=<%= [{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}].to_json %>:
       post:
-        no_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
-    access_token=*&batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}].to_json %>:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me/picture"}].to_json %>:
       post:
-        no_token: '[{"body":"{\"id\":\"123\"}"}]'
-    access_token=*&batch=<%= [{"method"=>"get", "relative_url"=>"me/picture", "body"=>"access_token=*"}].to_json %>:
+        with_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}].to_json %>:
       post:
-        no_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
-    access_token=*&batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"me/friends", "body"=>"access_token=*"}].to_json %>:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}].to_json %>:
       post:
-        no_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
-    access_token=*&batch=<%= [{"method"=>"get", "relative_url"=>"me", "body"=>"access_token=*"}, {"method"=>"get", "relative_url"=>"lukeshepard/likes", "body"=>"access_token=*"}].to_json %>:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}].to_json %>:
       post:
-        no_token: '[{"body":"{\"id\":\"123\"}"}, {"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"}]'
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"body":"{\"id\":\"123\"}"}]'
 
 
   /me:
