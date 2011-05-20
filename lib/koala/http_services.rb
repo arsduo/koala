@@ -24,7 +24,7 @@ module Koala
           # unfortunately, we can't use to_query because that's Rails, not Ruby
           # if no hash (e.g. no auth token) return empty string
           ((param_hash || {}).collect do |key_and_value|
-            key_and_value[1] = key_and_value[1].to_json if key_and_value[1].class != String
+            key_and_value[1] = key_and_value[1].to_json unless key_and_value[1].is_a? String
             "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
           end).join("&")
         end
