@@ -1,0 +1,12 @@
+# Override autotest default magic to rerun all tests every time a
+# change is detected on the file system.
+class Autotest
+  
+  def get_to_green
+    begin
+      rerun_all_tests
+      wait_for_changes unless all_good
+    end until all_good
+  end
+                            
+end
