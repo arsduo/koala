@@ -75,12 +75,19 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         end
         
         shared_examples_for "requests with a body param" do
-          it "sets the body to the encoded args string" do
+          it "sets the body to the encoded args string, if there are args" do
             test_args = "foo"
             Koala.stub(:encode_params).and_return(test_args)
           
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should == test_args
           end
+          
+          it "does not set the body if there are no args" do
+            test_args = ""
+            Koala.stub(:encode_params).and_return(test_args)
+            Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should be_nil
+          end
+          
         
           it "doesn't change the url" do
             test_args = "foo"
@@ -254,7 +261,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           # two requests should generate two batch operations
           Koala.should_receive(:make_request) do |url, args, method, options| 
             # test the batch operations to make sure they appear in the right order
-            puts args.inspect
             (args ||= {})["batch"].should =~ /.*me\/farglebarg.*otheruser\/bababa/
             @fake_response
           end
@@ -294,10 +300,27 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             Koala::Facebook::GraphAPI.new("foo").get_object('me')
           end }.to raise_exception(Koala::Facebook::APIError)
         end
+        
+        it "returns the result status if http_component is status" do
+          Koala.stub(:make_request).and_return(Koala::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
+          result = Koala::Facebook::GraphAPI.batch do
+            @api.get_object("koppel", {}, :http_component => :status)
+          end
+          result[0].should == 203
+        end
+
+        it "returns the result headers as a hash if http_component is headers" do
+          Koala.stub(:make_request).and_return(Koala::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
+          result = Koala::Facebook::GraphAPI.batch do
+            @api.get_object("koppel", {}, :http_component => :headers)
+          end
+          result[0].should == {"Content-Type" => "text/javascript; charset=UTF-8"}
+        end
       end
       
-      it "is not available on the GraphAndRestAPI class"
-      it "works with GraphAndRestAPI instances"
+      it "is not available on the GraphAndRestAPI class" do
+        Koala::Facebook::GraphAndRestAPI.should_not respond_to(:batch)
+      end
     end
   end
   
@@ -305,6 +328,16 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     it "should be able get two results at once" do
       me, koppel = Koala::Facebook::GraphAPI.batch do
         @api.get_object('me')
+        @api.get_object('koppel')
+      end
+      me['id'].should_not be_nil
+      koppel['id'].should_not be_nil
+    end
+
+      
+    it "works with GraphAndRestAPI instances" do
+      me, koppel = Koala::Facebook::GraphAPI.batch do
+        Koala::Facebook::GraphAndRestAPI.new(@api.access_token).get_object('me')
         @api.get_object('koppel')
       end
       me['id'].should_not be_nil
@@ -346,8 +379,17 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     end
 
     it "uploads binary files appropriately"
-    it "handles different request methods"
-    it "returns the desired http_component"
+    
+    it "handles different request methods" do
+      result = @api.put_wall_post("Hello, world, from the test suite batch API!")
+      wall_post = result["id"]
+      
+      wall_post, koppel = Koala::Facebook::GraphAPI.batch do
+        @api.put_like(wall_post)
+        @api.delete_object(wall_post)
+      end
+    end
+        
     it "allows you to specify a name paramter"
   end
 end

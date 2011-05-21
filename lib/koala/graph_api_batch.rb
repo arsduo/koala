@@ -30,10 +30,12 @@ module Koala
         
         # for get and delete, we append args to the URL string
         # otherwise, they go in the body
-        if args_in_url?
-          response[:relative_url] += (@url =~ /\?/ ? "&" : "?") + args_string if args_string.length > 0
-        else
-          response[:body] = args_string
+        if args_string.length > 0
+          if args_in_url?
+            response[:relative_url] += (@url =~ /\?/ ? "&" : "?") + args_string if args_string.length > 0
+          else
+            response[:body] = args_string if args_string.length > 0
+          end
         end
 
         response
@@ -88,7 +90,7 @@ module Koala
             result = Koala.make_request('/', args, 'post', @batch_http_options) 
 
             # Raise an error if we get a 500
-            raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status != 200
+            raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status >= 500
 
             # Map the results with post-processing included
             index = 0 # keep compat with ruby 1.8 - no with_index for map
@@ -101,8 +103,10 @@ module Koala
               body = JSON.parse("[#{call_result['body'].to_s}]")[0]
               unless call_result["code"].to_i >= 500 || error = GraphAPI.check_response(body)
                 # Get the HTTP component they want
+                puts batch_op.http_options.inspect
                 data = case batch_op.http_options[:http_component] 
                 when :status
+                  puts call_result.inspect
                   call_result["code"].to_i
                 when :headers
                   # facebook returns the headers as an array of k/v pairs, but we want a regular hash

@@ -77,6 +77,9 @@ graph_api:
     batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}].to_json %>:
       post:
         with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"body":"{\"id\":\"123\"}"}]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"FEED_ITEM_BATCH/likes"}, {"method"=>"delete", "relative_url"=> "FEED_ITEM_BATCH"}].to_json %>:
+      post:
+        with_token: '[{"body": "{\"id\": \"MOCK_LIKE\"}"},{"body":true}]'
 
 
   /me:
@@ -101,6 +104,9 @@ graph_api:
     message=Hello, world, from the test suite delete method!: 
       post: 
         with_token: '{"id": "FEED_ITEM_DELETE"}'
+    message=Hello, world, from the test suite batch API!: 
+      post: 
+        with_token: '{"id": "FEED_ITEM_BATCH"}'
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
