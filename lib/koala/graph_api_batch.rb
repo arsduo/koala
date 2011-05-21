@@ -27,7 +27,7 @@ module Koala
         # for get and delete, we append args to the URL string
         # otherwise, they go in the body
         if args_in_url?
-          response[:relative_url] += (@url =~ /\?/ ? "&" : "?") + args_string
+          response[:relative_url] += (@url =~ /\?/ ? "&" : "?") + args_string if args_string.length > 0
         else
           response[:body] = args_string
         end
