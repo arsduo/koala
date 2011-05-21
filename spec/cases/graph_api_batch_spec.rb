@@ -36,6 +36,10 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         Koala::Facebook::BatchOperation.new(@args).access_token.should == @args[:access_token]
       end
       
+      it "makes name accessible and equal to the :name param in http_options" do
+        Koala::Facebook::BatchOperation.new(@args).name.should == @args[:http_options][:name]
+      end
+      
       it "raises a KoalaError if no access token supplied" do
         expect { Koala::Facebook::BatchOperation.new(@args.merge(:access_token => nil)) }.to raise_exception(Koala::KoalaError)
       end
@@ -129,6 +133,18 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
          params[:relative_url].should_not =~ /access_token=#{@args[:access_token]}/
       end
       
+      it "includes a name if one is present" do
+        @args[:http_options][:name] = "baz"
+        params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
+        params[:name].should == @args[:http_options][:name]
+      end
+      
+      it "does not include a name if none was provided" do
+        @args[:http_options].delete(:name)
+        params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
+        params[:name].should be_nil
+      end      
+
       it "includes the method" do
         params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
         params[:method].should == @args[:method].to_sym
@@ -331,6 +347,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
     it "uploads binary files appropriately"
     it "handles different request methods"
+    it "returns the desired http_component"
     it "allows you to specify a name paramter"
   end
 end

@@ -1,12 +1,13 @@
 module Koala
   module Facebook
     class BatchOperation
-      attr_reader :access_token, :http_options, :post_processing
+      attr_reader :access_token, :http_options, :post_processing, :name
        
       def initialize(options = {})
         @args = options[:args] || {}
         @access_token = options[:access_token]
-        @http_options = options[:http_options] || {}
+        @http_options = (options[:http_options] || {}).dup # dup because we modify it below
+        @name = @http_options[:name]
         @url = options[:url]
         @method = options[:method].to_sym
         @post_processing = options[:post_processing]
@@ -21,8 +22,11 @@ module Koala
         
         response = {
           :method => @method, 
-          :relative_url => @url
+          :relative_url => @url,
         }
+        
+        # allow name parameter, which is used to make requests dependent on others
+        response[:name] = @name if @name
         
         # for get and delete, we append args to the URL string
         # otherwise, they go in the body
@@ -95,16 +99,22 @@ module Koala
 
               # (see note in API about JSON parsing)
               body = JSON.parse("[#{call_result['body'].to_s}]")[0]
-              unless error = GraphAPI.check_response(body)
+              unless call_result["code"].to_i >= 500 || error = GraphAPI.check_response(body)
                 # Get the HTTP component they want
-                data = batch_op.http_options[:http_component] != :headers ? body : \
+                data = case batch_op.http_options[:http_component] 
+                when :status
+                  call_result["code"].to_i
+                when :headers
                   # facebook returns the headers as an array of k/v pairs, but we want a regular hash
                   call_result['headers'].inject({}) { |headers, h| headers[h['name']] = h['value']; headers}
-
+                else
+                  body
+                end
+                
                 # process it if we are given a block to process with
                 batch_op.post_processing ? batch_op.post_processing.call(data) : data
               else
-                error
+                error || APIError.new({"type" => "HTTP #{call_result["code"].to_s}", "message" => "Response body: #{body}"})
               end
             end
           end
