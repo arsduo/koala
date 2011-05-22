@@ -311,6 +311,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           end }.to raise_exception(Koala::Facebook::APIError)
         end
         
+        it "throws an error if the response is a Batch API-style error" do
+          Koala.stub(:make_request).and_return(Koala::Response.new(200, '{"error":190,"error_description":"Error validating access token."}', {}))
+          expect { Koala::Facebook::GraphAPI.batch do
+            Koala::Facebook::GraphAPI.new("foo").get_object('me')
+          end }.to raise_exception(Koala::Facebook::APIError)  
+        end
+        
         it "returns the result status if http_component is status" do
           Koala.stub(:make_request).and_return(Koala::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
           result = Koala::Facebook::GraphAPI.batch do
@@ -421,6 +428,14 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         results[1].should be_an(Hash)
       end
       
+      it "throws an error for badly-constructed request relationships" do
+        expect { 
+          Koala::Facebook::GraphAPI.batch do
+            @api.get_connections("me", "friends", {:limit => 5})
+            @api.get_objects("{result=i-dont-exist:$.data.*.id}")
+          end
+        }.to raise_exception(Koala::Facebook::APIError)
+      end
     end
   end
 end

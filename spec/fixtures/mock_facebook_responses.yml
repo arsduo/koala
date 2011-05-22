@@ -82,10 +82,13 @@ graph_api:
         with_token: '[{"body": "{\"id\": \"MOCK_LIKE\"}"},{"body":true}]'
     batch=<%= [{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}].to_json %>:
       post:
-        with_token: '[null,{"body":"[{}, {}]"}]'
+        with_token: '[null,{"body":"{}"}]'
     batch=<%= [{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends", "omit_response_on_success" => false}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}].to_json %>:
       post:
-        with_token: '[{"body":"{\"data\":[]}"},{"body":"[{}, {}]"}]'
+        with_token: '[{"body":"{\"data\":[]}"},{"body":"{}"}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}].to_json %>:
+      post:
+        with_token: '{"error":190,"error_description":"Error validating access token."}'
 
 
 

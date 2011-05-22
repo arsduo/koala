@@ -87,13 +87,16 @@ module Koala
             # Make the POST request for the batch call
             # batch operations have to go over SSL, but since there's an access token, that secures that
             result = Koala.make_request('/', args, 'post', @batch_http_options) 
-
             # Raise an error if we get a 500
-            raise APIError.new({"type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}"}) if result.status >= 500
+            raise APIError.new("type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}") if result.status >= 500
 
-            # Map the results with post-processing included
+            response = JSON.parse(result.body.to_s)
+            # raise an error if we get a Batch API error message
+            raise APIError.new("type" => "Error #{response["error"]}", "message" => response["error_description"]) if response.is_a?(Hash) && response["error"]
+
+            # otherwise, map the results with post-processing included            
             index = 0 # keep compat with ruby 1.8 - no with_index for map
-            JSON.parse(result.body.to_s).map do |call_result|
+            response.map do |call_result|
               # Get the options hash
               batch_op = batch_calls[index]
               index += 1
