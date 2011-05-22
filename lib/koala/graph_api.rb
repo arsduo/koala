@@ -50,11 +50,10 @@ module Koala
       end
     
       def get_objects(ids, args = {}, options = {})
-        # Fetchs all of the given object from the graph.
-        # We return a map from ID to object. If any of the IDs are invalid,
-        # we raise an exception.
+        # Fetchs all of the given objects from the graph.
+        # If any of the IDs are invalid, they'll raise an exception.
         return [] if ids.empty?
-        graph_call("", args.merge("ids" => ids.join(",")), "get", options)
+        graph_call("", args.merge("ids" => ids.respond_to?(:join) ? ids.join(",") : ids), "get", options)
       end
       
       def put_object(parent_object, connection_name, args = {}, options = {})

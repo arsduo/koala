@@ -61,6 +61,11 @@ shared_examples_for "Koala GraphAPI" do
     results.should have(2).items
   end
 
+  it "should be able to get multiple objects if they're a string" do
+    results = @api.get_objects("contextoptional,naitik")
+    results.should have(2).items
+  end
+
   it "should be able to access a user's picture" do
     @api.get_picture("chris.baclig").should =~ /http[s]*\:\/\//
   end
