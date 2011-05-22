@@ -195,12 +195,11 @@ module Koala
       # API access
 
       # Make a call which may or may not be batched
-      def graph_call(*args, &post_processing)
+      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
         # Direct access to the Facebook API
         # see any of the above methods for example invocations
-        
         unless GraphAPI.batch_mode?
-          result = api(*args) do |response|
+          result = api(path, args, verb, options) do |response|
             if error = GraphAPI.check_response(response)
               raise error
             end
@@ -211,11 +210,11 @@ module Koala
         else
           # for batch APIs, we queue up the call details (incl. post-processing)
           GraphAPI.batch_calls << BatchOperation.new(
-            :url => args[0],
-            :args => args[1],
-            :method => args[2],
+            :url => path,
+            :args => args,
+            :method => verb,
             :access_token => @access_token,
-            :http_options => args[3],
+            :http_options => options,
             :post_processing => post_processing
           )
         end

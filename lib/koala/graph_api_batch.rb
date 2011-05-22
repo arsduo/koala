@@ -1,13 +1,13 @@
 module Koala
   module Facebook
     class BatchOperation
-      attr_reader :access_token, :http_options, :post_processing, :name
+      attr_reader :access_token, :http_options, :post_processing
        
       def initialize(options = {})
         @args = options[:args] || {}
         @access_token = options[:access_token]
         @http_options = (options[:http_options] || {}).dup # dup because we modify it below
-        @name = @http_options[:name]
+        @batch_args = @http_options.delete(:batch_args)
         @url = options[:url]
         @method = options[:method].to_sym
         @post_processing = options[:post_processing]
@@ -17,16 +17,15 @@ module Koala
       
       def to_batch_params(main_access_token)
         # set up the arguments
-        args = @args.merge(:access_token => @access_token) unless @access_token == main_access_token
-        args_string = Koala.encode_params(args)
+        args_string = Koala.encode_params(@access_token == main_access_token ? @args : @args.merge(:access_token => @access_token))
         
         response = {
           :method => @method, 
           :relative_url => @url,
         }
-        
+         
         # allow name parameter, which is used to make requests dependent on others
-        response[:name] = @name if @name
+        response.merge!(@batch_args) if @batch_args
         
         # for get and delete, we append args to the URL string
         # otherwise, they go in the body
@@ -37,7 +36,7 @@ module Koala
             response[:body] = args_string if args_string.length > 0
           end
         end
-
+        
         response
       end
   
@@ -84,7 +83,7 @@ module Koala
             access_token = args["access_token"] = batch_calls.first.access_token
             # need to support binary files
             args['batch'] = batch_calls.map { |batch_op| batch_op.to_batch_params(access_token) }.to_json
-
+            
             # Make the POST request for the batch call
             # batch operations have to go over SSL, but since there's an access token, that secures that
             result = Koala.make_request('/', args, 'post', @batch_http_options) 
@@ -99,26 +98,28 @@ module Koala
               batch_op = batch_calls[index]
               index += 1
 
-              # (see note in API about JSON parsing)
-              body = JSON.parse("[#{call_result['body'].to_s}]")[0]
-              unless call_result["code"].to_i >= 500 || error = GraphAPI.check_response(body)
-                # Get the HTTP component they want
-                puts batch_op.http_options.inspect
-                data = case batch_op.http_options[:http_component] 
-                when :status
-                  puts call_result.inspect
-                  call_result["code"].to_i
-                when :headers
-                  # facebook returns the headers as an array of k/v pairs, but we want a regular hash
-                  call_result['headers'].inject({}) { |headers, h| headers[h['name']] = h['value']; headers}
-                else
-                  body
-                end
+              if call_result
+                # (see note in API about JSON parsing)
+                body = JSON.parse("[#{call_result['body'].to_s}]")[0]
+                unless call_result["code"].to_i >= 500 || error = GraphAPI.check_response(body)
+                  # Get the HTTP component they want
+                  data = case batch_op.http_options[:http_component] 
+                  when :status
+                    call_result["code"].to_i
+                  when :headers
+                    # facebook returns the headers as an array of k/v pairs, but we want a regular hash
+                    call_result['headers'].inject({}) { |headers, h| headers[h['name']] = h['value']; headers}
+                  else
+                    body
+                  end
                 
-                # process it if we are given a block to process with
-                batch_op.post_processing ? batch_op.post_processing.call(data) : data
+                  # process it if we are given a block to process with
+                  batch_op.post_processing ? batch_op.post_processing.call(data) : data
+                else
+                  error || APIError.new({"type" => "HTTP #{call_result["code"].to_s}", "message" => "Response body: #{body}"})
+                end
               else
-                error || APIError.new({"type" => "HTTP #{call_result["code"].to_s}", "message" => "Response body: #{body}"})
+                nil
               end
             end
           end

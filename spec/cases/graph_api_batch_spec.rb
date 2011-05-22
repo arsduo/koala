@@ -35,9 +35,12 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       it "makes access_token accessible" do
         Koala::Facebook::BatchOperation.new(@args).access_token.should == @args[:access_token]
       end
-      
-      it "makes name accessible and equal to the :name param in http_options" do
-        Koala::Facebook::BatchOperation.new(@args).name.should == @args[:http_options][:name]
+            
+      it "doesn't change the original http_options" do
+        @args[:http_options][:name] = "baz2"
+        expected = @args[:http_options].dup
+        Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
+        @args[:http_options].should == expected
       end
       
       it "raises a KoalaError if no access token supplied" do
@@ -135,22 +138,29 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
          params[:relative_url].should =~ /access_token=#{@args[:access_token]}/
       end
 
+      it "includes the other arguments if the token is not the main one for the request" do
+        @args[:args] = {:a => 2}
+        params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
+        params[:relative_url].should =~ /a=2/
+      end
+
       it "does not include the access token if the token is the main one for the request" do
          params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
          params[:relative_url].should_not =~ /access_token=#{@args[:access_token]}/
       end
       
-      it "includes a name if one is present" do
-        @args[:http_options][:name] = "baz"
-        params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
-        params[:name].should == @args[:http_options][:name]
+      it "includes the other arguments if the token is the main one for the request" do
+        @args[:args] = {:a => 2}
+        params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
+        params[:relative_url].should =~ /a=2/
       end
       
-      it "does not include a name if none was provided" do
-        @args[:http_options].delete(:name)
+      it "includes any arguments passed as http_options[:batch_args]" do
+        batch_args = {:name => "baz", :foo => "bar"}
+        @args[:http_options][:batch_args] = batch_args
         params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
-        params[:name].should be_nil
-      end      
+        params.should include(batch_args)
+      end
 
       it "includes the method" do
         params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
@@ -389,7 +399,28 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         @api.delete_object(wall_post)
       end
     end
-        
-    it "allows you to specify a name paramter"
+    
+    describe "relating requests" do
+      it "allows you create dependencies between requests without omit_response_on_success" do
+        results = Koala::Facebook::GraphAPI.batch do
+          @api.get_connections("me", "friends", {:limit => 5}, :batch_args => {:name => "get-friends"})
+          @api.get_objects("{result=get-friends:$.data.*.id}")
+        end
+      
+        results[0].should be_nil
+        results[1].should be_an(Hash)
+      end
+      
+      it "allows you create dependencies between requests with omit_response_on_success" do
+        results = Koala::Facebook::GraphAPI.batch do
+          @api.get_connections("me", "friends", {:limit => 5}, :batch_args => {:name => "get-friends", :omit_response_on_success => false})
+          @api.get_objects("{result=get-friends:$.data.*.id}")
+        end
+      
+        results[0].should be_an(Array)
+        results[1].should be_an(Hash)
+      end
+      
+    end
   end
 end
