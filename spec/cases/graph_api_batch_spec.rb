@@ -407,8 +407,19 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
     end
     
+    it "allows FQL" do
+      result = Koala::Facebook::GraphAPI.batch do
+        @api.graph_call("method/fql.query", {:query=>"select name from user where uid=4"}, "post")
+      end
+      
+      fql_result = result[0]
+      fql_result[0].should be_a(Hash)
+      fql_result[0]["name"].should == "Mark Zuckerberg"
+    end
+    
+    
     describe "relating requests" do
-      it "allows you create dependencies between requests without omit_response_on_success" do
+      it "allows you create relationships between requests without omit_response_on_success" do
         results = Koala::Facebook::GraphAPI.batch do
           @api.get_connections("me", "friends", {:limit => 5}, :batch_args => {:name => "get-friends"})
           @api.get_objects("{result=get-friends:$.data.*.id}")
@@ -418,7 +429,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         results[1].should be_an(Hash)
       end
       
-      it "allows you create dependencies between requests with omit_response_on_success" do
+      it "allows you create relationships between requests with omit_response_on_success" do
         results = Koala::Facebook::GraphAPI.batch do
           @api.get_connections("me", "friends", {:limit => 5}, :batch_args => {:name => "get-friends", :omit_response_on_success => false})
           @api.get_objects("{result=get-friends:$.data.*.id}")
@@ -426,6 +437,26 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       
         results[0].should be_an(Array)
         results[1].should be_an(Hash)
+      end
+      
+      it "allows you to create dependencies" do
+        me, koppel = Koala::Facebook::GraphAPI.batch do
+          @api.get_object("me", {}, :batch_args => {:name => "getme"})
+          @api.get_object("koppel", {}, :batch_args => {:depends_on => "getme"})
+        end
+        
+        me.should be_nil # gotcha!  it's omitted because it's a successfully-executed dependency
+        koppel["id"].should_not be_nil
+      end
+      
+      it "properly handles dependencies that fail" do
+        data, koppel = Koala::Facebook::GraphAPI.batch do
+          @api.get_connections(@app_id, 'insights', {}, :batch_args => {:name => "getdata"})
+          @api.get_object("koppel", {}, :batch_args => {:depends_on => "getdata"})
+        end
+
+        data.should be_a(Koala::Facebook::APIError)
+        koppel.should be_nil
       end
       
       it "throws an error for badly-constructed request relationships" do

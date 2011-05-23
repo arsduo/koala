@@ -89,7 +89,15 @@ graph_api:
     batch=<%= [{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}].to_json %>:
       post:
         with_token: '{"error":190,"error_description":"Error validating access token."}'
-
+    batch=<%= [{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+name+from+user+where+uid%3D4"}].to_json %>:
+      post:
+        with_token: '[{"body":"[{\"name\":\"Mark Zuckerberg\"}]"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}].to_json %>:
+      post:
+        with_token: '[null,{"body":"{\"id\":\"123\"}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}].to_json %>:
+      post:
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
 
 
   /me:
