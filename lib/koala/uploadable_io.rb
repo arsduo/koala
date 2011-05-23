@@ -24,8 +24,18 @@ module Koala
     def to_file
       @io_or_path.is_a?(String) ? File.open(@io_or_path) : @io_or_path
     end
+    
+    def self.binary_content?(content)
+      content.is_a?(UploadableIO) || DETECTION_STRATEGIES.detect {|method| send(method, content)}
+    end
 
     private
+      DETECTION_STRATEGIES = [
+        :sinatra_param?,
+        :rails_3_param?,
+        :file_param?
+      ]
+    
       PARSE_STRATEGIES = [
         :parse_rails_3_param,
         :parse_sinatra_param,
@@ -41,24 +51,36 @@ module Koala
       end
       
       # Expects a parameter of type ActionDispatch::Http::UploadedFile
+      def self.rails_3_param?(uploaded_file)
+        uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.tempfile.respond_to?(:path)
+      end
+      
       def parse_rails_3_param(uploaded_file)
-        if uploaded_file.respond_to?(:content_type) and uploaded_file.respond_to?(:tempfile) and uploaded_file.tempfile.respond_to?(:path)
+        if UploadableIO.rails_3_param?(uploaded_file) 
           @io_or_path = uploaded_file.tempfile.path
           @content_type = uploaded_file.content_type
         end
       end
       
       # Expects a Sinatra hash of file info
+      def self.sinatra_param?(file_hash)
+        file_hash.kind_of?(Hash) and file_hash.has_key?(:type) and file_hash.has_key?(:tempfile)
+      end
+      
       def parse_sinatra_param(file_hash)
-        if file_hash.kind_of?(Hash) and file_hash.has_key?(:type) and file_hash.has_key?(:tempfile)
+        if UploadableIO.sinatra_param?(file_hash)
           @io_or_path = file_hash[:tempfile]
           @content_type = file_hash[:type] || detect_mime_type(tempfile)
         end
       end
       
       # takes a file object
+      def self.file_param?(file)
+        file.kind_of?(File)
+      end
+      
       def parse_file_object(file)
-        if file.kind_of?(File)
+        if UploadableIO.file_param?(file)
           @io_or_path = file
           @content_type = detect_mime_type(file.path)
         end

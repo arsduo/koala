@@ -9,6 +9,21 @@ module Koala::MIME
 end
 
 describe "Koala::UploadableIO" do
+  def rails_3_mocks
+    tempfile = stub('Tempfile', :path => "foo")
+    uploaded_file = stub('ActionDispatch::Http::UploadedFile',
+      :content_type => true,
+      :tempfile => tempfile
+    )
+    tempfile.stub!(:respond_to?).with(:path).and_return(true)
+
+    [tempfile, uploaded_file]
+  end
+  
+  def sinatra_mocks
+    {:type => "type", :tempfile => "Tempfile"}
+  end
+  
   describe "the constructor" do
     describe "when given a file path" do
       before(:each) do
@@ -63,13 +78,7 @@ describe "Koala::UploadableIO" do
 
     describe "when given a Rails 3 ActionDispatch::Http::UploadedFile" do
       before(:each) do
-        @tempfile = stub('Tempfile', :path => "foo")
-        @uploaded_file = stub('ActionDispatch::Http::UploadedFile',
-          :content_type => true,
-          :tempfile => @tempfile
-        )
-
-        @tempfile.stub!(:respond_to?).with(:path).and_return(true)
+        @tempfile, @uploaded_file = rails_3_mocks
       end
 
       it "should get the content type via the content_type method" do
@@ -87,10 +96,7 @@ describe "Koala::UploadableIO" do
 
     describe "when given a Sinatra file parameter hash" do
       before(:each) do
-        @file_hash = {
-          :type => "type",
-          :tempfile => "Tempfile"
-        }
+        @file_hash = sinatra_mocks
       end
 
       it "should get the content type from the :type key" do
@@ -146,6 +152,26 @@ describe "Koala::UploadableIO" do
       result = stub("File")
       File.should_receive(:open).with(BEACH_BALL_PATH).and_return(result)
       Koala::UploadableIO.new(BEACH_BALL_PATH).to_file.should == result
+    end
+  end
+
+  describe "#binary_content?" do
+    it "returns true for Rails 3 file uploads" do
+      Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_true
+    end
+    
+    it "returns true for Sinatra file uploads" do
+      Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_true
+    end
+    
+    it "returns true for File objects" do
+      Koala::UploadableIO.binary_content?(File.open(BEACH_BALL_PATH)).should be_true
+    end
+    
+    it "returns false for everything else" do
+      Koala::UploadableIO.binary_content?(StringIO.new).should be_false
+      Koala::UploadableIO.binary_content?(BEACH_BALL_PATH).should be_false
+      Koala::UploadableIO.binary_content?(nil).should be_false
     end
   end
 end  # describe UploadableIO
