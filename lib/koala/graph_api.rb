@@ -217,6 +217,7 @@ module Koala
             :http_options => options,
             :post_processing => post_processing
           )
+          nil # batch operations return nothing immediately 
         end
       end
       

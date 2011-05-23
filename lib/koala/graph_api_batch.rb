@@ -1,16 +1,18 @@
 module Koala
   module Facebook
     class BatchOperation
-      attr_reader :access_token, :http_options, :post_processing
+      attr_reader :access_token, :http_options, :post_processing, :files
        
       def initialize(options = {})
-        @args = options[:args] || {}
+        @args = (options[:args] || {}).dup # because we modify it below
         @access_token = options[:access_token]
         @http_options = (options[:http_options] || {}).dup # dup because we modify it below
-        @batch_args = @http_options.delete(:batch_args)
+        @batch_args = @http_options.delete(:batch_args) || {}
         @url = options[:url]
         @method = options[:method].to_sym
         @post_processing = options[:post_processing]
+        
+        process_binary_args
         
         raise Koala::KoalaError, "Batch operations require an access token, none provided." unless @access_token
       end
@@ -24,7 +26,8 @@ module Koala
           :relative_url => @url,
         }
          
-        # allow name parameter, which is used to make requests dependent on others
+        # handle batch-level arguments, such as name, depends_on, and attached_files
+        @batch_args[:attached_files] = @files.keys.join(",") if @files
         response.merge!(@batch_args) if @batch_args
         
         # for get and delete, we append args to the URL string
@@ -41,6 +44,19 @@ module Koala
       end
   
       protected
+      
+      def process_binary_args
+        # collect binary files
+        @args.each_pair do |key, value| 
+          if UploadableIO.binary_content?(value)
+            @files ||= {}
+            # we use object_id to ensure unique file identifiers across multiple batch operations
+            # remove it from the original hash and add it to the file store
+            id = "file#{GraphAPI.batch_calls.length}_#{@files.keys.length}"
+            @files[id] = @args.delete(key).is_a?(UploadableIO) ? value : UploadableIO.new(value)
+          end
+        end          
+      end
       
       def args_in_url?
         @method == :get || @method == :delete 
@@ -81,8 +97,10 @@ module Koala
             # Turn the call args collected into what facebook expects
             args = {}
             access_token = args["access_token"] = batch_calls.first.access_token
-            # need to support binary files
-            args['batch'] = batch_calls.map { |batch_op| batch_op.to_batch_params(access_token) }.to_json
+            args['batch'] = batch_calls.map { |batch_op| 
+              args.merge!(batch_op.files) if batch_op.files
+              batch_op.to_batch_params(access_token)
+            }.to_json
             
             # Make the POST request for the batch call
             # batch operations have to go over SSL, but since there's an access token, that secures that
@@ -102,7 +120,7 @@ module Koala
               index += 1
 
               if call_result
-                # (see note in API about JSON parsing)
+                # (see note in regular api method about JSON parsing)
                 body = JSON.parse("[#{call_result['body'].to_s}]")[0]
                 unless call_result["code"].to_i >= 500 || error = GraphAPI.check_response(body)
                   # Get the HTTP component they want

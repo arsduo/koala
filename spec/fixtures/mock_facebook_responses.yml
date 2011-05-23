@@ -98,6 +98,18 @@ graph_api:
     batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}].to_json %>:
       post:
         with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}].to_json %>:
+      post:
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "file0_0"}].to_json %>&file0_0=[FILE]:
+      post:
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "file0_0"}].to_json %>&file0_0=[FILE]:
+      post:
+        with_token: '[{"body":"{\"id\": \"MOCK_PHOTO\"}"}]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "file0_0"}, {"method"=>"post", "relative_url"=>"koppel/photos", "attached_files" => "file1_0"}].to_json %>&file0_0=[FILE]&file1_0=[FILE]:
+      post:
+        with_token: '[{"body":"{\"id\": \"MOCK_PHOTO\"}"}, {"body":"{\"id\": \"MOCK_PHOTO\"}"}]'
 
 
   /me:

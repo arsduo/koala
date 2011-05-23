@@ -43,9 +43,70 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         @args[:http_options].should == expected
       end
       
+      it "leaves the file array nil by default" do
+        Koala::Facebook::BatchOperation.new(@args).files.should be_nil        
+      end
+      
       it "raises a KoalaError if no access token supplied" do
         expect { Koala::Facebook::BatchOperation.new(@args.merge(:access_token => nil)) }.to raise_exception(Koala::KoalaError)
       end
+      
+      describe "when supplied binary files" do
+        before :each do
+          @binary = stub("Binary file")
+          @uploadable_io = stub("UploadableIO 1")
+          
+          @batch_queue = []
+          Koala::Facebook::GraphAPI.stub(:batch_calls).and_return(@batch_queue)
+          
+          Koala::UploadableIO.stub(:new).with(@binary).and_return(@uploadable_io)
+          Koala::UploadableIO.stub(:binary_content?).and_return(false)
+          Koala::UploadableIO.stub(:binary_content?).with(@binary).and_return(true)
+          Koala::UploadableIO.stub(:binary_content?).with(@uploadable_io).and_return(true)
+          @uploadable_io.stub(:is_a?).with(Koala::UploadableIO).and_return(true)
+
+          @args[:method] = "post" # files are always post
+        end
+        
+        it "adds binary files to the files attribute as UploadableIOs" do
+          @args[:args].merge!("source" => @binary)
+          batch_op = Koala::Facebook::BatchOperation.new(@args)
+          batch_op.files.should_not be_nil
+          batch_op.files.find {|k, v| v == @uploadable_io}.should_not be_nil
+        end
+        
+        it "works if supplied an UploadableIO as an argument" do
+          # as happens with put_picture at the moment
+          @args[:args].merge!("source" => @uploadable_io)
+          batch_op = Koala::Facebook::BatchOperation.new(@args)
+          batch_op.files.should_not be_nil
+          batch_op.files.find {|k, v| v == @uploadable_io}.should_not be_nil
+        end
+                
+        it "assigns each binary parameter unique name" do
+          @args[:args].merge!("source" => @binary, "source2" => @binary)
+          batch_op = Koala::Facebook::BatchOperation.new(@args)
+          # if the name wasn't unique, there'd just be one item
+          batch_op.files.should have(2).items
+        end
+        
+        it "assigns each binary parameter unique name across batch requests" do
+          @args[:args].merge!("source" => @binary, "source2" => @binary)
+          batch_op = Koala::Facebook::BatchOperation.new(@args)
+          # simulate the batch operation, since it's used in determination
+          @batch_queue << batch_op
+          batch_op2 = Koala::Facebook::BatchOperation.new(@args)
+          @batch_queue << batch_op2
+          # if the name wasn't unique, we should have < 4 items since keys would be the same
+          batch_op.files.merge(batch_op2.files).should have(4).items
+        end
+        
+        it "removes the value from the arguments" do
+          @args[:args].merge!("source" => @binary)
+          Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should_not =~ /source=/
+        end
+      end   
+      
     end
     
     describe ".to_batch_params" do    
@@ -156,7 +217,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
       
       it "includes any arguments passed as http_options[:batch_args]" do
-        batch_args = {:name => "baz", :foo => "bar"}
+        batch_args = {:name => "baz", :headers => {:some_param => true}}
         @args[:http_options][:batch_args] = batch_args
         params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
         params.should include(batch_args)
@@ -173,7 +234,31 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       
       it "works with nil args" do
         expect { Koala::Facebook::BatchOperation.new(@args.merge(:args => nil)).to_batch_params(nil) }.not_to raise_exception
-      end      
+      end 
+      
+      describe "with binary files" do
+        before :each do
+          @binary = stub("Binary file")
+          Koala::UploadableIO.stub(:binary_content?).and_return(false)
+          Koala::UploadableIO.stub(:binary_content?).with(@binary).and_return(true)
+          @uploadable_io = stub("UploadableIO")
+          Koala::UploadableIO.stub(:new).with(@binary).and_return(@uploadable_io)          
+          @uploadable_io.stub(:is_a?).with(Koala::UploadableIO).and_return(true)
+
+          @batch_queue = []
+          Koala::Facebook::GraphAPI.stub(:batch_calls).and_return(@batch_queue)
+
+          @args[:method] = "post" # files are always post
+        end
+        
+        it "adds file identifiers as attached_files in a comma-separated list" do
+          @args[:args].merge!("source" => @binary, "source2" => @binary)
+          batch_op = Koala::Facebook::BatchOperation.new(@args)
+          file_ids = batch_op.files.find_all {|k, v| v == @uploadable_io}.map {|k, v| k}
+          params = batch_op.to_batch_params(nil)
+          params[:attached_files].should == file_ids.join(",")
+        end     
+      end
     end
     
   end
@@ -198,6 +283,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       Koala::Facebook::GraphAPI.batch { @api.get_object("me") }
       Koala.should_receive(:make_request).once.and_return(Koala::Response.new(200, "[]", {}))
       Koala::Facebook::GraphAPI.batch { @api.get_object("me") }      
+    end
+    
+    it "returns nothing for a batch operation" do
+      Koala.stub(:make_request).and_return(Koala::Response.new(200, "[]", {}))
+      Koala::Facebook::GraphAPI.batch do
+        @api.get_object("me").should be_nil
+      end
     end
     
     it "creates a BatchObject when making a GraphAPI request in batch mode" do
@@ -264,6 +356,21 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             Koala::Facebook::GraphAPI.new(access_token).get_object('me')
             Koala::Facebook::GraphAPI.new(access_token).get_object('me')
           end        
+        end
+        
+        it "adds any files from the batch operations to the arguments" do
+          # stub the batch operation 
+          # we test above to ensure that files are properly assimilated into the BatchOperation instance
+          # right now, we want to make sure that batch_api handles them properly
+          @key = "file0_0"
+          @uploadable_io = stub("UploadableIO")
+          batch_op = stub("Koala Batch Operation", :files => {@key => @uploadable_io}, :to_batch_params => {}, :access_token => "foo")
+          Koala::Facebook::BatchOperation.stub(:new).and_return(batch_op)
+          
+          Koala.should_receive(:make_request).with(anything, hash_including(@key => @uploadable_io), anything, anything).and_return(@fake_response)            
+          Koala::Facebook::GraphAPI.batch do
+            Koala::Facebook::GraphAPI.new("bar").put_picture("path/to/file", "image/jpeg")
+          end         
         end
         
         it "preserves operation order" do
@@ -395,8 +502,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       koppel["id"].should_not be_nil
     end
 
-    it "uploads binary files appropriately"
-    
     it "handles different request methods" do
       result = @api.put_wall_post("Hello, world, from the test suite batch API!")
       wall_post = result["id"]
@@ -417,6 +522,29 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       fql_result[0]["name"].should == "Mark Zuckerberg"
     end
     
+    describe "binary files" do
+      it "posts binary files" do
+        file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+
+        result = Koala::Facebook::GraphAPI.batch do
+          @api.put_picture(file)
+        end
+        
+        @temporary_object_id = result[0]["id"]
+        @temporary_object_id.should_not be_nil
+      end
+      
+      it "posts binary files with multiple requests" do
+        file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+
+        results = Koala::Facebook::GraphAPI.batch do
+          @api.put_picture(file)
+          @api.put_picture(file, {}, "koppel")
+        end
+        results[0]["id"].should_not be_nil
+        results[1]["id"].should_not be_nil
+      end
+    end
     
     describe "relating requests" do
       it "allows you create relationships between requests without omit_response_on_success" do
