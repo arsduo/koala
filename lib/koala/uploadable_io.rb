@@ -4,7 +4,8 @@ module Koala
   class UploadableIO
     attr_reader :io_or_path, :content_type
 
-    def initialize(io_or_path_or_mixed, content_type = nil)
+    def initialize(io_or_path_or_mixed, content_type = nil, filename = 'koala-io-file.dum')
+      @filename=filename
       # see if we got the right inputs
       if content_type.nil?
         parse_init_mixed_param io_or_path_or_mixed
@@ -18,7 +19,7 @@ module Koala
     end
     
     def to_upload_io
-      UploadIO.new(@io_or_path, @content_type, "koala-io-file.dum")
+      UploadIO.new(@io_or_path, @content_type, @filename)
     end
     
     def to_file
