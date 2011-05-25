@@ -3,6 +3,8 @@ require 'yaml'
 
 module Koala
   module MockHTTPService
+    include Koala::HTTPService
+
     # Mocks all HTTP requests for with koala_spec_with_mocks.rb
     IS_MOCK = true # this lets our tests figure out if we want to stub methods
 
@@ -30,66 +32,58 @@ module Koala
     mock_response_file_path = File.join(File.dirname(__FILE__), '..', 'fixtures', 'mock_facebook_responses.yml')
     RESPONSES = YAML.load(ERB.new(IO.read(mock_response_file_path)).result(binding))
 
-    def self.included(base)
-      base.class_eval do
+    def self.make_request(path, args, verb, options = {})
+      path = 'root' if path == '' || path == '/'
+      verb ||= 'get'
+      server = options[:rest_api] ? 'rest_api' : 'graph_api'
+      with_token = args.delete('access_token') == ACCESS_TOKEN ? 'with_token' : 'no_token'
 
-        include Koala::HTTPService
+      # Assume format is always JSON
+      args.delete('format')
 
-        def self.make_request(path, args, verb, options = {})
-          path = 'root' if path == '' || path == '/'
-          verb ||= 'get'
-          server = options[:rest_api] ? 'rest_api' : 'graph_api'
-          with_token = args.delete('access_token') == ACCESS_TOKEN ? 'with_token' : 'no_token'
+      # Create a hash key for the arguments
+      args = create_params_key(args)
 
-          # Assume format is always JSON
-          args.delete('format')
+      begin
+        response = RESPONSES[server][path][args][verb][with_token]
 
-          # Create a hash key for the arguments
-          args = create_params_key(args)
+        # Raises an error of with_token/no_token key is missing
+        raise NoMethodError unless response
 
-          begin
-            response = RESPONSES[server][path][args][verb][with_token]
-
-            # Raises an error of with_token/no_token key is missing
-            raise NoMethodError unless response
-
-            # create response class object
-            response_object = if response.is_a? String
-                Koala::Response.new(200, response, {})
-              else
-                Koala::Response.new(response["code"] || 200, response["body"] || "", response["headers"] || {})
-              end
-
-          rescue NoMethodError
-            # Raises an error message with the place in the data YML
-            # to place a mock as well as a URL to request from
-            # Facebook's servers for the actual data
-            # (Don't forget to replace ACCESS_TOKEN with a real access token)
-            data_trace = [server, path, args, verb, with_token] * ': '
-
-            args = args == 'no_args' ? '' : "#{args}&"
-            args += 'format=json'
-            args += "&access_token=#{ACCESS_TOKEN}" if with_token
-
-            raise "Missing a mock response for #{data_trace}\nAPI PATH: #{[path, args].join('?')}"
-          end
-
-          response_object
-        end
-
-        protected
-        def self.create_params_key(params_hash)
-          if params_hash.empty?
-            'no_args'
+        # create response class object
+        response_object = if response.is_a? String
+            Koala::Response.new(200, response, {})
           else
-            params_hash.sort{ |a,b| a[0].to_s <=> b[0].to_s}.map do |arr|
-              arr[1] = '[FILE]' if arr[1].kind_of?(Koala::UploadableIO)
-              arr.join('=')
-            end.join('&')
+            Koala::Response.new(response["code"] || 200, response["body"] || "", response["headers"] || {})
           end
-        end
 
-      end # class_eval
-    end # included
+      rescue NoMethodError
+        # Raises an error message with the place in the data YML
+        # to place a mock as well as a URL to request from
+        # Facebook's servers for the actual data
+        # (Don't forget to replace ACCESS_TOKEN with a real access token)
+        data_trace = [server, path, args, verb, with_token] * ': '
+
+        args = args == 'no_args' ? '' : "#{args}&"
+        args += 'format=json'
+        args += "&access_token=#{ACCESS_TOKEN}" if with_token
+
+        raise "Missing a mock response for #{data_trace}\nAPI PATH: #{[path, args].join('?')}"
+      end
+
+      response_object
+    end
+
+    protected
+    def self.create_params_key(params_hash)
+      if params_hash.empty?
+        'no_args'
+      else
+        params_hash.sort{ |a,b| a[0].to_s <=> b[0].to_s}.map do |arr|
+          arr[1] = '[FILE]' if arr[1].kind_of?(Koala::UploadableIO)
+          arr.join('=')
+        end.join('&')
+      end
+    end
   end
 end

@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 
-module Horse
-  include Koala::NetHTTPService
-end
+Horse = Koala::NetHTTPService
 
 describe "NetHTTPService module holder class Horse" do
   before :each do

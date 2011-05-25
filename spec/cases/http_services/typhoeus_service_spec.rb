@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 
-module Deer
-  include Koala::TyphoeusService
-end
+Deer = Koala::TyphoeusService
 
 describe "TyphoeusService" do
 

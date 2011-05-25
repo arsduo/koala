@@ -124,7 +124,9 @@ module Koala
         options   = picture_args[3 + args_offset] || {} 
         
         args["source"] = Koala::UploadableIO.new(*picture_args.slice(0, 1 + args_offset))
-        
+
+        options[:http_service] = Koala.base_http_service if args["source"].requires_base_http_service
+
         self.put_object(target_id, "photos", args, options)
       end
     

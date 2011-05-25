@@ -9,6 +9,7 @@ require 'base64'
 
 # include koala modules
 require 'koala/http_services'
+require 'koala/http_services/net_http_service'
 require 'koala/graph_api'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
@@ -277,18 +278,29 @@ module Koala
 
   class KoalaError< StandardError; end
 
+  # Make an api request using the provided api service or one passed by the caller
+  def self.make_request(path, args, verb, options = {})
+    http_service = options.delete(:http_service) || Koala.http_service
+    options = options.merge(:use_ssl => true) if @always_use_ssl
+    http_service.make_request(path, args, verb, options)
+  end
+
   # finally, set up the http service Koala methods used to make requests
   # you can use your own (for HTTParty, etc.) by calling Koala.http_service = YourModule
-  def self.http_service=(service)
-    self.send(:include, service)
+  class << self
+    attr_accessor :http_service
+    attr_accessor :always_use_ssl
+    attr_accessor :base_http_service
   end
+  Koala.base_http_service = NetHTTPService
 
   # by default, try requiring Typhoeus -- if that works, use it
   # if you have Typheous and don't want to use it (or want another service),
   # you can run Koala.http_service = NetHTTPService (or MyHTTPService)
   begin
+    require 'koala/http_services/typhoeus_service'
     Koala.http_service = TyphoeusService
   rescue LoadError
-    Koala.http_service = NetHTTPService
+    Koala.http_service = Koala.base_http_service
   end
 end

@@ -2,7 +2,7 @@ require 'koala'
 
 module Koala
   class UploadableIO
-    attr_reader :io_or_path, :content_type
+    attr_reader :io_or_path, :content_type, :requires_base_http_service
 
     def initialize(io_or_path_or_mixed, content_type = nil)
       # see if we got the right inputs
@@ -12,7 +12,10 @@ module Koala
         @io_or_path = io_or_path_or_mixed
         @content_type = content_type
       end
-      
+
+      # Probably a StringIO or similar object, which won't work with Typhoeus
+      @requires_base_http_service = @io_or_path.respond_to?(:read) && !@io_or_path.kind_of?(File)
+
       raise KoalaError.new("Invalid arguments to initialize an UploadableIO") unless @io_or_path
       raise KoalaError.new("Unable to determine MIME type for UploadableIO") if !@content_type && Koala.multipart_requires_content_type?
     end

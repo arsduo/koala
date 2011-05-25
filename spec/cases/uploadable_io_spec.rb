@@ -29,6 +29,12 @@ describe "Koala::UploadableIO" do
           stub_type = @koala_io_params[1] = stub('Content Type')
           Koala::UploadableIO.new(*@koala_io_params).content_type.should == stub_type
         end
+
+        it "should detect that NetHTTPService must be used" do
+          @koala_io_params[0] = mock
+          @koala_io_params[0].stub!(:read)
+          Koala::UploadableIO.new(*@koala_io_params).requires_base_http_service.should be_true
+        end
       end
 
       describe "and no content type" do
