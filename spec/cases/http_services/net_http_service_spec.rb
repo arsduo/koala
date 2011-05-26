@@ -265,51 +265,6 @@ describe "NetHTTPService module holder class Horse" do
     end # describe return value
   end # describe when making a request
 
-  describe "when encoding parameters" do
-    it "should return an empty string if param_hash evaluates to false" do
-      Horse.encode_params(nil).should == ''
-    end
-
-    it "should convert values to JSON if the value is not a String" do
-      val = 'json_value'
-      not_a_string = 'not_a_string'
-      not_a_string.stub(:is_a?).and_return(false)
-      not_a_string.should_receive(:to_json).and_return(val)
-
-      string = "hi"
-
-      args = {
-        not_a_string => not_a_string,
-        string => string
-      }
-
-      result = Horse.encode_params(args)
-      result.split('&').find do |key_and_val|
-        key_and_val.match("#{not_a_string}=#{val}")
-      end.should be_true
-    end
-
-    it "should escape all values" do
-      args = Hash[*(1..4).map {|i| [i.to_s, "Value #{i}($"]}.flatten]
-
-      result = Horse.encode_params(args)
-      result.split('&').each do |key_val|
-        key, val = key_val.split('=')
-        val.should == CGI.escape(args[key])
-      end
-    end
-
-    it "should convert all keys to Strings" do
-      args = Hash[*(1..4).map {|i| [i, "val#{i}"]}.flatten]
-
-      result = Horse.encode_params(args)
-      result.split('&').each do |key_val|
-        key, val = key_val.split('=')
-        key.should == args.find{|key_val_arr| key_val_arr.last == val}.first.to_s
-      end
-    end
-  end
-
   describe "when detecting if multipart posting is needed" do
     it "should be true if any parameter value requires multipart post" do
       koala_io = mock("Koala::IO")

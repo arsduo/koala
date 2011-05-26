@@ -115,7 +115,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           it "adds the args to the URL string, with ? if no args previously present" do
             test_args = "foo"
             @args[:url] = url = "/"
-            Koala.stub(:encode_params).and_return(test_args)
+            Koala.http_service.stub(:encode_params).and_return(test_args)
           
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:relative_url].should == "#{url}?#{test_args}"
           end
@@ -123,7 +123,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           it "adds the args to the URL string, with & if args previously present" do
             test_args = "foo"
             @args[:url] = url = "/?a=2"
-            Koala.stub(:encode_params).and_return(test_args)
+            Koala.http_service.stub(:encode_params).and_return(test_args)
           
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:relative_url].should == "#{url}&#{test_args}"
           end
@@ -141,21 +141,21 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         shared_examples_for "requests with a body param" do
           it "sets the body to the encoded args string, if there are args" do
             test_args = "foo"
-            Koala.stub(:encode_params).and_return(test_args)
+            Koala.http_service.stub(:encode_params).and_return(test_args)
           
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should == test_args
           end
           
           it "does not set the body if there are no args" do
             test_args = ""
-            Koala.stub(:encode_params).and_return(test_args)
+            Koala.http_service.stub(:encode_params).and_return(test_args)
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should be_nil
           end
           
         
           it "doesn't change the url" do
             test_args = "foo"
-            Koala.stub(:encode_params).and_return(test_args)
+            Koala.http_service.stub(:encode_params).and_return(test_args)
 
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:relative_url].should == @args[:url]
           end

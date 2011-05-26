@@ -19,7 +19,7 @@ module Koala
       
       def to_batch_params(main_access_token)
         # set up the arguments
-        args_string = Koala.encode_params(@access_token == main_access_token ? @args : @args.merge(:access_token => @access_token))
+        args_string = Koala.http_service.encode_params(@access_token == main_access_token ? @args : @args.merge(:access_token => @access_token))
         
         response = {
           :method => @method, 
