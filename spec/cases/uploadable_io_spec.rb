@@ -142,9 +142,19 @@ describe "Koala::UploadableIO" do
       UploadIO.stub!(:new).with(anything, anything, anything).and_return(@upload_io)
     end
 
-    it "should call the constructor with the content type, file name, and a dummy file name" do
-      UploadIO.should_receive(:new).with(BEACH_BALL_PATH, "content/type", anything).and_return(@upload_io)
-      Koala::UploadableIO.new(BEACH_BALL_PATH, "content/type").to_upload_io.should == @upload_io
+    context "if no filename was provided" do
+      it "should call the constructor with the content type, file name, and a dummy file name" do
+        UploadIO.should_receive(:new).with(BEACH_BALL_PATH, "content/type", anything).and_return(@upload_io)
+        Koala::UploadableIO.new(BEACH_BALL_PATH, "content/type").to_upload_io.should == @upload_io
+      end
+    end
+    
+    context "if a filename was provided" do
+      it "should call the constructor with the content type, file name, and the filename" do
+        filename = "file"
+        UploadIO.should_receive(:new).with(BEACH_BALL_PATH, "content/type", filename).and_return(@upload_io)
+        Koala::UploadableIO.new(BEACH_BALL_PATH, "content/type", filename).to_upload_io
+      end
     end
   end
 
