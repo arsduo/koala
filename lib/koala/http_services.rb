@@ -113,7 +113,6 @@ module Koala
     def self.included(base)
       base.class_eval do
         require "typhoeus" unless defined?(Typhoeus)
-        include Typhoeus
         
         include Koala::HTTPService
 
@@ -131,7 +130,7 @@ module Koala
           # this makes public requests faster
           prefix = (args["access_token"] || @always_use_ssl || options[:use_ssl]) ? "https" : "http"
 
-          response = self.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
+          response = Typhoeus::Request.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
           Koala::Response.new(response.code, response.body, response.headers_hash)
         end
         

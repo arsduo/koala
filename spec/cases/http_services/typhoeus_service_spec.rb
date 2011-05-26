@@ -29,55 +29,55 @@ describe "TyphoeusService" do
         @mock_http_response = stub(Typhoeus::Response, :code => 1, :headers_hash => @mock_headers_hash, :body => @mock_body)
 
         # Typhoeus is an included module, so we stub methods on Deer itself
-        Deer.stub(:post).and_return(@mock_http_response)
-        Deer.stub(:get).and_return(@mock_http_response)
+        Typhoeus::Request.stub(:post).and_return(@mock_http_response)
+        Typhoeus::Request.stub(:get).and_return(@mock_http_response)
       end
 
       it "should use POST if verb is not GET" do
-        Deer.should_receive(:post).and_return(@mock_http_response)
+        Typhoeus::Request.should_receive(:post).and_return(@mock_http_response)
         Deer.make_request('anything', {}, 'anything')
       end
 
       it "should use GET if that verb is specified" do
-        Deer.should_receive(:get).and_return(@mock_http_response)
+        Typhoeus::Request.should_receive(:get).and_return(@mock_http_response)
         Deer.make_request('anything', {}, 'get')
       end
 
       describe "the connection" do
         it "should use SSL if the request has an access token" do
-          Deer.should_receive(:post).with(/https\:/, anything)
+          Typhoeus::Request.should_receive(:post).with(/https\:/, anything)
 
           Deer.make_request('anything', {"access_token" => "123"}, 'anything')
         end
 
         it "should use SSL if always_use_ssl is true, even if there's no token" do
-          Deer.should_receive(:post).with(/https\:/, anything)
+          Typhoeus::Request.should_receive(:post).with(/https\:/, anything)
 
           Deer.always_use_ssl = true
           Deer.make_request('anything', {}, 'anything')
         end
 
         it "should use SSL if the :use_ssl option is provided, even if there's no token" do
-          Deer.should_receive(:post).with(/https\:/, anything)
+          Typhoeus::Request.should_receive(:post).with(/https\:/, anything)
 
           Deer.always_use_ssl = true
           Deer.make_request('anything', {}, 'anything', :use_ssl => true)
         end
 
         it "should not use SSL if always_use_ssl is false and there's no token" do
-          Deer.should_receive(:post).with(/http\:/, anything)
+          Typhoeus::Request.should_receive(:post).with(/http\:/, anything)
 
           Deer.make_request('anything', {}, 'anything')
         end
 
         it "should use the graph server by default" do
-          Deer.should_receive(:post).with(Regexp.new(Koala::Facebook::GRAPH_SERVER), anything)
+          Typhoeus::Request.should_receive(:post).with(Regexp.new(Koala::Facebook::GRAPH_SERVER), anything)
 
           Deer.make_request('anything', {}, 'anything')
         end
 
         it "should use the REST server if the :rest_api option is true" do
-          Deer.should_receive(:post).with(Regexp.new(Koala::Facebook::REST_SERVER), anything)
+          Typhoeus::Request.should_receive(:post).with(Regexp.new(Koala::Facebook::REST_SERVER), anything)
 
           Deer.make_request('anything', {}, 'anything', :rest_api => true)
         end
@@ -85,21 +85,21 @@ describe "TyphoeusService" do
 
       it "should pass the arguments to Typhoeus under the :params key" do
         args = {:a => 2}
-        Deer.should_receive(:post).with(anything, hash_including(:params => args))
+        Typhoeus::Request.should_receive(:post).with(anything, hash_including(:params => args))
 
         Deer.make_request('anything', args, "post")
       end
 
       it "should add the method to the arguments if the method isn't get or post" do
         method = "telekenesis"
-        Deer.should_receive(:post).with(anything, hash_including(:params => {:method => method}))
+        Typhoeus::Request.should_receive(:post).with(anything, hash_including(:params => {:method => method}))
 
         Deer.make_request('anything', {}, method)
       end
 
       it "should pass :typhoeus_options to Typhoeus if provided" do
         t_options = {:a => :b}
-        Deer.should_receive(:post).with(anything, hash_including(t_options))
+        Typhoeus::Request.should_receive(:post).with(anything, hash_including(t_options))
 
         Deer.make_request("anything", {}, "post", :typhoeus_options => t_options)
       end
@@ -107,13 +107,13 @@ describe "TyphoeusService" do
       # for live tests, run the Graph API tests with Typhoues, which will run file uploads
       it "should pass any files directly on to Typhoues" do
         args = {:file => File.new(__FILE__, "r")}
-        Deer.should_receive(:post).with(anything, hash_including(:params => args)).and_return(Typhoeus::Response.new)
+        Typhoeus::Request.should_receive(:post).with(anything, hash_including(:params => args)).and_return(Typhoeus::Response.new)
         Deer.make_request("anything", args, :post)
       end
 
       it "should include the path in the request" do
         path = "/a/b/c/1"
-        Deer.should_receive(:post).with(Regexp.new(path), anything)
+        Typhoeus::Request.should_receive(:post).with(Regexp.new(path), anything)
 
         Deer.make_request(path, {}, "post")
       end
