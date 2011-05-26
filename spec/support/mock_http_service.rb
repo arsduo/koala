@@ -10,6 +10,7 @@ module Koala
 
     # Mocked values to be included in TEST_DATA used in specs
     ACCESS_TOKEN = '*'
+    APP_ACCESS_TOKEN = "**"
     OAUTH_CODE = 'OAUTHCODE'
 
     # Loads testing data
@@ -20,7 +21,7 @@ module Koala
     # Useful in mock_facebook_responses.yml
     OAUTH_DATA = TEST_DATA['oauth_test_data']
     OAUTH_DATA.merge!({
-      'app_access_token' => Koala::MockHTTPService::ACCESS_TOKEN,
+      'app_access_token' => APP_ACCESS_TOKEN,
       'session_key' => "session_key",
       'multiple_session_keys' => ["session_key", "session_key_2"]
     })
@@ -36,7 +37,8 @@ module Koala
       path = 'root' if path == '' || path == '/'
       verb ||= 'get'
       server = options[:rest_api] ? 'rest_api' : 'graph_api'
-      with_token = args.delete('access_token') == ACCESS_TOKEN ? 'with_token' : 'no_token'
+      token = args.delete('access_token') 
+      with_token = (token == ACCESS_TOKEN || token == APP_ACCESS_TOKEN) ? 'with_token' : 'no_token'
 
       # Assume format is always JSON
       args.delete('format')

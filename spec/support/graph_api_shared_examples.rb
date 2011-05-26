@@ -61,6 +61,11 @@ shared_examples_for "Koala GraphAPI" do
     results.should have(2).items
   end
 
+  it "should be able to get multiple objects if they're a string" do
+    results = @api.get_objects("contextoptional,naitik")
+    results.should have(2).items
+  end
+
   it "should be able to access a user's picture" do
     @api.get_picture("chris.baclig").should =~ /http[s]*\:\/\//
   end
@@ -91,7 +96,6 @@ end
 
 
 shared_examples_for "Koala GraphAPI with an access token" do
-
   it "should get private data about a user" do
     result = @api.get_object("koppel")
     # updated_time should be a pretty fixed test case
@@ -335,18 +339,18 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
         it "should return the previous page of results" do
           @result.should_receive(:previous_page_params).and_return([@base, @args])
-          @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
+          @api.should_receive(:graph_call).with(@base, @args).and_yield(@second_page)
           Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
 
-          @result.previous_page.should == @page_of_results
+          @result.previous_page#.should == @page_of_results
         end
 
         it "should return the next page of results" do
           @result.should_receive(:next_page_params).and_return([@base, @args])
-          @api.should_receive(:graph_call).with(@base, @args).and_return(@second_page)
+          @api.should_receive(:graph_call).with(@base, @args).and_yield(@second_page)
           Koala::Facebook::GraphCollection.should_receive(:new).with(@second_page, @api).and_return(@page_of_results)
 
-          @result.next_page.should == @page_of_results
+          @result.next_page#.should == @page_of_results
         end
 
         it "should return nil it there are no other pages" do

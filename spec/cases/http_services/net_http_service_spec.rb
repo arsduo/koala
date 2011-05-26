@@ -273,7 +273,7 @@ describe "NetHTTPService module holder class Horse" do
     it "should convert values to JSON if the value is not a String" do
       val = 'json_value'
       not_a_string = 'not_a_string'
-      not_a_string.stub(:class).and_return('NotAString')
+      not_a_string.stub(:is_a?).and_return(false)
       not_a_string.should_receive(:to_json).and_return(val)
 
       string = "hi"

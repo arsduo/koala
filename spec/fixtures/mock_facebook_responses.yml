@@ -49,7 +49,7 @@ graph_api:
     
   test_user_no_perms: &test_user_no_perms
     post:
-      with_token: '{"id": "777777777", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
+      with_token: '{"id": "777777777", "access_token":"<%= APP_ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
   
   test_user_befriended: &test_user_befriended
     post:
@@ -59,8 +59,59 @@ graph_api:
   root:
     ids=contextoptional,naitik: 
       get:
-        with_token: '[{}, {}]'
-        no_token: '[{}, {}]'
+        with_token: '{"contextoptional":"{}","naitik":"{}"}'
+        no_token: '{"contextoptional":"{}","naitik":"{}"}'
+    # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here 
+    batch=<%= [{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}].to_json %>:
+      post:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me/picture"}].to_json %>:
+      post:
+        with_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}].to_json %>:
+      post:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}].to_json %>:
+      post:
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}].to_json %>:
+      post:
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"body":"{\"id\":\"123\"}"}]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"FEED_ITEM_BATCH/likes"}, {"method"=>"delete", "relative_url"=> "FEED_ITEM_BATCH"}].to_json %>:
+      post:
+        with_token: '[{"body": "{\"id\": \"MOCK_LIKE\"}"},{"body":true}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}].to_json %>:
+      post:
+        with_token: '[null,{"body":"{}"}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends", "omit_response_on_success" => false}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}].to_json %>:
+      post:
+        with_token: '[{"body":"{\"data\":[]}"},{"body":"{}"}]'
+    batch=<%= [{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}].to_json %>:
+      post:
+        with_token: '{"error":190,"error_description":"Error validating access token."}'
+    batch=<%= [{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+name+from+user+where+uid%3D4"}].to_json %>:
+      post:
+        with_token: '[{"body":"[{\"name\":\"Mark Zuckerberg\"}]"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}].to_json %>:
+      post:
+        with_token: '[null,{"body":"{\"id\":\"123\"}"}]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}].to_json %>:
+      post:
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+    batch=<%= [{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}].to_json %>:
+      post:
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "file0_0"}].to_json %>&file0_0=[FILE]:
+      post:
+        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "file0_0"}].to_json %>&file0_0=[FILE]:
+      post:
+        with_token: '[{"body":"{\"id\": \"MOCK_PHOTO\"}"}]'
+    batch=<%= [{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "file0_0"}, {"method"=>"post", "relative_url"=>"koppel/photos", "attached_files" => "file1_0"}].to_json %>&file0_0=[FILE]&file1_0=[FILE]:
+      post:
+        with_token: '[{"body":"{\"id\": \"MOCK_PHOTO\"}"}, {"body":"{\"id\": \"MOCK_PHOTO\"}"}]'
+
+
   /me:
     no_args:
       get:
@@ -83,6 +134,9 @@ graph_api:
     message=Hello, world, from the test suite delete method!: 
       post: 
         with_token: '{"id": "FEED_ITEM_DELETE"}'
+    message=Hello, world, from the test suite batch API!: 
+      post: 
+        with_token: '{"id": "FEED_ITEM_BATCH"}'
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
@@ -169,7 +223,7 @@ graph_api:
         <<: *oauth_error
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&type=client_cred:
       post:
-        no_token: access_token=<%= ACCESS_TOKEN %>
+        no_token: access_token=<%= APP_ACCESS_TOKEN %>
   /oauth/exchange_sessions:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["session_key"] %>&type=client_cred: 
       post:

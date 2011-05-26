@@ -10,14 +10,12 @@ module Koala
       def rest_call(method, args = {}, options = {})
         options = options.merge!(:rest_api => true, :read_only => READ_ONLY_METHODS.include?(method))
 
-        response = api("method/#{method}", args.merge('format' => 'json'), 'get', options) do |response|
+        api("method/#{method}", args.merge('format' => 'json'), 'get', options) do |response|
           # check for REST API-specific errors
           if response.is_a?(Hash) && response["error_code"]
             raise APIError.new("type" => response["error_code"], "message" => response["error_msg"])
           end
         end
-
-        response
       end
 
       # read-only methods for which we can use API-read

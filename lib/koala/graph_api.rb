@@ -28,7 +28,20 @@ module Koala
       # If you are using the JavaScript SDK, you can use the
       # Koala::Facebook::OAuth.get_user_from_cookie() method below to get the OAuth access token
       # for the active user from the cookie saved by the SDK.
-         
+
+      def self.included(base)
+        base.class_eval do
+          def self.check_response(response)
+            # check for Graph API-specific errors
+            # this returns an error, which is immediately raised (non-batch)
+            # or added to the list of batch results (batch)
+            if response.is_a?(Hash) && error_details = response["error"]
+              APIError.new(error_details) 
+            end
+          end
+        end
+      end
+
       # Objects
 
       def get_object(id, args = {}, options = {})
@@ -37,11 +50,10 @@ module Koala
       end
     
       def get_objects(ids, args = {}, options = {})
-        # Fetchs all of the given object from the graph.
-        # We return a map from ID to object. If any of the IDs are invalid,
-        # we raise an exception.
+        # Fetchs all of the given objects from the graph.
+        # If any of the IDs are invalid, they'll raise an exception.
         return [] if ids.empty?
-        graph_call("", args.merge("ids" => ids.join(",")), "get", options)
+        graph_call("", args.merge("ids" => ids.respond_to?(:join) ? ids.join(",") : ids), "get", options)
       end
       
       def put_object(parent_object, connection_name, args = {}, options = {})
@@ -72,8 +84,9 @@ module Koala
           
       def get_connections(id, connection_name, args = {}, options = {})
         # Fetchs the connections for given object.
-        result = graph_call("#{id}/#{connection_name}", args, "get", options)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        graph_call("#{id}/#{connection_name}", args, "get", options) do |result|
+          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        end
       end
 
       def put_connections(id, connection_name, args = {}, options = {})
@@ -94,8 +107,9 @@ module Koala
     
       def get_picture(object, args = {}, options = {})
         # Gets a picture object, returning the URL (which Facebook sends as a header)
-        result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers))
-        result["Location"]
+        graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
+          result["Location"]
+        end
       end    
       
       def put_picture(*picture_args)
@@ -175,47 +189,62 @@ module Koala
             
       def search(search_terms, args = {}, options = {})
         args.merge!({:q => search_terms}) unless search_terms.nil?
-        result = graph_call("search", args, "get", options)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        graph_call("search", args, "get", options) do |result|
+          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        end
       end      
       
       # API access
-    
-      def graph_call(*args)
+
+      # Make a call which may or may not be batched
+      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
         # Direct access to the Facebook API
         # see any of the above methods for example invocations
-        response = api(*args) do |response|
-          # check for Graph API-specific errors
-          if response.is_a?(Hash) && error_details = response["error"]
-            raise APIError.new(error_details)
+        unless GraphAPI.batch_mode?
+          result = api(path, args, verb, options) do |response|
+            if error = GraphAPI.check_response(response)
+              raise error
+            end
           end
+          
+          # now process as appropriate (get picture header, make GraphCollection, etc.)
+          post_processing ? post_processing.call(result) : result
+        else
+          # for batch APIs, we queue up the call details (incl. post-processing)
+          GraphAPI.batch_calls << BatchOperation.new(
+            :url => path,
+            :args => args,
+            :method => verb,
+            :access_token => @access_token,
+            :http_options => options,
+            :post_processing => post_processing
+          )
+          nil # batch operations return nothing immediately 
         end
-      
-        response
-      end 
+      end
       
       # GraphCollection support
-      
       def get_page(params)
         # Pages through a set of results stored in a GraphCollection
         # Used for connections and search results
-        result = graph_call(*params)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        graph_call(*params) do |result|
+          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        end
       end
       
     end
     
     
     class GraphCollection < Array
-      #This class is a light wrapper for collections returned
-      #from the Graph API.
+      # This class is a light wrapper for collections returned
+      # from the Graph API.
       #
-      #It extends Array to allow direct access to the data colleciton
-      #which should allow it to drop in seamlessly.
+      # It extends Array to allow direct access to the data colleciton
+      # which should allow it to drop in seamlessly.
       #
-      #It also allows access to paging information and the
-      #ability to get the next/previous page in the collection
-      #by calling next_page or previous_page.
+      # It also allows access to paging information and the
+      # ability to get the next/previous page in the collection
+      # by calling next_page or previous_page.
       attr_reader :paging
       attr_reader :api
       

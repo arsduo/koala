@@ -57,8 +57,6 @@ describe "TyphoeusService" do
 
         it "should use SSL if the :use_ssl option is provided, even if there's no token" do
           Deer.should_receive(:post).with(/https\:/, anything)
-
-          Deer.always_use_ssl = true
           Deer.make_request('anything', {}, 'anything', :use_ssl => true)
         end
 
