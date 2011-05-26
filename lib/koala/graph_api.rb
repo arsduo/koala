@@ -76,6 +76,14 @@ module Koala
         result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
       end
 
+      def get_urls_comments(urls, args = {}, options = {})
+        # Fetchs the comments for given URLs.
+        # urls = URLs array
+        args.merge!({:ids => (urls * ',')}) unless urls.nil?
+        result = graph_call("comments", args, "get", options)
+        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+      end
+          
       def put_connections(id, connection_name, args = {}, options = {})
         # Posts a certain connection
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token

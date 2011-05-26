@@ -74,6 +74,11 @@ shared_examples_for "Koala GraphAPI" do
     result.should be_a(Array)
   end
 
+  it "should be able to access comments for " do
+    result = @api.get_urls_comments(["http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day/"])
+    result.should be_a(Array)
+  end
+
   # SEARCH
   it "should be able to search" do
     result = @api.search("facebook")
