@@ -16,7 +16,7 @@ describe "Koala::Facebook::TestUsers" do
         raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!"
       end
 
-      @is_mock = defined?(Koala::IS_MOCK) && Koala::IS_MOCK
+      @is_mock = Koala.http_service.respond_to?(:mock?) && Koala.http_service.mock?
     end
 
     describe "when initializing" do
