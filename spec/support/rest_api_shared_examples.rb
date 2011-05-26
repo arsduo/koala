@@ -87,6 +87,29 @@ shared_examples_for "Koala RestAPI" do
 
       @api.rest_call('anything', {}, options)
     end
+    
+    it "uses get by default" do
+      @api.should_receive(:api).with(
+        anything,
+        anything,
+        "get",
+        anything
+      )
+
+      @api.rest_call('anything')
+    end
+    
+    it "allows you to specify other http methods as the last argument" do
+      method = 'bar'
+      @api.should_receive(:api).with(
+        anything,
+        anything,
+        method,
+        anything
+      )
+
+      @api.rest_call('anything', {}, {}, method)
+    end
 
     it "should throw an APIError if the result hash has an error key" do
       Koala.stub(:make_request).and_return(Koala::Response.new(500, {"error_code" => "An error occurred!"}, {}))

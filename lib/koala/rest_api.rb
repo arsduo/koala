@@ -7,29 +7,15 @@ module Koala
         rest_call('fql.query', 'query' => fql)
       end
 
-      def rest_call(method, args = {}, options = {})
-        options = options.merge!(:rest_api => true, :read_only => READ_ONLY_METHODS.include?(method))
+      def rest_call(fb_method, args = {}, options = {}, method = "get")
+        options = options.merge!(:rest_api => true, :read_only => READ_ONLY_METHODS.include?(fb_method.to_s))
 
-        api("method/#{method}", args.merge('format' => 'json'), 'get', options) do |response|
+        api("method/#{fb_method}", args.merge('format' => 'json'), method, options) do |response|
           # check for REST API-specific errors
           if response.is_a?(Hash) && response["error_code"]
             raise APIError.new("type" => response["error_code"], "message" => response["error_msg"])
           end
         end
-      end
-
-
-      def post_rest_call(method, args = {}, options = {})
-        options = options.merge!(:rest_api => true, :read_only => READ_ONLY_METHODS.include?(method))
-
-        response = api("method/#{method}", args.merge('format' => 'json'), 'post', options) do |response|
-          # check for REST API-specific errors
-          if response.is_a?(Hash) && response["error_code"]
-            raise APIError.new("type" => response["error_code"], "message" => response["error_msg"])
-          end
-        end
-
-        response
       end
 
       # read-only methods for which we can use API-read
