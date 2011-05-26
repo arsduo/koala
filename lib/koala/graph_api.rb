@@ -80,8 +80,7 @@ module Koala
         # Fetchs the comments for given URLs.
         # urls = URLs array
         args.merge!({:ids => (urls * ',')}) unless urls.nil?
-        result = graph_call("comments", args, "get", options)
-        result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
+        graph_call("comments", args, "get", options)
       end
           
       def put_connections(id, connection_name, args = {}, options = {})
