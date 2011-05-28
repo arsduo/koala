@@ -7,15 +7,15 @@ Koala (<a href="http://github.com/arsduo/koala" target="_blank">http://github.co
 * Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We have no dependencies beyond the JSON gem.  Koala also has a built-in mechanism for using whichever HTTP library you prefer to make requests against the graph.)
 * Tested: Koala should have complete test coverage, so you can rely on it.  (Our complete test coverage can be run against either mocked responses or the live Facebook servers.)
 
-1.0 
+Installation
 ---
-Version 1.0 is due out on May 1st, 2011 with a ton of great features.  
+Easy:
     
-    sudo gem install koala
+    [sudo] gem install koala
 
-Until then, you can install the release candidate like so:
+Or in Bundler:
   
-    sudo gem install koala --pre
+    gem "koala"
   
 Graph API
 ----
