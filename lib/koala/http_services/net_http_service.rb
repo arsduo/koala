@@ -15,6 +15,10 @@ module Koala
       # this makes public requests faster
       private_request = args["access_token"] || @always_use_ssl || options[:use_ssl]
 
+      # if proxy/timeout options aren't passed, check if defaults are set
+      options[:proxy] ||= proxy
+      options[:timeout] ||= timeout
+
       # if the verb isn't get or post, send it as a post argument
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 

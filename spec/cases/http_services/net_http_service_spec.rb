@@ -126,6 +126,60 @@ describe "NetHTTPService module holder class Horse" do
         Horse.make_request('anything', {}, 'anything')
       end
     end
+    
+    describe "proxy options" do
+      before :each do
+        Horse.proxy = "http://defaultproxy"
+      end
+      after :all do
+        Horse.proxy = nil
+      end
+
+      it "should use passed proxy option if provided" do
+        Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything, "passedproxy", 80, nil, nil).and_return(@http_mock)
+        Horse.make_request('anything', {} , 'anything', {:proxy => "http://passedproxy"})
+      end
+      
+      it "should use default proxy if default is provided and NO proxy option passed" do
+        Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything, "defaultproxy", 80, nil, nil).and_return(@http_mock)
+        Horse.make_request('anything', {} , 'anything', {})
+      end
+      
+      it "should NOT use a proxy if default is NOT provided and NO proxy option passed" do
+        Horse.proxy = nil
+        Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
+        Horse.make_request('anything', {} , 'anything', {})
+      end
+    end
+    
+    describe "timeout options" do
+      before :each do
+        Horse.timeout = 20 # seconds
+      end
+      after :all do
+        Horse.timeout = nil # seconds
+      end
+
+      it "should use passed timeout option if provided" do
+        @http_mock.should_receive('open_timeout=').with(10)
+        @http_mock.should_receive('read_timeout=').with(10)
+        Horse.make_request('anything', {} , 'anything', {:timeout => 10})
+      end
+      
+      it "should use default timout if default is provided and NO timeout option passed" do
+        @http_mock.should_receive('open_timeout=').with(20)
+        @http_mock.should_receive('read_timeout=').with(20)
+        Horse.make_request('anything', {} , 'anything', {})
+      end
+      
+      it "should NOT use a timeout if default is NOT provided and NO timeout option passed" do
+        Horse.timeout = nil # seconds
+        @http_mock.should_not_receive('open_timeout=')
+        @http_mock.should_not_receive('read_timeout=')
+        Horse.make_request('anything', {} , 'anything', {})
+      end
+    end
+    
 
     it "should use the graph server by default" do
       Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
