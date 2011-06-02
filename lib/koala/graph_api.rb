@@ -89,11 +89,12 @@ module Koala
         end
       end
 
-      def get_urls_comments(urls, args = {}, options = {})
-        # Fetchs the comments for given URLs.
-        # urls = URLs array
-        args.merge!({:ids => (urls * ',')}) unless urls.nil?
-        graph_call("comments", args, "get", options)
+      def get_comments_for_urls(urls = [], args = {}, options = {})
+        # Fetchs the comments for given URLs (array or comma-separated string)
+        # see https://developers.facebook.com/blog/post/490
+        return [] if urls.empty?
+        args.merge!(:ids => urls.respond_to?(:join) ? urls.join(",") : urls)
+        get_object("comments", args, options)
       end
           
       def put_connections(id, connection_name, args = {}, options = {})

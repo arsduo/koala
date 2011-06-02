@@ -1,5 +1,13 @@
 v1.1
--- api, graph_call, and rest_call now take post-processing blocks (error checking is passed in options hash)
+-- Batch API support through Koala::Facebook::GraphAPI.batch
+  -- includes file uploads, error handling, and FQL
+  -- thanks to seejohnrun for the initial implementation!
+-- rest_call now has an optional argument for method, for REST API calls requiring POST, DELETE, etc. (thanks, !)
+-- added get_comments_for_urls (thanks, amrnt!)
+-- Filename can now be specified when uploading (e.g. for Ads API) (thanks, !)
+-- Support for switching HTTPService at will (thanks, chadk!)
+  -- Includes support for uploading StringIOs and other non-files via Net::HTTP even when using TyphoeusService 
+-- Koala now uses the modern Typhoeus API (thanks, aselder!)
 -- RealtimeUpdates now uses a GraphAPI object instead of its own API
 
 v1.0
