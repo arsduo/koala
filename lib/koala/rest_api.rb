@@ -3,8 +3,12 @@ module Koala
     REST_SERVER = "api.facebook.com"
 
     module RestAPIMethods
-      def fql_query(fql)
-        rest_call('fql.query', 'query' => fql)
+      def fql_query(fql, args = {}, options = {})
+        rest_call('fql.query', args.merge(:query => fql), options) 
+      end
+
+      def fql_multiquery(queries = {}, args = {}, options = {})
+        rest_call('fql.multiquery', args.merge(:queries => queries.to_json), options)
       end
 
       def rest_call(fb_method, args = {}, options = {}, method = "get")

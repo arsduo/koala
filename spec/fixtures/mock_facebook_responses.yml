@@ -24,6 +24,18 @@ rest_api:
         with_token: '[{"read_stream":1}]' 
         no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 216743"}]}'
 
+  /method/fql.multiquery:
+    'queries={"query1":"select post_id from stream where source_id = me()","query2":"select fromid from comment where post_id in (select post_id from #query1)","query3":"select uid, name from user where uid in (select fromid from #query2)"}':
+      get: 
+        with_token: '[{"name":"query1", "fql_result_set":[]},{"name":"query2", "fql_result_set":[]},{"name":"query3", "fql_result_set":[]}]'
+        no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 216743"}]}'
+    'queries={"query1":"select first_name from user where uid = 216743","query2":"select first_name from user where uid = 2905623"}':
+      get:
+        with_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Chris"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]' 
+        no_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Chris"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
+
+
+
 
 # ====== GRAPH API =====
 graph_api:
