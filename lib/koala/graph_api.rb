@@ -89,6 +89,13 @@ module Koala
         end
       end
 
+      def get_urls_comments(urls, args = {}, options = {})
+        # Fetchs the comments for given URLs.
+        # urls = URLs array
+        args.merge!({:ids => (urls * ',')}) unless urls.nil?
+        graph_call("comments", args, "get", options)
+      end
+          
       def put_connections(id, connection_name, args = {}, options = {})
         # Posts a certain connection
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token

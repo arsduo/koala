@@ -198,6 +198,24 @@ graph_api:
           headers:
             Location: http://facebook.com/
 
+  /comments:
+    ids=http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day:
+      get: 
+        with_token: '{"http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day": []}'
+        no_token: '{"http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day": []}'
+    ids=http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day,http://developers.facebook.com/blog/post/472:
+      get: 
+        with_token: '{"http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day": [], "http://developers.facebook.com/blog/post/472": []}'
+        no_token: '{"http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day": [], "http://developers.facebook.com/blog/post/472": []}'
+    ids=:
+      get:
+        body: '{"error": {"type": "OAuthException","message": "Cannot specify an empty identifier"}}'
+        code: 400
+    no_args:
+      get:
+        body: '{"error": {"type": "Exception","message": "No node specified"}}'
+        code: 500        
+
   /search:
     q=facebook:
       get: 
