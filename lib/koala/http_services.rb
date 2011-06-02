@@ -13,7 +13,7 @@ module Koala
     def self.included(base)
       base.class_eval do
         class << self
-          attr_accessor :always_use_ssl
+          attr_accessor :always_use_ssl, :proxy, :timeout
         end
 
         def self.server(options = {})
