@@ -16,6 +16,10 @@ module Koala
       # you can pass arguments directly to Typhoeus using the :typhoeus_options key
       typhoeus_options = {:params => args}.merge(options[:typhoeus_options] || {})
 
+      # if proxy/timeout options aren't passed, check if defaults are set
+      typhoeus_options[:proxy] ||= proxy
+      typhoeus_options[:timeout] ||= timeout
+
       # by default, we use SSL only for private requests (e.g. with access token)
       # this makes public requests faster
       prefix = (args["access_token"] || @always_use_ssl || options[:use_ssl]) ? "https" : "http"

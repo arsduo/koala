@@ -101,7 +101,17 @@ describe "TyphoeusService" do
 
         Deer.make_request("anything", {}, "post", :typhoeus_options => t_options)
       end
-      
+
+      it "should pass proxy and timeout :typhoeus_options to Typhoeus if set globally" do
+        Deer.proxy = "http://defaultproxy"
+        Deer.timeout = 20
+
+        t_options = {:proxy => "http://defaultproxy", :timeout => 20}
+        Deer.should_receive(:post).with(anything, hash_including(t_options))
+
+        Deer.make_request("anything", {}, "post")
+      end
+
       # for live tests, run the Graph API tests with Typhoues, which will run file uploads
       it "should pass any files directly on to Typhoues" do
         args = {:file => File.new(__FILE__, "r")}
