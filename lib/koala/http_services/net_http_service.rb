@@ -23,7 +23,6 @@ module Koala
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
       http = create_http(server(options), private_request, options)
-      http.use_ssl = true if private_request
 
       result = http.start do |http|
         response, body = if verb == "post"
@@ -64,10 +63,24 @@ module Koala
       else
         http = Net::HTTP.new(server, private_request ? 443 : nil)
       end
+      
       if options[:timeout]
         http.open_timeout = options[:timeout]
         http.read_timeout = options[:timeout]
       end
+      
+      # For HTTPS requests, set the proper CA certificates
+      if private_request
+        http.use_ssl = true  
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        
+        options[:ca_file] ||= ca_file
+        http.ca_file = options[:ca_file] if options[:ca_file] && File.exists?(options[:ca_file])
+        
+        options[:ca_path] ||= ca_path
+        http.ca_path = options[:ca_path] if options[:ca_path] && Dir.exists?(options[:ca_path])
+      end
+            
       http
     end
   end

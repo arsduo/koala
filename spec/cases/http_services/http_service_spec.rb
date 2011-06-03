@@ -35,6 +35,20 @@ describe "Koala::HTTPService" do
       end
     end
     
+    describe "ca_file accessor" do
+      it "should be added" do
+        Bear.methods.collect {|m| m.to_sym}.should include(:ca_file)
+        Bear.methods.collect {|m| m.to_sym}.should include(:ca_file=)
+      end
+    end
+    
+    describe "ca_path accessor" do
+      it "should be added" do
+        Bear.methods.collect {|m| m.to_sym}.should include(:ca_path)
+        Bear.methods.collect {|m| m.to_sym}.should include(:ca_path=)
+      end
+    end        
+    
     describe "server" do
       describe "without options[:beta]" do
         it "should return the rest server if options[:rest_api]" do
