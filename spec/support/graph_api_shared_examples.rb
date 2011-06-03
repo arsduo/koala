@@ -80,13 +80,13 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   it "should be able to access comments for a URL" do
-    result = @api.get_comments_for_urls(["http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day"])
-    (result["http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day"]).should
+    result = @api.get_comments_for_urls(["http://developers.facebook.com/blog/post/472"])
+    (result["http://developers.facebook.com/blog/post/472"]).should
   end
 
   it "should be able to access comments for 2 URLs" do
-    result = @api.get_comments_for_urls(["http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day", "http://developers.facebook.com/blog/post/472"])
-    (result["http://techcrunch.com/2011/04/08/the-seven-most-interesting-startups-at-500-startups-demo-day"] && result["http://developers.facebook.com/blog/post/472"]).should
+    result = @api.get_comments_for_urls(["http://developers.facebook.com/blog/post/490", "http://developers.facebook.com/blog/post/472"])
+    (result["http://developers.facebook.com/blog/post/490"] && result["http://developers.facebook.com/blog/post/472"]).should
   end
 
   # SEARCH
