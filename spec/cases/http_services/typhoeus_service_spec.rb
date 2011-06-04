@@ -107,7 +107,7 @@ describe "TyphoeusService" do
         Deer.timeout = 20
 
         t_options = {:proxy => "http://defaultproxy", :timeout => 20}
-        Deer.should_receive(:post).with(anything, hash_including(t_options))
+        Typhoeus::Request.should_receive(:post).with(anything, hash_including(t_options))
 
         Deer.make_request("anything", {}, "post")
       end
