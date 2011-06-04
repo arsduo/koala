@@ -152,7 +152,7 @@ shared_examples_for "Koala RestAPI" do
       it "should call fql.multiquery method" do
         @api.should_receive(:rest_call).with(
           "fql.multiquery", anything, anything
-        ).and_return(Koala::Response.new(200, "2", {}))
+        ).and_return({})
 
         @api.fql_multiquery stub('query string')
       end
@@ -169,6 +169,21 @@ shared_examples_for "Koala RestAPI" do
         )
 
         @api.fql_multiquery(queries)
+      end
+      
+      it "simplifies the response format" do
+        raw_results = [
+          {"name" => "query1", "fql_result_set" => [1, 2, 3]},
+          {"name" => "query2", "fql_result_set" => [:a, :b, :c]}
+        ]
+        expected_results = {
+          "query1" => [1, 2, 3],
+          "query2" => [:a, :b, :c]
+        }
+        
+        @api.stub(:rest_call).and_return(raw_results)
+        results = @api.fql_multiquery({:query => true})
+        results.should == expected_results
       end
       
       it "should pass on any other arguments provided" do
@@ -200,8 +215,8 @@ shared_examples_for "Koala RestAPI with an access token" do
       :query2 => 'select first_name from user where uid = 2905623'
     )
     result.size.should == 2
-    result.first["fql_result_set"].first['first_name'].should == 'Chris'
-    result.last["fql_result_set"].first['first_name'].should == 'Alex'
+    result["query1"].first['first_name'].should == 'Chris'
+    result["query2"].first['first_name'].should == 'Alex'
   end
 
   it "should be able to access protected information via FQL" do
@@ -228,8 +243,7 @@ shared_examples_for "Koala RestAPI with an access token" do
       :query3 => "select uid, name from user where uid in (select fromid from #query2)"
     )
     result.size.should == 3 
-    # we can't test in any more detail
-    # since we can't assume anything about whether you have friends or posts
+    result.keys.should include("query1", "query2", "query3")
   end
 
 end
@@ -250,8 +264,8 @@ shared_examples_for "Koala RestAPI without an access token" do
         :query2 => 'select first_name from user where uid = 2905623'
       )
       result.size.should == 2
-      result.first["fql_result_set"].first['first_name'].should == 'Chris'
-      result.last["fql_result_set"].first['first_name'].should == 'Alex'
+      result["query1"].first['first_name'].should == 'Chris'
+      result["query2"].first['first_name'].should == 'Alex'
     end
 
     it "should not be able to access protected information via FQL" do

@@ -8,7 +8,10 @@ module Koala
       end
 
       def fql_multiquery(queries = {}, args = {}, options = {})
-        rest_call('fql.multiquery', args.merge(:queries => queries.to_json), options)
+        if results = rest_call('fql.multiquery', args.merge(:queries => queries.to_json), options)
+          # simplify the multiquery result format
+          results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
+        end
       end
 
       def rest_call(fb_method, args = {}, options = {}, method = "get")
