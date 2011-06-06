@@ -1,5 +1,5 @@
 v1.1
-New/updated methods:
+New methods:
 -- Batch API support through Koala::Facebook::GraphAPI.batch (thanks, seejohnrun!)
   -- includes file uploads, error handling, and FQL
 -- Added GraphAPI#get_comments_for_urls (thanks, amrnt!)
