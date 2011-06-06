@@ -7,8 +7,8 @@ describe "TyphoeusService" do
 
   describe "TyphoeusService module holder class Deer" do
     before :each do
-      # reset the always_use_ssl parameter
-      Deer.always_use_ssl = nil
+      # reset global settings
+      Deer.always_use_ssl = Deer.proxy = Deer.timeout = nil
     end
 
     it "should define a make_request static module method" do

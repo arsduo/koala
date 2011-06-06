@@ -5,8 +5,8 @@ Horse = Koala::NetHTTPService
 
 describe "NetHTTPService module holder class Horse" do
   before :each do
-    # reset the always_use_ssl parameter
-    Horse.always_use_ssl = nil
+    # reset global settings
+    Horse.always_use_ssl = Horse.proxy = Horse.timeout = nil
   end
 
   it "should define a make_request static module method" do
