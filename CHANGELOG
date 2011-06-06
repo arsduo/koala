@@ -1,14 +1,20 @@
 v1.1
--- Batch API support through Koala::Facebook::GraphAPI.batch
+New/updated methods:
+-- Batch API support through Koala::Facebook::GraphAPI.batch (thanks, seejohnrun!)
   -- includes file uploads, error handling, and FQL
-  -- thanks to seejohnrun for the initial implementation!
--- rest_call now has an optional argument for method, for REST API calls requiring POST, DELETE, etc. (thanks, !)
--- added get_comments_for_urls (thanks, amrnt!)
--- Filename can now be specified when uploading (e.g. for Ads API) (thanks, !)
--- Support for switching HTTPService at will (thanks, chadk!)
-  -- Includes support for uploading StringIOs and other non-files via Net::HTTP even when using TyphoeusService 
--- Koala now uses the modern Typhoeus API (thanks, aselder!)
+-- Added GraphAPI#get_comments_for_urls (thanks, amrnt!)
+-- Added RestAPI#fql_multiquery, which simplifies the results (thanks, amrnt!)   
+Updated methods:
 -- RealtimeUpdates now uses a GraphAPI object instead of its own API
+-- RestAPI#rest_call now has an optional last argument for method, for calls requiring POST, DELETE, etc. (thanks, sshilo!)
+-- Filename can now be specified when uploading (e.g. for Ads API) (thanks, sshilo!)
+-- get_objects([]) returns [] instead of a Facebook error in non-batch mode (thanks, aselder!)
+Internal improvements:
+-- HTTP services are more modular and can be changed on the fly (thanks, chadk!)
+  -- Includes support for uploading StringIOs and other non-files via Net::HTTP even when using TyphoeusService
+-- Support for global proxy and timeout settings (thanks, itchy!)
+-- Support for setting certificate path and file to address Net::HTTP errors under Ruby 1.9.2
+-- Koala now uses the modern Typhoeus API (thanks, aselder!)
 
 v1.0
 New methods:
