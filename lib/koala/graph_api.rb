@@ -202,34 +202,6 @@ module Koala
         end
       end      
       
-      # API access
-
-      # Make a call which may or may not be batched
-      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
-        # Direct access to the Facebook API
-        # see any of the above methods for example invocations
-        unless GraphAPI.batch_mode?
-          result = api(path, args, verb, options) do |response|
-            if error = GraphAPI.check_response(response)
-              raise error
-            end
-          end
-          
-          # now process as appropriate (get picture header, make GraphCollection, etc.)
-          post_processing ? post_processing.call(result) : result
-        else
-          # for batch APIs, we queue up the call details (incl. post-processing)
-          GraphAPI.batch_calls << BatchOperation.new(
-            :url => path,
-            :args => args,
-            :method => verb,
-            :access_token => @access_token,
-            :http_options => options,
-            :post_processing => post_processing
-          )
-          nil # batch operations return nothing immediately 
-        end
-      end
       
       # GraphCollection support
       def get_page(params)
@@ -240,58 +212,12 @@ module Koala
         end
       end
       
-    end
-    
-    
-    class GraphCollection < Array
-      # This class is a light wrapper for collections returned
-      # from the Graph API.
-      #
-      # It extends Array to allow direct access to the data colleciton
-      # which should allow it to drop in seamlessly.
-      #
-      # It also allows access to paging information and the
-      # ability to get the next/previous page in the collection
-      # by calling next_page or previous_page.
-      attr_reader :paging
-      attr_reader :api
-      
-      def initialize(response, api)
-        super response["data"]
-        @paging = response["paging"]
-        @api = api
+      def batch(http_options = {}, &block)
+        batch_client = GraphBatchAPI.new(access_token)
+        yield batch_client
+        batch_client.execute(http_options)
       end
-            
-      # defines methods for NEXT and PREVIOUS pages
-      %w{next previous}.each do |this|
         
-        # def next_page
-        # def previous_page
-        define_method "#{this.to_sym}_page" do
-          base, args = send("#{this}_page_params")
-          base ? @api.get_page([base, args]) : nil
-        end
-        
-        # def next_page_params
-        # def previous_page_params
-        define_method "#{this.to_sym}_page_params" do
-          return nil unless @paging and @paging[this]
-          parse_page_url(@paging[this])
-        end
-      end
-      
-      def parse_page_url(url)
-        match = url.match(/.com\/(.*)\?(.*)/)
-        base = match[1]
-        args = match[2]
-        params = CGI.parse(args)
-        new_params = {}
-        params.each_pair do |key,value|
-          new_params[key] = value.join ","
-        end
-        [base,new_params]
-      end
-      
     end
   end
-end
+end  
