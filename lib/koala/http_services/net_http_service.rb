@@ -24,8 +24,8 @@ module Koala
 
       http = create_http(server(options), private_request, options)
 
-      result = http.start do |http|
-        response, body = if verb == "post"
+      response = http.start do |http|
+        if verb == "post"
           if params_require_multipart? args
             http.request Net::HTTP::Post::Multipart.new path, encode_multipart_params(args)
           else
@@ -34,9 +34,9 @@ module Koala
         else
           http.get("#{path}?#{encode_params(args)}")
         end
-      
-        Koala::Response.new(response.code.to_i, body, response)
       end
+
+      Koala::Response.new(response.code.to_i, response.body, response)
     end
 
     protected
@@ -48,9 +48,9 @@ module Koala
         "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
       end).join("&")
     end
-  
+
     def self.encode_multipart_params(param_hash)
-      Hash[*param_hash.collect do |key, value| 
+      Hash[*param_hash.collect do |key, value|
         [key, value.kind_of?(Koala::UploadableIO) ? value.to_upload_io : value]
       end.flatten]
     end
@@ -63,24 +63,24 @@ module Koala
       else
         http = Net::HTTP.new(server, private_request ? 443 : nil)
       end
-      
+
       if options[:timeout]
         http.open_timeout = options[:timeout]
         http.read_timeout = options[:timeout]
       end
-      
+
       # For HTTPS requests, set the proper CA certificates
       if private_request
-        http.use_ssl = true  
+        http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        
+
         options[:ca_file] ||= ca_file
         http.ca_file = options[:ca_file] if options[:ca_file] && File.exists?(options[:ca_file])
-        
+
         options[:ca_path] ||= ca_path
         http.ca_path = options[:ca_path] if options[:ca_path] && Dir.exists?(options[:ca_path])
       end
-            
+
       http
     end
   end

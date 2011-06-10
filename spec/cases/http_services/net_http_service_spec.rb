@@ -20,23 +20,18 @@ describe "NetHTTPService module holder class Horse" do
   describe "when making a request" do
     before(:each) do
       # Setup stubs for make_request to execute without exceptions
-      @mock_http_response = stub('Net::HTTPResponse', :code => 1)
       @mock_body = stub('Net::HTTPResponse body')
-      @http_request_result = [@mock_http_response, @mock_body]
-
-      # to_ary is called in Ruby 1.9 to provide backwards compatibility
-      # with the response, body = http.get() syntax we use
-      @mock_http_response.stub!(:to_ary).and_return(@http_request_result)
+      @mock_http_response = stub('Net::HTTPResponse', :code => 1, :body => @mock_body)
 
       @http_yield_mock = mock('Net::HTTP start yielded object')
 
-      @http_yield_mock.stub(:post).and_return(@http_request_result)
-      @http_yield_mock.stub(:get).and_return(@http_request_result)
+      @http_yield_mock.stub(:post).and_return(@mock_http_response)
+      @http_yield_mock.stub(:get).and_return(@mock_http_response)
 
       @http_mock = stub('Net::HTTP object', 'use_ssl=' => true, 'verify_mode=' => true)
       @http_mock.stub(:start).and_yield(@http_yield_mock)
       @http_mock.stub(:ca_path=)
-      @http_mock.stub(:ca_file=)      
+      @http_mock.stub(:ca_file=)
 
       Net::HTTP.stub(:new).and_return(@http_mock)
     end
@@ -84,7 +79,7 @@ describe "NetHTTPService module holder class Horse" do
         Horse.make_request('anything', @args, 'anything')
       end
     end
-    
+
     describe "if always_use_ssl is true" do
       before :each do
         Horse.always_use_ssl = true
@@ -128,7 +123,7 @@ describe "NetHTTPService module holder class Horse" do
         Horse.make_request('anything', {}, 'anything')
       end
     end
-    
+
     describe "proxy options" do
       before :each do
         Horse.proxy = "http://defaultproxy"
@@ -141,19 +136,19 @@ describe "NetHTTPService module holder class Horse" do
         Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything, "passedproxy", 80, nil, nil).and_return(@http_mock)
         Horse.make_request('anything', {} , 'anything', {:proxy => "http://passedproxy"})
       end
-      
+
       it "should use default proxy if default is provided and NO proxy option passed" do
         Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything, "defaultproxy", 80, nil, nil).and_return(@http_mock)
         Horse.make_request('anything', {} , 'anything', {})
       end
-      
+
       it "should NOT use a proxy if default is NOT provided and NO proxy option passed" do
         Horse.proxy = nil
         Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
         Horse.make_request('anything', {} , 'anything', {})
       end
     end
-    
+
     describe "timeout options" do
       before :each do
         Horse.timeout = 20 # seconds
@@ -167,13 +162,13 @@ describe "NetHTTPService module holder class Horse" do
         @http_mock.should_receive('read_timeout=').with(10)
         Horse.make_request('anything', {} , 'anything', {:timeout => 10})
       end
-      
+
       it "should use default timout if default is provided and NO timeout option passed" do
         @http_mock.should_receive('open_timeout=').with(20)
         @http_mock.should_receive('read_timeout=').with(20)
         Horse.make_request('anything', {} , 'anything', {})
       end
-      
+
       it "should NOT use a timeout if default is NOT provided and NO timeout option passed" do
         Horse.timeout = nil # seconds
         @http_mock.should_not_receive('open_timeout=')
@@ -181,115 +176,115 @@ describe "NetHTTPService module holder class Horse" do
         Horse.make_request('anything', {} , 'anything', {})
       end
     end
-    
+
     describe "ca_file options" do
       after :each do
         Horse.always_use_ssl = nil
         Horse.ca_file = nil
       end
-      
+
       it "should not use a ca_file if the request is not via SSL" do
-        Horse.always_use_ssl = false  
+        Horse.always_use_ssl = false
         @http_mock.should_not_receive(:ca_file=)
         Horse.make_request('anything', {} , 'anything', {:ca_file => '/no/file'})
       end
-      
+
       describe "when via SSL" do
         before :each do
           Horse.always_use_ssl = true
-          
+
           @global_ca_file_path = '/global/ca/file/path'
           File.stub(:exists?).and_return(true)
         end
 
         it "should not use a default ca_file if the default ca_file does not exist" do
           Horse.ca_file = @global_ca_file_path
-          
+
           File.should_receive(:exists?).with(@global_ca_file_path).and_return(false)
           Horse.should_not_receive(:ca_file=).with(@global_ca_file_path)
-          
+
           Horse.make_request('anything', {} , 'anything', {})
         end
-        
+
         it "should use passed ca_file options if provided" do
           given_ca_file = '/ca/file'
-          
+
           Horse.ca_file = @global_ca_file_path
           @http_mock.should_not_receive(:ca_file=).with(@global_ca_file_path)
           @http_mock.should_receive(:ca_file=).with(given_ca_file)
-          
+
           Horse.make_request('anything', {} , 'anything', {:ca_file => given_ca_file})
         end
-        
+
         it "should use default ca_file if default is provided and NO ca_file option is passed" do
           Horse.ca_file = @global_ca_file_path
           @http_mock.should_receive(:ca_file=).with(@global_ca_file_path)
-          
+
           Horse.make_request('anything', {} , 'anything', {})
         end
-        
+
         it "should NOT use a ca_file if default is NOT provided and NO ca_file option is passed" do
           @http_mock.should_not_receive(:ca_file=)
-          
-          Horse.make_request('anything', {} , 'anything', {})          
+
+          Horse.make_request('anything', {} , 'anything', {})
         end
       end
     end
-    
+
     describe "ca_path options" do
       after :each do
         Horse.always_use_ssl = nil
         Horse.ca_path = nil
       end
-      
+
       it "should not use a ca_path if the request is not via SSL" do
-        Horse.always_use_ssl = false  
+        Horse.always_use_ssl = false
         @http_mock.should_not_receive('ca_path=')
         Horse.make_request('anything', {} , 'anything', {:ca_file => '/no/file'})
       end
-      
+
       describe "when via SSL" do
         before :each do
           Horse.always_use_ssl = true
-          
+
           @global_ca_path = '/global/ca/path'
           Dir.stub(:exists?).and_return(true)
         end
 
         it "should not use a default ca_path if the default ca_path does not exist" do
           Horse.ca_path = @global_ca_path
-          
+
           Dir.should_receive(:exists?).with(@global_ca_path).and_return(false)
           Horse.should_not_receive(:ca_path=).with(@global_ca_path)
-          
+
           Horse.make_request('anything', {} , 'anything', {})
         end
-        
+
         it "should use passed ca_path options if provided" do
           given_ca_path = '/ca/path'
-          
+
           Horse.ca_path = @global_ca_path
           @http_mock.should_not_receive(:ca_ath=).with(@global_ca_path)
           @http_mock.should_receive(:ca_path=).with(given_ca_path)
-          
+
           Horse.make_request('anything', {} , 'anything', {:ca_path => given_ca_path})
         end
-        
+
         it "should use default ca_path if default is provided and NO ca_path option is passed" do
           Horse.ca_path = @global_ca_path
           @http_mock.should_receive(:ca_path=).with(@global_ca_path)
-          
+
           Horse.make_request('anything', {} , 'anything', {})
         end
-        
+
         it "should NOT use a ca_path if default is NOT provided and NO ca_path option is passed" do
           @http_mock.should_not_receive(:ca_path=)
-          
-          Horse.make_request('anything', {} , 'anything', {})          
+
+          Horse.make_request('anything', {} , 'anything', {})
         end
       end
-    end    
-    
+    end
+
     it "should use the graph server by default" do
       Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
       Horse.make_request('anything', {}, 'anything')
@@ -310,7 +305,7 @@ describe "NetHTTPService module holder class Horse" do
       @http_mock.should_receive(:start).and_yield(@http_yield_mock)
       Horse.make_request('anything', {}, 'anything')
     end
-    
+
     it 'creates a HTTP Proxy object when options contain a proxy' do
       Net::HTTP.should_receive(:new).with(anything, anything, 'proxy', 1234, 'user', 'pass').and_return(@http_mock)
       Horse.make_request('anything', {}, 'anything', {:proxy => 'http://user:pass@proxy:1234'})
@@ -324,14 +319,14 @@ describe "NetHTTPService module holder class Horse" do
 
     describe "via POST" do
       it "should use Net::HTTP to make a POST request" do
-        @http_yield_mock.should_receive(:post).and_return(@http_request_result)
+        @http_yield_mock.should_receive(:post).and_return(@mock_http_response)
 
         Horse.make_request('anything', {}, 'post')
       end
 
       it "should go to the specified path adding a / if it doesn't exist" do
         path = mock('Path')
-        @http_yield_mock.should_receive(:post).with(path, anything).and_return(@http_request_result)
+        @http_yield_mock.should_receive(:post).with(path, anything).and_return(@mock_http_response)
 
         Horse.make_request(path, {}, 'post')
       end
@@ -341,7 +336,7 @@ describe "NetHTTPService module holder class Horse" do
         params = mock('Encoded parameters')
         Horse.should_receive(:encode_params).with(args).and_return(params)
 
-        @http_yield_mock.should_receive(:post).with(anything, params).and_return(@http_request_result)
+        @http_yield_mock.should_receive(:post).with(anything, params).and_return(@mock_http_response)
 
         Horse.make_request('anything', args, 'post')
       end
@@ -356,11 +351,11 @@ describe "NetHTTPService module holder class Horse" do
 
           @file_stub = stub('fake File', "kind_of?" => true, "path" => 'anypath.jpg')
 
-          @http_yield_mock.stub(:request).with(@multipart_request_stub).and_return(@http_request_result)
+          @http_yield_mock.stub(:request).with(@multipart_request_stub).and_return(@mock_http_response)
         end
 
         it "should use multipart/form-data if any parameter is a valid file hash" do
-          @http_yield_mock.should_receive(:request).with(@multipart_request_stub).and_return(@http_request_result)
+          @http_yield_mock.should_receive(:request).with(@multipart_request_stub).and_return(@mock_http_response)
 
           Horse.make_request('anything', {}, 'post')
         end
@@ -388,7 +383,7 @@ describe "NetHTTPService module holder class Horse" do
 
     describe "via GET" do
       it "should use Net::HTTP to make a GET request" do
-        @http_yield_mock.should_receive(:get).and_return(@http_request_result)
+        @http_yield_mock.should_receive(:get).and_return(@mock_http_response)
 
         Horse.make_request('anything', {}, 'get')
       end
@@ -399,7 +394,7 @@ describe "NetHTTPService module holder class Horse" do
         args = {}
 
         Horse.should_receive(:encode_params).with(args).and_return(params)
-        @http_yield_mock.should_receive(:get).with("#{path}?#{params}").and_return(@http_request_result)
+        @http_yield_mock.should_receive(:get).with("#{path}?#{params}").and_return(@mock_http_response)
 
         Horse.make_request(path, args, 'get')
       end
@@ -442,11 +437,11 @@ describe "NetHTTPService module holder class Horse" do
 
       Horse.params_require_multipart?(args).should be_true
     end
-    
+
     describe "when encoding multipart/form-data params" do
       it "should replace Koala::UploadableIO values with UploadIO values" do
         upload_io = UploadIO.new(__FILE__, "fake type")
-        
+
         uploadable_io = stub('Koala::UploadableIO')
         uploadable_io.should_receive(:kind_of?).with(Koala::UploadableIO).and_return(true)
         uploadable_io.should_receive(:to_upload_io).and_return(upload_io)
@@ -454,13 +449,13 @@ describe "NetHTTPService module holder class Horse" do
           "not_a_file" => "not a file",
           "file" => uploadable_io
         }
-        
+
         result = Horse.encode_multipart_params(args)
 
         result["not_a_file"] == args["not_a_file"]
         result["file"] == upload_io
       end
     end
-    
+
   end
 end
