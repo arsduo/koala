@@ -72,7 +72,7 @@ module Koala
       # For HTTPS requests, set the proper CA certificates
       if private_request
         http.use_ssl = true  
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        http.verify_mode = options[:verify_mode] || OpenSSL::SSL::VERIFY_PEER
         
         options[:ca_file] ||= ca_file
         http.ca_file = options[:ca_file] if options[:ca_file] && File.exists?(options[:ca_file])
