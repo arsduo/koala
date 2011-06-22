@@ -8,6 +8,21 @@ describe "NetHTTPService module holder class Horse" do
     # reset global settings
     Horse.always_use_ssl = Horse.proxy = Horse.timeout = nil
   end
+  
+  it "has a ca_file accessor" do
+    Horse.methods.collect {|m| m.to_sym}.should include(:ca_file)
+    Horse.methods.collect {|m| m.to_sym}.should include(:ca_file=)
+  end
+  
+  it "has a ca_path accessor" do
+    Horse.methods.collect {|m| m.to_sym}.should include(:ca_path)
+    Horse.methods.collect {|m| m.to_sym}.should include(:ca_path=)
+  end
+  
+  it "has a verify_mode accessor" do
+    Horse.methods.collect {|m| m.to_sym}.should include(:verify_mode)
+    Horse.methods.collect {|m| m.to_sym}.should include(:verify_mode=)
+  end
 
   it "should define a make_request static module method" do
     Horse.respond_to?(:make_request).should be_true
@@ -31,7 +46,8 @@ describe "NetHTTPService module holder class Horse" do
       @http_mock = stub('Net::HTTP object', 'use_ssl=' => true, 'verify_mode=' => true)
       @http_mock.stub(:start).and_yield(@http_yield_mock)
       @http_mock.stub(:ca_path=)
-      @http_mock.stub(:ca_file=)
+      @http_mock.stub(:ca_file=)  
+      @http_mock.stub(:verify_mode=)
 
       Net::HTTP.stub(:new).and_return(@http_mock)
     end
@@ -192,41 +208,50 @@ describe "NetHTTPService module holder class Horse" do
       describe "when via SSL" do
         before :each do
           Horse.always_use_ssl = true
-
           @global_ca_file_path = '/global/ca/file/path'
-          File.stub(:exists?).and_return(true)
         end
 
-        it "should not use a default ca_file if the default ca_file does not exist" do
-          Horse.ca_file = @global_ca_file_path
-
-          File.should_receive(:exists?).with(@global_ca_file_path).and_return(false)
-          Horse.should_not_receive(:ca_file=).with(@global_ca_file_path)
-
-          Horse.make_request('anything', {} , 'anything', {})
+        context "if the file doesn't exist" do
+          it "raises Errno::ENOENT if the default ca_file does not exist" do
+            Horse.ca_file = @global_ca_file_path
+          
+            File.should_receive(:exists?).with(@global_ca_file_path).and_return(false)
+            expect { Horse.make_request('anything', {} , 'anything', {}) }.to raise_exception(Errno::ENOENT)
+          end
+          
+          it "raises Errno::ENOENT if options[:ca_file] does not exist" do          
+            File.should_receive(:exists?).with(@global_ca_file_path).and_return(false)
+            expect { Horse.make_request('anything', {} , 'anything', {:ca_file => @global_ca_file_path}) }.to raise_exception(Errno::ENOENT)
+          end
         end
-
-        it "should use passed ca_file options if provided" do
-          given_ca_file = '/ca/file'
-
-          Horse.ca_file = @global_ca_file_path
-          @http_mock.should_not_receive(:ca_file=).with(@global_ca_file_path)
-          @http_mock.should_receive(:ca_file=).with(given_ca_file)
-
-          Horse.make_request('anything', {} , 'anything', {:ca_file => given_ca_file})
-        end
-
-        it "should use default ca_file if default is provided and NO ca_file option is passed" do
-          Horse.ca_file = @global_ca_file_path
-          @http_mock.should_receive(:ca_file=).with(@global_ca_file_path)
-
-          Horse.make_request('anything', {} , 'anything', {})
-        end
-
-        it "should NOT use a ca_file if default is NOT provided and NO ca_file option is passed" do
-          @http_mock.should_not_receive(:ca_file=)
-
-          Horse.make_request('anything', {} , 'anything', {})
+        
+        context "if the file exists" do
+          before :each do
+            File.stub(:exists?).and_return(true)
+          end
+          
+          it "should use options[:ca_file] if provided" do
+            given_ca_file = '/ca/file'
+          
+            Horse.ca_file = @global_ca_file_path
+            @http_mock.should_not_receive(:ca_file=).with(@global_ca_file_path)
+            @http_mock.should_receive(:ca_file=).with(given_ca_file)
+          
+            Horse.make_request('anything', {} , 'anything', {:ca_file => given_ca_file})
+          end
+        
+          it "should use default ca_file if default is provided and NO ca_file option is passed" do
+            Horse.ca_file = @global_ca_file_path
+            @http_mock.should_receive(:ca_file=).with(@global_ca_file_path)
+          
+            Horse.make_request('anything', {} , 'anything', {})
+          end
+        
+          it "should NOT use a ca_file if default is NOT provided and NO ca_file option is passed" do
+            @http_mock.should_not_receive(:ca_file=)
+          
+            Horse.make_request('anything', {} , 'anything', {})          
+          end
         end
       end
     end
@@ -246,45 +271,97 @@ describe "NetHTTPService module holder class Horse" do
       describe "when via SSL" do
         before :each do
           Horse.always_use_ssl = true
-
           @global_ca_path = '/global/ca/path'
-          Dir.stub(:exists?).and_return(true)
         end
 
-        it "should not use a default ca_path if the default ca_path does not exist" do
-          Horse.ca_path = @global_ca_path
+        context "if the directory doesn't exist" do          
+          it "should not use a default ca_path if the default ca_path does not exist" do
+            Horse.ca_path = @global_ca_path
+          
+            Dir.should_receive(:exists?).with(@global_ca_path).and_return(false)
+            expect { Horse.make_request('anything', {} , 'anything', {}) }.to raise_exception(Errno::ENOENT)
+          end
 
-          Dir.should_receive(:exists?).with(@global_ca_path).and_return(false)
-          Horse.should_not_receive(:ca_path=).with(@global_ca_path)
-
-          Horse.make_request('anything', {} , 'anything', {})
+          it "should not use a default ca_path if the default ca_path does not exist" do
+            Dir.should_receive(:exists?).with(@global_ca_path).and_return(false)
+            expect { Horse.make_request('anything', {} , 'anything', {:ca_path => @global_ca_path}) }.to raise_exception(Errno::ENOENT)
+          end          
+        end       
+        
+        context "if the directory exists" do
+          before :each do
+            Dir.stub(:exists?).and_return(true)
+          end
+        
+          it "should use passed ca_path options if provided" do
+            given_ca_path = '/ca/path'
+          
+            Horse.ca_path = @global_ca_path
+            @http_mock.should_not_receive(:ca_ath=).with(@global_ca_path)
+            @http_mock.should_receive(:ca_path=).with(given_ca_path)
+          
+            Horse.make_request('anything', {} , 'anything', {:ca_path => given_ca_path})
+          end
+        
+          it "should use default ca_path if default is provided and NO ca_path option is passed" do
+            Horse.ca_path = @global_ca_path
+            @http_mock.should_receive(:ca_path=).with(@global_ca_path)
+          
+            Horse.make_request('anything', {} , 'anything', {})
+          end
+        
+          it "should NOT use a ca_path if default is NOT provided and NO ca_path option is passed" do
+            @http_mock.should_not_receive(:ca_path=)
+          
+            Horse.make_request('anything', {} , 'anything', {})          
+          end
         end
-
-        it "should use passed ca_path options if provided" do
-          given_ca_path = '/ca/path'
-
-          Horse.ca_path = @global_ca_path
-          @http_mock.should_not_receive(:ca_ath=).with(@global_ca_path)
-          @http_mock.should_receive(:ca_path=).with(given_ca_path)
-
-          Horse.make_request('anything', {} , 'anything', {:ca_path => given_ca_path})
+      end
+    end    
+    
+    describe "verify_mode options" do      
+      after :each do
+        Horse.always_use_ssl = nil
+        Horse.verify_mode = nil
+      end
+      
+      it "does not set verify mode if it's not SSL" do
+        Horse.always_use_ssl = nil
+        @http_mock.should_not_receive(:verify_mode=)
+        Horse.make_request('anything', {} , 'anything', {:verify_mode => "abc"})          
+      end
+      
+      context "when making an SSL request" do
+        before :each do
+          Horse.always_use_ssl = true
         end
-
-        it "should use default ca_path if default is provided and NO ca_path option is passed" do
-          Horse.ca_path = @global_ca_path
-          @http_mock.should_receive(:ca_path=).with(@global_ca_path)
-
-          Horse.make_request('anything', {} , 'anything', {})
+        
+        it "sets verify mode if provided in the options" do
+          mode = "foo"
+          @http_mock.should_receive(:verify_mode=).with(mode)
+          Horse.make_request('anything', {} , 'anything', {:verify_mode => mode})          
         end
-
-        it "should NOT use a ca_path if default is NOT provided and NO ca_path option is passed" do
-          @http_mock.should_not_receive(:ca_path=)
-
-          Horse.make_request('anything', {} , 'anything', {})
+      
+        it "sets verify mode to the default if provided (and none set in options)" do
+          Horse.verify_mode = "foo"
+          @http_mock.should_receive(:verify_mode=).with(Horse.verify_mode)
+          Horse.make_request('anything', {} , 'anything', {})          
+        end
+      
+        it "sets verify mode to the default if provided (and none set in options)" do
+          mode = "bar"
+          Horse.verify_mode = "foo"
+          @http_mock.should_receive(:verify_mode=).with(mode)
+          Horse.make_request('anything', {} , 'anything', {:verify_mode => mode})          
+        end
+      
+        it "sets verify mode to OpenSSL::SSL::VERIFY_PEER if no default or option is provided" do
+          @http_mock.should_receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_PEER)
+          Horse.make_request('anything', {} , 'anything', {})          
         end
       end
     end
-
+    
     it "should use the graph server by default" do
       Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
       Horse.make_request('anything', {}, 'anything')
@@ -293,12 +370,6 @@ describe "NetHTTPService module holder class Horse" do
     it "should use the REST server if the :rest_api option is true" do
       Net::HTTP.should_receive(:new).with(Koala::Facebook::REST_SERVER, anything).and_return(@http_mock)
       Horse.make_request('anything', {}, 'anything', :rest_api => true)
-    end
-
-    it "no longer sets verify_mode to no verification" do
-      @http_mock.should_not_receive('verify_mode=')
-
-      Horse.make_request('anything', {}, 'anything')
     end
 
     it "should start an HTTP connection" do
