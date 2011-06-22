@@ -3,14 +3,14 @@ require "typhoeus" unless defined?(Typhoeus)
 module Koala
   module TyphoeusService
     # this service uses Typhoeus to send requests to the graph
-    include Typhoeus  
+    include Typhoeus
     include Koala::HTTPService
 
     def self.make_request(path, args, verb, options = {})
       # if the verb isn't get or post, send it as a post argument
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
-      # switch any UploadableIOs to the files Typhoeus expects 
+      # switch any UploadableIOs to the files Typhoeus expects
       args.each_pair {|key, value| args[key] = value.to_file if value.is_a?(UploadableIO)}
 
       # you can pass arguments directly to Typhoeus using the :typhoeus_options key
@@ -27,9 +27,9 @@ module Koala
       response = Typhoeus::Request.send(verb, "#{prefix}://#{server(options)}#{path}", typhoeus_options)
       Koala::Response.new(response.code, response.body, response.headers_hash)
     end
-  
+
     protected
-      
+
     def self.multipart_requires_content_type?
       false # Typhoeus handles multipart file types, we don't have to require it
     end

@@ -3,7 +3,7 @@ New methods:
 -- Batch API support through Koala::Facebook::GraphAPI.batch (thanks, seejohnrun!)
   -- includes file uploads, error handling, and FQL
 -- Added GraphAPI#get_comments_for_urls (thanks, amrnt!)
--- Added RestAPI#fql_multiquery, which simplifies the results (thanks, amrnt!)   
+-- Added RestAPI#fql_multiquery, which simplifies the results (thanks, amrnt!)
 Updated methods:
 -- RealtimeUpdates now uses a GraphAPI object instead of its own API
 -- RestAPI#rest_call now has an optional last argument for method, for calls requiring POST, DELETE, etc. (thanks, sshilo!)
@@ -30,7 +30,7 @@ Updated methods:
 -- url_for_oauth_code can now take a :display option (thanks, netbe!)
 -- Net::HTTP can now accept :timeout and :proxy options (thanks, gilles!)
 -- Test users now supports using test accounts across multiple apps
-Internal improvements: 
+Internal improvements:
 -- For public requests, Koala now uses http by default (instead of https) to improve speed
   -- This can be overridden through Koala.always_use_ssl= or by passing :use_ssl => true in the options hash for an api call
 -- Read-only REST API requests now go through the faster api-read server
