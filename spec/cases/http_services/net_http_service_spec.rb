@@ -18,6 +18,11 @@ describe "NetHTTPService module holder class Horse" do
     Horse.methods.collect {|m| m.to_sym}.should include(:ca_path)
     Horse.methods.collect {|m| m.to_sym}.should include(:ca_path=)
   end
+  
+  it "has a verify_mode accessor" do
+    Horse.methods.collect {|m| m.to_sym}.should include(:verify_mode)
+    Horse.methods.collect {|m| m.to_sym}.should include(:verify_mode=)
+  end
 
   it "should define a make_request static module method" do
     Horse.respond_to?(:make_request).should be_true
@@ -47,6 +52,7 @@ describe "NetHTTPService module holder class Horse" do
       @http_mock.stub(:start).and_yield(@http_yield_mock)
       @http_mock.stub(:ca_path=)
       @http_mock.stub(:ca_file=)  
+      @http_mock.stub(:verify_mode=)
 
       Net::HTTP.stub(:new).and_return(@http_mock)
     end
@@ -317,6 +323,49 @@ describe "NetHTTPService module holder class Horse" do
         end
       end
     end    
+    
+    describe "verify_mode options" do      
+      after :each do
+        Horse.always_use_ssl = nil
+        Horse.verify_mode = nil
+      end
+      
+      it "does not set verify mode if it's not SSL" do
+        Horse.always_use_ssl = nil
+        @http_mock.should_not_receive(:verify_mode=)
+        Horse.make_request('anything', {} , 'anything', {:verify_mode => "abc"})          
+      end
+      
+      context "when making an SSL request" do
+        before :each do
+          Horse.always_use_ssl = true
+        end
+        
+        it "sets verify mode if provided in the options" do
+          mode = "foo"
+          @http_mock.should_receive(:verify_mode=).with(mode)
+          Horse.make_request('anything', {} , 'anything', {:verify_mode => mode})          
+        end
+      
+        it "sets verify mode to the default if provided (and none set in options)" do
+          Horse.verify_mode = "foo"
+          @http_mock.should_receive(:verify_mode=).with(Horse.verify_mode)
+          Horse.make_request('anything', {} , 'anything', {})          
+        end
+      
+        it "sets verify mode to the default if provided (and none set in options)" do
+          mode = "bar"
+          Horse.verify_mode = "foo"
+          @http_mock.should_receive(:verify_mode=).with(mode)
+          Horse.make_request('anything', {} , 'anything', {:verify_mode => mode})          
+        end
+      
+        it "sets verify mode to OpenSSL::SSL::VERIFY_PEER if no default or option is provided" do
+          @http_mock.should_receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_PEER)
+          Horse.make_request('anything', {} , 'anything', {})          
+        end
+      end
+    end
     
     it "should use the graph server by default" do
       Net::HTTP.should_receive(:new).with(Koala::Facebook::GRAPH_SERVER, anything).and_return(@http_mock)
