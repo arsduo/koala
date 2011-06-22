@@ -13,8 +13,9 @@ Internal improvements:
 -- HTTP services are more modular and can be changed on the fly (thanks, chadk!)
   -- Includes support for uploading StringIOs and other non-files via Net::HTTP even when using TyphoeusService
 -- Support for global proxy and timeout settings (thanks, itchy!)
--- Support for setting certificate path and file to address Net::HTTP errors under Ruby 1.9.2
+-- Support for global ca_path, ca_file, and verify_mode settings for Net::HTTP (thanks, spiegela!)
 -- Koala now uses the modern Typhoeus API (thanks, aselder!)
+-- Koala now uses the current modern Net::HTTP interface (thanks, romanbsd!)
 
 v1.0
 New methods:
@@ -24,7 +25,7 @@ New methods:
 -- Added put_connection and delete_connection convenience methods
 Updated methods:
 -- Search can now search places, checkins, etc. (thanks, rickyc!)
--- You can now pass :beta => true in the http options to use Facebook's beta tier.
+-- You can now pass :beta => true in the http options to use Facebook's beta tier
 -- TestUser#befriend now requires user info hashes (id and access token) due to Facebook API changes (thanks, pulsd and kbighorse!)
 -- All methods now accept an http_options hash as their optional last parameter (thanks, spiegela!)
 -- url_for_oauth_code can now take a :display option (thanks, netbe!)
@@ -40,6 +41,7 @@ Internal improvements:
 -- Updated parse_signed_request to match Facebook's current implementation (thanks, imajes!)
 -- APIError is now < StandardError, not Exception
 -- Added KoalaError for non-API errors
+-- Net::HTTP's SSL verification is no longer disabled by default
 Test improvements:
 -- Incorporated joshk's awesome rewrite of the entire Koala test suite (thanks, joshk!)
 -- Expanded HTTP service tests (added Typhoeus test suite and additional Net::HTTP test cases)
