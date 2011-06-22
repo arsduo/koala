@@ -7,6 +7,11 @@ module Koala
     # this service uses Net::HTTP to send requests to the graph
     include Koala::HTTPService
 
+    # Net::HTTP-specific values
+    class << self
+      attr_accessor :ca_file, :ca_path, :verify_mode
+    end
+    
     def self.make_request(path, args, verb, options = {})
       # We translate args to a valid query string. If post is specified,
       # we send a POST request to the given path with the given arguments.
@@ -14,10 +19,6 @@ module Koala
       # by default, we use SSL only for private requests
       # this makes public requests faster
       private_request = args["access_token"] || @always_use_ssl || options[:use_ssl]
-
-      # if proxy/timeout options aren't passed, check if defaults are set
-      options[:proxy] ||= proxy
-      options[:timeout] ||= timeout
 
       # if the verb isn't get or post, send it as a post argument
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
@@ -56,29 +57,33 @@ module Koala
     end
 
     def self.create_http(server, private_request, options)
-      if options[:proxy]
-        proxy = URI.parse(options[:proxy])
+      if proxy_server = options[:proxy] || proxy
+        proxy = URI.parse(proxy_server)
         http  = Net::HTTP.new(server, private_request ? 443 : nil,
                               proxy.host, proxy.port, proxy.user, proxy.password)
       else
-        http = Net::HTTP.new(server, private_request ? 443 : nil)
+        http  = Net::HTTP.new(server, private_request ? 443 : nil)
       end
       
-      if options[:timeout]
-        http.open_timeout = options[:timeout]
-        http.read_timeout = options[:timeout]
+      if timeout_value = options[:timeout] || timeout
+        http.open_timeout = timeout_value
+        http.read_timeout = timeout_value
       end
       
       # For HTTPS requests, set the proper CA certificates
       if private_request
         http.use_ssl = true  
-        http.verify_mode = options[:verify_mode] || OpenSSL::SSL::VERIFY_PEER
+        http.verify_mode = options[:verify_mode] || verify_mode || OpenSSL::SSL::VERIFY_PEER
         
-        options[:ca_file] ||= ca_file
-        http.ca_file = options[:ca_file] if options[:ca_file] && File.exists?(options[:ca_file])
+        if cert_file = options[:ca_file] || ca_file
+          raise Errno::ENOENT, "Certificate file #{cert_file.inspect} does not exist!" unless File.exists?(cert_file)
+          http.ca_file = cert_file 
+        end
         
-        options[:ca_path] ||= ca_path
-        http.ca_path = options[:ca_path] if options[:ca_path] && Dir.exists?(options[:ca_path])
+        if cert_path = options[:ca_path] || ca_path
+          raise Errno::ENOENT, "Certificate path #{cert_path.inspect} does not exist!" unless Dir.exists?(cert_path)
+          http.ca_path = cert_path
+        end
       end
             
       http
