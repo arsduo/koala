@@ -12,7 +12,6 @@ require 'koala/http_services'
 require 'koala/http_services/net_http_service'
 require 'koala/oauth'
 require 'koala/graph_api'
-require 'koala/graph_single_invoker'
 require 'koala/graph_batch_invoker'
 require 'koala/batch_operation'
 require 'koala/graph_collection'
@@ -69,21 +68,18 @@ module Koala
     
     class GraphAPI < API
       include GraphAPIMethods
-      include GraphSingleInvoker
     end
     
-    class GraphBatchAPI < API
-      include GraphAPIMethods
+    class GraphBatchAPI < GraphAPI
       include GraphBatchInvoker      
     end
-    
+        
     class RestAPI < API
       include RestAPIMethods
     end
 
     class GraphAndRestAPI < API
       include GraphAPIMethods
-      include GraphSingleInvoker
       include RestAPIMethods
     end
 

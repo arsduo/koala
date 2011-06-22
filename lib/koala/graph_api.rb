@@ -29,19 +29,6 @@ module Koala
       # Koala::Facebook::OAuth.get_user_from_cookie() method below to get the OAuth access token
       # for the active user from the cookie saved by the SDK.
 
-      def self.included(base)
-        base.class_eval do
-          def self.check_response(response)
-            # check for Graph API-specific errors
-            # this returns an error, which is immediately raised (non-batch)
-            # or added to the list of batch results (batch)
-            if response.is_a?(Hash) && error_details = response["error"]
-              APIError.new(error_details) 
-            end
-          end
-        end
-      end
-
       # Objects
 
       def get_object(id, args = {}, options = {})
@@ -214,10 +201,34 @@ module Koala
       
       def batch(http_options = {}, &block)
         batch_client = GraphBatchAPI.new(access_token)
-        yield batch_client
-        batch_client.execute(http_options)
-      end
         
+        if block
+          yield batch_client
+          batch_client.execute(http_options)
+        else
+          batch_client
+        end
+      end
+      
+      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
+        # Direct access to the Facebook API
+        # see any of the above methods for example invocations
+        result = api(path, args, verb, options) do |response|
+          raise error if error = check_response(response)
+        end
+
+        # now process as appropriate (get picture header, make GraphCollection, etc.)
+        post_processing ? post_processing.call(result) : result
+      end
+      
+      def check_response(response)
+        # check for Graph API-specific errors
+        # this returns an error, which is immediately raised (non-batch)
+        # or added to the list of batch results (batch)
+        if response.is_a?(Hash) && error_details = response["error"]
+          APIError.new(error_details) 
+        end
+      end     
     end
   end
 end  
