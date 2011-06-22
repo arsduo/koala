@@ -57,9 +57,10 @@ module Koala
         @args.each_pair do |key, value| 
           if UploadableIO.binary_content?(value)
             @files ||= {}
-            # we use object_id to ensure unique file identifiers across multiple batch operations
-            # remove it from the original hash and add it to the file store
-            id = "op#{identifier}_#{@files.keys.length}"
+            # we use a class-level counter to ensure unique file identifiers across multiple batch operations
+            # (this is thread safe, since we just care about uniqueness)
+            # so remove the file from the original hash and add it to the file store
+            id = "op#{identifier}_file#{@files.keys.length}"
             @files[id] = @args.delete(key).is_a?(UploadableIO) ? value : UploadableIO.new(value)
           end
         end          
