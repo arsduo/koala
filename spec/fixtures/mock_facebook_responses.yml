@@ -162,6 +162,16 @@ graph_api:
       post:
         <<: *token_required
         with_token: '{"id": "MOCK_PHOTO"}'
+  /me/videos:
+    source=[FILE]:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO"}'
+    message=This is the test message&source=[FILE]:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO"}'
+
   /koppel:
     no_args:
       get:

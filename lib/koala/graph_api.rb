@@ -109,9 +109,9 @@ module Koala
         graph_call("#{id}/#{connection_name}", args, "delete", options)
       end
 
-      # Pictures
-      # to delete pictures, use delete_object(photo_id)
-      # note: you'll need the user_photos permission to actually access photos after uploading them 
+      # Media (photos and videos)
+      # to delete photos or videos, use delete_object(object_id)
+      # note: you'll need the user_photos or user_videos permissions to actually access media after upload 
     
       def get_picture(object, args = {}, options = {})
         # Gets a picture object, returning the URL (which Facebook sends as a header)
@@ -120,36 +120,30 @@ module Koala
         end
       end    
       
+      # Can be called in multiple ways:
+      #
+      #   put_picture(file, [content_type], ...)
+      #   put_picture(path_to_file, [content_type], ...)
+      #
+      # You can pass in uploaded files directly from Rails or Sinatra.
+      # (See lib/koala/uploadable_io.rb for supported frameworks)
+      #
+      # Optional parameters can be added to the end of the argument list:
+      # - args:       a hash of request parameters (default: {})
+      # - target_id:  ID of the target where to post the picture (default: "me")
+      # - options:    a hash of http options passed to the HTTPService module
+      # 
+      #   put_picture(file, content_type, {:message => "Message"}, 01234560)
+      #   put_picture(params[:file], {:message => "Message"})
+      
       def put_picture(*picture_args)
-        # Can be called in multiple ways:
-        #
-        #   put_picture(file, [content_type], ...)
-        #   put_picture(path_to_file, [content_type], ...)
-        #
-        # You can pass in uploaded files directly from Rails or Sinatra.
-        # (See lib/koala/uploadable_io.rb for supported frameworks)
-        #
-        # Optional parameters can be added to the end of the argument list:
-        # - args:       a hash of request parameters (default: {})
-        # - target_id:  ID of the target where to post the picture (default: "me")
-        # - options:    a hash of http options passed to the HTTPService module
-        # 
-        #   put_picture(file, content_type, {:message => "Message"}, 01234560)
-        #   put_picture(params[:file], {:message => "Message"})
+        put_object(*parse_media_args(picture_args, "photos"))
+      end
         
-        raise KoalaError.new("Wrong number of arguments for put_picture") unless picture_args.size.between?(1, 5)
-        
-        args_offset = picture_args[1].kind_of?(Hash) || picture_args.size == 1 ? 0 : 1
-        
-        args      = picture_args[1 + args_offset] || {}
-        target_id = picture_args[2 + args_offset] || "me"
-        options   = picture_args[3 + args_offset] || {} 
-        
-        args["source"] = Koala::UploadableIO.new(*picture_args.slice(0, 1 + args_offset))
-
-        options[:http_service] = Koala.base_http_service if args["source"].requires_base_http_service
-
-        self.put_object(target_id, "photos", args, options)
+      def put_video(*video_args)
+        args = parse_media_args(video_args, "videos")
+        args.last[:video] = true
+        put_object(*args)
       end
     
       # Wall posts
@@ -217,7 +211,26 @@ module Koala
         yield batch_client
         batch_client.execute(http_options)
       end
+      
+      private
+      
+      def parse_media_args(media_args, method)
+        # photo and video uploads can accept different types of arguments (see above)
+        # so here, we parse the arguments into a form directly usable in put_object
+        raise KoalaError.new("Wrong number of arguments for put_#{method == "photos" ? "picture" : "video"}") unless media_args.size.between?(1, 5)
         
+        args_offset = media_args[1].kind_of?(Hash) || media_args.size == 1 ? 0 : 1
+        
+        args      = media_args[1 + args_offset] || {}
+        target_id = media_args[2 + args_offset] || "me"
+        options   = media_args[3 + args_offset] || {} 
+        
+        args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
+
+        options[:http_service] = Koala.base_http_service if args["source"].requires_base_http_service
+
+        [target_id, method, args, options]
+      end
     end
   end
 end  

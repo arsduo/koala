@@ -36,32 +36,46 @@ describe "Koala::HTTPService" do
     end
     
     describe "server" do
-      describe "without options[:beta]" do
-        it "should return the rest server if options[:rest_api]" do
+      describe "with no options" do
+        it "returns the REST server if options[:rest_api]" do
           Bear.server(:rest_api => true).should == Koala::Facebook::REST_SERVER
         end
 
-        it "should return the rest server if !options[:rest_api]" do
+        it "returns the graph server if !options[:rest_api]" do
           Bear.server(:rest_api => false).should == Koala::Facebook::GRAPH_SERVER
           Bear.server({}).should == Koala::Facebook::GRAPH_SERVER
         end
       end
-      
-      describe "without options[:beta]" do
+
+      describe "with options[:beta]" do
         before :each do
           @options = {:beta => true}
         end
         
-        it "should return the rest server if options[:rest_api]" do
+        it "returns the beta REST server if options[:rest_api]" do
           server = Bear.server(@options.merge(:rest_api => true))
-          server.should =~ Regexp.new(Koala::Facebook::REST_SERVER)
-          server.should =~ /beta\./
+          server.should =~ Regexp.new("beta.#{Koala::Facebook::REST_SERVER}")
         end
 
-        it "should return the rest server if !options[:rest_api]" do
-          server = Bear.server(:beta => true)
-          server.should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER)
-          server.should =~ /beta\./
+        it "returns the beta rest server if !options[:rest_api]" do
+          server = Bear.server(@options)
+          server.should =~ Regexp.new("beta.#{Koala::Facebook::GRAPH_SERVER}")
+        end
+      end
+      
+      describe "with options[:video]" do
+        before :each do
+          @options = {:video => true}
+        end
+        
+        it "should return the REST video server if options[:rest_api]" do
+          server = Bear.server(@options.merge(:rest_api => true))
+          server.should =~ Regexp.new(Koala::Facebook::REST_SERVER.gsub(/\.facebook/, "-video.facebook"))
+        end
+
+        it "should return the graph video server if !options[:rest_api]" do
+          server = Bear.server(@options)
+          server.should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER.gsub(/\.facebook/, "-video.facebook"))
         end
       end
     end

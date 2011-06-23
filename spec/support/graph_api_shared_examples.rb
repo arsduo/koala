@@ -166,44 +166,96 @@ shared_examples_for "Koala GraphAPI with an access token" do
     @temporary_object_id.should_not be_nil
   end
 
-  it "should be able to post photos to the user's wall with an open file object" do
-    content_type = "image/jpg"      
-    file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
-    
-    result = @api.put_picture(file, content_type)
-    @temporary_object_id = result["id"] 
-    @temporary_object_id.should_not be_nil
+  describe ".put_picture" do
+    it "should be able to post photos to the user's wall with an open file object" do
+      content_type = "image/jpg"      
+      file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+  
+      result = @api.put_picture(file, content_type)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+    end
+
+    it "uses the base HTTP service if the upload is a StringIO or similar" do
+      source = stub("UploadIO")
+      Koala::UploadableIO.stub(:new).and_return(source)
+      source.stub(:requires_base_http_service).and_return(true)
+      Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:http_service => Koala.base_http_service)).and_return(Koala::Response.new(200, "[]", {}))
+      @api.put_picture(StringIO.new)
+    end
+
+    it "should be able to post photos to the user's wall without an open file object" do
+      content_type = "image/jpg",
+      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
+  
+      result = @api.put_picture(file_path, content_type)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+    end
+  
+    it "should be able to verify a photo posted to a user's wall" do
+      content_type = "image/jpg",
+      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
+  
+      expected_message = "This is the test message"
+  
+      result = @api.put_picture(file_path, content_type, :message => expected_message)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+  
+      get_result = @api.get_object(@temporary_object_id)
+      get_result["name"].should == expected_message
+    end
   end
   
-  it "uses the base HTTP service if the upload is a StringIO or similar" do
-    source = stub("UploadIO")
-    Koala::UploadableIO.stub(:new).and_return(source)
-    source.stub(:requires_base_http_service).and_return(true)
-    Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:http_service => Koala.base_http_service)).and_return(Koala::Response.new(200, "[]", {}))
-    @api.put_picture(StringIO.new)
-  end
-  
-  it "should be able to post photos to the user's wall without an open file object" do
-    content_type = "image/jpg",
-    file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
+  describe ".put_video" do
+    it "should set the video flag to true" do
+      source = stub("UploadIO")
+      Koala::UploadableIO.stub(:new).and_return(source)
+      source.stub(:requires_base_http_service).and_return(false)
+      Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:video => true)).and_return(Koala::Response.new(200, "[]", {}))
+      @api.put_video("foo")
+    end
     
-    result = @api.put_picture(file_path, content_type)
-    @temporary_object_id = result["id"] 
-    @temporary_object_id.should_not be_nil
-  end
-    
-  it "should be able to verify a photo posted to a user's wall" do
-    content_type = "image/jpg",
-    file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
-    
-    expected_message = "This is the test message"
-    
-    result = @api.put_picture(file_path, content_type, :message => expected_message)
-    @temporary_object_id = result["id"] 
-    @temporary_object_id.should_not be_nil
-    
-    get_result = @api.get_object(@temporary_object_id)
-    get_result["name"].should == expected_message
+    it "should be able to post videos to the user's wall with an open file object" do
+      content_type = "image/jpg"      
+      file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+
+      result = @api.put_video(file, content_type)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+    end
+
+    it "uses the base HTTP service if the upload is a StringIO or similar" do
+      source = stub("UploadIO")
+      Koala::UploadableIO.stub(:new).and_return(source)
+      source.stub(:requires_base_http_service).and_return(true)
+      Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:http_service => Koala.base_http_service)).and_return(Koala::Response.new(200, "[]", {}))
+      @api.put_video(StringIO.new)
+    end
+
+    it "should be able to post videos to the user's wall without an open file object" do
+      content_type = "image/jpg",
+      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
+
+      result = @api.put_video(file_path, content_type)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+    end
+
+    it "should be able to verify a video posted to a user's wall" do
+      content_type = "image/jpg",
+      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
+
+      expected_message = "This is the test message"
+
+      result = @api.put_video(file_path, content_type, :message => expected_message)
+      @temporary_object_id = result["id"] 
+      @temporary_object_id.should_not be_nil
+
+      get_result = @api.get_object(@temporary_object_id)
+      get_result["name"].should == expected_message
+    end
   end
 
   it "should be able to verify a message with an attachment posted to a feed" do
@@ -267,6 +319,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :search => 3,
       # methods that have special arguments
       :put_picture => ["x.jpg", "image/jpg", {}, "me"],
+      :put_video => ["x.mp4", "video/mpeg4", {}, "me"],
       :get_objects => [["x"], {}]
     }.each_pair do |method_name, params|
       it "should pass http options through for #{method_name}" do

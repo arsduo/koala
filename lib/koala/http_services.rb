@@ -17,7 +17,9 @@ module Koala
         end
 
         def self.server(options = {})
-          "#{options[:beta] ? "beta." : ""}#{options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER}"          
+          server = "#{options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER}"
+          server.gsub!(/\.facebook/, "-video.facebook") if options[:video]
+          "#{options[:beta] ? "beta." : ""}#{server}"
         end
         
         def self.encode_params(param_hash)
