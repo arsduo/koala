@@ -27,6 +27,9 @@ module Koala
     SECRET = OAUTH_DATA['secret']
     SUBSCRIPTION_DATA = TEST_DATA["subscription_test_data"]
 
+    # fix our specs to use ok_json, so we always get the same results from to_json
+    MultiJson.engine = :ok_json
+
     # Loads the mock response data via ERB to substitue values for TEST_DATA (see oauth/access_token)
     mock_response_file_path = File.join(File.dirname(__FILE__), '..', 'fixtures', 'mock_facebook_responses.yml')
     RESPONSES = YAML.load(ERB.new(IO.read(mock_response_file_path)).result(binding))
