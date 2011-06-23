@@ -14,6 +14,7 @@ Internal improvements:
   -- Includes support for uploading StringIOs and other non-files via Net::HTTP even when using TyphoeusService
 -- Support for global proxy and timeout settings (thanks, itchy!)
 -- Support for global ca_path, ca_file, and verify_mode settings for Net::HTTP (thanks, spiegela!)
+-- Koala now uses multi_json to improve compatibility with Rubinius and other Ruby versions
 -- Koala now uses the modern Typhoeus API (thanks, aselder!)
 -- Koala now uses the current modern Net::HTTP interface (thanks, romanbsd!)
 
