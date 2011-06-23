@@ -99,7 +99,7 @@ module Koala
       def parse_signed_request(input)
         encoded_sig, encoded_envelope = input.split('.', 2)
         signature = base64_url_decode(encoded_sig).unpack("H*").first
-        envelope = JSON.parse(base64_url_decode(encoded_envelope))
+        envelope = MultiJson.decode(base64_url_decode(encoded_envelope))
 
         raise "SignedRequest: Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
 
@@ -126,7 +126,7 @@ module Koala
           })
         end
 
-        JSON.parse(response)
+        MultiJson.decode(response)
       end
 
       def get_tokens_from_session_keys(sessions, options = {})
@@ -149,7 +149,7 @@ module Koala
         result = fetch_token_string(args, post, "access_token", options)
 
         # if we have an error, parse the error JSON and raise an error
-        raise APIError.new((JSON.parse(result)["error"] rescue nil) || {}) if result =~ /error/
+        raise APIError.new((MultiJson.decode(result)["error"] rescue nil) || {}) if result =~ /error/
 
         # otherwise, parse the access token
         parse_access_token(result)

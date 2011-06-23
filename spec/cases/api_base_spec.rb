@@ -52,7 +52,7 @@ describe "Koala::Facebook::API" do
     Koala.stub(:make_request).and_return(response)
 
     json_body = mock('JSON body')
-    JSON.stub(:parse).and_return([json_body])
+    MultiJson.stub(:decode).and_return([json_body])
 
     @service.api('anything').should == json_body
   end
@@ -66,7 +66,7 @@ describe "Koala::Facebook::API" do
 
     @service.api('anything', {}, "get") do |arg|
       yield_test.pass
-      arg.should == JSON.parse(body)
+      arg.should == MultiJson.decode(body)
     end
   end
 

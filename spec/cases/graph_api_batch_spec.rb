@@ -225,7 +225,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       it "includes the method" do
         params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
-        params[:method].should == @args[:method].to_sym
+        params[:method].should == @args[:method].to_s
       end
       
       it "works with nil http_options" do
@@ -306,7 +306,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           Koala::Facebook::BatchOperation.stub(:new).and_return(op)
 
           # two requests should generate two batch operations
-          expected = [op.to_batch_params(access_token), op.to_batch_params(access_token)].to_json
+          expected = MultiJson.encode([op.to_batch_params(access_token), op.to_batch_params(access_token)])
           Koala.should_receive(:make_request).with(anything, hash_including("batch" => expected), anything, anything).and_return(@fake_response)
           Koala::Facebook::GraphAPI.new(access_token).batch do |batch_api|
             batch_api.get_object('me')

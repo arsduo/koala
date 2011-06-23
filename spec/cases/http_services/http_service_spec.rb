@@ -75,7 +75,7 @@ describe "Koala::HTTPService" do
         val = 'json_value'
         not_a_string = 'not_a_string'
         not_a_string.stub(:is_a?).and_return(false)
-        not_a_string.should_receive(:to_json).and_return(val)
+        MultiJson.should_receive(:encode).with(not_a_string).and_return(val)
 
         string = "hi"
 

@@ -8,7 +8,7 @@ module Koala
       end
 
       def fql_multiquery(queries = {}, args = {}, options = {})
-        if results = rest_call('fql.multiquery', args.merge(:queries => queries.to_json), options)
+        if results = rest_call('fql.multiquery', args.merge(:queries => MultiJson.encode(queries)), options)
           # simplify the multiquery result format
           results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
         end

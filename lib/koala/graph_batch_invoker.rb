@@ -30,10 +30,10 @@ module Koala
         # Turn the call args collected into what facebook expects
         args = {"access_token" => access_token}
 
-        args["batch"] = batch_calls.map { |batch_op|
+        args["batch"] = MultiJson.encode(batch_calls.map { |batch_op|
             args.merge!(batch_op.files) if batch_op.files
             batch_op.to_batch_params(access_token)
-          }.to_json
+          })
         
         # Make the POST request for the batch call
         # batch operations have to go over SSL, but since there's an access token, that secures that
@@ -41,7 +41,7 @@ module Koala
         # Raise an error if we get a 500
         raise APIError.new("type" => "HTTP #{result.status.to_s}", "message" => "Response body: #{result.body}") if result.status >= 500
 
-        response = JSON.parse(result.body.to_s)
+        response = MultiJson.decode(result.body.to_s)
         # raise an error if we get a Batch API error message
         raise APIError.new("type" => "Error #{response["error"]}", "message" => response["error_description"]) if response.is_a?(Hash) && response["error"]
 
@@ -54,7 +54,7 @@ module Koala
 
           if call_result
             # (see note in regular api method about JSON parsing)
-            body = JSON.parse("[#{call_result['body'].to_s}]")[0]
+            body = MultiJson.decode("[#{call_result['body'].to_s}]")[0]
             unless call_result["code"].to_i >= 500 || error = GraphAPI.check_response(body)
               # Get the HTTP component they want
               data = case batch_op.http_options[:http_component] 

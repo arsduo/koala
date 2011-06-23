@@ -29,7 +29,7 @@ module Koala
         args_string = Koala.http_service.encode_params(@access_token == main_access_token ? @args : @args.merge(:access_token => @access_token))
         
         response = {
-          :method => @method, 
+          :method => @method.to_s, 
           :relative_url => @url,
         }
          

@@ -1,7 +1,7 @@
 require 'cgi'
 require 'digest/md5'
 
-require 'json'
+require 'multi_json'
 
 # OpenSSL and Base64 are required to support signed_request
 require 'openssl'
@@ -56,8 +56,8 @@ module Koala
 
         # parse the body as JSON and run it through the error checker (if provided)
         # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
-        # and cause JSON.parse to fail -- so we account for that by wrapping the result in []
-        body = JSON.parse("[#{result.body.to_s}]")[0]
+        # and cause MultiJson.decode to fail -- so we account for that by wrapping the result in []
+        body = MultiJson.decode("[#{result.body.to_s}]")[0]
         yield body if error_checking_block
 
         # if we want a component other than the body (e.g. redirect header for images), return that

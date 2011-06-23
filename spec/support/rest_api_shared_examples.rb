@@ -154,13 +154,13 @@ shared_examples_for "Koala RestAPI" do
           "fql.multiquery", anything, anything
         ).and_return({})
 
-        @api.fql_multiquery stub('query string')
+        @api.fql_multiquery 'query string'
       end
 
       it "should pass a queries argument" do
         queries = stub('query string')
         queries_json = "some JSON"
-        queries.stub(:to_json).and_return(queries_json)
+        MultiJson.stub(:encode).with(queries).and_return(queries_json)
         
         @api.should_receive(:rest_call).with(
           anything,
