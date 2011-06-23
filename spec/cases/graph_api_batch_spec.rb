@@ -272,7 +272,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
     end
 
-    describe "#batch_api" do
+    describe "#batch" do
       before :each do
         @fake_response = Koala::Response.new(200, "[]", {})
         Koala.stub(:make_request).and_return(@fake_response)
@@ -398,6 +398,35 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         end
       end
 
+      it "is thread safe" do
+        # ensure batch operations on one thread don't affect those on another
+        thread_one_count = 0
+        thread_two_count = 0
+        first_count = 20
+        second_count = 10
+        
+        Koala.stub(:make_request).and_return(@fake_response)
+
+        thread1 = Thread.new do
+          @api.batch do |batch_api| 
+            first_count.times {|i| batch_api.get_object("me"); sleep(1) }
+            thread_one_count = batch_api.batch_calls.count
+          end
+        end
+            
+        thread2 = Thread.new do
+          @api.batch do |batch_api| 
+            second_count.times {|i| batch_api.get_object("me"); sleep(1) }
+            thread_two_count = batch_api.batch_calls.count
+          end
+        end
+        
+        thread1.join
+        thread2.join
+        
+        thread_one_count.should == first_count
+        thread_two_count.should == second_count
+      end
     end
   end
 
