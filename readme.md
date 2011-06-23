@@ -2,8 +2,8 @@ Koala
 ====
 [Koala](http://github.com/arsduo/koala) is a new Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), the REST API, realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
 
-* Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, just over 750 lines of code.)
-* Fast: Koala should, out of the box, be quick. In addition to supporting the vanilla Ruby networking libraries, it natively supports Typhoeus, our preferred gem for making fast HTTP requests. Of course, That brings us to our next topic:
+* Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, at just over 750 lines of code.)
+* Fast: Koala should, out of the box, be quick. In addition to supporting the vanilla Ruby networking libraries, it natively supports Typhoeus, our preferred gem for making fast HTTP requests. Of course, that brings us to our next topic:
 * Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We have no dependencies beyond the JSON gem.  Koala also has a built-in mechanism for using whichever HTTP library you prefer to make requests against the graph.)
 * Tested: Koala should have complete test coverage, so you can rely on it.  (Our complete test coverage can be run against either mocked responses or the live Facebook servers.)
 
@@ -47,7 +47,7 @@ When retrieving data that returns an array of results (for example, when calling
     # This is useful for paging across multiple requests
     next_path, next_args = feed.next_page_params
 
-    # You can use those params to easily get the next (or prevous) page
+    # You can use those params to easily get the next (or previous) page
     page = graph.get_page(feed.next_page_params)
 
 You can make multiple calls at once using Facebook's batch API:
@@ -152,4 +152,4 @@ You can also run live tests against Facebook's servers:
     # Again from anywhere in the project directory:
     LIVE=true rake spec
 
-Important Note: to run the live tests, you have to provide some of your own data in spec/fixtures/facebook_data.yml: a valid OAuth access token with publish\_stream, read\_stream, and user\_photos permissions and an OAuth code that can be used to generate an access token.  You can get thisdata at the OAuth Playground; if you want to use your own app, remember to swap out the app ID, secret, and other values.  (The file also provides valid values for other tests, which you're welcome to swap out for data specific to your own application.)
+Important Note: to run the live tests, you have to provide some of your own data in spec/fixtures/facebook_data.yml: a valid OAuth access token with publish\_stream, read\_stream, and user\_photos permissions and an OAuth code that can be used to generate an access token.  You can get this data at the OAuth Playground; if you want to use your own app, remember to swap out the app ID, secret, and other values.  (The file also provides valid values for other tests, which you're welcome to swap out for data specific to your own application.)
