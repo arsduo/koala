@@ -409,14 +409,14 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
         thread1 = Thread.new do
           @api.batch do |batch_api| 
-            first_count.times {|i| batch_api.get_object("me"); sleep(1) }
+            first_count.times {|i| batch_api.get_object("me"); sleep(0.01) }
             thread_one_count = batch_api.batch_calls.count
           end
         end
             
         thread2 = Thread.new do
           @api.batch do |batch_api| 
-            second_count.times {|i| batch_api.get_object("me"); sleep(1) }
+            second_count.times {|i| batch_api.get_object("me"); sleep(0.01) }
             thread_two_count = batch_api.batch_calls.count
           end
         end
