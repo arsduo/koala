@@ -209,7 +209,12 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
   
   describe ".put_video" do
-    it "should set the video flag to true" do
+    before :each do
+      @cat_movie = File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v")      
+      @content_type = "video/mpeg4"      
+    end
+    
+    it "should set options[:video] to true" do
       source = stub("UploadIO")
       Koala::UploadableIO.stub(:new).and_return(source)
       source.stub(:requires_base_http_service).and_return(false)
@@ -218,10 +223,9 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
     
     it "should be able to post videos to the user's wall with an open file object" do
-      content_type = "image/jpg"      
-      file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+      file = File.open(@cat_movie)
 
-      result = @api.put_video(file, content_type)
+      result = @api.put_video(file, @content_type)
       @temporary_object_id = result["id"] 
       @temporary_object_id.should_not be_nil
     end
@@ -235,27 +239,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
 
     it "should be able to post videos to the user's wall without an open file object" do
-      content_type = "image/jpg",
-      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
-
-      result = @api.put_video(file_path, content_type)
+      result = @api.put_video(@cat_movie, @content_type)
       @temporary_object_id = result["id"] 
       @temporary_object_id.should_not be_nil
     end
 
-    it "should be able to verify a video posted to a user's wall" do
-      content_type = "image/jpg",
-      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
-
-      expected_message = "This is the test message"
-
-      result = @api.put_video(file_path, content_type, :message => expected_message)
-      @temporary_object_id = result["id"] 
-      @temporary_object_id.should_not be_nil
-
-      get_result = @api.get_object(@temporary_object_id)
-      get_result["name"].should == expected_message
-    end
+    # note: Facebook doesn't post videos immediately to the wall, due to processing time
+    # during which get_object(video_id) will return false
+    # hence we can't do the same verify test we do for photos
   end
 
   it "should be able to verify a message with an attachment posted to a feed" do
