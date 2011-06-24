@@ -43,19 +43,19 @@ describe "Koala::Facebook::RealtimeUpdates" do
     it "should not allow write access to app_id" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
       # this should not throw errors
-      lambda { updates.app_id = 2 }.should raise_error(NoMethodError)
+      updates.methods.map(&:to_sym).should_not include(:app_id=)
     end
 
     it "should not allow write access to app_access_token" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
       # this should not throw errors
-      lambda { updates.app_access_token = 2 }.should raise_error(NoMethodError)
+      updates.methods.map(&:to_sym).should_not include(:app_access_token=)
     end
   
     it "should not allow write access to secret" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
       # this should not throw errors
-      lambda { updates.secret = 2 }.should raise_error(NoMethodError)
+      updates.methods.map(&:to_sym).should_not include(:secret=)
     end
     
     # init with secret / fetching the token

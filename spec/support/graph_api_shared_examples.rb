@@ -387,8 +387,8 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
       end
 
       it "should have a read-only paging attribute" do
-        lambda { @result.paging }.should_not raise_error
-        lambda { @result.paging = "paging" }.should raise_error(NoMethodError)
+        @result.methods.map(&:to_sym).should include(:paging)
+        @result.methods.map(&:to_sym).should_not include(:paging=)
       end
 
       describe "when getting a whole page" do
