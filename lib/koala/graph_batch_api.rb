@@ -1,14 +1,21 @@
 module Koala
   module Facebook
-      module GraphBatchInvoker
+      module GraphBatchAPIMethods
         
       def self.included(base)
         base.class_eval do
           alias_method :graph_call_outside_batch, :graph_call
           alias_method :graph_call, :graph_call_in_batch
+          
+          alias_method :check_graph_api_response, :check_response
+          alias_method :check_response, :check_graph_batch_api_response
         end
       end
       
+      def batch_calls
+        @batch_calls ||= []
+      end
+            
       def graph_call_in_batch(path, args = {}, verb = "get", options = {}, &post_processing)
           # for batch APIs, we queue up the call details (incl. post-processing)
           batch_calls << BatchOperation.new(
@@ -22,19 +29,22 @@ module Koala
           nil # batch operations return nothing immediately 
       end
 
-      def batch_calls
-        @batch_calls ||= []
+      def check_graph_batch_api_response(response)
+        if response.is_a?(Hash) && response["error"] && !response["error"].is_a?(Hash)
+          APIError.new("type" => "Error #{response["error"]}", "message" => response["error_description"])
+        else
+          check_graph_api_response(response)
+        end
       end
 
       def execute(http_options = {})
         return [] unless batch_calls.length > 0
         # Turn the call args collected into what facebook expects
-        args = {
-          "batch" => batch_calls.map { |batch_op|
-            args.merge!(batch_op.files) if batch_op.files
-            batch_op.to_batch_params(access_token)
-          }.to_json
-        }
+        args = {}
+        args["batch"] = batch_calls.map { |batch_op|
+          args.merge!(batch_op.files) if batch_op.files
+          batch_op.to_batch_params(access_token)
+        }.to_json
         
         graph_call_outside_batch('/', args, 'post', http_options) do |response|
           # map the results with post-processing included

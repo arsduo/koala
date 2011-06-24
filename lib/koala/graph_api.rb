@@ -214,7 +214,8 @@ module Koala
         # Direct access to the Facebook API
         # see any of the above methods for example invocations
         result = api(path, args, verb, options) do |response|
-          raise error if error = check_response(response)
+          error = check_response(response)
+          raise error if error
         end
 
         # now process as appropriate (get picture header, make GraphCollection, etc.)
