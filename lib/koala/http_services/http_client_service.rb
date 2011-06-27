@@ -12,6 +12,8 @@ module Koala
       # if proxy/timeout options aren't passed, check if defaults are set
       client_options[:default_proxy] ||= proxy
       client_options[:so_timeout]    ||= timeout
+      
+      prefix = (args["access_token"] || @always_use_ssl || options[:use_ssl]) ? "https" : "http"
 
       client   = HTTP::Client.new(server(options), client_options)
       
