@@ -130,8 +130,13 @@ module Koala
   # if you have Typheous and don't want to use it (or want another service),
   # you can run Koala.http_service = NetHTTPService (or MyHTTPService)
   begin
-    require 'koala/http_services/typhoeus_service'
-    Koala.http_service = TyphoeusService
+    if RUBY_PLATFORM == 'java'
+      require 'koala/http_services/http_client_service'
+      Koala.http_service = HttpClientService
+    else
+      require 'koala/http_services/typhoeus_service'
+      Koala.http_service = TyphoeusService
+    end
   rescue LoadError
     Koala.http_service = Koala.base_http_service
   end
