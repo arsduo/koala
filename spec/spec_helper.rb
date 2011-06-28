@@ -1,7 +1,7 @@
 begin
   require 'bundler/setup'
 rescue LoadError
-  puts 'although not required, bundler is recommened for running the tests'
+  puts 'although not required, bundler is recommended for running the tests'
 end
 
 # load the libraries
