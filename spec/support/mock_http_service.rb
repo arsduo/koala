@@ -5,6 +5,9 @@ module Koala
   module MockHTTPService
     include Koala::HTTPService
 
+    # fix our specs to use ok_json, so we always get the same results from to_json
+    MultiJson.engine = :ok_json
+
     # Mocks all HTTP requests for with koala_spec_with_mocks.rb
     # Mocked values to be included in TEST_DATA used in specs
     ACCESS_TOKEN = '*'
@@ -26,9 +29,6 @@ module Koala
     APP_ID = OAUTH_DATA['app_id']
     SECRET = OAUTH_DATA['secret']
     SUBSCRIPTION_DATA = TEST_DATA["subscription_test_data"]
-
-    # fix our specs to use ok_json, so we always get the same results from to_json
-    MultiJson.engine = :ok_json
 
     # Loads the mock response data via ERB to substitue values for TEST_DATA (see oauth/access_token)
     mock_response_file_path = File.join(File.dirname(__FILE__), '..', 'fixtures', 'mock_facebook_responses.yml')

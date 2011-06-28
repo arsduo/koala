@@ -4,8 +4,7 @@ module KoalaTest
     print "Validating permissions for live testing..."
     # make sure we have the necessary permissions
     api = Koala::Facebook::GraphAndRestAPI.new(token)
-    uid = api.get_object("me")["id"]
-    perms = api.fql_query("select read_stream, publish_stream, user_photos, user_videos, read_insights from permissions where uid = #{uid}")[0]
+    perms = api.fql_query("select read_stream, publish_stream, user_photos, user_videos, read_insights from permissions where uid = me()")[0]
     perms.each_pair do |perm, value|
       if value == (perm == "read_insights" ? 1 : 0) # live testing depends on insights calls failing 
         puts "failed!\n" # put a new line after the print above
