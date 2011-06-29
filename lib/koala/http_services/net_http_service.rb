@@ -81,7 +81,7 @@ module Koala
         end
         
         if cert_path = options[:ca_path] || ca_path
-          raise Errno::ENOENT, "Certificate path #{cert_path.inspect} does not exist!" unless Dir.exists?(cert_path)
+          raise Errno::ENOENT, "Certificate path #{cert_path.inspect} does not exist!" unless File.directory?(cert_path)
           http.ca_path = cert_path
         end
       end
