@@ -278,19 +278,19 @@ describe "NetHTTPService module holder class Horse" do
           it "should not use a default ca_path if the default ca_path does not exist" do
             Horse.ca_path = @global_ca_path
 
-            Dir.should_receive(:exists?).with(@global_ca_path).and_return(false)
+            File.should_receive(:directory?).with(@global_ca_path).and_return(false)
             expect { Horse.make_request('anything', {} , 'anything', {}) }.to raise_exception(Errno::ENOENT)
           end
 
           it "should not use a default ca_path if the default ca_path does not exist" do
-            Dir.should_receive(:exists?).with(@global_ca_path).and_return(false)
+            File.should_receive(:directory?).with(@global_ca_path).and_return(false)
             expect { Horse.make_request('anything', {} , 'anything', {:ca_path => @global_ca_path}) }.to raise_exception(Errno::ENOENT)
           end
         end
 
         context "if the directory exists" do
           before :each do
-            Dir.stub(:exists?).and_return(true)
+            File.stub(:directory?).and_return(true)
           end
 
           it "should use passed ca_path options if provided" do
