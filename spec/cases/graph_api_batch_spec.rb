@@ -431,7 +431,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
   end
 
   describe "usage tests" do
-    it "should be able get two results at once" do
+    it "can get two results at once" do
       me, koppel = @api.batch do |batch_api|
         batch_api.get_object('me')
         batch_api.get_object('koppel')
@@ -578,6 +578,32 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           end
         }.to raise_exception(Koala::Facebook::APIError)
       end
+    end
+  end
+
+  describe "new interface" do
+    it "includes a deprecation warning on GraphAPI" do
+      begin 
+        Koala::Facebook::GraphAPI.batch do
+        end
+      rescue NoMethodError => @err
+      end
+      
+      # verify the message points people to the wiki page
+      @err.should
+      @err.message.should =~ /https\:\/\/github.com\/arsduo\/koala\/wiki\/Batch-requests/
+    end
+    
+    it "includes a deprecation warning on GraphAndRESTAPI" do
+      begin 
+        Koala::Facebook::GraphAndRestAPI.batch do
+        end
+      rescue NoMethodError => @err
+      end
+      
+      # verify the message points people to the wiki page
+      @err.should
+      @err.message.should =~ /https\:\/\/github.com\/arsduo\/koala\/wiki\/Batch-requests/
     end
   end
 end
