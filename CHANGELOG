@@ -1,9 +1,12 @@
 v1.1
 New methods:
--- Batch API support through Koala::Facebook::GraphAPI.batch (thanks, seejohnrun!)
+-- Added Batch API support (thanks, seejohnrun and spiegela!)
   -- includes file uploads, error handling, and FQL
+-- Added GraphAPI#put_video
 -- Added GraphAPI#get_comments_for_urls (thanks, amrnt!)
 -- Added RestAPI#fql_multiquery, which simplifies the results (thanks, amrnt!)
+-- HTTP services support global proxy and timeout settings (thanks, itchy!)
+-- Net::HTTP supports global ca_path, ca_file, and verify_mode settings (thanks, spiegela!)
 Updated methods:
 -- RealtimeUpdates now uses a GraphAPI object instead of its own API
 -- RestAPI#rest_call now has an optional last argument for method, for calls requiring POST, DELETE, etc. (thanks, sshilo!)
@@ -12,11 +15,10 @@ Updated methods:
 Internal improvements:
 -- HTTP services are more modular and can be changed on the fly (thanks, chadk!)
   -- Includes support for uploading StringIOs and other non-files via Net::HTTP even when using TyphoeusService
--- Support for global proxy and timeout settings (thanks, itchy!)
--- Support for global ca_path, ca_file, and verify_mode settings for Net::HTTP (thanks, spiegela!)
 -- Koala now uses multi_json to improve compatibility with Rubinius and other Ruby versions
 -- Koala now uses the modern Typhoeus API (thanks, aselder!)
 -- Koala now uses the current modern Net::HTTP interface (thanks, romanbsd!)
+-- Fixed bugs and typos (thanks, waynn, mokevnin, and tikh!)
 
 v1.0
 New methods:
