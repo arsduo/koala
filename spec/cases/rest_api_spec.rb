@@ -12,8 +12,6 @@ describe "Koala::Facebook::RestAPI" do
   end
   
   context "with an access token" do
-    include LiveTestingDataHelper
-
     before :each do
       @api = Koala::Facebook::RestAPI.new(@token)
     end

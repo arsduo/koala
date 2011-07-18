@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe "Koala::Facebook::GraphAndRestAPI" do
-  include LiveTestingDataHelper
-
   describe "with an access token" do
     before(:each) do
       @api = Koala::Facebook::GraphAndRestAPI.new(@token)

@@ -8,7 +8,6 @@ end
 require 'koala'
 
 # load testing data libraries
-require 'support/live_testing_data_helper'
 require 'support/mock_http_service'
 require 'support/rest_api_shared_examples'
 require 'support/graph_api_shared_examples'

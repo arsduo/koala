@@ -2,8 +2,6 @@ require 'spec_helper'
 
 describe "Koala::Facebook::TestUsers" do
   context "with access token" do
-    include LiveTestingDataHelper
-
     before :all do
       # get oauth data
       @oauth_data = $testing_data["oauth_test_data"]

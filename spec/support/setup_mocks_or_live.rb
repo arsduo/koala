@@ -1,5 +1,11 @@
 # small helper method for live testing
 module KoalaTest
+  def self.setup_test_user
+    test_user_api = Koala::Facebook::TestUsers.new(:app_id => $testing_data["app_id"], :secret => $testing_data["secret"])
+    live_testing_user = test_user_api.create(true, "read_stream, publish_stream, user_photos, user_videos, read_insights")
+    $testing_data["oauth_token"] = live_testing_user["access_token"]
+  end
+
   def self.validate_user_info(token)
     print "Validating permissions for live testing..."
     # make sure we have the necessary permissions
@@ -33,19 +39,18 @@ unless ENV['LIVE']
 else
   # Runs Koala specs through the Facebook servers
   #
-  # Note that you need a valid OAuth token and code for these
-  # specs to run.  See facebook_data.yml for more information.
-
   # load testing data (see note in readme.md)
   $testing_data = YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml'))
 
-  unless $testing_data["oauth_token"]
-    puts "Access token tests will fail until you store a valid token in facebook_data.yml"
+  oauth_data = $testing_data["oauth_test_data"]
+  unless oauth_data && oauth_data["session_key"]
+    puts "Session key tests will fail be run since the session_key field in facebook_data.yml is blank."      
   end
 
-  unless $testing_data["oauth_test_data"] && $testing_data["oauth_test_data"]["code"] && $testing_data["oauth_test_data"]["secret"]
-    puts "OAuth code tests will fail until you store valid data for the user's OAuth code and the app secret in facebook_data.yml"
+  # use a test user unless the developer wants to test against a real profile
+  unless $testing_data["oauth_token"]
+    KoalaTest.setup_test_user
+  else
+    KoalaTest.validate_user_info($testing_data["oauth_token"])
   end
-  
-  KoalaTest.validate_user_info $testing_data["oauth_token"]
 end

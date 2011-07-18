@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Koala::Facebook::GraphAPI in batch mode" do
-  include LiveTestingDataHelper
+
   before :each do
     @api = Koala::Facebook::GraphAPI.new(@token)
     # app API

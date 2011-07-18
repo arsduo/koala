@@ -1,22 +1,19 @@
-# Check out http://oauth.twoalex.com/ to easily generate tokens, cookies, etc.
-# Those values will work with the default settings in this yaml.
+# Live tests will run against a test users unless you supply a value for oauth_token yourself
+# (note: this will leave some photos and videos posted to your wall, since they can't be deleted through the API)
+
+# These values are configured to work with the OAuth Playground app by default
 # Of course, you can change this to work with your own app.
-# Just remember to update all fields!
- 
-# You must supply this value yourself to test the GraphAPI class.
-# Your OAuth token should have publish_stream, read_stream, and user_photos permissions.
-oauth_token: 
+# Check out http://oauth.twoalex.com/ to easily generate tokens, cookies, etc.
+
+# Your OAuth token should have the read_stream, publish_stream, user_photos, user_videos, and read_insights permissions.
+oauth_token:  # see note above
 
 # for testing the OAuth class    
 # baseline app
 oauth_test_data: 
-  # You must supply this value yourself, since they will expire.
+  # the following two values are not needed for most of the test suite, but the relevant tests will not run if they're not present
   code: 
-  # easiest way to get session keys: use multiple test accounts with the Javascript login at http://oauth.twoalex.com
-  session_key: 
-  multiple_session_keys:
-    - 
-    - 
+  session_key:
   
   # These values will work out of the box
   app_id: 119908831367602
