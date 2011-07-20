@@ -54,3 +54,13 @@ else
     KoalaTest.validate_user_info($testing_data["oauth_token"])
   end
 end
+
+# set up a global before block to set the token for tests
+# set the token up for 
+Spec::Runner.configure do |config|
+  config.before :each do
+    @token = $testing_data["oauth_token"]
+  end
+end
+
+
