@@ -407,3 +407,9 @@ graph_api:
   /777777777:
     no_args:
       <<: *item_deleted
+
+  /my_page:
+    fields=access_token:
+      get:
+        <<: *token_required
+        with_token: '{"access_token": "<%= APP_ACCESS_TOKEN %>"}'

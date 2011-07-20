@@ -192,7 +192,12 @@ module Koala
           result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
         end
       end
-      
+     
+      # Page Access Token Support
+      def get_page_access_token(object_id)
+        result = get_object(object_id, :fields => "access_token")
+        result ? result["access_token"] : nil
+      end
       
       # Batch API
       def batch(http_options = {}, &block)

@@ -290,6 +290,11 @@ shared_examples_for "Koala GraphAPI with an access token" do
     like_result.should be_true
   end
 
+  # Page Access Token Support
+  it "should be able to get a page's access token" do
+    result = @api.get_page_access_token("my_page")
+    result.should == Koala::MockHTTPService::OAUTH_DATA["app_access_token"]
+  end
 
   # test all methods to make sure they pass data through to the API
   # we run the tests here (rather than in the common shared example group)
