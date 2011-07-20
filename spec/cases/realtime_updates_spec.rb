@@ -22,7 +22,7 @@ describe "Koala::Facebook::RealtimeUpdates" do
     
     # check subscription data
     unless @verify_token && @challenge_data && @subscription_path
-      raise Exception, "Must supply verify_token and equivalent challenge_data to run live subscription tests!" 
+      raise Exception, "Must supply verify_token and equivalent challenge_data to run subscription tests!" 
     end
   end
 
@@ -151,20 +151,24 @@ describe "Koala::Facebook::RealtimeUpdates" do
       end
       
       describe "and a block is given" do
+        before :each do
+          @params['hub.verify_token'] = @token
+        end
+          
         it "should give the block the token as a parameter" do
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params)do |token|
+          Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             token.should == @token
           end
         end
         
         it "should return false if the given block return false" do
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params)do |token|
+          Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             false
           end.should be_false
         end
         
         it "should return false if the given block returns nil" do
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params)do |token|
+          Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             nil
           end.should be_false
         end
