@@ -42,11 +42,6 @@ else
   # load testing data (see note in readme.md)
   $testing_data = YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml'))
 
-  oauth_data = $testing_data["oauth_test_data"]
-  unless oauth_data && oauth_data["session_key"]
-    puts "Session key tests will fail be run since the session_key field in facebook_data.yml is blank."      
-  end
-
   # use a test user unless the developer wants to test against a real profile
   unless $testing_data["oauth_token"]
     KoalaTest.setup_test_user

@@ -180,7 +180,7 @@ describe "Koala::Facebook::OAuth" do
   end
 
   describe "for fetching access tokens" do 
-    if @code
+    if $testing_data['oauth_test_data']['code']
       describe "get_access_token_info" do
         it "should properly get and parse an access token token results into a hash" do
           result = @oauth.get_access_token_info(@code)
@@ -281,13 +281,13 @@ describe "Koala::Facebook::OAuth" do
       # fetch_token_string
       # somewhat duplicative with the tests for get_access_token and get_app_access_token
       # but no harm in thoroughness
-      if @code
+      if $testing_data["oauth_test_data"]["code"]
         it "should fetch a proper token string from Facebook when given a code" do
           result = @oauth.send(:fetch_token_string, :code => @code, :redirect_uri => @callback_url)
           result.should =~ /^access_token/
         end
       else
-        puts "fetch_token_string code test will not be run since the code field in facebook_data.yml is blank."
+        it "fetch_token_string code test will not be run since the code field in facebook_data.yml is blank."
       end
 
       it "should fetch a proper token string from Facebook when asked for the app token" do
@@ -298,108 +298,112 @@ describe "Koala::Facebook::OAuth" do
   end
 
   describe "for exchanging session keys" do
-    describe "with get_token_info_from_session_keys" do
-      it "should get an array of session keys from Facebook when passed a single key" do
-        result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
-        result.should be_an(Array)
-        result.length.should == 1
-      end
+    if $testing_data["oauth_test_data"]["session_key"]
+      describe "with get_token_info_from_session_keys" do
+        it "should get an array of session keys from Facebook when passed a single key" do
+          result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
+          result.should be_an(Array)
+          result.length.should == 1
+        end
 
-      it "should get an array of session keys from Facebook when passed multiple keys" do
-        result = @oauth.get_tokens_from_session_keys(@multiple_session_keys)
-        result.should be_an(Array)
-        result.length.should == 2
-      end
+        it "should get an array of session keys from Facebook when passed multiple keys" do
+          result = @oauth.get_tokens_from_session_keys(@multiple_session_keys)
+          result.should be_an(Array)
+          result.length.should == 2
+        end
     
-      it "should return the original hashes" do
-        result = @oauth.get_token_info_from_session_keys(@multiple_session_keys)
-        result[0].should be_a(Hash)
-      end
+        it "should return the original hashes" do
+          result = @oauth.get_token_info_from_session_keys(@multiple_session_keys)
+          result[0].should be_a(Hash)
+        end
     
-      it "should properly handle invalid session keys" do
-        result = @oauth.get_token_info_from_session_keys(["foo", "bar"])
-        #it should return nil for each of the invalid ones
-        result.each {|r| r.should be_nil}
-      end
+        it "should properly handle invalid session keys" do
+          result = @oauth.get_token_info_from_session_keys(["foo", "bar"])
+          #it should return nil for each of the invalid ones
+          result.each {|r| r.should be_nil}
+        end
     
-      it "should properly handle a mix of valid and invalid session keys" do
-        result = @oauth.get_token_info_from_session_keys(["foo"].concat(@multiple_session_keys))
-        # it should return nil for each of the invalid ones
-        result.each_with_index {|r, index| index > 0 ? r.should(be_a(Hash)) : r.should(be_nil)}
-      end
+        it "should properly handle a mix of valid and invalid session keys" do
+          result = @oauth.get_token_info_from_session_keys(["foo"].concat(@multiple_session_keys))
+          # it should return nil for each of the invalid ones
+          result.each_with_index {|r, index| index > 0 ? r.should(be_a(Hash)) : r.should(be_nil)}
+        end
     
-      it "should throw an APIError if Facebook returns an empty body (as happens for instance when the API breaks)" do
-        @oauth.should_receive(:fetch_token_string).and_return("")
-        lambda { @oauth.get_token_info_from_session_keys(@multiple_session_keys) }.should raise_error(Koala::Facebook::APIError)
-      end
+        it "should throw an APIError if Facebook returns an empty body (as happens for instance when the API breaks)" do
+          @oauth.should_receive(:fetch_token_string).and_return("")
+          lambda { @oauth.get_token_info_from_session_keys(@multiple_session_keys) }.should raise_error(Koala::Facebook::APIError)
+        end
     
-      it "should pass on any options provided to make_request" do
-        options = {:a => 2}
-        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
-        @oauth.get_token_info_from_session_keys([], options)
+        it "should pass on any options provided to make_request" do
+          options = {:a => 2}
+          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+          @oauth.get_token_info_from_session_keys([], options)
+        end
       end
-    end
   
-    describe "with get_tokens_from_session_keys" do
-      it "should call get_token_info_from_session_keys" do
-        args = @multiple_session_keys
-        @oauth.should_receive(:get_token_info_from_session_keys).with(args, anything).and_return([])
-        @oauth.get_tokens_from_session_keys(args)
-      end
+      describe "with get_tokens_from_session_keys" do
+        it "should call get_token_info_from_session_keys" do
+          args = @multiple_session_keys
+          @oauth.should_receive(:get_token_info_from_session_keys).with(args, anything).and_return([])
+          @oauth.get_tokens_from_session_keys(args)
+        end
     
-      it "should return an array of strings" do
-        args = @multiple_session_keys
-        result = @oauth.get_tokens_from_session_keys(args)
-        result.each {|r| r.should be_a(String) }
-      end
+        it "should return an array of strings" do
+          args = @multiple_session_keys
+          result = @oauth.get_tokens_from_session_keys(args)
+          result.each {|r| r.should be_a(String) }
+        end
     
-      it "should properly handle invalid session keys" do
-        result = @oauth.get_tokens_from_session_keys(["foo", "bar"])
-        # it should return nil for each of the invalid ones
-        result.each {|r| r.should be_nil}
-      end
+        it "should properly handle invalid session keys" do
+          result = @oauth.get_tokens_from_session_keys(["foo", "bar"])
+          # it should return nil for each of the invalid ones
+          result.each {|r| r.should be_nil}
+        end
     
-      it "should properly handle a mix of valid and invalid session keys" do
-        result = @oauth.get_tokens_from_session_keys(["foo"].concat(@multiple_session_keys))
-        # it should return nil for each of the invalid ones
-        result.each_with_index {|r, index| index > 0 ? r.should(be_a(String)) : r.should(be_nil)}
-      end
+        it "should properly handle a mix of valid and invalid session keys" do
+          result = @oauth.get_tokens_from_session_keys(["foo"].concat(@multiple_session_keys))
+          # it should return nil for each of the invalid ones
+          result.each_with_index {|r, index| index > 0 ? r.should(be_a(String)) : r.should(be_nil)}
+        end
     
-      it "should pass on any options provided to make_request" do
-        options = {:a => 2}
-        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
-        @oauth.get_tokens_from_session_keys([], options)
-      end
-    end
-
-    describe "get_token_from_session_key" do
-      it "should call get_tokens_from_session_keys when the get_token_from_session_key is called" do
-        key = @oauth_data["session_key"]
-        @oauth.should_receive(:get_tokens_from_session_keys).with([key], anything).and_return([])
-        @oauth.get_token_from_session_key(key)
+        it "should pass on any options provided to make_request" do
+          options = {:a => 2}
+          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+          @oauth.get_tokens_from_session_keys([], options)
+        end
       end
 
-      it "should get back the access token string from get_token_from_session_key" do
-        result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
-        result.should be_a(String)
-      end
+      describe "get_token_from_session_key" do
+        it "should call get_tokens_from_session_keys when the get_token_from_session_key is called" do
+          key = @oauth_data["session_key"]
+          @oauth.should_receive(:get_tokens_from_session_keys).with([key], anything).and_return([])
+          @oauth.get_token_from_session_key(key)
+        end
 
-      it "should be the first value in the array" do
-        result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
-        array = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
-        result.should == array[0]
-      end
+        it "should get back the access token string from get_token_from_session_key" do
+          result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
+          result.should be_a(String)
+        end
+
+        it "should be the first value in the array" do
+          result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
+          array = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
+          result.should == array[0]
+        end
     
-      it "should properly handle an invalid session key" do
-        result = @oauth.get_token_from_session_key("foo")
-        result.should be_nil
-      end
+        it "should properly handle an invalid session key" do
+          result = @oauth.get_token_from_session_key("foo")
+          result.should be_nil
+        end
     
-      it "should pass on any options provided to make_request" do
-        options = {:a => 2}
-        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
-        @oauth.get_token_from_session_key("", options)
+        it "should pass on any options provided to make_request" do
+          options = {:a => 2}
+          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+          @oauth.get_token_from_session_key("", options)
+        end
       end
+    else
+      it "Session key exchange tests will not be run since the session key in facebook_data.yml is blank."  
     end
   end
   
