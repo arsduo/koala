@@ -3,11 +3,10 @@ require 'spec_helper'
 describe "Koala::Facebook::RealtimeUpdates" do
   before :all do
     # get oauth data
-    @oauth_data = $testing_data["oauth_test_data"]
-    @app_id = @oauth_data["app_id"]
-    @secret = @oauth_data["secret"]
-    @callback_url = @oauth_data["callback_url"]
-    @app_access_token = @oauth_data["app_access_token"]
+    @app_id = KoalaTest.app_id
+    @secret = KoalaTest.secret
+    @callback_url = KoalaTest.oauth_test_data["callback_url"]
+    @app_access_token = KoalaTest.app_access_token
     
     # check OAuth data
     unless @app_id && @secret && @callback_url && @app_access_token
@@ -15,10 +14,9 @@ describe "Koala::Facebook::RealtimeUpdates" do
     end
     
     # get subscription data
-    @subscription_data = $testing_data["subscription_test_data"]
-    @verify_token = @subscription_data["verify_token"]
-    @challenge_data = @subscription_data["challenge_data"]
-    @subscription_path = @subscription_data["subscription_path"]
+    @verify_token = KoalaTest.subscription_test_data["verify_token"]
+    @challenge_data = KoalaTest.subscription_test_data["challenge_data"]
+    @subscription_path = KoalaTest.subscription_test_data["subscription_path"]
     
     # check subscription data
     unless @verify_token && @challenge_data && @subscription_path

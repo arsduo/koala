@@ -5,10 +5,10 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
   before :each do
     @api = Koala::Facebook::GraphAPI.new(@token)
     # app API
-    @oauth_data = $testing_data["oauth_test_data"]
-    @app_id = @oauth_data["app_id"]
-    @app_access_token = @oauth_data["app_access_token"]
+    @app_id = KoalaTest.app_id
+    @app_access_token = KoalaTest.app_access_token
     @app_api = Koala::Facebook::GraphAPI.new(@app_access_token)
+    puts @app_api.inspect
   end 
   
   describe "BatchOperations" do

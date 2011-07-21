@@ -3,17 +3,16 @@ require 'spec_helper'
 describe "Koala::Facebook::OAuth" do
   before :each do
     # make the relevant test data easily accessible
-    @oauth_data = $testing_data["oauth_test_data"]
-    @app_id = @oauth_data["app_id"]
-    @secret = @oauth_data["secret"]
-    @code = @oauth_data["code"]
-    @callback_url = @oauth_data["callback_url"]
-    @raw_token_string = @oauth_data["raw_token_string"]
-    @raw_offline_access_token_string = @oauth_data["raw_offline_access_token_string"]
+    @app_id = KoalaTest.app_id
+    @secret = KoalaTest.secret
+    @code = KoalaTest.code
+    @callback_url = KoalaTest.oauth_test_data["callback_url"]
+    @raw_token_string = KoalaTest.oauth_test_data["raw_token_string"]
+    @raw_offline_access_token_string = KoalaTest.oauth_test_data["raw_offline_access_token_string"]
     
     # for signed requests (http://developers.facebook.com/docs/authentication/canvas/encryption_proposal)
-    @signed_params = @oauth_data["signed_params"]
-    @signed_params_result = @oauth_data["signed_params_result"]
+    @signed_params = KoalaTest.oauth_test_data["signed_params"]
+    @signed_params_result = KoalaTest.oauth_test_data["signed_params_result"]
     
     # this should expanded to cover all variables
     raise Exception, "Must supply app data to run FacebookOAuthTests!" unless @app_id && @secret && @callback_url && 
@@ -21,7 +20,7 @@ describe "Koala::Facebook::OAuth" do
                                                                               @raw_offline_access_token_string
 
     # we can just test against the same key twice
-    @multiple_session_keys = [@oauth_data["session_key"], @oauth_data["session_key"]] if @oauth_data["session_key"]
+    @multiple_session_keys = [KoalaTest.session_key, KoalaTest.session_key] if KoalaTest.session_key
 
     @oauth = Koala::Facebook::OAuth.new(@app_id, @secret, @callback_url)
 
@@ -55,37 +54,39 @@ describe "Koala::Facebook::OAuth" do
   describe "for cookie parsing" do
     describe "get_user_info_from_cookies" do
       it "should properly parse valid cookies" do
-        result = @oauth.get_user_info_from_cookies(@oauth_data["valid_cookies"])
+        puts KoalaTest.oauth_test_data["valid_cookies"].inspect
+        puts @oauth.inspect
+        result = @oauth.get_user_info_from_cookies(KoalaTest.oauth_test_data["valid_cookies"])
         result.should be_a(Hash)
       end
   
       it "should return all the cookie components from valid cookie string" do
-        cookie_data = @oauth_data["valid_cookies"]
+        cookie_data = KoalaTest.oauth_test_data["valid_cookies"]
         parsing_results = @oauth.get_user_info_from_cookies(cookie_data)
         number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
         parsing_results.length.should == number_of_components
       end
 
       it "should properly parse valid offline access cookies (e.g. no expiration)" do 
-        result = @oauth.get_user_info_from_cookies(@oauth_data["offline_access_cookies"])
+        result = @oauth.get_user_info_from_cookies(KoalaTest.oauth_test_data["offline_access_cookies"])
         result["uid"].should      
       end
 
       it "should return all the cookie components from offline access cookies" do
-        cookie_data = @oauth_data["offline_access_cookies"]
+        cookie_data = KoalaTest.oauth_test_data["offline_access_cookies"]
         parsing_results = @oauth.get_user_info_from_cookies(cookie_data)
         number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
         parsing_results.length.should == number_of_components
       end
 
       it "shouldn't parse expired cookies" do
-        result = @oauth.get_user_info_from_cookies(@oauth_data["expired_cookies"])
+        result = @oauth.get_user_info_from_cookies(KoalaTest.oauth_test_data["expired_cookies"])
         result.should be_nil
       end
   
       it "shouldn't parse invalid cookies" do
         # make an invalid string by replacing some values
-        bad_cookie_hash = @oauth_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
+        bad_cookie_hash = KoalaTest.oauth_test_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
         result = @oauth.get_user_info_from_cookies(bad_cookie_hash)
         result.should be_nil
       end
@@ -93,19 +94,19 @@ describe "Koala::Facebook::OAuth" do
     
     describe "get_user_from_cookies" do
       it "should use get_user_info_from_cookies to parse the cookies" do
-        data = @oauth_data["valid_cookies"]
+        data = KoalaTest.oauth_test_data["valid_cookies"]
         @oauth.should_receive(:get_user_info_from_cookies).with(data).and_return({})
         @oauth.get_user_from_cookies(data)
       end
 
       it "should use return a string if the cookies are valid" do
-        result = @oauth.get_user_from_cookies(@oauth_data["valid_cookies"])
+        result = @oauth.get_user_from_cookies(KoalaTest.oauth_test_data["valid_cookies"])
         result.should be_a(String)
       end
       
       it "should return nil if the cookies are invalid" do
         # make an invalid string by replacing some values
-        bad_cookie_hash = @oauth_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
+        bad_cookie_hash = KoalaTest.oauth_test_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
         result = @oauth.get_user_from_cookies(bad_cookie_hash)
         result.should be_nil
       end        
@@ -180,7 +181,7 @@ describe "Koala::Facebook::OAuth" do
   end
 
   describe "for fetching access tokens" do 
-    if $testing_data['oauth_test_data']['code']
+    if KoalaTest.code
       describe "get_access_token_info" do
         it "should properly get and parse an access token token results into a hash" do
           result = @oauth.get_access_token_info(@code)
@@ -281,7 +282,7 @@ describe "Koala::Facebook::OAuth" do
       # fetch_token_string
       # somewhat duplicative with the tests for get_access_token and get_app_access_token
       # but no harm in thoroughness
-      if $testing_data["oauth_test_data"]["code"]
+      if KoalaTest.code
         it "should fetch a proper token string from Facebook when given a code" do
           result = @oauth.send(:fetch_token_string, :code => @code, :redirect_uri => @callback_url)
           result.should =~ /^access_token/
@@ -298,10 +299,10 @@ describe "Koala::Facebook::OAuth" do
   end
 
   describe "for exchanging session keys" do
-    if $testing_data["oauth_test_data"]["session_key"]
+    if KoalaTest.session_key
       describe "with get_token_info_from_session_keys" do
         it "should get an array of session keys from Facebook when passed a single key" do
-          result = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
+          result = @oauth.get_tokens_from_session_keys([KoalaTest.session_key])
           result.should be_an(Array)
           result.length.should == 1
         end
@@ -375,19 +376,19 @@ describe "Koala::Facebook::OAuth" do
 
       describe "get_token_from_session_key" do
         it "should call get_tokens_from_session_keys when the get_token_from_session_key is called" do
-          key = @oauth_data["session_key"]
+          key = KoalaTest.session_key
           @oauth.should_receive(:get_tokens_from_session_keys).with([key], anything).and_return([])
           @oauth.get_token_from_session_key(key)
         end
 
         it "should get back the access token string from get_token_from_session_key" do
-          result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
+          result = @oauth.get_token_from_session_key(KoalaTest.session_key)
           result.should be_a(String)
         end
 
         it "should be the first value in the array" do
-          result = @oauth.get_token_from_session_key(@oauth_data["session_key"])
-          array = @oauth.get_tokens_from_session_keys([@oauth_data["session_key"]])
+          result = @oauth.get_token_from_session_key(KoalaTest.session_key)
+          array = @oauth.get_tokens_from_session_keys([KoalaTest.session_key])
           result.should == array[0]
         end
     

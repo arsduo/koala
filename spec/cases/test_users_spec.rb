@@ -4,10 +4,9 @@ describe "Koala::Facebook::TestUsers" do
   context "with access token" do
     before :all do
       # get oauth data
-      @oauth_data = $testing_data["oauth_test_data"]
-      @app_id = @oauth_data["app_id"]
-      @secret = @oauth_data["secret"]
-      @app_access_token = @oauth_data["app_access_token"]
+      @app_id = KoalaTest.app_id
+      @secret = KoalaTest.secret
+      @app_access_token = KoalaTest.app_access_token
 
       # check OAuth data
       unless @app_id && @secret && @app_access_token

@@ -1,9 +1,29 @@
 # small helper method for live testing
 module KoalaTest
+  
+  class << self
+    attr_accessor :oauth_token, :app_id, :secret, :app_access_token, :code, :session_key
+    attr_accessor :oauth_test_data, :subscription_test_data
+  end
+  
+  def self.setup_test_data(data)
+    # make data accessible to all our tests
+    self.oauth_test_data = data["oauth_test_data"]
+    self.subscription_test_data = data["subscription_test_data"]
+    self.oauth_token = data["oauth_token"]
+    self.app_id = data["oauth_test_data"]["app_id"]
+    self.app_access_token = data["oauth_test_data"]["app_access_token"]
+    self.secret = data["oauth_test_data"]["secret"]
+    self.code = data["oauth_test_data"]["code"]
+    self.session_key = data["oauth_test_data"]["session_key"]
+  end
+  
   def self.setup_test_user
-    test_user_api = Koala::Facebook::TestUsers.new(:app_id => $testing_data["app_id"], :secret => $testing_data["secret"])
+    puts "Setting up test user"
+    test_user_api = Koala::Facebook::TestUsers.new(:app_id => self.app_id, :secret => self.secret)
     live_testing_user = test_user_api.create(true, "read_stream, publish_stream, user_photos, user_videos, read_insights")
-    $testing_data["oauth_token"] = live_testing_user["access_token"]
+    puts "Test user: #{live_testing_user.inspect}"
+    self.oauth_token = live_testing_user["access_token"]
   end
 
   def self.validate_user_info(token)
@@ -35,26 +55,26 @@ unless ENV['LIVE']
   # Facebook services, run koala_spec_without_mocks.rb.
   Koala.http_service = Koala::MockHTTPService
 
-  $testing_data = Koala::MockHTTPService::TEST_DATA
+  KoalaTest.setup_test_data(Koala::MockHTTPService::TEST_DATA)
 else
   # Runs Koala specs through the Facebook servers
   #
-  # load testing data (see note in readme.md)
-  $testing_data = YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml'))
-
+  # load testing data (see note in readme.md)  
+  KoalaTest.setup_test_data(YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml')))
+  
   # use a test user unless the developer wants to test against a real profile
-  unless $testing_data["oauth_token"]
-    KoalaTest.setup_test_user
+  if token = KoalaTest.oauth_token
+    KoalaTest.validate_user_info(token)
   else
-    KoalaTest.validate_user_info($testing_data["oauth_token"])
+    KoalaTest.setup_test_user
   end
 end
 
 # set up a global before block to set the token for tests
 # set the token up for 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.before :each do
-    @token = $testing_data["oauth_token"]
+    @token = KoalaTest.oauth_token
   end
 end
 
