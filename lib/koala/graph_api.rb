@@ -249,8 +249,6 @@ module Koala
         
         args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
 
-        options[:http_service] = Koala.base_http_service if args["source"].requires_base_http_service
-
         [target_id, method, args, options]
       end      
     end
