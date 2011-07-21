@@ -54,8 +54,6 @@ describe "Koala::Facebook::OAuth" do
   describe "for cookie parsing" do
     describe "get_user_info_from_cookies" do
       it "should properly parse valid cookies" do
-        puts KoalaTest.oauth_test_data["valid_cookies"].inspect
-        puts @oauth.inspect
         result = @oauth.get_user_info_from_cookies(KoalaTest.oauth_test_data["valid_cookies"])
         result.should be_a(Hash)
       end

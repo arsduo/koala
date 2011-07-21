@@ -8,7 +8,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     @app_id = KoalaTest.app_id
     @app_access_token = KoalaTest.app_access_token
     @app_api = Koala::Facebook::GraphAPI.new(@app_access_token)
-    puts @app_api.inspect
   end 
   
   describe "BatchOperations" do
