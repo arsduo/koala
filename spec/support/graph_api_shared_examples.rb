@@ -131,6 +131,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result = @api.put_wall_post("Hello, world, from the test suite!")
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
+    puts "@temporary_object_id: #{@temporary_object_id}"
   end
 
   # DELETE

@@ -1,47 +1,3 @@
-# small helper method for live testing
-module KoalaTest
-  
-  class << self
-    attr_accessor :oauth_token, :app_id, :secret, :app_access_token, :code, :session_key
-    attr_accessor :oauth_test_data, :subscription_test_data
-  end
-  
-  def self.setup_test_data(data)
-    # make data accessible to all our tests
-    self.oauth_test_data = data["oauth_test_data"]
-    self.subscription_test_data = data["subscription_test_data"]
-    self.oauth_token = data["oauth_token"]
-    self.app_id = data["oauth_test_data"]["app_id"]
-    self.app_access_token = data["oauth_test_data"]["app_access_token"]
-    self.secret = data["oauth_test_data"]["secret"]
-    self.code = data["oauth_test_data"]["code"]
-    self.session_key = data["oauth_test_data"]["session_key"]
-  end
-  
-  def self.setup_test_user
-    puts "Setting up test user"
-    test_user_api = Koala::Facebook::TestUsers.new(:app_id => self.app_id, :secret => self.secret)
-    live_testing_user = test_user_api.create(true, "read_stream, publish_stream, user_photos, user_videos, read_insights")
-    puts "Test user: #{live_testing_user.inspect}"
-    self.oauth_token = live_testing_user["access_token"]
-  end
-
-  def self.validate_user_info(token)
-    print "Validating permissions for live testing..."
-    # make sure we have the necessary permissions
-    api = Koala::Facebook::GraphAndRestAPI.new(token)
-    perms = api.fql_query("select read_stream, publish_stream, user_photos, user_videos, read_insights from permissions where uid = me()")[0]
-    perms.each_pair do |perm, value|
-      if value == (perm == "read_insights" ? 1 : 0) # live testing depends on insights calls failing 
-        puts "failed!\n" # put a new line after the print above
-        raise ArgumentError, "Your access token must have the read_stream, publish_stream, and user_photos permissions, and lack read_insights.  You have: #{perms.inspect}"
-      end
-    end
-    puts "done!"
-  end
-end
-
-
 unless ENV['LIVE']
   # By default the Koala specs are run using stubs for HTTP requests
   #
@@ -53,8 +9,7 @@ unless ENV['LIVE']
   # we are not testing the latest responses from the Facebook servers.
   # Therefore, to be certain all specs pass with the current
   # Facebook services, run koala_spec_without_mocks.rb.
-  Koala.http_service = Koala::MockHTTPService
-
+  Koala.http_service = Koala::MockHTTPService  
   KoalaTest.setup_test_data(Koala::MockHTTPService::TEST_DATA)
 else
   # Runs Koala specs through the Facebook servers
@@ -75,6 +30,20 @@ end
 RSpec.configure do |config|
   config.before :each do
     @token = KoalaTest.oauth_token
+  end
+  
+  config.after :each do
+    # clean up any objects posted to Facebook
+    if @temporary_object_id #&& real_user?
+      puts "Cleaning up #{@temporary_object_id}"
+      api = @api || (@test_users ? @test_users.graph_api : nil)
+      raise "Unable to locate API when passed temporary object to delete!" unless api
+
+      # clean up any objects we've posted
+      result = (api.delete_object(id) rescue false)
+      # if we errored out or Facebook returned false, track that
+      puts "Encountered error when cleaning up #{@temporary_object_id}: #{result}" unless result
+    end
   end
 end
 

@@ -108,7 +108,7 @@ module Koala
 
   # Make an api request using the provided api service or one passed by the caller
   def self.make_request(path, args, verb, options = {})
-    HTTPService.make_request(path, args, verb, options)
+    http_service.make_request(path, args, verb, options)
   end
 
   # finally, set up the http service Koala methods used to make requests

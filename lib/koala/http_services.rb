@@ -25,6 +25,8 @@ module Koala
       # we send a POST request to the given path with the given arguments.
       # if the verb isn't get or post, send it as a post argument
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
+      args.each_pair {|key, value| args[key] = value.to_file if value.is_a?(UploadableIO)}
+      
       options = {:url => "#{server(options)}#{path}", :params => args}.merge(Koala.http_options || {}).merge(options)
       
       conn = Faraday.new(options) do |builder|

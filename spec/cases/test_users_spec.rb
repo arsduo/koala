@@ -12,8 +12,6 @@ describe "Koala::Facebook::TestUsers" do
       unless @app_id && @secret && @app_access_token
         raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!"
       end
-
-      @is_mock = Koala.http_service.respond_to?(:mock?) && Koala.http_service.mock?
     end
 
     describe "when initializing" do
@@ -168,7 +166,7 @@ describe "Koala::Facebook::TestUsers" do
         @test_users = Koala::Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
         @network = []
 
-        if @is_mock
+        if KoalaTest.mock_interface?
           id_counter = 999999900
           @test_users.stub!(:create).and_return do
             id_counter += 1
