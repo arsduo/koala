@@ -21,21 +21,24 @@ module Koala
     end
 
     def self.make_request(path, args, verb, options = {})
-      # We translate args to a valid query string. If post is specified,
-      # we send a POST request to the given path with the given arguments.
       # if the verb isn't get or post, send it as a post argument
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
-      args.each_pair {|key, value| args[key] = value.to_file if value.is_a?(UploadableIO)}
       
-      options = {:url => "#{server(options)}#{path}", :params => args}.merge(Koala.http_options || {}).merge(options)
-      
-      conn = Faraday.new(options) do |builder|
-        builder.request :url_encoded  # convert request params as "www-form-urlencoded"
-        builder.request :multipart if params_require_multipart?(args)
+      # turn all the keys to strings (Faraday has issues with symbols under 1.8.7) and resolve UploadableIOs
+      params = args.inject({}) {|hash, kv| hash[kv.first.to_s] = kv.last.is_a?(UploadableIO) ? kv.last.to_upload_io : kv.last; hash}
+
+      # figure out our options for this request
+      http_options = {}.merge(Koala.http_options || {}).merge(options)      
+
+      # set up our Faraday connection
+      conn = Faraday.new(server(options), http_options) do |builder|
+        builder.request :multipart
+        builder.request :url_encoded
         builder.adapter Faraday.default_adapter
       end
 
-      response = conn.send(verb)
+      response = conn.send(verb, path, params)
+      puts "Response: #{response.inspect}"
       Koala::Response.new(response.status.to_i, response.body, response.headers)
     end
     
@@ -52,7 +55,7 @@ module Koala
     protected
 
     def self.params_require_multipart?(param_hash)
-      param_hash.any? { |key, value| value.kind_of?(Koala::UploadableIO) }
+      param_hash.any? { |key, value| value.kind_of?(File) }
     end
 
     def self.multipart_requires_content_type?
