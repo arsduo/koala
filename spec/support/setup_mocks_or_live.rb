@@ -6,7 +6,7 @@ module KoalaTest
     api = Koala::Facebook::GraphAndRestAPI.new(token)
     perms = api.fql_query("select read_stream, publish_stream, user_photos, user_videos, read_insights from permissions where uid = me()")[0]
     perms.each_pair do |perm, value|
-      if value == (perm == "read_insights" ? 1 : 0) # live testing depends on insights calls failing 
+      if value == (perm == "read_insights" ? 1 : 0) # live testing depends on insights calls failing
         puts "failed!\n" # put a new line after the print above
         raise ArgumentError, "Your access token must have the read_stream, publish_stream, and user_photos permissions, and lack read_insights.  You have: #{perms.inspect}"
       end
@@ -46,6 +46,6 @@ else
   unless $testing_data["oauth_test_data"] && $testing_data["oauth_test_data"]["code"] && $testing_data["oauth_test_data"]["secret"]
     puts "OAuth code tests will fail until you store valid data for the user's OAuth code and the app secret in facebook_data.yml"
   end
-  
+
   KoalaTest.validate_user_info $testing_data["oauth_token"]
 end

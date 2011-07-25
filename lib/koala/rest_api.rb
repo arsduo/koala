@@ -4,7 +4,7 @@ module Koala
 
     module RestAPIMethods
       def fql_query(fql, args = {}, options = {})
-        rest_call('fql.query', args.merge(:query => fql), options) 
+        rest_call('fql.query', args.merge(:query => fql), options)
       end
 
       def fql_multiquery(queries = {}, args = {}, options = {})

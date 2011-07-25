@@ -38,7 +38,7 @@ module Koala
       path = 'root' if path == '' || path == '/'
       verb ||= 'get'
       server = options[:rest_api] ? 'rest_api' : 'graph_api'
-      token = args.delete('access_token') 
+      token = args.delete('access_token')
       with_token = (token == ACCESS_TOKEN || token == APP_ACCESS_TOKEN) ? 'with_token' : 'no_token'
 
       # Assume format is always JSON

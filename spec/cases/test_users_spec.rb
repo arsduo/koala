@@ -83,7 +83,7 @@ describe "Koala::Facebook::TestUsers" do
         @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including(args), anything, anything)
         @test_users.create(true, nil, args)
       end
-      
+
       it "lets you specify http options that get passed through to the graph call" do
         options = {:some_http_option => true}
         @test_users.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
@@ -143,22 +143,22 @@ describe "Koala::Facebook::TestUsers" do
           (first_user["id"] && first_user["access_token"] && first_user["login_url"]).should
           (second_user["id"] && second_user["access_token"] && second_user["login_url"]).should
         end
-      
+
         it "should make two users into friends with string hashes" do
           result = @test_users.befriend(@user1, @user2)
           result.should be_true
         end
-      
+
         it "should make two users into friends with symbol hashes" do
           new_user_1 = {}
           @user1.each_pair {|k, v| new_user_1[k.to_sym] = v}
           new_user_2 = {}
           @user2.each_pair {|k, v| new_user_2[k.to_sym] = v}
-        
+
           result = @test_users.befriend(new_user_1, new_user_2)
           result.should be_true
-        end        
-      
+        end
+
         it "should not accept user IDs anymore" do
           lambda { @test_users.befriend(@user1["id"], @user2["id"]) }.should raise_exception
         end

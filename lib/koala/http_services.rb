@@ -21,7 +21,7 @@ module Koala
           server.gsub!(/\.facebook/, "-video.facebook") if options[:video]
           "#{options[:beta] ? "beta." : ""}#{server}"
         end
-        
+
         def self.encode_params(param_hash)
           # unfortunately, we can't use to_query because that's Rails, not Ruby
           # if no hash (e.g. no auth token) return empty string
@@ -30,13 +30,13 @@ module Koala
             "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
           end).join("&")
         end
-                                      
+
         protected
-        
+
         def self.params_require_multipart?(param_hash)
           param_hash.any? { |key, value| value.kind_of?(Koala::UploadableIO) }
         end
-    
+
         def self.multipart_requires_content_type?
           true
         end
