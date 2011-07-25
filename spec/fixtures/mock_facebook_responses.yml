@@ -133,26 +133,27 @@ graph_api:
     fields=id:
       get: 
         with_token: '{"id": "216743"}'
-        
+
   /me/feed:
     message=Hello, world, from the test suite!: 
-      post: 
+      post:
         with_token: '{"id": "MOCK_FEED_ITEM"}'
     message=Hello, world, from the test suite, testing comments!:
       post:
         with_token: '{"id": "MOCK_FEED_ITEM"}'
     message=the cats are asleep: 
-      post: 
+      post:
         with_token: '{"id": "FEED_ITEM_CATS"}'
     message=Hello, world, from the test suite delete method!: 
-      post: 
+      post:
         with_token: '{"id": "FEED_ITEM_DELETE"}'
     message=Hello, world, from the test suite batch API!: 
-      post: 
+      post:
         with_token: '{"id": "FEED_ITEM_BATCH"}'
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
+
   /me/photos:
     source=[FILE]:
       post:
@@ -162,6 +163,21 @@ graph_api:
       post:
         <<: *token_required
         with_token: '{"id": "MOCK_PHOTO"}'
+    url=http://somesite.com/cute_cat.jpg:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
+    message=my message&url=http://somesite.com/cute_cat.jpg:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
+
+  /theharvard/photos:
+    message=another message&url=http://somesite.com/cute_cat.jpg:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
+
   /me/videos:
     source=[FILE]:
       post:

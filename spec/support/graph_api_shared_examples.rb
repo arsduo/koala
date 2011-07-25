@@ -206,8 +206,30 @@ shared_examples_for "Koala GraphAPI with an access token" do
       get_result = @api.get_object(@temporary_object_id)
       get_result["name"].should == expected_message
     end
+
+    describe "using a URL instead of a file" do
+      before(:all) do
+        @image_url = "http://somesite.com/cute_cat.jpg"
+      end
+
+      it "should be able to post photo to the user's wall using a URL" do
+        result = @api.put_picture(@image_url)
+        result["id"].should == "MOCK_PHOTO_FROM_URL"
+      end
+
+      it "should be able to post photo to the user's wall using a URL and an additional param" do
+        result = @api.put_picture(@image_url, :message => "my message")
+        result["id"].should == "MOCK_PHOTO_FROM_URL"
+      end
+
+      it "should be able to post photo to the user's wall using a URL and a target_id" do
+        result = @api.put_picture(@image_url, {:message => "another message"}, "theharvard")
+        result["id"].should == "MOCK_PHOTO_FROM_URL"
+      end
+    end
+
   end
-  
+
   describe ".put_video" do
     before :each do
       @cat_movie = File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v")      
