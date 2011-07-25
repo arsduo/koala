@@ -87,7 +87,7 @@ shared_examples_for "Koala RestAPI" do
 
       @api.rest_call('anything', {}, options)
     end
-    
+
     it "uses get by default" do
       @api.should_receive(:api).with(
         anything,
@@ -98,7 +98,7 @@ shared_examples_for "Koala RestAPI" do
 
       @api.rest_call('anything')
     end
-    
+
     it "allows you to specify other http methods as the last argument" do
       method = 'bar'
       @api.should_receive(:api).with(
@@ -134,20 +134,20 @@ shared_examples_for "Koala RestAPI" do
 
         @api.fql_query(query)
       end
-      
+
       it "should pass on any other arguments provided" do
         args = {:a => 2}
         @api.should_receive(:rest_call).with(anything, hash_including(args), anything)
         @api.fql_query("a query", args)
       end
-      
+
       it "should pass on any http options provided" do
         opts = {:a => 2}
         @api.should_receive(:rest_call).with(anything, anything, hash_including(opts))
         @api.fql_query("a query", {}, opts)
       end
     end
-    
+
     describe "when making a FQL-multiquery request" do
       it "should call fql.multiquery method" do
         @api.should_receive(:rest_call).with(
@@ -161,7 +161,7 @@ shared_examples_for "Koala RestAPI" do
         queries = stub('query string')
         queries_json = "some JSON"
         MultiJson.stub(:encode).with(queries).and_return(queries_json)
-        
+
         @api.should_receive(:rest_call).with(
           anything,
           hash_including(:queries => queries_json),
@@ -170,7 +170,7 @@ shared_examples_for "Koala RestAPI" do
 
         @api.fql_multiquery(queries)
       end
-      
+
       it "simplifies the response format" do
         raw_results = [
           {"name" => "query1", "fql_result_set" => [1, 2, 3]},
@@ -180,18 +180,18 @@ shared_examples_for "Koala RestAPI" do
           "query1" => [1, 2, 3],
           "query2" => [:a, :b, :c]
         }
-        
+
         @api.stub(:rest_call).and_return(raw_results)
         results = @api.fql_multiquery({:query => true})
         results.should == expected_results
       end
-      
+
       it "should pass on any other arguments provided" do
         args = {:a => 2}
         @api.should_receive(:rest_call).with(anything, hash_including(args), anything)
         @api.fql_multiquery("a query", args)
       end
-      
+
       it "should pass on any http options provided" do
         opts = {:a => 2}
         @api.should_receive(:rest_call).with(anything, anything, hash_including(opts))
@@ -234,15 +234,15 @@ shared_examples_for "Koala RestAPI with an access token" do
     # we've verified that you have read_stream permissions, so we can test against that
     result.first["read_stream"].should == 1
   end
-  
-  
+
+
   it "should be able to access protected information via FQL.multiquery" do
     result = @api.fql_multiquery(
-      :query1 => "select post_id from stream where source_id = me()", 
-      :query2 => "select fromid from comment where post_id in (select post_id from #query1)", 
+      :query1 => "select post_id from stream where source_id = me()",
+      :query2 => "select fromid from comment where post_id in (select post_id from #query1)",
       :query3 => "select uid, name from user where uid in (select fromid from #query2)"
     )
-    result.size.should == 3 
+    result.size.should == 3
     result.keys.should include("query1", "query2", "query3")
   end
 
@@ -257,7 +257,7 @@ shared_examples_for "Koala RestAPI without an access token" do
       @result.size.should == 1
       @result.first["first_name"].should == "Chris"
     end
-    
+
     it "should be able to access public information via FQL.multiquery" do
       result = @api.fql_multiquery(
         :query1 => 'select first_name from user where uid = 216743',
@@ -271,14 +271,14 @@ shared_examples_for "Koala RestAPI without an access token" do
     it "should not be able to access protected information via FQL" do
       lambda { @api.fql_query("select read_stream from permissions where uid = 216743") }.should raise_error(Koala::Facebook::APIError)
     end
-    
+
     it "should not be able to access protected information via FQL.multiquery" do
-      lambda { 
+      lambda {
         @api.fql_multiquery(
-          :query1 => "select post_id from stream where source_id = me()", 
-          :query2 => "select fromid from comment where post_id in (select post_id from #query1)", 
+          :query1 => "select post_id from stream where source_id = me()",
+          :query2 => "select fromid from comment where post_id in (select post_id from #query1)",
           :query3 => "select uid, name from user where uid in (select fromid from #query2)"
-        ) 
+        )
       }.should raise_error(Koala::Facebook::APIError)
     end
   end

@@ -11,13 +11,13 @@ Installation
 ---
 
 Easy:
-    
+
     [sudo|rvm] gem install koala
-    
+
 Or in Bundler:
-  
+
     gem "koala"
-  
+
 Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
@@ -130,7 +130,7 @@ Test Users
 -----
 
 We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph or REST API:
-    
+
     @test_users = Koala::Facebook::TestUsers.new(:app_id => id, :secret => secret)
     user = @test_users.create(is_app_installed, desired_permissions)
     user_graph_api = Koala::Facebook::GraphAPI.new(user["access_token"])
@@ -149,13 +149,13 @@ Testing
 -----
 
 Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box:
-    
+
     # From anywhere in the project directory:
     bundle exec rake spec
-    
+
 
 You can also run live tests against Facebook's servers:
-    
+
     # Again from anywhere in the project directory:
     LIVE=true bundle exec rake spec
 

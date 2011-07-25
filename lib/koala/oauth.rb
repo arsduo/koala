@@ -52,7 +52,7 @@ module Koala
         permissions = options[:permissions]
         scope = permissions ? "&scope=#{permissions.is_a?(Array) ? permissions.join(",") : permissions}" : ""
         display = options.has_key?(:display) ? "&display=#{options[:display]}" : ""
-        
+
         callback = options[:callback] || @oauth_callback_url
         raise ArgumentError, "url_for_oauth_code must get a callback either from the OAuth object or in the options!" unless callback
 

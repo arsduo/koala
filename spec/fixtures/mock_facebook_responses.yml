@@ -1,6 +1,6 @@
-# Responses by MockHTTPService are taken directly from 
+# Responses by MockHTTPService are taken directly from
 # this file.
-# 
+#
 # Structure
 # ----------
 #
@@ -10,28 +10,28 @@
 #       with_token:
 #       no_token:
 
-# ====== REST API ===== 
+# ====== REST API =====
 rest_api:
 
 # -- Stubbed Responses --
   /method/fql.query:
     query=select first_name from user where uid = 216743:
-      get: 
+      get:
         no_token: '[{"first_name":"Chris"}]'
         with_token: '[{"first_name":"Chris"}]'
     query=select read_stream from permissions where uid = 216743:
       get:
-        with_token: '[{"read_stream":1}]' 
+        with_token: '[{"read_stream":1}]'
         no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 216743"}]}'
 
   /method/fql.multiquery:
     'queries=<%= MultiJson.encode({"query1" => "select post_id from stream where source_id = me()", "query2" => "select fromid from comment where post_id in (select post_id from #query1)", "query3" => "select uid, name from user where uid in (select fromid from #query2)"}) %>':
-      get: 
+      get:
         with_token: '[{"name":"query1", "fql_result_set":[]},{"name":"query2", "fql_result_set":[]},{"name":"query3", "fql_result_set":[]}]'
         no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 216743"}]}'
     'queries=<%= MultiJson.encode({"query1" => "select first_name from user where uid = 216743", "query2" => "select first_name from user where uid = 2905623"}) %>':
       get:
-        with_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Chris"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]' 
+        with_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Chris"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
         no_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Chris"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
 
 
@@ -45,7 +45,7 @@ graph_api:
   # Error responses for when a token is required, but not given
   token_required_responses: &token_required
     no_token: '{"error":{"type":"OAuthAccessTokenException", "message":"An access token is required to request this resource."}}'
-  
+
   # Common mock item responses
   item_deleted: &item_deleted
     delete:
@@ -58,22 +58,22 @@ graph_api:
   # Subscription error response
   verification_error: &verification_error
     with_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
-    
+
   test_user_no_perms: &test_user_no_perms
     post:
       with_token: '{"id": "777777777", "access_token":"<%= APP_ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
-  
+
   test_user_befriended: &test_user_befriended
     post:
       with_token: 'true'
-  
+
 # -- Stubbed Responses --
   root:
-    ids=contextoptional,naitik: 
+    ids=contextoptional,naitik:
       get:
         with_token: '{"contextoptional":"{}","naitik":"{}"}'
         no_token: '{"contextoptional":"{}","naitik":"{}"}'
-    # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here 
+    # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}]) %>:
       post:
         with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
@@ -104,15 +104,15 @@ graph_api:
     batch=<%= MultiJson.encode([{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+name+from+user+where+uid%3D4"}]) %>:
       post:
         with_token: '[{"body":"[{\"name\":\"Mark Zuckerberg\"}]"}]'
-      
+
     # dependencies
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}]) %>:
       post: &batch_dependent
-        with_token: '[null,{"body":"{\"id\":\"123\"}"}]'  
+        with_token: '[null,{"body":"{\"id\":\"123\"}"}]'
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}]) %>:
       post:
         with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
-  
+
     # attached files tests
     batch=<%= MultiJson.encode([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
       post:
@@ -131,24 +131,24 @@ graph_api:
         <<: *token_required
         with_token: '{"updated_time": 1}'
     fields=id:
-      get: 
+      get:
         with_token: '{"id": "216743"}'
-        
+
   /me/feed:
-    message=Hello, world, from the test suite!: 
-      post: 
+    message=Hello, world, from the test suite!:
+      post:
         with_token: '{"id": "MOCK_FEED_ITEM"}'
     message=Hello, world, from the test suite, testing comments!:
       post:
         with_token: '{"id": "MOCK_FEED_ITEM"}'
-    message=the cats are asleep: 
-      post: 
+    message=the cats are asleep:
+      post:
         with_token: '{"id": "FEED_ITEM_CATS"}'
-    message=Hello, world, from the test suite delete method!: 
-      post: 
+    message=Hello, world, from the test suite delete method!:
+      post:
         with_token: '{"id": "FEED_ITEM_DELETE"}'
-    message=Hello, world, from the test suite batch API!: 
-      post: 
+    message=Hello, world, from the test suite batch API!:
+      post:
         with_token: '{"id": "FEED_ITEM_BATCH"}'
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
@@ -177,25 +177,25 @@ graph_api:
       get:
         with_token: '{"id": 1, "name": 1, "updated_time": 1}'
         no_token: '{"id": 1, "name": 1}'
-                
+
   /contextoptional:
     no_args:
       get:
         with_token: '{"id": 1, "name": 1}'
         no_token: '{"id": 1, "name": 1}'
-        
-  /contextoptional/photos: 
-    no_args: 
-      get: 
+
+  /contextoptional/photos:
+    no_args:
+      get:
         with_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         no_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
-    
-  /lukeshepard/likes: 
-    no_args: 
-      get: 
+
+  /lukeshepard/likes:
+    no_args:
+      get:
         <<: *token_required
         with_token: '{"data": [{}]}'
-  
+
   /lukeshepard/picture:
     type=large:
       get:
@@ -207,8 +207,8 @@ graph_api:
           code: 302
           headers:
             Location: https://facebook.com/large
-    
-   
+
+
   /chris.baclig/picture:
     no_args:
       get:
@@ -223,11 +223,11 @@ graph_api:
 
   /comments:
     ids=http://developers.facebook.com/blog/post/472:
-      get: 
+      get:
         with_token: '{"http://developers.facebook.com/blog/post/472": []}'
         no_token: '{"http://developers.facebook.com/blog/post/472": []}'
     ids=http://developers.facebook.com/blog/post/490,http://developers.facebook.com/blog/post/472:
-      get: 
+      get:
         with_token: '{"http://developers.facebook.com/blog/post/490": [], "http://developers.facebook.com/blog/post/472": []}'
         no_token: '{"http://developers.facebook.com/blog/post/490": [], "http://developers.facebook.com/blog/post/472": []}'
     ids=:
@@ -237,64 +237,64 @@ graph_api:
     no_args:
       get:
         body: '{"error": {"type": "Exception","message": "No node specified"}}'
-        code: 500        
+        code: 500
 
   /search:
     q=facebook:
-      get: 
+      get:
         with_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
     "limit=25&q=facebook&until=2010-09-23T21:17:33+0000":
-      get: 
+      get:
         with_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
-      
+
   '/115349521819193_113815981982767':
     no_args:
       delete:
         <<: *token_required
-  
+
   # -- OAuth responses --
-  /oauth/access_token: 
+  /oauth/access_token:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=<%= OAUTH_CODE %>&redirect_uri=<%= OAUTH_DATA["callback_url"] %>:
       get:
         no_token: access_token=<%= ACCESS_TOKEN %>
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=foo&redirect_uri=<%= OAUTH_DATA["callback_url"] %>: 
-      get: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=foo&redirect_uri=<%= OAUTH_DATA["callback_url"] %>:
+      get:
         <<: *oauth_error
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&type=client_cred:
       post:
         no_token: access_token=<%= APP_ACCESS_TOKEN %>
   /oauth/exchange_sessions:
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["session_key"] %>&type=client_cred: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["session_key"] %>&type=client_cred:
       post:
         no_token: '[{"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["multiple_session_keys"].join(",") %>&type=client_cred: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["multiple_session_keys"].join(",") %>&type=client_cred:
       post:
         no_token: '[{"access_token":"<%= ACCESS_TOKEN %>","expires":4315}, {"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= ["foo"].concat(OAUTH_DATA["multiple_session_keys"]).join(",") %>&type=client_cred: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= ["foo"].concat(OAUTH_DATA["multiple_session_keys"]).join(",") %>&type=client_cred:
       post:
         no_token: '[null, {"access_token":"<%= ACCESS_TOKEN %>","expires":4315}, {"access_token":"<%= ACCESS_TOKEN %>","expires":4315}]'
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=foo,bar&type=client_cred: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=foo,bar&type=client_cred:
       post:
         no_token: '[null, null]'
-    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=foo&type=client_cred: 
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=foo&type=client_cred:
       post:
         no_token: '[null]'
 
 
 
-# -- Subscription Responses -- 
+# -- Subscription Responses --
   /<%= APP_ID %>/subscriptions:
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
-      post: 
+      post:
         with_token:
           code: 200
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
-      post: 
+      post:
         with_token: '{"error":{"type":"Exception","message":"(#2200) subscription validation failed"}}'
     callback_url=foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
-      post: 
+      post:
         with_token: '{"error":{"type":"Exception","message":"(#100) callback_url URL is not properly formatted"}}'
     object=user:
       delete:
@@ -304,7 +304,7 @@ graph_api:
       delete:
         with_token: '{"error":{"type":"Exception","message":"(#100) Invalid parameter"}}'
     no_args:
-      delete: 
+      delete:
         with_token:
           code: 200
       get:
@@ -321,28 +321,28 @@ graph_api:
     no_args:
       post:
         with_token: '{"id": "MOCK_LIKE"}'
-        
+
   /MOCK_FEED_ITEM/comments:
     message=it's my comment!:
       post:
         with_token: '{"id": "MOCK_COMMENT"}'
-  
+
   /MOCK_FEED_ITEM:
     no_args:
       <<: *item_deleted
-  
+
   /FEED_ITEM_CONTEXT:
-    no_args: 
+    no_args:
       <<: *item_deleted
       get:
         with_token: '{"link":"http://oauth.twoalex.com/", "name": "OAuth Playground"}'
-  
+
   /FEED_ITEM_CATS:
     no_args:
       <<: *item_deleted
-      get: 
+      get:
         with_token: '{"message": "the cats are asleep"}'
-  
+
   /FEED_ITEM_DELETE:
     no_args:
       <<: *item_deleted
@@ -350,9 +350,9 @@ graph_api:
   /FEED_ITEM_DELETE/likes:
     no_args:
       <<: *item_deleted
-      post: 
+      post:
         with_token: 'true'
-            
+
   /MOCK_COMMENT:
     no_args:
       <<: *item_deleted
@@ -363,13 +363,13 @@ graph_api:
       <<: *item_deleted
       get:
         with_token: "{\"name\": \"This is the test message\"}"
-        
+
 # -- Mock Test User Responses --
   /<%= APP_ID %>/accounts/test-users:
     installed=false:
       <<: *test_user_no_perms
     installed=false&permissions=read_stream:
-      <<: *test_user_no_perms                                                                                                                                                            
+      <<: *test_user_no_perms
     installed=true&permissions=read_stream:
       post:
         with_token: '{"id": "999999999", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
@@ -379,7 +379,7 @@ graph_api:
     no_args:
       get:
         with_token: '{"data":[{"id": "999999999", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}]}'
-        
+
   /999999999:
     no_args:
       <<: *item_deleted
@@ -394,10 +394,10 @@ graph_api:
     no_args:
       delete:
         with_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
- 
+
   /888888888:
     no_args:
-      <<: *item_deleted   
+      <<: *item_deleted
 
   /888888888/friends/999999999:
     no_args:

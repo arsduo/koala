@@ -55,7 +55,7 @@ shared_examples_for "Koala GraphAPI" do
     results = @api.get_objects([])
     results.should == []
   end
-  
+
   it "should be able to get multiple objects" do
     results = @api.get_objects(["contextoptional", "naitik"])
     results.should have(2).items
@@ -168,11 +168,11 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
   describe ".put_picture" do
     it "should be able to post photos to the user's wall with an open file object" do
-      content_type = "image/jpg"      
+      content_type = "image/jpg"
       file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
-  
+
       result = @api.put_picture(file, content_type)
-      @temporary_object_id = result["id"] 
+      @temporary_object_id = result["id"]
       @temporary_object_id.should_not be_nil
     end
 
@@ -187,33 +187,33 @@ shared_examples_for "Koala GraphAPI with an access token" do
     it "should be able to post photos to the user's wall without an open file object" do
       content_type = "image/jpg",
       file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
-  
+
       result = @api.put_picture(file_path, content_type)
-      @temporary_object_id = result["id"] 
+      @temporary_object_id = result["id"]
       @temporary_object_id.should_not be_nil
     end
-  
+
     it "should be able to verify a photo posted to a user's wall" do
       content_type = "image/jpg",
       file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
-  
+
       expected_message = "This is the test message"
-  
+
       result = @api.put_picture(file_path, content_type, :message => expected_message)
-      @temporary_object_id = result["id"] 
+      @temporary_object_id = result["id"]
       @temporary_object_id.should_not be_nil
-  
+
       get_result = @api.get_object(@temporary_object_id)
       get_result["name"].should == expected_message
     end
   end
-  
+
   describe ".put_video" do
     before :each do
-      @cat_movie = File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v")      
-      @content_type = "video/mpeg4"      
+      @cat_movie = File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v")
+      @content_type = "video/mpeg4"
     end
-    
+
     it "should set options[:video] to true" do
       source = stub("UploadIO")
       Koala::UploadableIO.stub(:new).and_return(source)
@@ -221,12 +221,12 @@ shared_examples_for "Koala GraphAPI with an access token" do
       Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:video => true)).and_return(Koala::Response.new(200, "[]", {}))
       @api.put_video("foo")
     end
-    
+
     it "should be able to post videos to the user's wall with an open file object" do
       file = File.open(@cat_movie)
 
       result = @api.put_video(file, @content_type)
-      @temporary_object_id = result["id"] 
+      @temporary_object_id = result["id"]
       @temporary_object_id.should_not be_nil
     end
 
@@ -240,7 +240,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
     it "should be able to post videos to the user's wall without an open file object" do
       result = @api.put_video(@cat_movie, @content_type)
-      @temporary_object_id = result["id"] 
+      @temporary_object_id = result["id"]
       @temporary_object_id.should_not be_nil
     end
 
