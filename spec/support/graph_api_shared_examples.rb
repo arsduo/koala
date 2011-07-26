@@ -131,7 +131,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result = @api.put_wall_post("Hello, world, from the test suite!")
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
-    puts "@temporary_object_id: #{@temporary_object_id}"
   end
 
   # DELETE
@@ -176,15 +175,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @temporary_object_id = result["id"] 
       @temporary_object_id.should_not be_nil
     end
-
-    it "uses the base HTTP service if the upload is a StringIO or similar" #do
-=begin      source = stub("UploadIO")
-      Koala::UploadableIO.stub(:new).and_return(source)
-      source.stub(:requires_base_http_service).and_return(true)
-      Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:http_service => Koala.base_http_service)).and_return(Koala::Response.new(200, "[]", {}))
-      @api.put_picture(StringIO.new)
-    end
-=end
 
     it "should be able to post photos to the user's wall without an open file object" do
       content_type = "image/jpg",
@@ -232,14 +222,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @temporary_object_id.should_not be_nil
     end
 
-    it "uses the base HTTP service if the upload is a StringIO or similar" #do
-=begin      source = stub("UploadIO")
-      Koala::UploadableIO.stub(:new).and_return(source)
-      source.stub(:requires_base_http_service).and_return(true)
-      Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:http_service => Koala.base_http_service)).and_return(Koala::Response.new(200, "[]", {}))
-      @api.put_video(StringIO.new)
-    end
-=end
 
     it "should be able to post videos to the user's wall without an open file object" do
       result = @api.put_video(@cat_movie, @content_type)

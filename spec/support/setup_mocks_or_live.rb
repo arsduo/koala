@@ -34,13 +34,15 @@ RSpec.configure do |config|
   
   config.after :each do
     # clean up any objects posted to Facebook
-    if @temporary_object_id #&& real_user?
-      puts "Cleaning up #{@temporary_object_id}"
+    if @temporary_object_id && KoalaTest.real_user?
       api = @api || (@test_users ? @test_users.graph_api : nil)
       raise "Unable to locate API when passed temporary object to delete!" unless api
 
+      # wait 10ms to allow Facebook to propagate data so we can delete it
+      sleep(0.01)
+      
       # clean up any objects we've posted
-      result = (api.delete_object(id) rescue false)
+      result = (api.delete_object(@temporary_object_id) rescue false)
       # if we errored out or Facebook returned false, track that
       puts "Encountered error when cleaning up #{@temporary_object_id}: #{result}" unless result
     end
