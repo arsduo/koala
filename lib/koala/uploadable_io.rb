@@ -87,7 +87,6 @@ module Koala
         @io_or_path = file
         @content_type = content_type || detect_mime_type(file.path)
         @filename = File.basename(file.path)
-        puts "Got filename: #{File.basename(file.path)}"
       end
     end
     

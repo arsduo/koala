@@ -517,11 +517,12 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       it "posts binary files with multiple requests" do
         file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+        file2 = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
 
         Koala::Facebook::BatchOperation.instance_variable_set(:@identifier, 0)
         results = @api.batch do |batch_api|
           batch_api.put_picture(file)
-          batch_api.put_picture(file, {}, "koppel")
+          batch_api.put_picture(file2, {}, "koppel")
         end
         results[0]["id"].should_not be_nil
         results[1]["id"].should_not be_nil

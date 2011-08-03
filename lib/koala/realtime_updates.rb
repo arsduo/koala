@@ -1,5 +1,3 @@
-require 'koala'
-
 module Koala
   module Facebook
     module RealtimeUpdateMethods
