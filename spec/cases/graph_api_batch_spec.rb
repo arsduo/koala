@@ -8,8 +8,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     @app_id = KoalaTest.app_id
     @app_access_token = KoalaTest.app_access_token
     @app_api = Koala::Facebook::GraphAPI.new(@app_access_token)
-  end 
-  
+  end
+
   describe "BatchOperations" do
     before :each do
       @args = {
@@ -21,43 +21,43 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         :post_processing => lambda { }
       }
     end
-    
+
     describe "#new" do
       it "makes http_options accessible" do
         Koala::Facebook::BatchOperation.new(@args).http_options.should == @args[:http_options]
       end
-      
+
       it "makes post_processing accessible" do
         Koala::Facebook::BatchOperation.new(@args).post_processing.should == @args[:post_processing]
       end
-      
+
       it "makes access_token accessible" do
         Koala::Facebook::BatchOperation.new(@args).access_token.should == @args[:access_token]
       end
-            
+
       it "doesn't change the original http_options" do
         @args[:http_options][:name] = "baz2"
         expected = @args[:http_options].dup
         Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
         @args[:http_options].should == expected
       end
-      
+
       it "leaves the file array nil by default" do
-        Koala::Facebook::BatchOperation.new(@args).files.should be_nil        
+        Koala::Facebook::BatchOperation.new(@args).files.should be_nil
       end
-      
+
       it "raises a KoalaError if no access token supplied" do
         expect { Koala::Facebook::BatchOperation.new(@args.merge(:access_token => nil)) }.to raise_exception(Koala::KoalaError)
       end
-      
+
       describe "when supplied binary files" do
         before :each do
           @binary = stub("Binary file")
           @uploadable_io = stub("UploadableIO 1")
-          
+
           @batch_queue = []
           Koala::Facebook::GraphAPI.stub(:batch_calls).and_return(@batch_queue)
-          
+
           Koala::UploadableIO.stub(:new).with(@binary).and_return(@uploadable_io)
           Koala::UploadableIO.stub(:binary_content?).and_return(false)
           Koala::UploadableIO.stub(:binary_content?).with(@binary).and_return(true)
@@ -66,14 +66,14 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
           @args[:method] = "post" # files are always post
         end
-        
+
         it "adds binary files to the files attribute as UploadableIOs" do
           @args[:args].merge!("source" => @binary)
           batch_op = Koala::Facebook::BatchOperation.new(@args)
           batch_op.files.should_not be_nil
           batch_op.files.find {|k, v| v == @uploadable_io}.should_not be_nil
         end
-        
+
         it "works if supplied an UploadableIO as an argument" do
           # as happens with put_picture at the moment
           @args[:args].merge!("source" => @uploadable_io)
@@ -81,14 +81,14 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           batch_op.files.should_not be_nil
           batch_op.files.find {|k, v| v == @uploadable_io}.should_not be_nil
         end
-                
+
         it "assigns each binary parameter unique name" do
           @args[:args].merge!("source" => @binary, "source2" => @binary)
           batch_op = Koala::Facebook::BatchOperation.new(@args)
           # if the name wasn't unique, there'd just be one item
           batch_op.files.should have(2).items
         end
-        
+
         it "assigns each binary parameter unique name across batch requests" do
           @args[:args].merge!("source" => @binary, "source2" => @binary)
           batch_op = Koala::Facebook::BatchOperation.new(@args)
@@ -99,59 +99,59 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           # if the name wasn't unique, we should have < 4 items since keys would be the same
           batch_op.files.merge(batch_op2.files).should have(4).items
         end
-        
+
         it "removes the value from the arguments" do
           @args[:args].merge!("source" => @binary)
           Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should_not =~ /source=/
         end
-      end   
-      
+      end
+
     end
-    
-    describe ".to_batch_params" do    
+
+    describe ".to_batch_params" do
       describe "handling arguments and URLs" do
         shared_examples_for "request with no body" do
           it "adds the args to the URL string, with ? if no args previously present" do
             test_args = "foo"
             @args[:url] = url = "/"
             Koala.http_service.stub(:encode_params).and_return(test_args)
-          
+
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:relative_url].should == "#{url}?#{test_args}"
           end
-        
+
           it "adds the args to the URL string, with & if args previously present" do
             test_args = "foo"
             @args[:url] = url = "/?a=2"
             Koala.http_service.stub(:encode_params).and_return(test_args)
-          
+
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:relative_url].should == "#{url}&#{test_args}"
           end
-          
+
           it "adds nothing to the URL string if there are no args to be added" do
             @args[:args] = {}
-            Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])[:relative_url].should == @args[:url]            
+            Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])[:relative_url].should == @args[:url]
           end
-          
+
           it "adds nothing to the body" do
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should be_nil
           end
         end
-        
+
         shared_examples_for "requests with a body param" do
           it "sets the body to the encoded args string, if there are args" do
             test_args = "foo"
             Koala.http_service.stub(:encode_params).and_return(test_args)
-          
+
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should == test_args
           end
-          
+
           it "does not set the body if there are no args" do
             test_args = ""
             Koala.http_service.stub(:encode_params).and_return(test_args)
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:body].should be_nil
           end
-          
-        
+
+
           it "doesn't change the url" do
             test_args = "foo"
             Koala.http_service.stub(:encode_params).and_return(test_args)
@@ -159,40 +159,40 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)[:relative_url].should == @args[:url]
           end
         end
-            
+
         context "for get operations" do
           before :each do
             @args[:method] = :get
           end
-        
-          it_should_behave_like "request with no body"        
+
+          it_should_behave_like "request with no body"
         end
-      
+
         context "for delete operations" do
           before :each do
             @args[:method] = :delete
           end
-        
-          it_should_behave_like "request with no body"        
+
+          it_should_behave_like "request with no body"
         end
-      
+
         context "for get operations" do
           before :each do
             @args[:method] = :put
           end
-        
-          it_should_behave_like "requests with a body param"  
+
+          it_should_behave_like "requests with a body param"
         end
-      
+
         context "for delete operations" do
           before :each do
             @args[:method] = :post
           end
-        
-          it_should_behave_like "requests with a body param"       
+
+          it_should_behave_like "requests with a body param"
         end
       end
-    
+
       it "includes the access token if the token is not the main one for the request" do
          params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(nil)
          params[:relative_url].should =~ /access_token=#{@args[:access_token]}/
@@ -208,13 +208,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
          params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
          params[:relative_url].should_not =~ /access_token=#{@args[:access_token]}/
       end
-      
+
       it "includes the other arguments if the token is the main one for the request" do
         @args[:args] = {:a => 2}
         params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
         params[:relative_url].should =~ /a=2/
       end
-      
+
       it "includes any arguments passed as http_options[:batch_args]" do
         batch_args = {:name => "baz", :headers => {:some_param => true}}
         @args[:http_options][:batch_args] = batch_args
@@ -226,22 +226,22 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         params = Koala::Facebook::BatchOperation.new(@args).to_batch_params(@args[:access_token])
         params[:method].should == @args[:method].to_s
       end
-      
+
       it "works with nil http_options" do
         expect { Koala::Facebook::BatchOperation.new(@args.merge(:http_options => nil)).to_batch_params(nil) }.not_to raise_exception
       end
-      
+
       it "works with nil args" do
         expect { Koala::Facebook::BatchOperation.new(@args.merge(:args => nil)).to_batch_params(nil) }.not_to raise_exception
-      end 
-      
+      end
+
       describe "with binary files" do
         before :each do
           @binary = stub("Binary file")
           Koala::UploadableIO.stub(:binary_content?).and_return(false)
           Koala::UploadableIO.stub(:binary_content?).with(@binary).and_return(true)
           @uploadable_io = stub("UploadableIO")
-          Koala::UploadableIO.stub(:new).with(@binary).and_return(@uploadable_io)          
+          Koala::UploadableIO.stub(:new).with(@binary).and_return(@uploadable_io)
           @uploadable_io.stub(:is_a?).with(Koala::UploadableIO).and_return(true)
 
           @batch_queue = []
@@ -249,7 +249,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
           @args[:method] = "post" # files are always post
         end
-        
+
         it "adds file identifiers as attached_files in a comma-separated list" do
           @args[:args].merge!("source" => @binary, "source2" => @binary)
           batch_op = Koala::Facebook::BatchOperation.new(@args)
@@ -403,26 +403,26 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         thread_two_count = 0
         first_count = 20
         second_count = 10
-        
+
         Koala.stub(:make_request).and_return(@fake_response)
 
         thread1 = Thread.new do
-          @api.batch do |batch_api| 
+          @api.batch do |batch_api|
             first_count.times {|i| batch_api.get_object("me"); sleep(0.01) }
             thread_one_count = batch_api.batch_calls.count
           end
         end
-            
+
         thread2 = Thread.new do
-          @api.batch do |batch_api| 
+          @api.batch do |batch_api|
             second_count.times {|i| batch_api.get_object("me"); sleep(0.01) }
             thread_two_count = batch_api.batch_calls.count
           end
         end
-        
+
         thread1.join
         thread2.join
-        
+
         thread_one_count.should == first_count
         thread_two_count.should == second_count
       end
@@ -583,24 +583,24 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
   describe "new interface" do
     it "includes a deprecation warning on GraphAPI" do
-      begin 
+      begin
         Koala::Facebook::GraphAPI.batch do
         end
       rescue NoMethodError => @err
       end
-      
+
       # verify the message points people to the wiki page
       @err.should
       @err.message.should =~ /https\:\/\/github.com\/arsduo\/koala\/wiki\/Batch-requests/
     end
-    
+
     it "includes a deprecation warning on GraphAndRESTAPI" do
-      begin 
+      begin
         Koala::Facebook::GraphAndRestAPI.batch do
         end
       rescue NoMethodError => @err
       end
-      
+
       # verify the message points people to the wiki page
       @err.should
       @err.message.should =~ /https\:\/\/github.com\/arsduo\/koala\/wiki\/Batch-requests/

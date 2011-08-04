@@ -20,11 +20,11 @@ describe "Koala::UploadableIO" do
 
     [tempfile, uploaded_file]
   end
-  
+
   def sinatra_mocks
     {:type => "type", :tempfile => "Tempfile", :filename => "foo.bar"}
   end
-  
+
   describe "the constructor" do
     describe "when given a file path" do
       before(:each) do
@@ -161,7 +161,7 @@ describe "Koala::UploadableIO" do
         Koala::UploadableIO.new(BEACH_BALL_PATH, "content/type").to_upload_io.should == @upload_io
       end
     end
-    
+
     context "if a filename was provided" do
       it "should call the constructor with the content type, file name, and the filename" do
         filename = "file"
@@ -188,15 +188,15 @@ describe "Koala::UploadableIO" do
     it "returns true for Rails 3 file uploads" do
       Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_true
     end
-    
+
     it "returns true for Sinatra file uploads" do
       Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_true
     end
-    
+
     it "returns true for File objects" do
       Koala::UploadableIO.binary_content?(File.open(BEACH_BALL_PATH)).should be_true
     end
-    
+
     it "returns false for everything else" do
       Koala::UploadableIO.binary_content?(StringIO.new).should be_false
       Koala::UploadableIO.binary_content?(BEACH_BALL_PATH).should be_false

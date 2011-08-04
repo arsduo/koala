@@ -3,7 +3,7 @@ require 'koala'
 module Koala
   module Facebook
     module TestUserMethods
-      
+
       def initialize(options = {})
         @app_id = options[:app_id]
         @app_access_token = options[:app_access_token]
@@ -26,20 +26,20 @@ module Koala
         args['permissions'] = (permissions.is_a?(Array) ? permissions.join(",") : permissions) if installed
         result = @graph_api.graph_call(accounts_path, args, "post", options)
       end
-      
+
       def list
         @graph_api.graph_call(accounts_path)["data"]
       end
-      
+
       def delete(test_user)
         test_user = test_user["id"] if test_user.is_a?(Hash)
         @graph_api.delete_object(test_user)
       end
-      
+
       def delete_all
         list.each {|u| delete u}
       end
-      
+
       def befriend(user1_hash, user2_hash)
         user1_id = user1_hash["id"] || user1_hash[:id]
         user2_id = user2_hash["id"] || user2_hash[:id]
@@ -51,11 +51,11 @@ module Koala
           # but the Facebook call would fail
           raise ArgumentError, "TestUsers#befriend requires hash arguments for both users with id and access_token"
         end
-        
+
         u1_graph_api = GraphAPI.new(user1_token)
         u2_graph_api = GraphAPI.new(user2_token)
 
-        u1_graph_api.graph_call("#{user1_id}/friends/#{user2_id}", {}, "post") && 
+        u1_graph_api.graph_call("#{user1_id}/friends/#{user2_id}", {}, "post") &&
           u2_graph_api.graph_call("#{user2_id}/friends/#{user1_id}", {}, "post")
       end
 
@@ -73,9 +73,9 @@ module Koala
         end
         return users
       end
-      
+
       protected
-      
+
       def accounts_path
         @accounts_path ||= "/#{@app_id}/accounts/test-users"
       end

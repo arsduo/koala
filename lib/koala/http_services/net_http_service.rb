@@ -11,7 +11,7 @@ module Koala
     class << self
       attr_accessor :ca_file, :ca_path, :verify_mode
     end
-    
+
     def self.make_request(path, args, verb, options = {})
       # We translate args to a valid query string. If post is specified,
       # we send a POST request to the given path with the given arguments.
@@ -72,14 +72,14 @@ module Koala
 
       # For HTTPS requests, set the proper CA certificates
       if private_request
-        http.use_ssl = true  
+        http.use_ssl = true
         http.verify_mode = options[:verify_mode] || verify_mode || OpenSSL::SSL::VERIFY_PEER
-        
+
         if cert_file = options[:ca_file] || ca_file
           raise Errno::ENOENT, "Certificate file #{cert_file.inspect} does not exist!" unless File.exists?(cert_file)
-          http.ca_file = cert_file 
+          http.ca_file = cert_file
         end
-        
+
         if cert_path = options[:ca_path] || ca_path
           raise Errno::ENOENT, "Certificate path #{cert_path.inspect} does not exist!" unless File.directory?(cert_path)
           http.ca_path = cert_path

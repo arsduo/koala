@@ -12,23 +12,23 @@ module Koala
       # by calling next_page or previous_page.
       attr_reader :paging
       attr_reader :api
-      
+
       def initialize(response, api)
         super response["data"]
         @paging = response["paging"]
         @api = api
       end
-            
+
       # defines methods for NEXT and PREVIOUS pages
       %w{next previous}.each do |this|
-        
+
         # def next_page
         # def previous_page
         define_method "#{this.to_sym}_page" do
           base, args = send("#{this}_page_params")
           base ? @api.get_page([base, args]) : nil
         end
-        
+
         # def next_page_params
         # def previous_page_params
         define_method "#{this.to_sym}_page_params" do
@@ -36,7 +36,7 @@ module Koala
           parse_page_url(@paging[this])
         end
       end
-      
+
       def parse_page_url(url)
         match = url.match(/.com\/(.*)\?(.*)/)
         base = match[1]
@@ -48,7 +48,7 @@ module Koala
         end
         [base,new_params]
       end
-      
+
     end
   end
 end
