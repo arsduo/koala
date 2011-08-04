@@ -294,6 +294,12 @@ shared_examples_for "Koala GraphAPI with an access token" do
     like_result.should be_true
   end
 
+  # Page Access Token Support
+  it "gets a page's access token" do
+    # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
+    @api.should_receive(:api).with("my_page", {:fields => "access_token"}, "get", anything)
+    @api.get_page_access_token("my_page")
+  end
 
   # test all methods to make sure they pass data through to the API
   # we run the tests here (rather than in the common shared example group)
