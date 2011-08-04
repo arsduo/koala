@@ -13,6 +13,7 @@ Updated methods:
 -- Filename can now be specified when uploading (e.g. for Ads API) (thanks, sshilo!)
 -- get_objects([]) returns [] instead of a Facebook error in non-batch mode (thanks, aselder!)
 Internal improvements:
+-- Koala is now more compatible with other Rubies (JRuby, Rubinius, etc.)
 -- HTTP services are more modular and can be changed on the fly (thanks, chadk!)
   -- Includes support for uploading StringIOs and other non-files via Net::HTTP even when using TyphoeusService
 -- Koala now uses multi_json to improve compatibility with Rubinius and other Ruby versions

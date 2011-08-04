@@ -4,7 +4,7 @@ Koala
 
 * Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, at just over 750 lines of code.)
 * Fast: Koala should, out of the box, be quick. In addition to supporting the vanilla Ruby networking libraries, it natively supports Typhoeus, our preferred gem for making fast HTTP requests. Of course, that brings us to our next topic:
-* Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We have no dependencies beyond the JSON gem.  Koala also has a built-in mechanism for using whichever HTTP library you prefer to make requests against the graph.)
+* Flexible: Koala should be useful to everyone, regardless of their current configuration.  (In addition to vanilla Ruby, we support JRuby, Rubinius, and REE, and provide  built-in mechanism for using whichever HTTP library you prefer.)
 * Tested: Koala should have complete test coverage, so you can rely on it.  (Our complete test coverage can be run against either mocked responses or the live Facebook servers.)
 
 Installation
@@ -13,28 +13,26 @@ Installation
 Easy:
     
     [sudo|rvm] gem install koala
-    # for 1.1rc add --pre
     
-
 Or in Bundler:
   
-    gem "koala" # add ', "~> 1.1rc"' for the release candidate
+    gem "koala"
   
 Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
 
-    graph = Koala::Facebook::GraphAPI.new(oauth_access_token)
-    profile = graph.get_object("me")
-    friends = graph.get_connections("me", "friends")
-    graph.put_object("me", "feed", :message => "I am writing on my wall!")
+    @graph = Koala::Facebook::GraphAPI.new(oauth_access_token)
+    profile = @graph.get_object("me")
+    friends = @graph.get_connections("me", "friends")
+    @graph.put_object("me", "feed", :message => "I am writing on my wall!")
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
 When retrieving data that returns an array of results (for example, when calling GraphAPI#get_connections or GraphAPI#search) a GraphCollection object (a sub-class of Array) will be returned, which contains added methods for getting the next and previous page of results:
 
     # Returns the feed items for the currently logged-in user as a GraphCollection
-    feed = graph.get_connections("me", "feed")
+    feed = @graph.get_connections("me", "feed")
 
     # GraphCollection is a sub-class of Array, so you can use it as a usual Array
     first_entry = feed[0]
@@ -48,28 +46,28 @@ When retrieving data that returns an array of results (for example, when calling
     next_path, next_args = feed.next_page_params
 
     # You can use those params to easily get the next (or previous) page
-    page = graph.get_page(feed.next_page_params)
+    page = @graph.get_page(feed.next_page_params)
 
 You can make multiple calls at once using Facebook's batch API:
 
     # Returns an array of results as if they were called non-batch
-    graph.batch do
-      graph.get_connections('me', 'friends')
-      graph.get_object('me')
-      graph.get_picture('me')
+    @graph.batch do |batch_api|
+      batch_api.get_object('me')
+      batch_api.get_object('koppel')
     end
 
 Check out the wiki for more examples.
 
-The old-school REST API
+The REST API
 -----
 Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.
 
 Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the RestAPI class:
 
-	@rest = Koala::Facebook::RestAPI.new(oauth_access_token)
-	@rest.fql_query(my_fql_query) # convenience method
-	@rest.rest_call("stream.publish", arguments_hash) # generic version
+  	@rest = Koala::Facebook::RestAPI.new(oauth_access_token)
+  	@rest.fql_query(my_fql_query) # convenience method
+  	@rest.fql_multiquery(fql_query_hash) # convenience method
+  	@rest.rest_call("stream.publish", arguments_hash) # generic version
 
 We reserve the right to expand the built-in REST API coverage to additional convenience methods in the future, depending on how fast Facebook moves to fill in the gaps.
 
@@ -82,7 +80,7 @@ You can use the Graph and REST APIs without an OAuth access token, but the real 
 
 If your application uses Koala and the Facebook [JavaScript SDK](http://github.com/facebook/connect-js) (formerly Facebook Connect), you can use the OAuth class to parse the cookies:
     @oauth.get_user_from_cookies(cookies) # gets the user's ID
-	@oauth.get_user_info_from_cookies(cookies) # parses and returns the entire hash
+	  @oauth.get_user_info_from_cookies(cookies) # parses and returns the entire hash
 
 And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
 	  # generate authenticating URL
@@ -93,20 +91,18 @@ And if you have to use the more complicated [redirect-based OAuth process](http:
 You can also get your application's own access token, which can be used without a user session for subscriptions and certain other requests:
     @oauth.get_app_access_token
 
-That's it!  It's pretty simple once you get the hang of it.  If you're new to OAuth, though, check out the wiki and the OAuth Playground example site (see below).
-
-*Signed Requests:* Excited to try out the new signed request authentication scheme?  Good news!  Koala now supports parsing those parameters:
+For those building apps on Facebook, parsing signed requests is simple:
     @oauth.parse_signed_request(request)
 
-*Exchanging session keys:* Stuck building tab applications on Facebook?  Wishing you had an OAuth token so you could use the Graph API?  You're in luck! Koala now allows you to exchange session keys for OAuth access tokens:
+Or, if for some horrible reason, you're still using session keys, despair not!  It's easy to turn them into shiny, modern OAuth tokens:
     @oauth.get_token_from_session_key(session_key)
     @oauth.get_tokens_from_session_keys(array_of_session_keys)
 
+That's it!  It's pretty simple once you get the hang of it.  If you're new to OAuth, though, check out the wiki and the OAuth Playground example site (see below).
+
 Real-time Updates
 -----
-The Graph API now allows your application to subscribe to real-time updates for certain objects in the graph.
-
-Currently, Facebook only supports subscribing to users, permissions and errors.  On top of that, there are limitations on what attributes and connections for each of these objects you can subscribe to updates for.  Check the [official Facebook documentation](http://developers.facebook.com/docs/api/realtime) for more details.
+Sometimes, reaching out to Facebook is a pain -- let it reach out to you instead.  The Graph API allows your application to subscribe to real-time updates for certain objects in the graph; check the [official Facebook documentation](http://developers.facebook.com/docs/api/realtime) for more details on what objects you can subscribe to and what limitations may apply.
 
 Koala makes it easy to interact with your applications using the RealtimeUpdates class:
 
@@ -129,6 +125,17 @@ And to top it all off, RealtimeUpdates provides a static method to respond to Fa
     Koala::Facebook::RealtimeUpdates.meet_challenge(params, your_verify_token)
 
 For more information about meet_challenge and the RealtimeUpdates class, check out the Real-Time Updates page on the wiki.
+
+Test Users
+-----
+
+We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph or REST API:
+    
+    @test_users = Koala::Facebook::TestUsers.new(:app_id => id, :secret => secret)
+    user = @test_users.create(is_app_installed, desired_permissions)
+    user_graph_api = Koala::Facebook::GraphAPI.new(user["access_token"])
+    # or, if you want to make a whole community:
+    @test_users.create_network(network_size, is_app_installed, common_permissions)
 
 See examples, ask questions
 -----

@@ -5,3 +5,7 @@ group :development, :test do
 end
 
 gemspec
+
+if defined? JRUBY_VERSION
+  gem "jruby-openssl"
+end
