@@ -42,50 +42,53 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       # TEST USER MANAGEMENT
-      it "should create a test user when not given installed" do
-        result = @test_users.create(false)
-        @temporary_object_id = result["id"]
-        result.should be_a(Hash)
-        (result["id"] && result["access_token"] && result["login_url"]).should
+      
+      describe ".create" do
+        it "should create a test user when not given installed" do
+          result = @test_users.create(false)
+          @temporary_object_id = result["id"]
+          result.should be_a(Hash)
+          (result["id"] && result["access_token"] && result["login_url"]).should
+        end
+
+        it "should create a test user when not given installed, ignoring permissions" do
+          result = @test_users.create(false, "read_stream")
+          @temporary_object_id = result["id"]
+          result.should be_a(Hash)
+          (result["id"] && result["access_token"] && result["login_url"]).should
+        end
+
+        it "should accept permissions as a string" do
+          @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
+          result = @test_users.create(true, "read_stream,publish_stream")
+        end
+
+        it "should accept permissions as an array" do
+          @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
+          result = @test_users.create(true, ["read_stream", "publish_stream"])
+        end
+
+        it "should create a test user when given installed and a permission" do
+          result = @test_users.create(true, "read_stream")
+          @temporary_object_id = result["id"]
+          result.should be_a(Hash)
+          (result["id"] && result["access_token"] && result["login_url"]).should
+        end
+
+        it "lets you specify other graph arguments, like uid and access token" do
+          args = {:uid => "some test user ID", :owner_access_token => "some owner access token"}
+          @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including(args), anything, anything)
+          @test_users.create(true, nil, args)
+        end
+
+        it "lets you specify http options that get passed through to the graph call" do
+          options = {:some_http_option => true}
+          @test_users.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
+          @test_users.create(true, nil, {}, options)
+        end
       end
 
-      it "should create a test user when not given installed, ignoring permissions" do
-        result = @test_users.create(false, "read_stream")
-        @temporary_object_id = result["id"]
-        result.should be_a(Hash)
-        (result["id"] && result["access_token"] && result["login_url"]).should
-      end
-
-      it "should accept permissions as a string" do
-        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
-        result = @test_users.create(true, "read_stream,publish_stream")
-      end
-
-      it "should accept permissions as an array" do
-        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
-        result = @test_users.create(true, ["read_stream", "publish_stream"])
-      end
-
-      it "should create a test user when given installed and a permission" do
-        result = @test_users.create(true, "read_stream")
-        @temporary_object_id = result["id"]
-        result.should be_a(Hash)
-        (result["id"] && result["access_token"] && result["login_url"]).should
-      end
-
-      it "lets you specify other graph arguments, like uid and access token" do
-        args = {:uid => "some test user ID", :owner_access_token => "some owner access token"}
-        @test_users.graph_api.should_receive(:graph_call).with(anything, hash_including(args), anything, anything)
-        @test_users.create(true, nil, args)
-      end
-
-      it "lets you specify http options that get passed through to the graph call" do
-        options = {:some_http_option => true}
-        @test_users.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
-        @test_users.create(true, nil, {}, options)
-      end
-
-      describe "with a user to delete" do
+      describe ".delete" do
         before :each do
           @user1 = @test_users.create(true, "read_stream")
           @user2 = @test_users.create(true, "read_stream,user_interests")
@@ -111,13 +114,38 @@ describe "Koala::Facebook::TestUsers" do
         end
       end
 
-      describe "with delete_all" do
+      describe ".delete_all" do
         it "should delete all users found by the list commnand" do
           array = [1, 2, 3]
           @test_users.should_receive(:list).and_return(array)
           array.each {|i| @test_users.should_receive(:delete).with(i) }
           @test_users.delete_all
         end
+      end
+      
+      describe ".update" do
+        before :each do
+          @updates = {:name => "Foo Baz"}
+        end
+        
+        it "makes a POST with the test user Graph API " do
+          user = @test_users.create(true)
+          @test_users.graph_api.should_receive(:graph_call).with(anything, anything, "post", anything)
+          @test_users.update(user, @updates)
+        end
+
+        it "makes a request to the test user with the update params " do
+          user = @test_users.create(true)
+          @test_users.graph_api.should_receive(:graph_call).with(user["id"], @updates, anything, anything)
+          @test_users.update(user, @updates)
+        end
+        
+        it "works" do
+          user = @test_users.create(true)
+          @test_users.update(user, @updates)
+          user_info = Koala::Facebook::GraphAPI.new(user["access_token"]).get_object(user["id"])
+          user_info["name"].should == @updates[:name]
+        end                
       end
 
       describe "with existing users" do

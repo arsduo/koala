@@ -1,6 +1,7 @@
 v1.2
 New methods:
--- 
+-- TestUsers#update lets you update the name or password of an existing test user
+-- GraphAPI.get_page_access_token lets you easily fetch the access token for a page you manage (thanks, marcgg!)
 Updated methods:
 -- put_picture now accepts URLs to images (thanks, marcgg!)
 Internal improvements:

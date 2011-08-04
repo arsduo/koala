@@ -39,7 +39,12 @@ module Koala
       def delete_all
         list.each {|u| delete u}
       end
-
+      
+      def update(test_user, args = {}, http_options = {})
+        test_user = test_user["id"] if test_user.is_a?(Hash)
+        @graph_api.graph_call(test_user, args, "post", http_options)
+      end
+      
       def befriend(user1_hash, user2_hash)
         user1_id = user1_hash["id"] || user1_hash[:id]
         user2_id = user2_hash["id"] || user2_hash[:id]
