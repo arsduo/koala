@@ -111,7 +111,8 @@ module Koala
       #
       #   put_picture(file, [content_type], ...)
       #   put_picture(path_to_file, [content_type], ...)
-      #
+      #   put_picture(picture_url, ...)
+      # 
       # You can pass in uploaded files directly from Rails or Sinatra.
       # (See lib/koala/uploadable_io.rb for supported frameworks)
       #
@@ -122,6 +123,9 @@ module Koala
       #
       #   put_picture(file, content_type, {:message => "Message"}, 01234560)
       #   put_picture(params[:file], {:message => "Message"})
+      # 
+      #   (Note that with URLs, there's no optional content type field)
+      #   put_picture(picture_url, {:message => "Message"}, my_page_id)
 
       def put_picture(*picture_args)
         put_object(*parse_media_args(picture_args, "photos"))
@@ -245,11 +249,26 @@ module Koala
 
         args      = media_args[1 + args_offset] || {}
         target_id = media_args[2 + args_offset] || "me"
-        options   = media_args[3 + args_offset] || {}
+        options   = media_args[3 + args_offset] || {} 
 
-        args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
+        if url?(media_args.first)
+          # If media_args is a URL, we can upload without UploadableIO
+          args.merge!(:url => media_args.first)
+        else
+          args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
+        end
 
         [target_id, method, args, options]
+      end
+
+      def url?(data)
+        return false unless data.is_a? String
+        begin
+          uri = URI.parse(data)
+          %w( http https ).include?(uri.scheme)
+        rescue URI::BadURIError
+          false
+        end
       end
     end
   end

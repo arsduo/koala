@@ -73,6 +73,7 @@ graph_api:
       get:
         with_token: '{"contextoptional":"{}","koppel":"{}"}'
         no_token: '{"contextoptional":"{}","koppel":"{}"}'
+
     # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here 
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}]) %>:
       post:
@@ -104,7 +105,7 @@ graph_api:
     batch=<%= MultiJson.encode([{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+first_name+from+user+where+uid%3D2905623"}]) %>:
       post:
         with_token: '[{"body":"[{\"first_name\":\"Alex\"}]"}]'
-      
+
     # dependencies
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}]) %>:
       post: &batch_dependent
@@ -112,7 +113,7 @@ graph_api:
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}]) %>:
       post:
         with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
-  
+
     # attached files tests
     batch=<%= MultiJson.encode([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
       post:
@@ -125,6 +126,8 @@ graph_api:
         with_token: '[{"body":"{\"id\": \"MOCK_PHOTO\"}"}, {"body":"{\"id\": \"MOCK_PHOTO\"}"}]'
 
 
+
+
   /me:
     no_args:
       get:
@@ -133,26 +136,27 @@ graph_api:
     fields=id:
       get: 
         with_token: '{"id": "2901279"}'
-        
+
   /me/feed:
     message=Hello, world, from the test suite!: 
-      post: 
+      post:
         with_token: '{"id": "MOCK_FEED_ITEM"}'
     message=Hello, world, from the test suite, testing comments!:
       post:
         with_token: '{"id": "MOCK_FEED_ITEM"}'
     message=the cats are asleep: 
-      post: 
+      post:
         with_token: '{"id": "FEED_ITEM_CATS"}'
     message=Hello, world, from the test suite delete method!: 
-      post: 
+      post:
         with_token: '{"id": "FEED_ITEM_DELETE"}'
     message=Hello, world, from the test suite batch API!: 
-      post: 
+      post:
         with_token: '{"id": "FEED_ITEM_BATCH"}'
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
+
   /me/photos:
     source=[FILE]:
       post:
@@ -162,6 +166,15 @@ graph_api:
       post:
         <<: *token_required
         with_token: '{"id": "MOCK_PHOTO"}'
+    url=https://github.com/arsduo/koala/raw/master/spec/fixtures/beach.jpg:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
+    message=my message&url=https://github.com/arsduo/koala/raw/master/spec/fixtures/beach.jpg:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
+
   /me/videos:
     source=[FILE]:
       post:
