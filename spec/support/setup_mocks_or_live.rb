@@ -17,15 +17,14 @@ else
   # load testing data (see note in readme.md)  
   KoalaTest.setup_test_data(YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml')))
   
-  if adapter = ENV['ADAPTER']
-    # allow live tests with different adapters
-    begin
-      require adapter
-      Faraday.default_adapter = adapter.to_sym
-      puts "Using Faraday adapter #{adapter}."
-    rescue LoadError
-      puts "Unable to load adapter #{adapter}, using Net::HTTP."
-    end
+  # allow live tests with different adapters
+  adapter = ENV['ADAPTER'] || "typhoeus"# use Typhoeus by default if available
+  begin
+    require adapter
+    Faraday.default_adapter = adapter.to_sym
+    puts "Using Faraday adapter #{adapter}."
+  rescue LoadError
+    puts "Unable to load adapter #{adapter}, using Net::HTTP."
   end
     
   # use a test user unless the developer wants to test against a real profile
