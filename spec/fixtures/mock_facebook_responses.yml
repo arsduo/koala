@@ -166,11 +166,11 @@ graph_api:
       post:
         <<: *token_required
         with_token: '{"id": "MOCK_PHOTO"}'
-    url=https://github.com/arsduo/koala/raw/master/spec/fixtures/beach.jpg:
+    url=http://img.slate.com/images/redesign2008/slate_logo.gif:
       post:
         <<: *token_required
         with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
-    message=my message&url=https://github.com/arsduo/koala/raw/master/spec/fixtures/beach.jpg:
+    message=my message&url=http://img.slate.com/images/redesign2008/slate_logo.gif:
       post:
         <<: *token_required
         with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
