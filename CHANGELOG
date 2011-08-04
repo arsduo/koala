@@ -1,3 +1,16 @@
+v1.2
+New methods:
+-- 
+Updated methods:
+-- put_picture now accepts URLs to images (thanks, marcgg!)
+Internal improvements:
+-- Koala now uses Faraday to make requests, replacing the HTTPServices (see wiki)
+Testing improvements:
+-- Live test suites now run against test users by default
+  -- Test suite can be repeatedly run live without having to update facebook_data.yml
+  -- OAuth code and session key tests cannot be run against test users
+  
+
 v1.1
 New methods:
 -- Added Batch API support (thanks, seejohnrun and spiegela!)
