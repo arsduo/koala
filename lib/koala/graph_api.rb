@@ -119,10 +119,11 @@ module Koala
       # - args:       a hash of request parameters (default: {})
       # - target_id:  ID of the target where to post the picture (default: "me")
       # - options:    a hash of http options passed to the HTTPService module
-      # 
+      #
       #   put_picture(file, content_type, {:message => "Message"}, 01234560)
       #   put_picture(params[:file], {:message => "Message"})
-      
+      #   put_picture(picture_url, {:message => "Message"}, my_page_id)
+
       def put_picture(*picture_args)
         put_object(*parse_media_args(picture_args, "photos"))
       end
@@ -233,26 +234,39 @@ module Koala
           APIError.new(error_details) 
         end
       end
-      
+
       private
-      
+
       def parse_media_args(media_args, method)
         # photo and video uploads can accept different types of arguments (see above)
         # so here, we parse the arguments into a form directly usable in put_object
         raise KoalaError.new("Wrong number of arguments for put_#{method == "photos" ? "picture" : "video"}") unless media_args.size.between?(1, 5)
-        
+
         args_offset = media_args[1].kind_of?(Hash) || media_args.size == 1 ? 0 : 1
-        
+
         args      = media_args[1 + args_offset] || {}
         target_id = media_args[2 + args_offset] || "me"
         options   = media_args[3 + args_offset] || {} 
-        
-        args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
 
-        options[:http_service] = Koala.base_http_service if args["source"].requires_base_http_service
+        if url? media_args.first
+          # If media_args is a URL, we can upload without UploadableIO
+          args.merge!(:url => media_args.first)
+        else
+          args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
+          options[:http_service] = Koala.base_http_service if args["source"].requires_base_http_service
+        end
 
         [target_id, method, args, options]
-      end      
+      end
+
+      def url?(data)
+        return false unless data.is_a? String
+        uri = URI.parse(data)
+        %w( http https ).include?(uri.scheme)
+      rescue URI::BadURIError
+        false
+      end
+
     end
   end
-end  
+end
