@@ -204,19 +204,19 @@ end
 shared_examples_for "Koala RestAPI with an access token" do
   # FQL
   it "should be able to access public information via FQL" do
-    result = @api.fql_query('select first_name from user where uid = 216743')
+    result = @api.fql_query("select first_name from user where uid = #{KoalaTest.user2_id}")
     result.size.should == 1
-    result.first['first_name'].should == 'Chris'
+    result.first['first_name'].should == KoalaTest.user2_name
   end
 
   it "should be able to access public information via FQL.multiquery" do
     result = @api.fql_multiquery(
-      :query1 => 'select first_name from user where uid = 216743',
-      :query2 => 'select first_name from user where uid = 2905623'
+      :query1 => "select first_name from user where uid = #{KoalaTest.user2_id}",
+      :query2 => "select first_name from user where uid = #{KoalaTest.user1_id}"
     )
     result.size.should == 2
-    result["query1"].first['first_name'].should == 'Chris'
-    result["query2"].first['first_name'].should == 'Alex'
+    result["query1"].first['first_name'].should == KoalaTest.user2_name
+    result["query2"].first['first_name'].should == KoalaTest.user1_name
   end
 
   it "should be able to access protected information via FQL" do
@@ -253,23 +253,23 @@ shared_examples_for "Koala RestAPI without an access token" do
   # FQL_QUERY
   describe "when making a FQL request" do
     it "should be able to access public information via FQL" do
-      @result = @api.fql_query("select first_name from user where uid = 216743")
-      @result.size.should == 1
-      @result.first["first_name"].should == "Chris"
+      result = @api.fql_query("select first_name from user where uid = #{KoalaTest.user2_id}")
+      result.size.should == 1
+      result.first['first_name'].should == KoalaTest.user2_name
     end
-    
+
     it "should be able to access public information via FQL.multiquery" do
       result = @api.fql_multiquery(
-        :query1 => 'select first_name from user where uid = 216743',
-        :query2 => 'select first_name from user where uid = 2905623'
+        :query1 => "select first_name from user where uid = #{KoalaTest.user2_id}",
+        :query2 => "select first_name from user where uid = #{KoalaTest.user1_id}"
       )
       result.size.should == 2
-      result["query1"].first['first_name'].should == 'Chris'
-      result["query2"].first['first_name'].should == 'Alex'
+      result["query1"].first['first_name'].should == KoalaTest.user2_name
+      result["query2"].first['first_name'].should == KoalaTest.user1_name
     end
 
     it "should not be able to access protected information via FQL" do
-      lambda { @api.fql_query("select read_stream from permissions where uid = 216743") }.should raise_error(Koala::Facebook::APIError)
+      lambda { @api.fql_query("select read_stream from permissions where uid = #{KoalaTest.user2_id}") }.should raise_error(Koala::Facebook::APIError)
     end
     
     it "should not be able to access protected information via FQL.multiquery" do

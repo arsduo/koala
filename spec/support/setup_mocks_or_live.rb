@@ -32,7 +32,7 @@ else
   if token = KoalaTest.oauth_token
     KoalaTest.validate_user_info(token)
   else
-    KoalaTest.setup_test_user
+    KoalaTest.setup_test_users
   end
 end
 
@@ -45,7 +45,7 @@ RSpec.configure do |config|
   
   config.after :each do
     # clean up any objects posted to Facebook
-    if @temporary_object_id && KoalaTest.real_user?
+    if @temporary_object_id && !KoalaTest.mock_interface?
       api = @api || (@test_users ? @test_users.graph_api : nil)
       raise "Unable to locate API when passed temporary object to delete!" unless api
 
@@ -55,7 +55,7 @@ RSpec.configure do |config|
       # clean up any objects we've posted
       result = (api.delete_object(@temporary_object_id) rescue false)
       # if we errored out or Facebook returned false, track that
-      puts "Encountered error when cleaning up #{@temporary_object_id}: #{result}" unless result
+      puts "Unable to delete #{@temporary_object_id}: #{result} (probably a photo or video, which can't be deleted through the API)" unless result
     end
   end
 end

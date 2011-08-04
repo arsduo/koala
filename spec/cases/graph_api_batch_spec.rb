@@ -383,7 +383,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         it "returns the result status if http_component is status" do
           Koala.stub(:make_request).and_return(Koala::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
           result = @api.batch do |batch_api|
-            batch_api.get_object("koppel", {}, :http_component => :status)
+            batch_api.get_object(KoalaTest.user1, {}, :http_component => :status)
           end
           result[0].should == 203
         end
@@ -391,7 +391,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         it "returns the result headers as a hash if http_component is headers" do
           Koala.stub(:make_request).and_return(Koala::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
           result = @api.batch do |batch_api|
-            batch_api.get_object("koppel", {}, :http_component => :headers)
+            batch_api.get_object(KoalaTest.user1, {}, :http_component => :headers)
           end
           result[0].should == {"Content-Type" => "text/javascript; charset=UTF-8"}
         end
@@ -433,7 +433,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     it "can get two results at once" do
       me, koppel = @api.batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_object('koppel')
+        batch_api.get_object(KoalaTest.user1)
       end
       me['id'].should_not be_nil
       koppel['id'].should_not be_nil
@@ -442,7 +442,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     it "works with GraphAndRestAPI instances" do
       me, koppel = Koala::Facebook::GraphAndRestAPI.new(@api.access_token).batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_object('koppel')
+        batch_api.get_object(KoalaTest.user1)
       end
       me['id'].should_not be_nil
       koppel['id'].should_not be_nil
@@ -476,7 +476,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     it "inserts errors in the appropriate place, without breaking other results" do
       failed_insights, koppel = @api.batch do |batch_api|
         batch_api.get_connections(@app_id, 'insights')
-        batch_api.get_object("koppel", {}, {"access_token" => @app_api.access_token})
+        batch_api.get_object(KoalaTest.user1, {}, {"access_token" => @app_api.access_token})
       end
       failed_insights.should be_a(Koala::Facebook::APIError)
       koppel["id"].should_not be_nil
@@ -494,12 +494,12 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
     it "allows FQL" do
       result = @api.batch do |batch_api|
-        batch_api.graph_call("method/fql.query", {:query=>"select name from user where uid=4"}, "post")
+        batch_api.graph_call("method/fql.query", {:query=>"select first_name from user where uid=#{KoalaTest.user1_id}"}, "post")
       end
 
       fql_result = result[0]
       fql_result[0].should be_a(Hash)
-      fql_result[0]["name"].should == "Mark Zuckerberg"
+      fql_result[0]["first_name"].should == "Alex"
     end
 
     describe "binary files" do
@@ -522,7 +522,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         Koala::Facebook::BatchOperation.instance_variable_set(:@identifier, 0)
         results = @api.batch do |batch_api|
           batch_api.put_picture(file)
-          batch_api.put_picture(file2, {}, "koppel")
+          batch_api.put_picture(file2, {}, KoalaTest.user1)
         end
         results[0]["id"].should_not be_nil
         results[1]["id"].should_not be_nil
@@ -553,7 +553,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       it "allows you to create dependencies" do
         me, koppel = @api.batch do |batch_api|
           batch_api.get_object("me", {}, :batch_args => {:name => "getme"})
-          batch_api.get_object("koppel", {}, :batch_args => {:depends_on => "getme"})
+          batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getme"})
         end
 
         me.should be_nil # gotcha!  it's omitted because it's a successfully-executed dependency
@@ -563,7 +563,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       it "properly handles dependencies that fail" do
         data, koppel = @api.batch do |batch_api|
           batch_api.get_connections(@app_id, 'insights', {}, :batch_args => {:name => "getdata"})
-          batch_api.get_object("koppel", {}, :batch_args => {:depends_on => "getdata"})
+          batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getdata"})
         end
 
         data.should be_a(Koala::Facebook::APIError)

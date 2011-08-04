@@ -1,19 +1,23 @@
-# Live tests will run against a test users unless you supply a value for oauth_token yourself
-# (note: this will leave some photos and videos posted to your wall, since they can't be deleted through the API)
+# Testing data
+
+# IMPORTANT NOTE: live tests will run against a test users automatically
+# If you want to run them against a real user or test users on a different account, you can
+# by enter an OAuth token, code, and session_key (for real users) or changing the app_id and secret (for test users) 
+# (note for real users: this will leave some photos and videos posted to your wall, since they can't be deleted through the API)
 
 # These values are configured to work with the OAuth Playground app by default
 # Of course, you can change this to work with your own app.
 # Check out http://oauth.twoalex.com/ to easily generate tokens, cookies, etc.
 
 # Your OAuth token should have the read_stream, publish_stream, user_photos, user_videos, and read_insights permissions.
-oauth_token:  # see note above
+oauth_token: 
 
 # for testing the OAuth class    
 # baseline app
 oauth_test_data: 
   # the following two values are not needed for most of the test suite, but the relevant tests will not run if they're not present
   code: 
-  session_key:
+  session_key: 
   
   # These values will work out of the box
   app_id: 119908831367602

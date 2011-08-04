@@ -15,24 +15,24 @@ rest_api:
 
 # -- Stubbed Responses --
   /method/fql.query:
-    query=select first_name from user where uid = 216743:
+    query=select first_name from user where uid = 2901279:
       get: 
-        no_token: '[{"first_name":"Chris"}]'
-        with_token: '[{"first_name":"Chris"}]'
-    query=select read_stream from permissions where uid = 216743:
+        no_token: '[{"first_name":"Luke"}]'
+        with_token: '[{"first_name":"Luke"}]'
+    query=select read_stream from permissions where uid = 2901279:
       get:
         with_token: '[{"read_stream":1}]' 
-        no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 216743"}]}'
+        no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 2901279"}]}'
 
   /method/fql.multiquery:
     'queries=<%= MultiJson.encode({"query1" => "select post_id from stream where source_id = me()", "query2" => "select fromid from comment where post_id in (select post_id from #query1)", "query3" => "select uid, name from user where uid in (select fromid from #query2)"}) %>':
       get: 
         with_token: '[{"name":"query1", "fql_result_set":[]},{"name":"query2", "fql_result_set":[]},{"name":"query3", "fql_result_set":[]}]'
-        no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 216743"}]}'
-    'queries=<%= MultiJson.encode({"query1" => "select first_name from user where uid = 216743", "query2" => "select first_name from user where uid = 2905623"}) %>':
+        no_token: '{"error_code":104,"error_msg":"Requires valid signature","request_args":[{"key":"method","value":"fql.query"},{"key":"format","value":"json"},{"key":"query","value":"select read_stream from permissions where uid = 2901279"}]}'
+    'queries=<%= MultiJson.encode({"query1" => "select first_name from user where uid = 2901279", "query2" => "select first_name from user where uid = 2905623"}) %>':
       get:
-        with_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Chris"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]' 
-        no_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Chris"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
+        with_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]' 
+        no_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
 
 
 
@@ -101,9 +101,9 @@ graph_api:
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}]) %>:
       post:
         with_token: '{"error":190,"error_description":"Error validating access token."}'
-    batch=<%= MultiJson.encode([{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+name+from+user+where+uid%3D4"}]) %>:
+    batch=<%= MultiJson.encode([{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+first_name+from+user+where+uid%3D2905623"}]) %>:
       post:
-        with_token: '[{"body":"[{\"name\":\"Mark Zuckerberg\"}]"}]'
+        with_token: '[{"body":"[{\"first_name\":\"Alex\"}]"}]'
       
     # dependencies
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}]) %>:
@@ -132,7 +132,7 @@ graph_api:
         with_token: '{"updated_time": 1}'
     fields=id:
       get: 
-        with_token: '{"id": "216743"}'
+        with_token: '{"id": "2901279"}'
         
   /me/feed:
     message=Hello, world, from the test suite!: 
@@ -190,7 +190,7 @@ graph_api:
         with_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
         no_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
     
-  /lukeshepard/likes: 
+  /lukeshepard/friends: 
     no_args: 
       get: 
         <<: *token_required

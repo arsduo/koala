@@ -62,7 +62,7 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   it "should be able to get multiple objects if they're a string" do
-    results = @api.get_objects("contextoptional,koppel")
+    results = @api.get_objects("contextoptional,#{KoalaTest.user1}")
     results.should have(2).items
   end
 
@@ -122,7 +122,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result.length.should == 2
   end
   it "should be able to access connections from users" do
-    result = @api.get_connections(KoalaTest.user2, "likes")
+    result = @api.get_connections(KoalaTest.user2, "friends")
     result.length.should > 0
   end
 
@@ -441,12 +441,11 @@ shared_examples_for "Koala GraphAPI without an access token" do
   end
 
   it "shouldn't be able to access connections from users" do
-    lambda { @api.get_connections("lukeshepard", "likes") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @api.get_connections("lukeshepard", "friends") }.should raise_error(Koala::Facebook::APIError)
   end
 
   it "should not be able to put an object" do
     lambda { @result = @api.put_object("lukeshepard", "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
-    puts "Error!  Object #{@result.inspect} somehow put onto Luke Shepard's wall!" if @result
   end
 
   # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
@@ -455,13 +454,11 @@ shared_examples_for "Koala GraphAPI without an access token" do
       attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
       @result = @api.put_wall_post("Hello, world", attachment, "contextoptional")
     end).should raise_error(Koala::Facebook::APIError)
-    puts "Error!  Object #{@result.inspect} somehow put onto Context Optional's wall!" if @result
   end
 
   it "should not be able to comment on an object" do
     # random public post on the ContextOptional wall
     lambda { @result = @api.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::APIError)
-    puts "Error!  Object #{@result.inspect} somehow commented on post 7204941866_119776748033392!" if @result
   end
 
   it "should not be able to like an object" do

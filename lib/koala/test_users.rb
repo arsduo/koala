@@ -37,7 +37,7 @@ module Koala
       end
       
       def delete_all
-        list.each {|u| delete u }
+        list.each {|u| delete u}
       end
       
       def befriend(user1_hash, user2_hash)
