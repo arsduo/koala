@@ -69,10 +69,10 @@ graph_api:
   
 # -- Stubbed Responses --
   root:
-    ids=contextoptional,naitik: 
+    ids=contextoptional,koppel: 
       get:
-        with_token: '{"contextoptional":"{}","naitik":"{}"}'
-        no_token: '{"contextoptional":"{}","naitik":"{}"}'
+        with_token: '{"contextoptional":"{}","koppel":"{}"}'
+        no_token: '{"contextoptional":"{}","koppel":"{}"}'
     # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here 
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}]) %>:
       post:

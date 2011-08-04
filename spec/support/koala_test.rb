@@ -19,12 +19,12 @@ module KoalaTest
   end
   
   def self.setup_test_user
-    puts "Setting up test user"
+    print "Setting up test users..."
     test_user_api = Koala::Facebook::TestUsers.new(:app_id => self.app_id, :secret => self.secret)
-    live_testing_user = test_user_api.create(true, "read_stream, publish_stream, user_photos, user_videos, read_insights")
-    puts "Test user: #{live_testing_user.inspect}"
+    @live_testing_user, @live_testing_friend = test_user_api.create_network(2, true, "read_stream, publish_stream, user_photos, user_videos, read_insights")
+    puts "done."
     @test_user = true
-    self.oauth_token = live_testing_user["access_token"]
+    self.oauth_token = @live_testing_user["access_token"]
   end
 
   def self.validate_user_info(token)
@@ -45,7 +45,24 @@ module KoalaTest
     !(mock_interface? || @test_user)
   end
   
+  def self.test_user?
+    !!@test_user
+  end
+  
   def self.mock_interface?
     Koala.http_service == Koala::MockHTTPService
   end
+  
+  def self.user1
+    test_user? ? @live_testing_user["id"] : "koppel"
+  end
+  
+  def self.user2
+    test_user? ? @live_testing_user["id"] : "lukeshepard"
+  end
+  
+  def self.page
+    "contextoptional"
+  end
+  
 end

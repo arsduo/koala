@@ -16,7 +16,7 @@ shared_examples_for "Koala GraphAPI" do
   # GRAPH CALL
   describe "graph_call" do
     it "should pass all arguments to the api method" do
-      args = ["koppel", {}, "get", {:a => :b}]
+      args = [KoalaTest.user1, {}, "get", {:a => :b}]
 
       @api.should_receive(:api).with(*args)
 
@@ -25,7 +25,7 @@ shared_examples_for "Koala GraphAPI" do
 
     it "should throw an APIError if the result hash has an error key" do
       Koala.stub(:make_request).and_return(Koala::Response.new(500, {"error" => "An error occurred!"}, {}))
-      lambda { @api.graph_call("koppel", {}) }.should raise_exception(Koala::Facebook::APIError)
+      lambda { @api.graph_call(KoalaTest.user1, {}) }.should raise_exception(Koala::Facebook::APIError)
     end
   end
 
@@ -40,13 +40,13 @@ shared_examples_for "Koala GraphAPI" do
 
   # get_object
   it "should get public data about a user" do
-    result = @api.get_object("koppel")
+    result = @api.get_object(KoalaTest.user1)
     # the results should have an ID and a name, among other things
     (result["id"] && result["name"]).should_not be_nil
   end
 
   it "should get public data about a Page" do
-    result = @api.get_object("contextoptional")
+    result = @api.get_object(KoalaTest.page)
     # the results should have an ID and a name, among other things
     (result["id"] && result["name"]).should
   end
@@ -57,12 +57,12 @@ shared_examples_for "Koala GraphAPI" do
   end
   
   it "should be able to get multiple objects" do
-    results = @api.get_objects(["contextoptional", "naitik"])
+    results = @api.get_objects([KoalaTest.page, KoalaTest.user1])
     results.should have(2).items
   end
 
   it "should be able to get multiple objects if they're a string" do
-    results = @api.get_objects("contextoptional,naitik")
+    results = @api.get_objects("contextoptional,koppel")
     results.should have(2).items
   end
 
@@ -71,11 +71,11 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   it "should be able to access a user's picture, given a picture type"  do
-    @api.get_picture("lukeshepard", {:type => 'large'}).should =~ /^http[s]*\:\/\//
+    @api.get_picture(KoalaTest.user2, {:type => 'large'}).should =~ /^http[s]*\:\/\//
   end
 
   it "should be able to access connections from public Pages" do
-    result = @api.get_connections("contextoptional", "photos")
+    result = @api.get_connections(KoalaTest.page, "photos")
     result.should be_a(Array)
   end
 
@@ -107,7 +107,7 @@ end
 
 shared_examples_for "Koala GraphAPI with an access token" do
   it "should get private data about a user" do
-    result = @api.get_object("koppel")
+    result = @api.get_object(KoalaTest.user1)
     # updated_time should be a pretty fixed test case
     result["updated_time"].should_not be_nil
   end
@@ -118,11 +118,11 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "should be able to get multiple objects" do
-    result = @api.get_objects(["contextoptional", "naitik"])
+    result = @api.get_objects([KoalaTest.page, KoalaTest.user1])
     result.length.should == 2
   end
   it "should be able to access connections from users" do
-    result = @api.get_connections("lukeshepard", "likes")
+    result = @api.get_connections(KoalaTest.user2, "likes")
     result.length.should > 0
   end
 
@@ -333,14 +333,14 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
   describe "when getting a collection" do
     # GraphCollection methods
     it "should get a GraphCollection when getting connections" do
-      @result = @api.get_connections("contextoptional", "photos")
+      @result = @api.get_connections(KoalaTest.page, "photos")
       @result.should be_a(Koala::Facebook::GraphCollection)
     end
 
     it "should return nil if the get_collections call fails with nil" do
       # this happens sometimes
       @api.should_receive(:graph_call).and_return(nil)
-      @api.get_connections("contextoptional", "photos").should be_nil
+      @api.get_connections(KoalaTest.page, "photos").should be_nil
     end
 
     it "should get a GraphCollection when searching" do
@@ -368,7 +368,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
     # GraphCollection attributes
     describe "the GraphCollection" do
       before(:each) do
-        @result = @api.get_connections("contextoptional", "photos")
+        @result = @api.get_connections(KoalaTest.page, "photos")
       end
 
       it "should have a read-only paging attribute" do
