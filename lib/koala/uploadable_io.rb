@@ -2,7 +2,7 @@ require 'koala'
 
 module Koala
   class UploadableIO
-    attr_reader :io_or_path, :content_type, :requires_base_http_service
+    attr_reader :io_or_path, :content_type, :filename
 
     def initialize(io_or_path_or_mixed, content_type = nil, filename = nil)
       # see if we got the right inputs
@@ -40,8 +40,7 @@ module Koala
       :parse_rails_3_param,
       :parse_sinatra_param,
       :parse_file_object,
-      :parse_string_path,
-      :parse_io
+      :parse_string_path
     ]
     
     def parse_init_mixed_param(mixed, content_type = nil)

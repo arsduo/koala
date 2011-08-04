@@ -36,14 +36,8 @@ shared_examples_for "MIME::Types can't return results" do
       end
     end
 
-    it "should throw an exception if the MIME type can't be determined and the HTTP service requires content type" do
-      Koala.stub!(:multipart_requires_content_type?).and_return(true)
+    it "should throw an exception" do
       lambda { Koala::UploadableIO.new(*@koala_io_params) }.should raise_exception(Koala::KoalaError)
-    end
-
-    it "should just have @content_type == nil if the HTTP service doesn't require content type" do
-      Koala.stub!(:multipart_requires_content_type?).and_return(false)
-      Koala::UploadableIO.new(*@koala_io_params).content_type.should be_nil
     end
   end
 end
