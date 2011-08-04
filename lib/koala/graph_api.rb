@@ -76,14 +76,6 @@ module Koala
         end
       end
 
-      def get_comments_for_urls(urls = [], args = {}, options = {})
-        # Fetchs the comments for given URLs (array or comma-separated string)
-        # see https://developers.facebook.com/blog/post/490
-        return [] if urls.empty?
-        args.merge!(:ids => urls.respond_to?(:join) ? urls.join(",") : urls)
-        get_object("comments", args, options)
-      end
-
       def put_connections(id, connection_name, args = {}, options = {})
         # Posts a certain connection
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
@@ -187,13 +179,21 @@ module Koala
         end
       end
       
-      # Page management
-      def get_page_access_token(page_id)
-        result = get_object(page_id, :fields => "access_token") do
+      # Convenience Methods
+      
+      def get_page_access_token(object_id)
+        result = get_object(object_id, :fields => "access_token") do
           result ? result["access_token"] : nil
         end
       end
 
+      def get_comments_for_urls(urls = [], args = {}, options = {})
+        # Fetchs the comments for given URLs (array or comma-separated string)
+        # see https://developers.facebook.com/blog/post/490
+        return [] if urls.empty?
+        args.merge!(:ids => urls.respond_to?(:join) ? urls.join(",") : urls)
+        get_object("comments", args, options)
+      end
 
       # GraphCollection support
       def get_page(params)
