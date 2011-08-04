@@ -44,7 +44,7 @@ describe "Koala::Facebook::API" do
 
     Koala.stub(:make_request).and_return(response)
 
-    @service.api('anything', 'get', {}, :http_component => http_component)
+    @service.api('anything', {}, 'get', :http_component => http_component)
   end
 
   it "should return the body of the request as JSON if no http_component is given" do
