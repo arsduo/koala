@@ -199,9 +199,7 @@ shared_examples_for "Koala RestAPI" do
       end
     end
   end
-end
 
-shared_examples_for "Koala RestAPI with an access token" do
   # FQL
   it "should be able to access public information via FQL" do
     result = @api.fql_query('select first_name from user where uid = 216743')
@@ -244,42 +242,5 @@ shared_examples_for "Koala RestAPI with an access token" do
     )
     result.size.should == 3 
     result.keys.should include("query1", "query2", "query3")
-  end
-
-end
-
-
-shared_examples_for "Koala RestAPI without an access token" do
-  # FQL_QUERY
-  describe "when making a FQL request" do
-    it "should be able to access public information via FQL" do
-      @result = @api.fql_query("select first_name from user where uid = 216743")
-      @result.size.should == 1
-      @result.first["first_name"].should == "Chris"
-    end
-    
-    it "should be able to access public information via FQL.multiquery" do
-      result = @api.fql_multiquery(
-        :query1 => 'select first_name from user where uid = 216743',
-        :query2 => 'select first_name from user where uid = 2905623'
-      )
-      result.size.should == 2
-      result["query1"].first['first_name'].should == 'Chris'
-      result["query2"].first['first_name'].should == 'Alex'
-    end
-
-    it "should not be able to access protected information via FQL" do
-      lambda { @api.fql_query("select read_stream from permissions where uid = 216743") }.should raise_error(Koala::Facebook::APIError)
-    end
-    
-    it "should not be able to access protected information via FQL.multiquery" do
-      lambda { 
-        @api.fql_multiquery(
-          :query1 => "select post_id from stream where source_id = me()", 
-          :query2 => "select fromid from comment where post_id in (select post_id from #query1)", 
-          :query3 => "select uid, name from user where uid in (select fromid from #query2)"
-        ) 
-      }.should raise_error(Koala::Facebook::APIError)
-    end
   end
 end

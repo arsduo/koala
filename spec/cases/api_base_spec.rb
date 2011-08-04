@@ -2,13 +2,14 @@ require 'spec_helper'
 
 describe "Koala::Facebook::API" do
   before(:each) do
-    @service = Koala::Facebook::API.new
+    @token = "adfadf"
+    @service = Koala::Facebook::API.new(@token)
   end
 
-  it "should not include an access token if none was given" do
+  it "includes an access token in requests" do
     Koala.should_receive(:make_request).with(
       anything,
-      hash_not_including('access_token' => 1),
+      hash_including('access_token' => @token),
       anything,
       anything
     ).and_return(Koala::Response.new(200, "", ""))
@@ -16,21 +17,7 @@ describe "Koala::Facebook::API" do
     @service.api('anything')
   end
 
-  it "should include an access token if given" do
-    token = 'adfadf'
-    service = Koala::Facebook::API.new token
-
-    Koala.should_receive(:make_request).with(
-      anything,
-      hash_including('access_token' => token),
-      anything,
-      anything
-    ).and_return(Koala::Response.new(200, "", ""))
-
-    service.api('anything')
-  end
-
-  it "should have an attr_reader for access token" do
+  it "has an attr_reader for access token" do
     token = 'adfadf'
     service = Koala::Facebook::API.new token
     service.access_token.should == token

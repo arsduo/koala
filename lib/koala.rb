@@ -33,7 +33,7 @@ module Koala
 
     class API
       # initialize with an access token
-      def initialize(access_token = nil)
+      def initialize(access_token)
         @access_token = access_token
       end
       attr_reader :access_token
