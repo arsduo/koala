@@ -131,7 +131,7 @@ describe "Koala::UploadableIO" do
 
       it "gets the content type from the :type key" do
         uploadable = Koala::UploadableIO.new(@file_hash)
-        uploadable.content_type.should == @file_hash["filename"]
+        uploadable.filename.should == @file_hash[:filename]
       end
     end
 
