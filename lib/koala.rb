@@ -8,8 +8,7 @@ require 'openssl'
 require 'base64'
 
 # include koala modules
-require 'koala/http_services'
-require 'koala/http_services/net_http_service'
+require 'koala/http_service'
 require 'koala/oauth'
 require 'koala/graph_api'
 require 'koala/graph_batch_api'
@@ -18,7 +17,6 @@ require 'koala/graph_collection'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
 require 'koala/test_users'
-require 'koala/http_services'
 
 # add KoalaIO class
 require 'koala/uploadable_io'

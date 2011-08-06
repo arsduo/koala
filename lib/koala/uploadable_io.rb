@@ -1,4 +1,4 @@
-require 'koala'
+require "net/http/post/multipart"
 
 module Koala
   class UploadableIO

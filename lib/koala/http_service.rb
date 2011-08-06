@@ -57,15 +57,6 @@ module Koala
         "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
       end).join("&")
     end
-    
-    protected
 
-    def self.params_require_multipart?(param_hash)
-      param_hash.any? { |key, value| value.kind_of?(File) }
-    end
-
-    def self.multipart_requires_content_type?
-      true
-    end
   end
 end
