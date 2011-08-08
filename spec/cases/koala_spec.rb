@@ -3,12 +3,12 @@ require 'spec_helper'
 describe "Koala" do
   it "has an http_service accessor" do
     Koala.should respond_to(:http_service)
-    Koala.should respond_to(:http_service=)  
+    Koala.should respond_to(:http_service=)
   end
-  
+
   it "has an http_options accessor" do
     Koala.should respond_to(:http_options)
-    Koala.should respond_to(:http_options=)  
+    Koala.should respond_to(:http_options=)
   end
 
   define "make_request" do
@@ -22,5 +22,5 @@ describe "Koala" do
       Koala.make_request(path, args, verb, options)
     end
   end
-  
+
 end
