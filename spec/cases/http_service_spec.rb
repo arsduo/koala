@@ -6,8 +6,8 @@ describe "Koala::HTTPService" do
     it "exists" do
       # in Ruby 1.8, .methods returns strings
       # in Ruby 1.9, .method returns symbols
-      Koala::HTTPService.methods.collect {|m| m.to_sym}.should include(:faraday_configuration)
-      Koala::HTTPService.methods.collect {|m| m.to_sym}.should include(:faraday_configuration=)
+      Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_configuration)
+      Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_configuration=)
     end
   end
 

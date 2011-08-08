@@ -38,26 +38,26 @@ describe "Koala::Facebook::TestUsers" do
       # attributes
       it "should allow read access to app_id, app_access_token, and secret" do
         # in Ruby 1.9, .method returns symbols
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:app_id)
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:app_id=)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should include(:app_id)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should_not include(:app_id=)
       end
 
       it "should allow read access to app_access_token" do
         # in Ruby 1.9, .method returns symbols
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:app_access_token)
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:app_access_token=)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should include(:app_access_token)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should_not include(:app_access_token=)
       end
 
       it "should allow read access to secret" do
         # in Ruby 1.9, .method returns symbols
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:secret)
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:secret=)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should include(:secret)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should_not include(:secret=)
       end
 
       it "should allow read access to api" do
         # in Ruby 1.9, .method returns symbols
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:api)
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:api=)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should include(:api)
+        Koala::Facebook::TestUsers.instance_methods.map(&:to_sym).should_not include(:api=)
       end
 
       # old graph_api accessor
