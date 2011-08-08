@@ -435,7 +435,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
       describe "when parsing page paramters" do
         before(:each) do
-          @graph_collection = Koala::Facebook::GraphCollection.new({"data" => []}, Koala::Facebook::GraphAPI.new)
+          @graph_collection = Koala::Facebook::GraphCollection.new({"data" => []}, Koala::Facebook::API.new)
         end
 
         it "should return the base as the first array entry" do

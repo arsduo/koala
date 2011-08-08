@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "Koala::Facebook::GraphAPI" do  
   context "with an access token" do
     before :each do
-      @api = Koala::Facebook::GraphAPI.new(@token)
+      @api = Koala::Facebook::API.new(@token)
     end
 
     it_should_behave_like "Koala GraphAPI"
@@ -13,7 +13,7 @@ describe "Koala::Facebook::GraphAPI" do
 
   context "without an access token" do
     before :each do
-      @api = Koala::Facebook::GraphAPI.new
+      @api = Koala::Facebook::API.new
     end
 
     it_should_behave_like "Koala GraphAPI"

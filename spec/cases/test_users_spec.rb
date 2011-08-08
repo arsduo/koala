@@ -168,7 +168,7 @@ describe "Koala::Facebook::TestUsers" do
         it "works" do
           user = @test_users.create(true)
           @test_users.update(user, @updates)
-          user_info = Koala::Facebook::GraphAPI.new(user["access_token"]).get_object(user["id"])
+          user_info = Koala::Facebook::API.new(user["access_token"]).get_object(user["id"])
           user_info["name"].should == @updates[:name]
         end                
       end

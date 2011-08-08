@@ -224,7 +224,7 @@ shared_examples_for "Koala RestAPI with an access token" do
 
     # get the current user's ID
     # we're sneakily using the Graph API, which should be okay since it has its own tests
-    g = Koala::Facebook::GraphAPI.new(@token)
+    g = Koala::Facebook::API.new(@token)
     id = g.get_object("me", :fields => "id")["id"]
 
     # now send a query about your permissions

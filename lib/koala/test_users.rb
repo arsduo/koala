@@ -24,7 +24,7 @@ module Koala
           oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
           @app_access_token = oauth.get_app_access_token
         end
-        @graph_api = GraphAPI.new(@app_access_token)
+        @graph_api = API.new(@app_access_token)
       end
 
       def create(installed, permissions = nil, args = {}, options = {})
@@ -64,8 +64,8 @@ module Koala
           raise ArgumentError, "TestUsers#befriend requires hash arguments for both users with id and access_token"
         end
 
-        u1_graph_api = GraphAPI.new(user1_token)
-        u2_graph_api = GraphAPI.new(user2_token)
+        u1_graph_api = API.new(user1_token)
+        u2_graph_api = API.new(user2_token)
 
         u1_graph_api.graph_call("#{user1_id}/friends/#{user2_id}", {}, "post") &&
           u2_graph_api.graph_call("#{user2_id}/friends/#{user1_id}", {}, "post")

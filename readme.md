@@ -22,7 +22,7 @@ Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
 
-    @graph = Koala::Facebook::GraphAPI.new(oauth_access_token)
+    @graph = Koala::Facebook::API.new(oauth_access_token)
     profile = @graph.get_object("me")
     friends = @graph.get_connections("me", "friends")
     @graph.put_object("me", "feed", :message => "I am writing on my wall!")
@@ -64,7 +64,7 @@ Where the Graph API and the old REST API overlap, you should choose the Graph AP
 
 Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the RestAPI class:
 
-  	@rest = Koala::Facebook::RestAPI.new(oauth_access_token)
+  	@rest = Koala::Facebook::API.new(oauth_access_token)
   	@rest.fql_query(my_fql_query) # convenience method
   	@rest.fql_multiquery(fql_query_hash) # convenience method
   	@rest.rest_call("stream.publish", arguments_hash) # generic version
@@ -133,7 +133,7 @@ We also support the test users API, allowing you to conjure up fake users and co
 
     @test_users = Koala::Facebook::TestUsers.new(:app_id => id, :secret => secret)
     user = @test_users.create(is_app_installed, desired_permissions)
-    user_graph_api = Koala::Facebook::GraphAPI.new(user["access_token"])
+    user_graph_api = Koala::Facebook::API.new(user["access_token"])
     # or, if you want to make a whole community:
     @test_users.create_network(network_size, is_app_installed, common_permissions)
 

@@ -45,7 +45,7 @@ module Koala
           @app_access_token = oauth.get_app_access_token
         end
 
-        @graph_api = GraphAPI.new(@app_access_token)
+        @graph_api = API.new(@app_access_token)
       end
 
       # subscribes for realtime updates

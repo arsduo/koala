@@ -15,7 +15,7 @@ module Koala
       # token, this will fetch the profile of the active user and the list
       # of the user's friends:
       #
-      #    graph = Koala::Facebook::GraphAPI.new(access_token)
+      #    graph = Koala::Facebook::API.new(access_token)
       #    user = graph.get_object("me")
       #    friends = graph.get_connections(user["id"], "friends")
       #
