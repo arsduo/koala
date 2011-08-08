@@ -29,12 +29,16 @@ module Koala
     # Contributors: Alex Koppel, Chris Baclig, Rafi Jacoby, and the team at Context Optional
     # http://github.com/arsduo/koala
 
+    # APIs
     class API
       # initialize with an access token
       def initialize(access_token = nil)
         @access_token = access_token
       end
       attr_reader :access_token
+
+      include GraphAPIMethods
+      include RestAPIMethods
 
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
@@ -62,23 +66,14 @@ module Koala
       end
     end
 
-    # APIs
+    # legacy support for old APIs
+    GraphAPI = API
+    RestAPI = API
+    GraphAndRestAPI = API
 
-    class GraphAPI < API
-      include GraphAPIMethods
-    end
-
-    class GraphBatchAPI < GraphAPI
+    # special enhanced APIs
+    class GraphBatchAPI < API
       include GraphBatchAPIMethods
-    end
-
-    class RestAPI < API
-      include RestAPIMethods
-    end
-
-    class GraphAndRestAPI < API
-      include GraphAPIMethods
-      include RestAPIMethods
     end
 
     class RealtimeUpdates
