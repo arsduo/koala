@@ -33,7 +33,8 @@ module Koala
 
     class API
       # initialize with an access token
-      def initialize(access_token = nil)
+      def initialize(access_token = nil, default_options = {})
+        @default_options = default_options
         @access_token = access_token
       end
       attr_reader :access_token
@@ -41,6 +42,7 @@ module Koala
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
+        options = @default_options.merge(options) # options takes precedence
         
         # add a leading /
         path = "/#{path}" unless path =~ /^\//
