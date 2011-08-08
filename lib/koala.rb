@@ -104,18 +104,16 @@ module Koala
 
   class KoalaError < StandardError; end
 
-  # Make an api request using the provided api service or one passed by the caller
-  def self.make_request(path, args, verb, options = {})
-    http_service.make_request(path, args, verb, options)
-  end
 
-  # finally, set up the http service Koala methods used to make requests
-  # you can use your own (for HTTParty, etc.) by calling Koala.http_service = YourModule
+  # finally, the few things defined on the Koala module itself
   class << self
     attr_accessor :http_options, :http_service
   end
 
+  def self.make_request(path, args, verb, options = {})
+    http_service.make_request(path, args, verb, options)
+  end
+
   # we use Faraday as our main service, with mock as the other main one
   self.http_service = HTTPService
-
 end
