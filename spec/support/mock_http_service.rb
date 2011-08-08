@@ -7,7 +7,7 @@ module Koala
 
     # fix our specs to use ok_json, so we always get the same results from to_json
     MultiJson.engine = :ok_json
-    
+
     # Mocks all HTTP requests for with koala_spec_with_mocks.rb
     # Mocked values to be included in TEST_DATA used in specs
     ACCESS_TOKEN = '*'
@@ -76,7 +76,7 @@ module Koala
 
       response_object
     end
-    
+
     def self.encode_params(*args)
       # use HTTPService's encode_params
       HTTPService.encode_params(*args)

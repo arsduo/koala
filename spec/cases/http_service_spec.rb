@@ -2,37 +2,36 @@ require 'spec_helper'
 
 
 describe "Koala::HTTPService" do
-
   describe "faraday_configuration accessor" do
-    it "should be added" do
+    it "exists" do
       # in Ruby 1.8, .methods returns strings
-      # in Ruby 1.9, .method returns symbols 
+      # in Ruby 1.9, .method returns symbols
       Koala::HTTPService.methods.collect {|m| m.to_sym}.should include(:faraday_configuration)
       Koala::HTTPService.methods.collect {|m| m.to_sym}.should include(:faraday_configuration=)
     end
   end
-  
+
   describe "DEFAULT_MIDDLEWARE" do
-    before :each do 
+    before :each do
       @builder = stub("Faraday connection builder")
       @builder.stub(:request)
       @builder.stub(:adapter)
     end
-    
+
     it "is defined" do
       Koala::HTTPService.const_defined?("DEFAULT_MIDDLEWARE").should be_true
     end
-    
+
     it "adds multipart" do
       @builder.should_receive(:request).with(:multipart)
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
     end
-    
+
     it "adds url_encoded" do
       @builder.should_receive(:request).with(:url_encoded)
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
     end
-    
+
     it "uses the default adapter" do
       adapter = :testing_now
       Faraday.stub(:default_adapter).and_return(adapter)
@@ -40,7 +39,7 @@ describe "Koala::HTTPService" do
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
     end
   end
-  
+
   describe "server" do
     describe "with no options" do
       it "returns the REST server if options[:rest_api]" do
@@ -57,7 +56,7 @@ describe "Koala::HTTPService" do
       before :each do
         @options = {:beta => true}
       end
-      
+
       it "returns the beta REST server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
         server.should =~ Regexp.new("beta.#{Koala::Facebook::REST_SERVER}")
@@ -68,12 +67,12 @@ describe "Koala::HTTPService" do
         server.should =~ Regexp.new("beta.#{Koala::Facebook::GRAPH_SERVER}")
       end
     end
-    
+
     describe "with options[:video]" do
       before :each do
         @options = {:video => true}
       end
-      
+
       it "should return the REST video server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
         server.should =~ Regexp.new(Koala::Facebook::REST_SERVER.gsub(/\.facebook/, "-video.facebook"))

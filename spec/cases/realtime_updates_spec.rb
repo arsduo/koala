@@ -61,7 +61,7 @@ describe "Koala::Facebook::RealtimeUpdates" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
       updates.graph_api.should == updates.api
     end
-    
+
     it "fire a deprecation warning when graph_api is called" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
       Koala::Utils.should_receive(:deprecate)

@@ -79,9 +79,9 @@ module Koala
     class TestUsers
       include TestUserMethods
     end
-    
+
     # legacy support for old APIs
-    class OldAPI < API; 
+    class OldAPI < API;
       def initialize(*args)
         Koala::Utils.deprecate("#{self.class.name} is deprecated and will be removed in a future version; please use the API class instead.")
         super
@@ -114,7 +114,7 @@ module Koala
   class << self
     attr_accessor :http_options, :http_service
   end
-  
+
   # we use Faraday as our main service, with mock as the other main one
   self.http_service = HTTPService
 

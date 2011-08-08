@@ -104,7 +104,7 @@ module Koala
       #   put_picture(file, [content_type], ...)
       #   put_picture(path_to_file, [content_type], ...)
       #   put_picture(picture_url, ...)
-      # 
+      #
       # You can pass in uploaded files directly from Rails or Sinatra.
       # (See lib/koala/uploadable_io.rb for supported frameworks)
       #
@@ -115,7 +115,7 @@ module Koala
       #
       #   put_picture(file, content_type, {:message => "Message"}, 01234560)
       #   put_picture(params[:file], {:message => "Message"})
-      # 
+      #
       #   (Note that with URLs, there's no optional content type field)
       #   put_picture(picture_url, {:message => "Message"}, my_page_id)
 
@@ -178,9 +178,9 @@ module Koala
           result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
         end
       end
-      
+
       # Convenience Methods
-      
+
       def get_page_access_token(object_id)
         result = get_object(object_id, :fields => "access_token") do
           result ? result["access_token"] : nil
@@ -255,7 +255,7 @@ module Koala
 
         args      = media_args[1 + args_offset] || {}
         target_id = media_args[2 + args_offset] || "me"
-        options   = media_args[3 + args_offset] || {} 
+        options   = media_args[3 + args_offset] || {}
 
         if url?(media_args.first)
           # If media_args is a URL, we can upload without UploadableIO

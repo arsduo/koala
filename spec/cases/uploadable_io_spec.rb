@@ -45,7 +45,7 @@ describe "Koala::UploadableIO" do
         it "returns an UploadIO with the same content type" do
           Koala::UploadableIO.new(*@koala_io_params).content_type.should == @stub_type
         end
-        
+
         it "returns an UploadIO with the file's name" do
           Koala::UploadableIO.new(*@koala_io_params).filename.should == File.basename(@path)
         end
@@ -75,7 +75,7 @@ describe "Koala::UploadableIO" do
           content_stub = @koala_io_params[1] = stub('Content Type')
           Koala::UploadableIO.new(*@koala_io_params).content_type.should == content_stub
         end
-        
+
         it "returns an UploadableIO with the right filename" do
           Koala::UploadableIO.new(*@koala_io_params).filename.should == File.basename(@file.path)
         end
@@ -102,7 +102,7 @@ describe "Koala::UploadableIO" do
         @uploaded_file.should_receive(:content_type).and_return(expected_content_type)
         Koala::UploadableIO.new(@uploaded_file).content_type.should == expected_content_type
       end
-      
+
       it "gets the filename from the UploadedFile" do
         Koala::UploadableIO.new(@uploaded_file).filename.should == @uploaded_file.original_filename
       end

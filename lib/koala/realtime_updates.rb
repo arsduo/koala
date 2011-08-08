@@ -74,8 +74,8 @@ module Koala
         @graph_api.graph_call(subscription_path)["data"]
       end
 
-      def graph_api        
-        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")     
+      def graph_api
+        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
         @api
       end
 

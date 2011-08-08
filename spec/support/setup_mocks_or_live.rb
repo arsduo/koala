@@ -9,14 +9,14 @@ unless ENV['LIVE']
   # we are not testing the latest responses from the Facebook servers.
   # Therefore, to be certain all specs pass with the current
   # Facebook services, run koala_spec_without_mocks.rb.
-  Koala.http_service = Koala::MockHTTPService  
+  Koala.http_service = Koala::MockHTTPService
   KoalaTest.setup_test_data(Koala::MockHTTPService::TEST_DATA)
 else
   # Runs Koala specs through the Facebook servers
   #
-  # load testing data (see note in readme.md)  
+  # load testing data (see note in readme.md)
   KoalaTest.setup_test_data(YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml')))
-  
+
   # allow live tests with different adapters
   adapter = ENV['ADAPTER'] || "typhoeus"# use Typhoeus by default if available
   begin
@@ -26,7 +26,7 @@ else
   rescue LoadError
     puts "Unable to load adapter #{adapter}, using Net::HTTP."
   end
-    
+
   # use a test user unless the developer wants to test against a real profile
   if token = KoalaTest.oauth_token
     KoalaTest.validate_user_info(token)
@@ -36,13 +36,13 @@ else
 end
 
 # set up a global before block to set the token for tests
-# set the token up for 
+# set the token up for
 RSpec.configure do |config|
   config.before :each do
-    @token = KoalaTest.oauth_token    
+    @token = KoalaTest.oauth_token
     Koala::Utils.stub(:deprecate) # never fire deprecation warnings
   end
-  
+
   config.after :each do
     # clean up any objects posted to Facebook
     if @temporary_object_id && !KoalaTest.mock_interface?
@@ -51,7 +51,7 @@ RSpec.configure do |config|
 
       # wait 10ms to allow Facebook to propagate data so we can delete it
       sleep(0.01)
-      
+
       # clean up any objects we've posted
       result = (api.delete_object(@temporary_object_id) rescue false)
       # if we errored out or Facebook returned false, track that

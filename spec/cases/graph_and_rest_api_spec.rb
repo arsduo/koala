@@ -5,7 +5,7 @@ describe "Koala::Facebook::GraphAndRestAPI" do
     before :each do
       Koala::Utils.stub(:deprecate) # avoid actual messages to stderr
     end
-    
+
     it "still allows you to instantiate a GraphAndRestAPI object" do
       api = Koala::Facebook::GraphAndRestAPI.new("token").should be_a(Koala::Facebook::GraphAndRestAPI)
     end
@@ -13,13 +13,13 @@ describe "Koala::Facebook::GraphAndRestAPI" do
     it "ultimately creates an API object" do
       api = Koala::Facebook::GraphAndRestAPI.new("token").should be_a(Koala::Facebook::API)
     end
-        
+
     it "fires a depreciation warning" do
       Koala::Utils.should_receive(:deprecate)
       api = Koala::Facebook::GraphAndRestAPI.new("token")
     end
   end
-  
+
   describe "with an access token" do
     before(:each) do
       @api = Koala::Facebook::API.new(@token)

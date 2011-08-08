@@ -46,12 +46,12 @@ module Koala
       def delete_all
         list.each {|u| delete u}
       end
-      
+
       def update(test_user, args = {}, http_options = {})
         test_user = test_user["id"] if test_user.is_a?(Hash)
         @api.graph_call(test_user, args, "post", http_options)
       end
-      
+
       def befriend(user1_hash, user2_hash)
         user1_id = user1_hash["id"] || user1_hash[:id]
         user2_id = user2_hash["id"] || user2_hash[:id]
@@ -87,10 +87,10 @@ module Koala
       end
 
       def graph_api
-        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")     
+        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
         @api
       end
-      
+
       protected
 
       def accounts_path

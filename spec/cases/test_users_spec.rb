@@ -34,32 +34,32 @@ describe "Koala::Facebook::TestUsers" do
         Koala::Facebook::OAuth.should_receive(:new).with(@app_id, @secret).and_return(oauth)
         test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
       end
-      
+
       # attributes
       it "should allow read access to app_id, app_access_token, and secret" do
-        # in Ruby 1.9, .method returns symbols 
+        # in Ruby 1.9, .method returns symbols
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:app_id)
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:app_id=)
       end
 
       it "should allow read access to app_access_token" do
-        # in Ruby 1.9, .method returns symbols 
+        # in Ruby 1.9, .method returns symbols
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:app_access_token)
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:app_access_token=)
       end
 
       it "should allow read access to secret" do
-        # in Ruby 1.9, .method returns symbols 
+        # in Ruby 1.9, .method returns symbols
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:secret)
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:secret=)
       end
 
       it "should allow read access to api" do
-        # in Ruby 1.9, .method returns symbols 
+        # in Ruby 1.9, .method returns symbols
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:api)
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:api=)
       end
-      
+
       # old graph_api accessor
       it "returns the api object when graph_api is called" do
         test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
@@ -79,7 +79,7 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       # TEST USER MANAGEMENT
-      
+
       describe ".create" do
         it "should create a test user when not given installed" do
           result = @test_users.create(false)
@@ -159,12 +159,12 @@ describe "Koala::Facebook::TestUsers" do
           @test_users.delete_all
         end
       end
-      
+
       describe ".update" do
         before :each do
           @updates = {:name => "Foo Baz"}
         end
-        
+
         it "makes a POST with the test user Graph API " do
           user = @test_users.create(true)
           @test_users.graph_api.should_receive(:graph_call).with(anything, anything, "post", anything)
@@ -176,13 +176,13 @@ describe "Koala::Facebook::TestUsers" do
           @test_users.graph_api.should_receive(:graph_call).with(user["id"], @updates, anything, anything)
           @test_users.update(user, @updates)
         end
-        
+
         it "works" do
           user = @test_users.create(true)
           @test_users.update(user, @updates)
           user_info = Koala::Facebook::API.new(user["access_token"]).get_object(user["id"])
           user_info["name"].should == @updates[:name]
-        end                
+        end
       end
 
       describe "with existing users" do
