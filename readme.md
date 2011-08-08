@@ -1,22 +1,24 @@
 Koala
 ====
-[Koala](http://github.com/arsduo/koala) is a new Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), the REST API, realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
+[Koala](http://github.com/arsduo/koala) is a Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), the REST API, realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
 
-* Lightweight: Koala should be as light and simple as Facebook’s own new libraries, providing API accessors and returning simple JSON.  (We clock in, with comments, at just over 750 lines of code.)
-* Fast: Koala should, out of the box, be quick. In addition to supporting the vanilla Ruby networking libraries, it natively supports Typhoeus, our preferred gem for making fast HTTP requests. Of course, that brings us to our next topic:
-* Flexible: Koala should be useful to everyone, regardless of their current configuration.  (In addition to vanilla Ruby, we support JRuby, Rubinius, and REE, and provide  built-in mechanism for using whichever HTTP library you prefer.)
-* Tested: Koala should have complete test coverage, so you can rely on it.  (Our complete test coverage can be run against either mocked responses or the live Facebook servers.)
+* Lightweight: Koala should be as light and simple as Facebook’s own libraries, providing API accessors and returning simple JSON.
+* Fast: Koala should, out of the box, be quick. Out of the box, we use Facebook's faster read-only servers when possible and if available, the Typhoeus gem to make snappy Facebook requests.  Of course, that brings us to our next topic:
+* Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We support JRuby, Rubinius, and REE as well as vanilla Ruby, and use the Faraday library to provide complete flexibility over how HTTP requests are made.)
+* Tested: Koala should have complete test coverage, so you can rely on it.  (Our test coverage is complete and can be run against either mocked responses or the live Facebook servers.)
 
 Installation
 ---
 
 Easy:
 
-    [sudo|rvm] gem install koala
+    [sudo|rvm] gem install koala --pre # for 1.2 beta
+    [sudo|rvm] gem install koala # for 1.1
 
 Or in Bundler:
 
-    gem "koala"
+    gem "koala", "~> 1.2.0beta" 
+    gem "koala" # for 1.1 
 
 Graph API
 ----
@@ -29,49 +31,45 @@ The Graph API is the simple, slick new interface to Facebook's data.  Using it w
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
-When retrieving data that returns an array of results (for example, when calling GraphAPI#get_connections or GraphAPI#search) a GraphCollection object (a sub-class of Array) will be returned, which contains added methods for getting the next and previous page of results:
+When retrieving data that returns an array of results (for example, when calling API#get_connections or API#search) a GraphCollection object will be returned, which makes it easy to page through the results:
 
     # Returns the feed items for the currently logged-in user as a GraphCollection
     feed = @graph.get_connections("me", "feed")
-
-    # GraphCollection is a sub-class of Array, so you can use it as a usual Array
-    first_entry = feed[0]
-    last_entry = feed.last
-
-    # Returns the next page of results (also as a GraphCollection)
+    feed.each {|f| do_something_with_item(f) } # it's a subclass of Array
     next_feed = feed.next_page
 
-    # Returns an array describing the URL for the next page: [path, arguments]
-    # This is useful for paging across multiple requests
-    next_path, next_args = feed.next_page_params
+    # You can also get an array describing the URL for the next page: [path, arguments]
+    # This is useful for storing page state across multiple browser requests
+    next_page_params = feed.next_page_params
+    page = @graph.get_page(next_page_params)
 
-    # You can use those params to easily get the next (or previous) page
-    page = @graph.get_page(feed.next_page_params)
-
-You can make multiple calls at once using Facebook's batch API:
+You can also make multiple calls at once using Facebook's batch API:
 
     # Returns an array of results as if they were called non-batch
     @graph.batch do |batch_api|
       batch_api.get_object('me')
-      batch_api.get_object('koppel')
+      batch_api.put_wall_post('Making a post in a batch.')
     end
 
-Check out the wiki for more examples.
+Check out the wiki for more details and examples.
 
 The REST API
 -----
 Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.
 
-Koala now supports the old-school REST API using OAuth access tokens; to use this, instantiate your class using the RestAPI class:
+Fortunately, Koala supports the REST API using the very same interface; to use this, instantiate an API:
 
   	@rest = Koala::Facebook::API.new(oauth_access_token)
   	@rest.fql_query(my_fql_query) # convenience method
   	@rest.fql_multiquery(fql_query_hash) # convenience method
   	@rest.rest_call("stream.publish", arguments_hash) # generic version
 
-We reserve the right to expand the built-in REST API coverage to additional convenience methods in the future, depending on how fast Facebook moves to fill in the gaps.
+Of course, you can use the Graph API methods on the same object -- the power of two APIs right in the palm of your hand.
 
-(If you want the power of both APIs in the palm of your hand, try out the GraphAndRestAPI class.)
+    @api = Koala::Facebook::API.new(oauth_access_token)
+    fql = @api.fql_query(my_fql_query)
+    @api.put_wall_post(process_result(fql))
+    
 
 OAuth
 -----
@@ -159,4 +157,4 @@ You can also run live tests against Facebook's servers:
     # Again from anywhere in the project directory:
     LIVE=true bundle exec rake spec
 
-Important Note: to run the live tests, you have to provide some of your own data in spec/fixtures/facebook_data.yml: a valid OAuth access token with publish\_stream, read\_stream, and user\_photos permissions and an OAuth code that can be used to generate an access token.  You can get this data at the OAuth Playground; if you want to use your own app, remember to swap out the app ID, secret, and other values.  (The file also provides valid values for other tests, which you're welcome to swap out for data specific to your own application.)
+By default, the live tests are run against test users, so you can run them as frequently as you want.  If you want to run them against a real user, however, you can fill in the OAuth token, code, and access\_token values in spec/fixtures/facebook_data.yml.  See the wiki for more details.

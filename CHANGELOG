@@ -1,16 +1,23 @@
 v1.2
 New methods:
+-- API is now the main API class, contains both Graph and REST methods
+  -- Old classes are aliased with deprecation warnings (non-breaking change)
 -- TestUsers#update lets you update the name or password of an existing test user
 -- GraphAPI.get_page_access_token lets you easily fetch the access token for a page you manage (thanks, marcgg!)
 Updated methods:
 -- put_picture now accepts URLs to images (thanks, marcgg!)
 Internal improvements:
 -- Koala now uses Faraday to make requests, replacing the HTTPServices (see wiki)
+  -- Koala::HTTPService.faraday_options allows specification of default Faraday connection options
+  -- Koala::HTTPService.faraday_middleware lets you 
+-- RealTimeUpdates and TestUsers are no longer subclasses of API, but have their own .api objects
+  -- The old .graph_api is an alias with a deprecation warning
 Testing improvements:
 -- Live test suites now run against test users by default
   -- Test suite can be repeatedly run live without having to update facebook_data.yml
   -- OAuth code and session key tests cannot be run against test users
-  
+-- Faraday adapter for live tests can be specified with ADAPTER=[your adapter] in the shell command
+-- Expanded test coverage
 
 v1.1
 New methods:
