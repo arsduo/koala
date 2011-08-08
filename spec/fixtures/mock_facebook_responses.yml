@@ -409,7 +409,7 @@ graph_api:
       <<: *item_deleted
       get: 
         with_token: '{"name":"Foo Baz"}'
-    name=Foo Baz&password=abcd:
+    name=Foo Baz:
       post:
         with_token: 'true'
       
