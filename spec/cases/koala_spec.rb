@@ -6,11 +6,6 @@ describe "Koala" do
     Koala.should respond_to(:http_service=)
   end
 
-  it "has an http_options accessor" do
-    Koala.should respond_to(:http_options)
-    Koala.should respond_to(:http_options=)
-  end
-
   define "make_request" do
     it "passes all its arguments to the http_service" do
       http_service = stub("http_service")

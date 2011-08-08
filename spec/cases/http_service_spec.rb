@@ -2,13 +2,14 @@ require 'spec_helper'
 
 
 describe "Koala::HTTPService" do
-  describe "faraday_configuration accessor" do
-    it "exists" do
-      # in Ruby 1.8, .methods returns strings
-      # in Ruby 1.9, .method returns symbols
-      Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_configuration)
-      Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_configuration=)
-    end
+  it "has a faraday_middleware accessor" do
+    Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_middleware)
+    Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_middleware=)
+  end
+
+  it "has an faraday_options accessor" do
+    Koala::HTTPService.should respond_to(:faraday_options)
+    Koala::HTTPService.should respond_to(:faraday_options=)
   end
 
   describe "DEFAULT_MIDDLEWARE" do
@@ -151,9 +152,9 @@ describe "Koala::HTTPService" do
         Koala::HTTPService.make_request("anything", {}, "anything")
       end
 
-      it "merges Koala.http_options into the request params" do
+      it "merges Koala::HTTPService.faraday_options into the request params" do
         http_options = {:a => 2, :c => "3"}
-        Koala.stub(:http_options).and_return(http_options)
+        Koala::HTTPService.faraday_options = http_options
         Faraday.should_receive(:new).with(anything, hash_including(http_options)).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get")
       end
@@ -164,24 +165,24 @@ describe "Koala::HTTPService" do
         Koala::HTTPService.make_request("anything", {}, "get", options)
       end
 
-      it "overrides Koala.http_options with any provided options for the request params" do
+      it "overrides Koala::HTTPService.faraday_options with any provided options for the request params" do
         options = {:a => 2, :c => "3"}
         http_options = {:a => :a}
-        Koala.stub(:http_options).and_return(http_options)
+        Koala::HTTPService.stub(:http_options).and_return(http_options)
 
         Faraday.should_receive(:new).with(anything, hash_including(http_options.merge(options))).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get", options)
       end
 
-      it "uses the default builder block if HTTPService.faraday_configuration block is not defined" do
-        Koala::HTTPService.stub(:faraday_configuration).and_return(nil)        
+      it "uses the default builder block if HTTPService.faraday_middleware block is not defined" do
+        Koala::HTTPService.stub(:faraday_middleware).and_return(nil)        
         Faraday.should_receive(:new).with(anything, anything, &Koala::HTTPService::DEFAULT_MIDDLEWARE).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get")        
       end
       
-      it "uses the defined HTTPService.faraday_configuration block if defined" do
+      it "uses the defined HTTPService.faraday_middleware block if defined" do
         block = Proc.new { }
-        Koala::HTTPService.should_receive(:faraday_configuration).and_return(block)
+        Koala::HTTPService.should_receive(:faraday_middleware).and_return(block)
         Faraday.should_receive(:new).with(anything, anything, &block).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get")        
       end

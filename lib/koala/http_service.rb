@@ -15,7 +15,7 @@ module Koala
     # common functionality for all HTTP services
 
     class << self
-      attr_accessor :faraday_configuration
+      attr_accessor :faraday_middleware, :faraday_options
     end
 
     DEFAULT_MIDDLEWARE = Proc.new do |builder|
@@ -38,11 +38,11 @@ module Koala
       params = args.inject({}) {|hash, kv| hash[kv.first.to_s] = kv.last.is_a?(UploadableIO) ? kv.last.to_upload_io : kv.last; hash}
 
       # figure out our options for this request
-      http_options = {:params => (verb == "get" ? params : {})}.merge(Koala.http_options || {}).merge(options)
+      http_options = {:params => (verb == "get" ? params : {})}.merge(faraday_options || {}).merge(options)
 
       # set up our Faraday connection
       # we have to manually assign params to the URL or the
-      conn = Faraday.new(server(options), http_options, &(faraday_configuration || DEFAULT_MIDDLEWARE))
+      conn = Faraday.new(server(options), http_options, &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
       response = conn.send(verb, path, (verb == "post" ? params : {}))
       Koala::Response.new(response.status.to_i, response.body, response.headers)

@@ -107,7 +107,7 @@ module Koala
 
   # finally, the few things defined on the Koala module itself
   class << self
-    attr_accessor :http_options, :http_service
+    attr_accessor :http_service
   end
 
   def self.make_request(path, args, verb, options = {})
