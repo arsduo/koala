@@ -129,4 +129,112 @@ describe "Koala::HTTPService" do
       end
     end
   end
+
+  describe "#make_request" do
+    before :each do
+      # Setup stubs for make_request to execute without exceptions
+      @mock_body = stub('Typhoeus response body')
+      @mock_headers_hash = stub({:value => "headers hash"})
+      @mock_http_response = stub("Faraday Response", :status => 200, :headers => @mock_headers_hash, :body => @mock_body)
+
+      @mock_connection = stub("Faraday connection")
+      @mock_connection.stub(:get).and_return(@mock_http_response)
+      @mock_connection.stub(:post).and_return(@mock_http_response)
+      Faraday.stub(:new).and_return(@mock_connection)
+    end
+
+    describe "creating the Faraday connection" do
+      it "creates a Faraday connection using the server" do
+        server = "foo"
+        Koala::HTTPService.stub(:server).and_return(server)
+        Faraday.should_receive(:new).with(server, anything).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {}, "anything")
+      end
+
+      it "merges Koala.http_options into the request params" do
+        http_options = {:a => 2, :c => "3"}
+        Koala.stub(:http_options).and_return(http_options)
+        Faraday.should_receive(:new).with(anything, hash_including(http_options)).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {}, "get")
+      end
+
+      it "merges any provided options into the request params" do
+        options = {:a => 2, :c => "3"}
+        Faraday.should_receive(:new).with(anything, hash_including(options)).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {}, "get", options)
+      end
+
+      it "overrides Koala.http_options with any provided options for the request params" do
+        options = {:a => 2, :c => "3"}
+        http_options = {:a => :a}
+        Koala.stub(:http_options).and_return(http_options)
+
+        Faraday.should_receive(:new).with(anything, hash_including(http_options.merge(options))).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {}, "get", options)
+      end
+
+      it "uses the default builder block if HTTPService.faraday_configuration block is not defined" do
+        Koala::HTTPService.stub(:faraday_configuration).and_return(nil)        
+        Faraday.should_receive(:new).with(anything, anything, &Koala::HTTPService::DEFAULT_MIDDLEWARE).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {}, "get")        
+      end
+      
+      it "uses the defined HTTPService.faraday_configuration block if defined" do
+        block = Proc.new { }
+        Koala::HTTPService.should_receive(:faraday_configuration).and_return(block)
+        Faraday.should_receive(:new).with(anything, anything, &block).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {}, "get")        
+      end
+    end
+
+    it "makes a POST request if the verb isn't get" do
+      @mock_connection.should_receive(:post).and_return(@mock_http_response)
+      Koala::HTTPService.make_request("anything", {}, "anything")
+    end
+
+    it "includes the verb in the body if the verb isn't get" do
+      verb = "eat"
+      @mock_connection.should_receive(:post).with(anything, hash_including("method" => verb)).and_return(@mock_http_response)
+      Koala::HTTPService.make_request("anything", {}, verb)
+    end
+
+    it "makes a GET request if the verb is get" do
+      @mock_connection.should_receive(:get).and_return(@mock_http_response)
+      Koala::HTTPService.make_request("anything", {}, "get")
+    end
+
+    describe "for GETs" do
+      it "submits the arguments in the body" do
+        # technically this is done for all requests, but you don't send GET requests with files
+        args = {"a" => :b, "c" => 3}
+        Faraday.should_receive(:new).with(anything, hash_including(:params => args)).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", args, "get")
+      end
+
+      it "submits nothing to the body" do
+        # technically this is done for all requests, but you don't send GET requests with files
+        args = {"a" => :b, "c" => 3}
+        @mock_connection.should_receive(:get).with(anything, {}).and_return(@mock_http_response)
+        Koala::HTTPService.make_request("anything", args, "get")
+      end
+    end
+
+    describe "for POSTs" do
+      it "submits the arguments in the body" do
+        # technically this is done for all requests, but you don't send GET requests with files
+        args = {"a" => :b, "c" => 3}
+        @mock_connection.should_receive(:post).with(anything, hash_including(args)).and_return(@mock_http_response)
+        Koala::HTTPService.make_request("anything", args, "post")
+      end
+
+      it "turns any UploadableIOs to UploadIOs" do
+        # technically this is done for all requests, but you don't send GET requests with files
+        upload_io = stub("UploadIO")
+        u = Koala::UploadableIO.new("/path/to/stuff", "img/jpg")
+        u.stub(:to_upload_io).and_return(upload_io)
+        @mock_connection.should_receive(:post).with(anything, hash_including("source" => upload_io)).and_return(@mock_http_response)
+        Koala::HTTPService.make_request("anything", {:source => u}, "post")
+      end
+    end
+  end
 end
