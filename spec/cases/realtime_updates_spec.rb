@@ -33,29 +33,29 @@ describe "Koala::Facebook::RealtimeUpdates" do
     
     # attributes
     it "should allow read access to app_id, app_access_token, and secret" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
-      # this should not throw errors
-      updates.app_id && updates.app_access_token && updates.secret
-    end
-    
-    it "should not allow write access to app_id" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
-      # this should not throw errors
-      updates.methods.map(&:to_sym).should_not include(:app_id=)
+      # in Ruby 1.9, .method returns symbols 
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should include(:app_id)
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:app_id=)
     end
 
-    it "should not allow write access to app_access_token" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
-      # this should not throw errors
-      updates.methods.map(&:to_sym).should_not include(:app_access_token=)
+    it "should allow read access to app_access_token" do
+      # in Ruby 1.9, .method returns symbols 
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should include(:app_access_token)
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:app_access_token=)
     end
-  
-    it "should not allow write access to secret" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
-      # this should not throw errors
-      updates.methods.map(&:to_sym).should_not include(:secret=)
+
+    it "should allow read access to secret" do
+      # in Ruby 1.9, .method returns symbols 
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should include(:secret)
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:secret=)
     end
-    
+
+    it "should allow read access to graph_api" do
+      # in Ruby 1.9, .method returns symbols 
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should include(:graph_api)
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:graph_api=)
+    end
+
     # init with secret / fetching the token
     it "should initialize properly with an app_id and a secret" do 
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)

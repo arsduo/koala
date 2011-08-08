@@ -81,14 +81,12 @@ module Koala
       include RestAPIMethods
     end
 
-    class RealtimeUpdates < API
+    class RealtimeUpdates
       include RealtimeUpdateMethods
     end
 
-    class TestUsers < API
+    class TestUsers
       include TestUserMethods
-      # make the Graph API accessible in case someone wants to make other calls to interact with their users
-      attr_reader :graph_api
     end
 
     # Errors

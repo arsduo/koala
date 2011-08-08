@@ -6,7 +6,7 @@ module Koala
       def self.included(base)
         # make the attributes readable
         base.class_eval do
-          attr_reader :app_id, :app_access_token, :secret
+          attr_reader :graph_api, :app_id, :app_access_token, :secret
 
           # parses the challenge params and makes sure the call is legitimate
           # returns the challenge string to be sent back to facebook if true

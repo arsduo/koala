@@ -34,6 +34,31 @@ describe "Koala::Facebook::TestUsers" do
         Koala::Facebook::OAuth.should_receive(:new).with(@app_id, @secret).and_return(oauth)
         test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
       end
+      
+      # attributes
+      it "should allow read access to app_id, app_access_token, and secret" do
+        # in Ruby 1.9, .method returns symbols 
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:app_id)
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:app_id=)
+      end
+
+      it "should allow read access to app_access_token" do
+        # in Ruby 1.9, .method returns symbols 
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:app_access_token)
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:app_access_token=)
+      end
+
+      it "should allow read access to secret" do
+        # in Ruby 1.9, .method returns symbols 
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:secret)
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:secret=)
+      end
+
+      it "should allow read access to graph_api" do
+        # in Ruby 1.9, .method returns symbols 
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:graph_api)
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:graph_api=)
+      end
     end
 
     describe "when used without network" do

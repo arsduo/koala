@@ -4,6 +4,13 @@ module Koala
   module Facebook
     module TestUserMethods
 
+      def self.included(base)
+        base.class_eval do
+          # make the Graph API accessible in case someone wants to make other calls to interact with their users
+          attr_reader :graph_api, :app_id, :app_access_token, :secret
+        end
+      end
+
       def initialize(options = {})
         @app_id = options[:app_id]
         @app_access_token = options[:app_access_token]
