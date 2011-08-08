@@ -7,7 +7,7 @@ module Koala
       def self.included(base)
         base.class_eval do
           # make the Graph API accessible in case someone wants to make other calls to interact with their users
-          attr_reader :graph_api, :app_id, :app_access_token, :secret
+          attr_reader :api, :app_id, :app_access_token, :secret
         end
       end
 
@@ -24,23 +24,23 @@ module Koala
           oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
           @app_access_token = oauth.get_app_access_token
         end
-        @graph_api = API.new(@app_access_token)
+        @api = API.new(@app_access_token)
       end
 
       def create(installed, permissions = nil, args = {}, options = {})
         # Creates and returns a test user
         args['installed'] = installed
         args['permissions'] = (permissions.is_a?(Array) ? permissions.join(",") : permissions) if installed
-        result = @graph_api.graph_call(accounts_path, args, "post", options)
+        result = @api.graph_call(accounts_path, args, "post", options)
       end
 
       def list
-        @graph_api.graph_call(accounts_path)["data"]
+        @api.graph_call(accounts_path)["data"]
       end
 
       def delete(test_user)
         test_user = test_user["id"] if test_user.is_a?(Hash)
-        @graph_api.delete_object(test_user)
+        @api.delete_object(test_user)
       end
 
       def delete_all
@@ -49,7 +49,7 @@ module Koala
       
       def update(test_user, args = {}, http_options = {})
         test_user = test_user["id"] if test_user.is_a?(Hash)
-        @graph_api.graph_call(test_user, args, "post", http_options)
+        @api.graph_call(test_user, args, "post", http_options)
       end
       
       def befriend(user1_hash, user2_hash)
@@ -86,6 +86,11 @@ module Koala
         return users
       end
 
+      def graph_api
+        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")     
+        @api
+      end
+      
       protected
 
       def accounts_path

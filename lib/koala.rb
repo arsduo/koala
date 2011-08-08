@@ -17,6 +17,7 @@ require 'koala/graph_collection'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
 require 'koala/test_users'
+require 'koala/utils'
 
 # add KoalaIO class
 require 'koala/uploadable_io'
@@ -66,11 +67,6 @@ module Koala
       end
     end
 
-    # legacy support for old APIs
-    GraphAPI = API
-    RestAPI = API
-    GraphAndRestAPI = API
-
     # special enhanced APIs
     class GraphBatchAPI < API
       include GraphBatchAPIMethods
@@ -83,6 +79,17 @@ module Koala
     class TestUsers
       include TestUserMethods
     end
+    
+    # legacy support for old APIs
+    class OldAPI < API; 
+      def initialize(*args)
+        Koala::Utils.deprecate("#{self.class.name} is deprecated and will be removed in a future version; please use the API class instead.")
+        super
+      end
+    end
+    class GraphAPI < OldAPI; end
+    class RestAPI < OldAPI; end
+    class GraphAndRestAPI < OldAPI; end
 
     # Errors
 

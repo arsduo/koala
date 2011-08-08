@@ -54,10 +54,22 @@ describe "Koala::Facebook::TestUsers" do
         Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:secret=)
       end
 
-      it "should allow read access to graph_api" do
+      it "should allow read access to api" do
         # in Ruby 1.9, .method returns symbols 
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:graph_api)
-        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:graph_api=)
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should include(:api)
+        Koala::Facebook::TestUsers.instance_methods.collect {|m| m.to_sym}.should_not include(:api=)
+      end
+      
+      # old graph_api accessor
+      it "returns the api object when graph_api is called" do
+        test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
+        test_users.graph_api.should == test_users.api
+      end
+
+      it "fire a deprecation warning when graph_api is called" do
+        test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
+        Koala::Utils.should_receive(:deprecate)
+        test_users.graph_api
       end
     end
 

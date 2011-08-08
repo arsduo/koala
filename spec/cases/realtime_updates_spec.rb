@@ -32,7 +32,7 @@ describe "Koala::Facebook::RealtimeUpdates" do
     end
     
     # attributes
-    it "should allow read access to app_id, app_access_token, and secret" do
+    it "should allow read access to app_id" do
       # in Ruby 1.9, .method returns symbols 
       Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should include(:app_id)
       Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:app_id=)
@@ -50,12 +50,24 @@ describe "Koala::Facebook::RealtimeUpdates" do
       Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:secret=)
     end
 
-    it "should allow read access to graph_api" do
+    it "should allow read access to api" do
       # in Ruby 1.9, .method returns symbols 
-      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should include(:graph_api)
-      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:graph_api=)
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should include(:api)
+      Koala::Facebook::RealtimeUpdates.instance_methods.collect {|m| m.to_sym}.should_not include(:api=)
     end
 
+    # old graph_api accessor
+    it "returns the api object when graph_api is called" do
+      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
+      updates.graph_api.should == updates.api
+    end
+    
+    it "fire a deprecation warning when graph_api is called" do
+      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
+      Koala::Utils.should_receive(:deprecate)
+      updates.graph_api
+    end
+    
     # init with secret / fetching the token
     it "should initialize properly with an app_id and a secret" do 
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
