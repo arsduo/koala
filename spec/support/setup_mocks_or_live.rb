@@ -39,7 +39,8 @@ end
 # set the token up for 
 RSpec.configure do |config|
   config.before :each do
-    @token = KoalaTest.oauth_token
+    @token = KoalaTest.oauth_token    
+    Koala::Utils.stub(:deprecate) # never fire deprecation warnings
   end
   
   config.after :each do
