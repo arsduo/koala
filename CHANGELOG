@@ -18,6 +18,7 @@ Testing improvements:
   -- OAuth code and session key tests cannot be run against test users
 -- Faraday adapter for live tests can be specified with ADAPTER=[your adapter] in the shell command
 -- Expanded test coverage
+-- Fixed bug with YAML parsing in Ruby 1.9
 
 v1.1
 New methods:
