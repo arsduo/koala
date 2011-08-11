@@ -24,10 +24,13 @@ YAML::ENGINE.yamler = 'syck' if RUBY_VERSION == '1.9.2' && RUBY_PATCHLEVEL < 290
 # load the library
 require 'koala'
 
+# ensure consistent to_json behavior
+# this must be required first so mock_http_service loads the YAML as expected
+require 'support/ordered_hash' 
+require 'support/json_testing_fix' 
+
 # set up our testing environment
 require 'support/mock_http_service'
-# ensure consistent to_json behavior
-require 'support/json_testing_fix' 
 require 'support/koala_test'
 # load testing data and (if needed) create test users or validate real users
 KoalaTest.setup_test_environment!

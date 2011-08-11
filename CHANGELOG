@@ -17,6 +17,7 @@ Testing improvements:
   -- Test suite can be repeatedly run live without having to update facebook_data.yml
   -- OAuth code and session key tests cannot be run against test users
 -- Faraday adapter for live tests can be specified with ADAPTER=[your adapter] in the shell command
+-- Tests now pass against all rubies on Travis CI
 -- Expanded test coverage
 -- Fixed bug with YAML parsing in Ruby 1.9
 
