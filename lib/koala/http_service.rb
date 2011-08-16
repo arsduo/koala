@@ -39,8 +39,8 @@ module Koala
       # turn all the keys to strings (Faraday has issues with symbols under 1.8.7) and resolve UploadableIOs
       params = args.inject({}) {|hash, kv| hash[kv.first.to_s] = kv.last.is_a?(UploadableIO) ? kv.last.to_upload_io : kv.last; hash}
 
-      # figure out our options for this request
-      http_options = {:params => (verb == "get" ? params : {})}.merge(faraday_options || {}).merge(options)
+      # figure out our options for this request   
+      http_options = {:params => (verb == "get" ? params : {})}.merge(faraday_options || {}).merge(process_options(options))
       http_options[:use_ssl] = true if args["access_token"] # require http if there's a token
 
       # set up our Faraday connection
@@ -62,6 +62,8 @@ module Koala
     end
     
     # deprecations
+    # not elegant or compact code, but temporary
+    
     def self.always_use_ssl
       Koala::Utils.deprecate("HTTPService.always_use_ssl is now HTTPService.faraday_options[:use_ssl]; always_use_ssl will be removed in a future version.")
       faraday_options[:use_ssl]
@@ -81,6 +83,79 @@ module Koala
       Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.faraday_options[:timeout]; .timeout will be removed in a future version.")
       faraday_options[:timeout] = value
     end
+    
+    def self.timeout
+      Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.faraday_options[:timeout]; .timeout will be removed in a future version.")
+      faraday_options[:timeout]
+    end
 
+    def self.timeout=(value)
+      Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.faraday_options[:timeout]; .timeout will be removed in a future version.")
+      faraday_options[:timeout] = value
+    end
+    
+    def self.proxy
+      Koala::Utils.deprecate("HTTPService.proxy is now HTTPService.faraday_options[:proxy]; .proxy will be removed in a future version.")
+      faraday_options[:proxy]
+    end
+
+    def self.proxy=(value)
+      Koala::Utils.deprecate("HTTPService.proxy is now HTTPService.faraday_options[:proxy]; .proxy will be removed in a future version.")
+      faraday_options[:proxy] = value
+    end
+    
+    def self.ca_path
+      Koala::Utils.deprecate("HTTPService.ca_path is now (HTTPService.faraday_options[:ssl] ||= {})[:ca_path]; .ca_path will be removed in a future version.")
+      (faraday_options[:ssl] || {})[:ca_path]
+    end
+
+    def self.ca_path=(value)
+      Koala::Utils.deprecate("HTTPService.ca_path is now (HTTPService.faraday_options[:ssl] ||= {})[:ca_path]; .ca_path will be removed in a future version.")
+      (faraday_options[:ssl] ||= {})[:ca_path] = value
+    end
+    
+    def self.ca_file
+      Koala::Utils.deprecate("HTTPService.ca_file is now (HTTPService.faraday_options[:ssl] ||= {})[:ca_file]; .ca_file will be removed in a future version.")
+      (faraday_options[:ssl] || {})[:ca_file]
+    end
+
+    def self.ca_file=(value)
+      Koala::Utils.deprecate("HTTPService.ca_file is now (HTTPService.faraday_options[:ssl] ||= {})[:ca_file]; .ca_file will be removed in a future version.")
+      (faraday_options[:ssl] ||= {})[:ca_file] = value
+    end
+
+    def self.verify_mode
+      Koala::Utils.deprecate("HTTPService.verify_mode is now (HTTPService.faraday_options[:ssl] ||= {})[:verify_mode]; .verify_mode will be removed in a future version.")
+      (faraday_options[:ssl] || {})[:verify_mode]
+    end
+
+    def self.verify_mode=(value)
+      Koala::Utils.deprecate("HTTPService.verify_mode is now (HTTPService.faraday_options[:ssl] ||= {})[:verify_mode]; .verify_mode will be removed in a future version.")
+      (faraday_options[:ssl] ||= {})[:verify_mode] = value
+    end
+
+    def self.process_options(options)
+      if typhoeus_options = options.delete(:typhoeus_options)
+        Koala::Utils.deprecate("typhoeus_options should now be included directly in the http_options hash.  Support for this key will be removed in a future version.")
+        options = options.merge(typhoeus_options)
+      end
+      
+      if ca_file = options.delete(:ca_file)
+        Koala::Utils.deprecate("http_options[:ca_file] should now be passed inside (http_options[:ssl] = {}) -- that is, http_options[:ssl][:ca_file].  Support for this key will be removed in a future version.")
+        (options[:ssl] ||= {})[:ca_file] = ca_file
+      end
+
+      if ca_path = options.delete(:ca_path)
+        Koala::Utils.deprecate("http_options[:ca_path] should now be passed inside (http_options[:ssl] = {}) -- that is, http_options[:ssl][:ca_path].  Support for this key will be removed in a future version.")
+        (options[:ssl] ||= {})[:ca_path] = ca_path
+      end
+
+      if verify_mode = options.delete(:verify_mode)
+        Koala::Utils.deprecate("http_options[:verify_mode] should now be passed inside (http_options[:ssl] = {}) -- that is, http_options[:ssl][:verify_mode].  Support for this key will be removed in a future version.")
+        (options[:ssl] ||= {})[:verify_mode] = verify_mode
+      end
+      
+      options
+    end     
   end
 end
