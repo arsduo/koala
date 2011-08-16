@@ -11,7 +11,7 @@ Internal improvements:
   -- Koala::HTTPService.faraday_options allows specification of default Faraday connection options
   -- Koala::HTTPService.faraday_middleware allows custom middleware configurations 
 -- RealTimeUpdates and TestUsers are no longer subclasses of API, but have their own .api objects
-  -- The old .graph_api is an alias with a deprecation warning
+  -- The old .graph_api accessor is aliases to .api with a deprecation warning
 Testing improvements:
 -- Live test suites now run against test users by default
   -- Test suite can be repeatedly run live without having to update facebook_data.yml

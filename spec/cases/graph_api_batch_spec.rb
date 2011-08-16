@@ -439,15 +439,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       koppel['id'].should_not be_nil
     end
 
-    it "works with GraphAndRestAPI instances" do
-      me, koppel = Koala::Facebook::API.new(@api.access_token).batch do |batch_api|
-        batch_api.get_object('me')
-        batch_api.get_object(KoalaTest.user1)
-      end
-      me['id'].should_not be_nil
-      koppel['id'].should_not be_nil
-    end
-
     it 'should be able to make mixed calls inside of a batch' do
       me, friends = @api.batch do |batch_api|
         batch_api.get_object('me')
