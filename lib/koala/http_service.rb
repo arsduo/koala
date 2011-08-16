@@ -18,6 +18,8 @@ module Koala
       attr_accessor :faraday_middleware, :faraday_options
     end
 
+    @faraday_options ||= {}
+    
     DEFAULT_MIDDLEWARE = Proc.new do |builder|
       builder.request :multipart
       builder.request :url_encoded
@@ -27,7 +29,7 @@ module Koala
     def self.server(options = {})
       server = "#{options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER}"
       server.gsub!(/\.facebook/, "-video.facebook") if options[:video]
-      "https://#{options[:beta] ? "beta." : ""}#{server}"
+      "#{options[:use_ssl] ? "https" : "http"}://#{options[:beta] ? "beta." : ""}#{server}"
     end
 
     def self.make_request(path, args, verb, options = {})
@@ -39,10 +41,11 @@ module Koala
 
       # figure out our options for this request
       http_options = {:params => (verb == "get" ? params : {})}.merge(faraday_options || {}).merge(options)
+      http_options[:use_ssl] = true if args["access_token"] # require http if there's a token
 
       # set up our Faraday connection
       # we have to manually assign params to the URL or the
-      conn = Faraday.new(server(options), http_options, &(faraday_middleware || DEFAULT_MIDDLEWARE))
+      conn = Faraday.new(server(http_options), http_options, &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
       response = conn.send(verb, path, (verb == "post" ? params : {}))
       Koala::Response.new(response.status.to_i, response.body, response.headers)
@@ -56,6 +59,27 @@ module Koala
         key_and_value[1] = MultiJson.encode(key_and_value[1]) unless key_and_value[1].is_a? String
         "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
       end).join("&")
+    end
+    
+    # deprecations
+    def self.always_use_ssl
+      Koala::Utils.deprecate("HTTPService.always_use_ssl is now HTTPService.faraday_options[:use_ssl]; always_use_ssl will be removed in a future version.")
+      faraday_options[:use_ssl]
+    end
+
+    def self.always_use_ssl=(value)
+      Koala::Utils.deprecate("HTTPService.always_use_ssl is now HTTPService.faraday_options[:use_ssl]; always_use_ssl will be removed in a future version.")
+      faraday_options[:use_ssl] = value
+    end
+    
+    def self.timeout
+      Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.faraday_options[:timeout]; .timeout will be removed in a future version.")
+      faraday_options[:timeout]
+    end
+
+    def self.timeout=(value)
+      Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.faraday_options[:timeout]; .timeout will be removed in a future version.")
+      faraday_options[:timeout] = value
     end
 
   end

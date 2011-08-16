@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-
 describe "Koala::HTTPService" do
   it "has a faraday_middleware accessor" do
     Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_middleware)
@@ -10,6 +9,10 @@ describe "Koala::HTTPService" do
   it "has an faraday_options accessor" do
     Koala::HTTPService.should respond_to(:faraday_options)
     Koala::HTTPService.should respond_to(:faraday_options=)
+  end
+  
+  it "sets faraday_options to {} by default" do
+    Koala::HTTPService.faraday_options.should == {}
   end
 
   describe "DEFAULT_MIDDLEWARE" do
@@ -168,10 +171,25 @@ describe "Koala::HTTPService" do
       it "overrides Koala::HTTPService.faraday_options with any provided options for the request params" do
         options = {:a => 2, :c => "3"}
         http_options = {:a => :a}
-        Koala::HTTPService.stub(:http_options).and_return(http_options)
+        Koala::HTTPService.stub(:faraday_options).and_return(http_options)
 
         Faraday.should_receive(:new).with(anything, hash_including(http_options.merge(options))).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get", options)
+      end
+      
+      it "forces use_ssl to true if an access token is present" do
+        options = {:use_ssl => false}
+        Koala::HTTPService.stub(:faraday_options).and_return(:use_ssl => false)
+        Faraday.should_receive(:new).with(anything, hash_including(:use_ssl => true)).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get", options)
+      end
+      
+      it "calls server with the composite options" do
+        options = {:a => 2, :c => "3"}
+        http_options = {:a => :a}
+        Koala::HTTPService.stub(:faraday_options).and_return(http_options)
+        Koala::HTTPService.should_receive(:server).with(hash_including(http_options.merge(options))).and_return("foo")
+        Koala::HTTPService.make_request("anything", {}, "get", options)        
       end
 
       it "uses the default builder block if HTTPService.faraday_middleware block is not defined" do
@@ -237,5 +255,46 @@ describe "Koala::HTTPService" do
         Koala::HTTPService.make_request("anything", {:source => u}, "post")
       end
     end
+  end
+
+  describe "deprecated options" do
+    before :each do
+      Koala::HTTPService.stub(:faraday_options).and_return({})
+    end
+    
+    {
+      :timeout => :timeout,
+      :always_use_ssl => :use_ssl   
+    }.each_pair do |deprecated_method, parameter|
+      describe "##{deprecated_method}" do
+        context "read" do
+          it "reads faraday_options[:#{parameter}]" do
+            value = "foo"
+            Koala::HTTPService.faraday_options[parameter] = value
+            Koala::HTTPService.send(deprecated_method).should == value
+          end
+      
+          it "generates a deprecation warning" do
+            Koala::Utils.should_receive(:deprecate)
+            Koala::HTTPService.send(deprecated_method)
+          end
+        end
+      
+        context "write" do
+          it "writes to faraday_options[:#{parameter}]" do
+            Koala::HTTPService.faraday_options[parameter] = nil
+            value = "foo"
+            Koala::HTTPService.send(:"#{deprecated_method}=", value)
+            Koala::HTTPService.faraday_options[parameter].should == value
+          end
+      
+          it "generates a deprecation warning" do
+            Koala::Utils.should_receive(:deprecate)
+            Koala::HTTPService.send(:"#{deprecated_method}=", 2)
+          end
+        end
+      end
+    end
+    
   end
 end
