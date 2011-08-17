@@ -156,6 +156,22 @@ module Koala
       end
       
       options
-    end     
+    end   
+  end
+  
+  module TyphoeusService
+    def self.deprecated_interface
+      # support old-style interface with a warning
+      Koala::Utils.deprecate("the TyphoeusService module is deprecated; to use Typhoeus, set Faraday.default_adapter = :typhoeus.  Enabling Typhoeus for all Faraday connections.")
+      Faraday.default_adapter = :typhoeus
+    end
+  end
+
+  module NetHTTPService
+    def self.deprecated_interface
+      # support old-style interface with a warning
+      Koala::Utils.deprecate("the NetHTTPService module is deprecated; to use Net::HTTP, set Faraday.default_adapter = :net_http.  Enabling Net::HTTP for all Faraday connections.")
+      Faraday.default_adapter = :net_http
+    end
   end
 end

@@ -5,6 +5,35 @@ describe "Koala" do
     Koala.should respond_to(:http_service)
     Koala.should respond_to(:http_service=)
   end
+  
+  context "for deprecated services" do
+    before :each do
+      @service = Koala.http_service
+    end
+    
+    after :each do
+      Koala.http_service = @service
+    end
+
+    it "invokes deprecated_interface if present" do
+      mock_service = stub("http service")
+      mock_service.should_receive(:deprecated_interface)
+      Koala.http_service = mock_service
+    end
+    
+    it "does not set the service if it's deprecated" do
+      mock_service = stub("http service")
+      mock_service.stub(:deprecated_interface)
+      Koala.http_service = mock_service
+      Koala.http_service.should == @service
+    end
+
+    it "sets the service if it's not deprecated" do
+      mock_service = stub("http service")
+      Koala.http_service = mock_service
+      Koala.http_service.should == mock_service
+    end
+  end
 
   define "make_request" do
     it "passes all its arguments to the http_service" do

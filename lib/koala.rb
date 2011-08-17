@@ -110,6 +110,18 @@ module Koala
     attr_accessor :http_service
   end
 
+  def self.http_service=(service)
+    if service.respond_to?(:deprecated_interface)
+      # if this is a deprecated module, support the old interface
+      # by changing the default adapter so the right library is used
+      # we continue to use the single HTTPService module for everything
+      service.deprecated_interface 
+    else
+      # if it's a real http_service, use it
+      @http_service = service
+    end
+  end
+
   def self.make_request(path, args, verb, options = {})
     http_service.make_request(path, args, verb, options)
   end

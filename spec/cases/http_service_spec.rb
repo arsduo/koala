@@ -260,6 +260,11 @@ describe "Koala::HTTPService" do
   describe "deprecated options" do
     before :each do
       Koala::HTTPService.stub(:http_options).and_return({})
+      @service = Koala.http_service
+    end
+
+    after :each do
+      Koala.http_service = @service
     end
     
     {
@@ -413,6 +418,27 @@ describe "Koala::HTTPService" do
           verify_mode = :foo
           Faraday.should_receive(:new).with(anything, hash_not_including(:verify_mode => verify_mode)).and_return(@mock_connection)
           Koala::HTTPService.make_request("anything", {}, "get", :verify_mode => verify_mode)
+        end
+      end
+    end
+
+    {
+      :typhoeus => Koala::TyphoeusService, 
+      :net_http => Koala::NetHTTPService
+    }.each_pair do |adapter, module_class|
+      describe module_class.to_s do
+        it "should respond to deprecated_interface" do
+           module_class.should respond_to(:deprecated_interface)
+        end
+      
+        it "should issue a deprecation warning" do
+          Koala::Utils.should_receive(:deprecate)
+          module_class.deprecated_interface
+        end
+      
+        it "should set the default adapter to #{adapter}" do
+          module_class.deprecated_interface
+          Faraday.default_adapter.should == adapter
         end
       end
     end
