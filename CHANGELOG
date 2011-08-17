@@ -8,8 +8,10 @@ Updated methods:
 -- put_picture now accepts URLs to images (thanks, marcgg!)
 Internal improvements:
 -- Koala now uses Faraday to make requests, replacing the HTTPServices (see wiki)
-  -- Koala::HTTPService.faraday_options allows specification of default Faraday connection options
-  -- Koala::HTTPService.faraday_middleware allows custom middleware configurations 
+  -- Koala::HTTPService.http_options allows specification of default Faraday connection options
+  -- Koala::HTTPService.faraday_middleware allows custom middleware configurations
+  -- Koala now defaults to Net::HTTP rather than Typhoeus
+  -- Koala::NetHTTPService and Koala::TyphoeusService modules no longer exist
 -- RealTimeUpdates and TestUsers are no longer subclasses of API, but have their own .api objects
   -- The old .graph_api accessor is aliases to .api with a deprecation warning
 Testing improvements:
