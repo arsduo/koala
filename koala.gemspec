@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name    = %q{koala}
-  s.version = "1.2.0beta1"
+  s.version = "1.2.0beta"
   s.date    = %q{2011-07-18}
 
   s.summary     = %q{A lightweight, flexible library for Facebook with support for the Graph API, the REST API, realtime updates, and OAuth authentication.}
