@@ -6,13 +6,13 @@ describe "Koala::HTTPService" do
     Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_middleware=)
   end
 
-  it "has an faraday_options accessor" do
-    Koala::HTTPService.should respond_to(:faraday_options)
-    Koala::HTTPService.should respond_to(:faraday_options=)
+  it "has an http_options accessor" do
+    Koala::HTTPService.should respond_to(:http_options)
+    Koala::HTTPService.should respond_to(:http_options=)
   end
   
-  it "sets faraday_options to {} by default" do
-    Koala::HTTPService.faraday_options.should == {}
+  it "sets http_options to {} by default" do
+    Koala::HTTPService.http_options.should == {}
   end
 
   describe "DEFAULT_MIDDLEWARE" do
@@ -155,9 +155,9 @@ describe "Koala::HTTPService" do
         Koala::HTTPService.make_request("anything", {}, "anything")
       end
 
-      it "merges Koala::HTTPService.faraday_options into the request params" do
+      it "merges Koala::HTTPService.http_options into the request params" do
         http_options = {:a => 2, :c => "3"}
-        Koala::HTTPService.faraday_options = http_options
+        Koala::HTTPService.http_options = http_options
         Faraday.should_receive(:new).with(anything, hash_including(http_options)).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get")
       end
@@ -168,10 +168,10 @@ describe "Koala::HTTPService" do
         Koala::HTTPService.make_request("anything", {}, "get", options)
       end
 
-      it "overrides Koala::HTTPService.faraday_options with any provided options for the request params" do
+      it "overrides Koala::HTTPService.http_options with any provided options for the request params" do
         options = {:a => 2, :c => "3"}
         http_options = {:a => :a}
-        Koala::HTTPService.stub(:faraday_options).and_return(http_options)
+        Koala::HTTPService.stub(:http_options).and_return(http_options)
 
         Faraday.should_receive(:new).with(anything, hash_including(http_options.merge(options))).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get", options)
@@ -179,7 +179,7 @@ describe "Koala::HTTPService" do
       
       it "forces use_ssl to true if an access token is present" do
         options = {:use_ssl => false}
-        Koala::HTTPService.stub(:faraday_options).and_return(:use_ssl => false)
+        Koala::HTTPService.stub(:http_options).and_return(:use_ssl => false)
         Faraday.should_receive(:new).with(anything, hash_including(:use_ssl => true)).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get", options)
       end
@@ -187,7 +187,7 @@ describe "Koala::HTTPService" do
       it "calls server with the composite options" do
         options = {:a => 2, :c => "3"}
         http_options = {:a => :a}
-        Koala::HTTPService.stub(:faraday_options).and_return(http_options)
+        Koala::HTTPService.stub(:http_options).and_return(http_options)
         Koala::HTTPService.should_receive(:server).with(hash_including(http_options.merge(options))).and_return("foo")
         Koala::HTTPService.make_request("anything", {}, "get", options)        
       end
@@ -259,7 +259,7 @@ describe "Koala::HTTPService" do
 
   describe "deprecated options" do
     before :each do
-      Koala::HTTPService.stub(:faraday_options).and_return({})
+      Koala::HTTPService.stub(:http_options).and_return({})
     end
     
     {
@@ -269,9 +269,9 @@ describe "Koala::HTTPService" do
     }.each_pair do |deprecated_method, parameter|
       describe "##{deprecated_method}" do
         context "read" do
-          it "reads faraday_options[:#{parameter}]" do
+          it "reads http_options[:#{parameter}]" do
             value = "foo"
-            Koala::HTTPService.faraday_options[parameter] = value
+            Koala::HTTPService.http_options[parameter] = value
             Koala::HTTPService.send(deprecated_method).should == value
           end
       
@@ -282,11 +282,11 @@ describe "Koala::HTTPService" do
         end
       
         context "write" do
-          it "writes to faraday_options[:#{parameter}]" do
-            Koala::HTTPService.faraday_options[parameter] = nil
+          it "writes to http_options[:#{parameter}]" do
+            Koala::HTTPService.http_options[parameter] = nil
             value = "foo"
             Koala::HTTPService.send(:"#{deprecated_method}=", value)
-            Koala::HTTPService.faraday_options[parameter].should == value
+            Koala::HTTPService.http_options[parameter].should == value
           end
       
           it "generates a deprecation warning" do
@@ -301,13 +301,13 @@ describe "Koala::HTTPService" do
     [:ca_path, :ca_file, :verify_mode].each do |deprecated_method|
       describe "##{deprecated_method}" do
         context "read" do
-          it "reads faraday_options[:ssl][:#{deprecated_method}] if faraday_options[:ssl]" do
+          it "reads http_options[:ssl][:#{deprecated_method}] if http_options[:ssl]" do
             value = "foo"
-            Koala::HTTPService.faraday_options[:ssl] = {deprecated_method => value}
+            Koala::HTTPService.http_options[:ssl] = {deprecated_method => value}
             Koala::HTTPService.send(deprecated_method).should == value
           end
       
-          it "returns nil if faraday_options[:ssl] is not defined" do
+          it "returns nil if http_options[:ssl] is not defined" do
             Koala::HTTPService.send(deprecated_method).should be_nil
           end
 
@@ -318,25 +318,25 @@ describe "Koala::HTTPService" do
         end
       
         context "write" do      
-          it "defines faraday_options[:ssl] if not defined" do
-            Koala::HTTPService.faraday_options[:ssl] = nil
+          it "defines http_options[:ssl] if not defined" do
+            Koala::HTTPService.http_options[:ssl] = nil
             value = "foo"
             Koala::HTTPService.send(:"#{deprecated_method}=", value)
-            Koala::HTTPService.faraday_options[:ssl].should
+            Koala::HTTPService.http_options[:ssl].should
           end
 
-          it "writes to faraday_options[:ssl][:#{deprecated_method}]" do
+          it "writes to http_options[:ssl][:#{deprecated_method}]" do
             value = "foo"
             Koala::HTTPService.send(:"#{deprecated_method}=", value)
-            Koala::HTTPService.faraday_options[:ssl].should
-            Koala::HTTPService.faraday_options[:ssl][deprecated_method].should == value
+            Koala::HTTPService.http_options[:ssl].should
+            Koala::HTTPService.http_options[:ssl][deprecated_method].should == value
           end
           
-          it "does not redefine faraday_options[:ssl] if already defined" do
+          it "does not redefine http_options[:ssl] if already defined" do
             hash = {:a => 2}
-            Koala::HTTPService.faraday_options[:ssl] = hash
+            Koala::HTTPService.http_options[:ssl] = hash
             Koala::HTTPService.send(:"#{deprecated_method}=", 3)
-            Koala::HTTPService.faraday_options[:ssl].should include(hash)
+            Koala::HTTPService.http_options[:ssl].should include(hash)
           end
                 
           it "generates a deprecation warning" do
