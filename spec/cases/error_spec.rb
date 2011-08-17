@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Koala::Facebook::APIError do
   it "is a StandardError" do
     Koala::Facebook::APIError.new.should be_a(StandardError)

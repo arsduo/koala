@@ -7,7 +7,6 @@ rescue LoadError
   puts 'although not required, bundler is recommened for running the tests'
 end
 
-
 task :default => :spec
 
 require 'rspec/core/rake_task'

@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Koala::Utils do
   it "has a deprecate method" do
     Koala::Utils.should respond_to(:deprecate)
