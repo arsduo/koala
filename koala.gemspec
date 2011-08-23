@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name    = %q{koala}
-  s.version = "1.2.0beta1"
-  s.date    = %q{2011-08-17}
+  s.version = "1.2.0beta2"
+  s.date    = %q{2011-08-23}
 
   s.summary     = %q{A lightweight, flexible library for Facebook with support for the Graph API, the REST API, realtime updates, and OAuth authentication.}
   s.description = %q{Koala is a lightweight, flexible Ruby SDK for Facebook.  It allows read/write access to the social graph via the Graph and REST APIs, as well as support for realtime updates and OAuth and Facebook Connect authentication.  Koala is fully tested and supports Net::HTTP and Typhoeus connections out of the box and can accept custom modules for other services.}
@@ -29,22 +29,19 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<multi_json>,      ["~> 1.0"])
-      s.add_runtime_dependency(%q<faraday>,  ["~> 0.7.4"])
-      s.add_runtime_dependency(%q<faraday-stack>,  ["~> 0.1.3"])
+      s.add_runtime_dependency(%q<faraday>,  ["~> 0.7.0"])
       s.add_development_dependency(%q<rspec>,     ["~> 2.5"])
       s.add_development_dependency(%q<rake>,      ["~> 0.8.7"])
     else
       s.add_dependency(%q<multi_json>,      ["~> 1.0"])
       s.add_dependency(%q<rspec>,     ["~> 2.5"])
       s.add_dependency(%q<rake>,      ["~> 0.8.7"])
-      s.add_dependency(%q<faraday>,  ["~> 0.7.4"])
-      s.add_dependency(%q<faraday-stack>,  ["~> 0.1.3"])
+      s.add_dependency(%q<faraday>,  ["~> 0.7.0"])
     end
   else
     s.add_dependency(%q<multi_json>,      ["~> 1.0"])
     s.add_dependency(%q<rspec>,     ["~> 2.5"])
     s.add_dependency(%q<rake>,      ["~> 0.8.7"])
-    s.add_dependency(%q<faraday>,  ["~> 0.7.4"])
-    s.add_dependency(%q<faraday-stack>,  ["~> 0.1.3"])
+    s.add_dependency(%q<faraday>,  ["~> 0.7.0"])
   end
 end

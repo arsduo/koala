@@ -19,7 +19,8 @@ Testing improvements:
 -- Live test suites now run against test users by default
   -- Test suite can be repeatedly run live without having to update facebook_data.yml
   -- OAuth code and session key tests cannot be run against test users
--- Faraday adapter for live tests can be specified with ADAPTER=[your adapter] in the shell command
+-- Faraday adapter for live tests can be specified with ADAPTER=[your adapter] in the rspec command
+-- Live tests can be run against the beta server by specifying BETA=true in the rspec command
 -- Tests now pass against all rubies on Travis CI
 -- Expanded test coverage
 -- Fixed bug with YAML parsing in Ruby 1.9

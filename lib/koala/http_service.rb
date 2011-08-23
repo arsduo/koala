@@ -1,5 +1,4 @@
 require 'faraday'
-require 'faraday_stack'
 
 module Koala
   class Response

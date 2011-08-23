@@ -35,6 +35,8 @@ module KoalaTest
       rescue LoadError
         puts "Unable to load adapter #{adapter}, using Net::HTTP."
       end
+      
+      Koala.http_service.http_options[:beta] = true if ENV["beta"]
 
       # use a test user unless the developer wants to test against a real profile
       unless token = KoalaTest.oauth_token
