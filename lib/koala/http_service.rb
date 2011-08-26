@@ -46,7 +46,19 @@ module Koala
       # we have to manually assign params to the URL or the
       conn = Faraday.new(server(request_options), request_options, &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
-      response = conn.send(verb, path, (verb == "post" ? params : {}))
+      # in some rare cases, users may elect to use no URL encoding
+      # because Farady wants to form-encode, we have to pass the params
+      # in the query string, instead of as actual params
+      # this allows something like '%0D%0A' to post linebreaks
+      # in theory, it would be better if Faraday offered a request options for data-encoding
+      # similar to using the -d (data) flag vs the -f (form) flag in cURL
+      if request_options[:no_encoding]
+        path += '?'
+        path += params.collect{|k,v| "#{k}=#{v}"}.join('&')
+        response = conn.send(verb, path)
+      else
+        response = conn.send(verb, path, (verb == "post" ? params : {}))
+      end
       Koala::Response.new(response.status.to_i, response.body, response.headers)
     end
 
