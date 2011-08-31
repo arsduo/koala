@@ -104,7 +104,7 @@ module Koala
         raise "SignedRequest: Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
 
         # now see if the signature is valid (digest, key, data)
-        hmac = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, @app_secret, encoded_envelope.tr("-_", "+/"))
+        hmac = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, @app_secret, encoded_envelope)
         raise 'SignedRequest: Invalid signature' if (signature != hmac)
 
         return envelope
