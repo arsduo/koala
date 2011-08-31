@@ -31,7 +31,7 @@ module Koala
           fb_cookie.split("&").map {|param| param = param.split("="); components[param[0]] = param[1]}
 
           # generate the signature and make sure it matches what we expect
-          auth_string = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
+          auth_string = components.keys.sort.collect {|a| include_key_in_signature?(a) ? "#{a}=#{components[a]}": nil}.compact.join("")
           sig = Digest::MD5.hexdigest(auth_string + @app_secret)
           sig == components["sig"] && (components["expires"] == "0" || Time.now.to_i < components["expires"].to_i) ? components : nil
         end
@@ -144,6 +144,10 @@ module Koala
 
       protected
 
+      def include_key_in_signature?(key)
+         %w{access_token expires uid}.include?(key)
+      end
+      
       def get_token_from_server(args, post = false, options = {})
         # fetch the result from Facebook's servers
         result = fetch_token_string(args, post, "access_token", options)
