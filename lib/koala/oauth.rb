@@ -9,31 +9,18 @@ module Koala
       end
 
       def get_user_info_from_cookie(cookie_hash)
-        # Parses the cookie set by the official Facebook JavaScript SDK.
-        #
-        # cookies should be a Hash, like the one Rails provides
+        # Parses the cookie set Facebook's JavaScript SDK.
+        # You can pass Rack/Rails/Sinatra's cookie hash directly to this method.
         #
         # If the user is logged in via Facebook, we return a dictionary with the
         # keys "uid" and "access_token". The former is the user's Facebook ID,
         # and the latter can be used to make authenticated requests to the Graph API.
         # If the user is not logged in, we return None.
-        #
-        # Download the official Facebook JavaScript SDK at
-        # http://github.com/facebook/connect-js/. Read more about Facebook
-        # authentication at http://developers.facebook.com/docs/authentication/.
 
-        if fb_cookie = cookie_hash["fbs_" + @app_id.to_s]
-          # remove the opening/closing quote
-          fb_cookie = fb_cookie.gsub(/\"/, "")
-
-          # since we no longer get individual cookies, we have to separate out the components ourselves
-          components = {}
-          fb_cookie.split("&").map {|param| param = param.split("="); components[param[0]] = param[1]}
-
-          # generate the signature and make sure it matches what we expect
-          auth_string = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
-          sig = Digest::MD5.hexdigest(auth_string + @app_secret)
-          sig == components["sig"] && (components["expires"] == "0" || Time.now.to_i < components["expires"].to_i) ? components : nil
+        if signed_cookie = cookie_hash["fbsr_#{@app_id}"]
+          parse_signed_cookie(signed_cookie)
+        elsif unsigned_cookie = cookie_hash["fbs_#{@app_id}"]
+          parse_unsigned_cookie(unsigned_cookie)
         end
       end
       alias_method :get_user_info_from_cookies, :get_user_info_from_cookie
@@ -70,7 +57,7 @@ module Koala
       def get_access_token_info(code, options = {})
         # convenience method to get a parsed token from Facebook for a given code
         # should this require an OAuth callback URL?
-        get_token_from_server({:code => code, :redirect_uri => @oauth_callback_url}, false, options)
+        get_token_from_server({:code => code, :redirect_uri => options[:redirect_uri] || @oauth_callback_url}, false, options)
       end
 
       def get_access_token(code, options = {})
@@ -161,6 +148,29 @@ module Koala
           hash.merge!(key => value)
         end
         components
+      end
+      
+      def parse_unsigned_cookie(fb_cookie)
+        # remove the opening/closing quote
+        fb_cookie = fb_cookie.gsub(/\"/, "")
+
+        # since we no longer get individual cookies, we have to separate out the components ourselves
+        components = {}
+        fb_cookie.split("&").map {|param| param = param.split("="); components[param[0]] = param[1]}
+
+        # generate the signature and make sure it matches what we expect
+        auth_string = components.keys.sort.collect {|a| a == "sig" ? nil : "#{a}=#{components[a]}"}.reject {|a| a.nil?}.join("")
+        sig = Digest::MD5.hexdigest(auth_string + @app_secret)
+        sig == components["sig"] && (components["expires"] == "0" || Time.now.to_i < components["expires"].to_i) ? components : nil
+      end
+      
+      def parse_signed_cookie(fb_cookie)
+        components = parse_signed_request(fb_cookie)
+        if (code = components["code"]) && token_info = get_access_token_info(code, :redirect_uri => '')
+          components.merge(token_info)
+        else
+          nil
+        end
       end
 
       def fetch_token_string(args, post = false, endpoint = "access_token", options = {})

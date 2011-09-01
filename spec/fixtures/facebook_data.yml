@@ -30,11 +30,12 @@ oauth_test_data:
     # note: the tests stub the time class so these default cookies are always valid (if you're using the default app)
     # if not you may want to remove the stubbing to test expiration
     fbs_119908831367602: '"access_token=119908831367602|2.LKE7ksSPOx0V_8mHPr2NHQ__.3600.1273363200-2905623|CMpi0AYbn03Oukzv94AUha2qbO4.&expires=1273363200&secret=lT_9zm5r5IbJ6Aa5O54nFw__&session_key=2.LKE7ksSPOx0V_8mHPr2NHQ__.3600.1273363200-2905623&sig=9515e93113921f9476a4efbdd4a3c746&uid=2905623"'
-  expired_cookies:
-    fbs_119908831367602: '"access_token=119908831367602|2.xv9mi6QSOpr474s4n2X_pw__.3600.1273287600-2905623|yVt5WH_S6J5p3gFa5_5lBzckhws.&expires=1273287600&secret=V_E79ovQnXqxGctFuC_n5A__&session_key=2.xv9mi6QSOpr474s4n2X_pw__.3600.1273287600-2905623&sig=eeef60838c0c800258d89b7e6ddddddb&uid=2905623"'
   offline_access_cookies:
     # note: I've revoked the offline access for security reasons, so you can't make calls against this :)
     fbs_119908831367602: '"access_token=119908831367602|08170230801eb225068e7a70-2905623|Q3LDCYYF8CX9cstxnZLsxiR0nwg.&expires=0&secret=78abaee300b392e275072a9f2727d436&session_key=08170230801eb225068e7a70-2905623&sig=423b8aa4b6fa1f9a571955f8e929d567&uid=2905623"'
+  valid_signed_cookies: 
+    "fbsr_119908831367602": "f1--LHwjHVCxfs97hRHL-4cF-0jNxZRc6MGzo1qHLb0.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImNvZGUiOiIyLkFRQm90a0pBWlhVY1l3RkMuMzYwMC4xMzE0ODEzNjAwLjEtMjkwNTYyM3x4V2xya0d0UmJIZlpIclRnVWwxQmxJcVhRbjQiLCJpc3N1ZWRfYXQiOjEzMTQ4MDY2NTUsInVzZXJfaWQiOiIyOTA1NjIzIn0"
+
 
   # These values from the OAuth Playground (see above) will work out of the box
   # You can update this to live data if desired
