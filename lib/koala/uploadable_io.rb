@@ -40,7 +40,8 @@ module Koala
       :parse_rails_3_param,
       :parse_sinatra_param,
       :parse_file_object,
-      :parse_string_path
+      :parse_string_path,
+      :parse_io
     ]
 
     def parse_init_mixed_param(mixed, content_type = nil)
