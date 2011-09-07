@@ -243,16 +243,6 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       describe "tests that create users" do
-        before :each do
-          test_users = Koala::Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
-          test_users.delete_all
-        end
-
-        after :each do
-          test_users = Koala::Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
-          test_users.delete_all
-        end
-
         it "should create a 5 person network" do
           size = 5
           @network = @test_users.create_network(size)
