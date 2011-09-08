@@ -25,8 +25,12 @@ Or in Bundler:
 Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
-
+  
+    # 1.2beta and above
     @graph = Koala::Facebook::API.new(oauth_access_token)
+    # 1.1 or earlier
+    @graph = Koala::Facebook::GraphAPI.new(oauth_access_token)
+    
     profile = @graph.get_object("me")
     friends = @graph.get_connections("me", "friends")
     @graph.put_object("me", "feed", :message => "I am writing on my wall!")
@@ -61,13 +65,22 @@ Where the Graph API and the old REST API overlap, you should choose the Graph AP
 
 Fortunately, Koala supports the REST API using the very same interface; to use this, instantiate an API:
 
-  	@rest = Koala::Facebook::API.new(oauth_access_token)
+  	# 1.2beta and above
+    @rest = Koala::Facebook::API.new(oauth_access_token)
+    # 1.1 or earlier
+    @rest = Koala::Facebook::RestAPI.new(oauth_access_token)
+  	
   	@rest.fql_query(my_fql_query) # convenience method
   	@rest.fql_multiquery(fql_query_hash) # convenience method
   	@rest.rest_call("stream.publish", arguments_hash) # generic version
 
 Of course, you can use the Graph API methods on the same object -- the power of two APIs right in the palm of your hand.
 
+    # 1.2beta and above
+    @api = Koala::Facebook::API.new(oauth_access_token)
+    # 1.1 or earlier
+    @api = Koala::Facebook::GraphAndRestAPI.new(oauth_access_token)
+    
     @api = Koala::Facebook::API.new(oauth_access_token)
     fql = @api.fql_query(my_fql_query)
     @api.put_wall_post(process_result(fql))
