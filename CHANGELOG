@@ -5,7 +5,9 @@ New methods:
 -- TestUsers#update lets you update the name or password of an existing test user
 -- API.get_page_access_token lets you easily fetch the access token for a page you manage (thanks, marcgg!)
 Updated methods:
+-- OAuth now parses Facebook's new signed cookie format
 -- API.put_picture now accepts URLs to images (thanks, marcgg!)
+-- Bug fixes to put_picture, parse_signed_request, and the test suite (thanks, johnbhall and Will S.!)
 Internal improvements:
 -- Koala now uses Faraday to make requests, replacing the HTTPServices (see wiki)
   -- Koala::HTTPService.http_options allows specification of default Faraday connection options
