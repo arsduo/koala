@@ -86,6 +86,34 @@ describe "Koala::UploadableIO" do
       end
     end
 
+    describe "when given an IO object" do
+      before(:each) do
+        @io = StringIO.open("abcdefgh")
+        @koala_io_params = [@io]
+      end
+
+      describe "and a content type" do
+        before :each do
+          @koala_io_params.concat(["image/jpg"])
+        end
+
+        it "returns an UploadableIO with the same io" do
+          Koala::UploadableIO.new(*@koala_io_params).io_or_path.should == @koala_io_params[0]
+        end
+
+        it "returns an UploadableIO with the same content_type" do
+          content_stub = @koala_io_params[1] = stub('Content Type')
+          Koala::UploadableIO.new(*@koala_io_params).content_type.should == content_stub
+        end
+      end
+
+      describe "and no content type" do
+        it "raises an exception" do
+          lambda { Koala::UploadableIO.new(*@koala_io_params) }.should raise_exception(Koala::KoalaError)
+        end
+      end
+    end
+
     describe "when given a Rails 3 ActionDispatch::Http::UploadedFile" do
       before(:each) do
         @tempfile, @uploaded_file = rails_3_mocks
