@@ -571,32 +571,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       it "throws an error for badly-constructed request relationships" do
         expect {
-
-  describe "new interface" do
-    it "includes a deprecation warning on GraphAPI" do
-      begin
-        Koala::Facebook::GraphAPI.batch do
-        end
-      rescue NoMethodError => @err
-      end
-
-      # verify the message points people to the wiki page
-      @err.should
-      @err.message.should =~ /https\:\/\/github.com\/arsduo\/koala\/wiki\/Batch-requests/
-    end
-
-    it "includes a deprecation warning on GraphAndRESTAPI" do
-      begin
-        Koala::Facebook::GraphAndRestAPI.batch do
-        end
-      rescue NoMethodError => @err
-      end
-
-      # verify the message points people to the wiki page
-      @err.should
-      @err.message.should =~ /https\:\/\/github.com\/arsduo\/koala\/wiki\/Batch-requests/
-    end
-  end
           @api.batch do |batch_api|
             batch_api.get_connections("me", "friends", {:limit => 5})
             batch_api.get_objects("{result=i-dont-exist:$.data.*.id}")

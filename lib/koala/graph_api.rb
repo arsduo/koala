@@ -208,15 +208,7 @@ module Koala
           batch_client
         end
       end
-
-      def self.included(base)
-        base.class_eval do
-          def self.batch
-            raise NoMethodError, "The BatchAPI signature has changed (the original implementation was not thread-safe).  Please see https://github.com/arsduo/koala/wiki/Batch-requests.  (This message will be removed in the final 1.1 release.)"
-          end
-        end
-      end
-
+      
       # Direct access to the Facebook API
       # see any of the above methods for example invocations
       def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
