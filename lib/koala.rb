@@ -8,7 +8,6 @@ require 'openssl'
 require 'base64'
 
 # include koala modules
-require 'koala/http_service'
 require 'koala/oauth'
 require 'koala/graph_api'
 require 'koala/graph_batch_api'
@@ -17,10 +16,16 @@ require 'koala/graph_collection'
 require 'koala/rest_api'
 require 'koala/realtime_updates'
 require 'koala/test_users'
-require 'koala/utils'
+
+# HTTP module so we can communicate with Facebook
+require 'koala/http_service'
 
 # add KoalaIO class
 require 'koala/uploadable_io'
+
+# miscellaneous
+require 'koala/utils'
+require 'koala/version'
 
 module Koala
 

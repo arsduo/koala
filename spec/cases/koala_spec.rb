@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe "Koala" do
+  it "has a version" do
+    Koala.const_defined?("VERSION").should be_true
+  end
+  
   it "has an http_service accessor" do
     Koala.should respond_to(:http_service)
     Koala.should respond_to(:http_service=)
