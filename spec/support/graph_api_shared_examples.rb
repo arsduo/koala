@@ -40,14 +40,6 @@ shared_examples_for "Koala GraphAPI" do
       @api.graph_call("/me").should == expected
     end
     
-    it "passes results through a post_processing block if supplied" do
-      result = {}
-      block = Proc.new {|r| r}
-      @api.stub(:api).and_return(result)
-      block.should_receive(:call).with(result)
-      @api.graph_call("/me", {}, "get", {}, &block)
-    end 
-    
     it "returns the post_processing block's results if one is supplied" do
       other_result = [:a, 2, :three]
       block = Proc.new {|r| other_result}
