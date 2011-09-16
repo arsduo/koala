@@ -18,7 +18,11 @@ module Koala
       end
     
       def initialize(response, api)
-        super response["data"]
+        if response["data"].instance_of? Hash
+          super [response["data"]]
+        else
+          super response["data"]
+        end
         @paging = response["paging"]
         @raw_response = response
         @api = api
