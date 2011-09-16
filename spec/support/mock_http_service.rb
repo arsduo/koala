@@ -18,7 +18,8 @@ module Koala
     TEST_DATA = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'fixtures', 'facebook_data.yml'))
     TEST_DATA.merge!('oauth_token' => Koala::MockHTTPService::ACCESS_TOKEN)
     TEST_DATA['oauth_test_data'].merge!('code' => Koala::MockHTTPService::OAUTH_CODE)
-
+    TEST_DATA['search_time'] = (Time.now - 3600).to_s
+    
     # Useful in mock_facebook_responses.yml
     OAUTH_DATA = TEST_DATA['oauth_test_data']
     OAUTH_DATA.merge!({

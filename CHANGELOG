@@ -8,6 +8,10 @@ Updated methods:
 -- OAuth now parses Facebook's new signed cookie format
 -- API.put_picture now accepts URLs to images (thanks, marcgg!)
 -- Bug fixes to put_picture, parse_signed_request, and the test suite (thanks, johnbhall and Will S.!)
+-- Smarter GraphCollection use
+  -- Any pageable result will now become a GraphCollection
+  -- Non-pageable results from get_connections no longer error
+  -- GraphCollection.raw_results allows access to original result data
 Internal improvements:
 -- Koala now uses Faraday to make requests, replacing the HTTPServices (see wiki)
   -- Koala::HTTPService.http_options allows specification of default Faraday connection options
@@ -17,6 +21,7 @@ Internal improvements:
   -- Koala no longer automatically switches to Net::HTTP when uploading IO objects to Facebook
 -- RealTimeUpdates and TestUsers are no longer subclasses of API, but have their own .api objects
   -- The old .graph_api accessor is aliases to .api with a deprecation warning
+-- Removed deprecation warnings for pre-1.1 batch interface
 Testing improvements:
 -- Live test suites now run against test users by default
   -- Test suite can be repeatedly run live without having to update facebook_data.yml
@@ -24,7 +29,7 @@ Testing improvements:
 -- Faraday adapter for live tests can be specified with ADAPTER=[your adapter] in the rspec command
 -- Live tests can be run against the beta server by specifying BETA=true in the rspec command
 -- Tests now pass against all rubies on Travis CI
--- Expanded test coverage
+-- Expanded and refactored test coverage
 -- Fixed bug with YAML parsing in Ruby 1.9
 
 v1.1
