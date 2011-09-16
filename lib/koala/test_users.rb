@@ -35,7 +35,7 @@ module Koala
       end
 
       def list
-        @api.graph_call(accounts_path)["data"]
+        @api.graph_call(accounts_path)
       end
 
       def delete(test_user)

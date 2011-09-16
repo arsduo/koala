@@ -430,7 +430,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
   end
 
   describe "usage tests" do
-    it "can get two results at once" do
+    it "gets two results at once" do
       me, koppel = @api.batch do |batch_api|
         batch_api.get_object('me')
         batch_api.get_object(KoalaTest.user1)
@@ -439,7 +439,15 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       koppel['id'].should_not be_nil
     end
 
-    it 'should be able to make mixed calls inside of a batch' do
+    it 'makes mixed calls inside of a batch' do
+      me, friends = @api.batch do |batch_api|
+        batch_api.get_object('me')
+        batch_api.get_connections('me', 'friends')
+      end
+      friends.should be_a(Koala::Facebook::GraphCollection)
+    end
+    
+    it 'turns pageable results into GraphCollections' do
       me, friends = @api.batch do |batch_api|
         batch_api.get_object('me')
         batch_api.get_connections('me', 'friends')
@@ -448,14 +456,14 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       friends.should be_an(Array)
     end
 
-    it 'should be able to make a get_picture call inside of a batch' do
+    it 'makes a get_picture call inside of a batch' do
       pictures = @api.batch do |batch_api|
         batch_api.get_picture('me')
       end
       pictures.first.should_not be_empty
     end
 
-    it "should handle requests for two different tokens" do
+    it "handles requests for two different tokens" do
       me, insights = @api.batch do |batch_api|
         batch_api.get_object('me')
         batch_api.get_connections(@app_id, 'insights', {}, {"access_token" => @app_api.access_token})
@@ -563,14 +571,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       it "throws an error for badly-constructed request relationships" do
         expect {
-          @api.batch do |batch_api|
-            batch_api.get_connections("me", "friends", {:limit => 5})
-            batch_api.get_objects("{result=i-dont-exist:$.data.*.id}")
-          end
-        }.to raise_exception(Koala::Facebook::APIError)
-      end
-    end
-  end
 
   describe "new interface" do
     it "includes a deprecation warning on GraphAPI" do
@@ -595,6 +595,14 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       # verify the message points people to the wiki page
       @err.should
       @err.message.should =~ /https\:\/\/github.com\/arsduo\/koala\/wiki\/Batch-requests/
+    end
+  end
+          @api.batch do |batch_api|
+            batch_api.get_connections("me", "friends", {:limit => 5})
+            batch_api.get_objects("{result=i-dont-exist:$.data.*.id}")
+          end
+        }.to raise_exception(Koala::Facebook::APIError)
+      end
     end
   end
 end

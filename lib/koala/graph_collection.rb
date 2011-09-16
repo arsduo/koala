@@ -10,12 +10,17 @@ module Koala
       # It also allows access to paging information and the
       # ability to get the next/previous page in the collection
       # by calling next_page or previous_page.
-      attr_reader :paging
-      attr_reader :api
+      attr_reader :paging, :api, :raw_response
 
+      def self.evaluate(response, api)
+        # turn the response into a GraphCollection if it's pageable; if not, return the original response
+        response.is_a?(Hash) && response["data"].is_a?(Array) ? self.new(response, api) : response
+      end
+    
       def initialize(response, api)
         super response["data"]
         @paging = response["paging"]
+        @raw_response = response
         @api = api
       end
 

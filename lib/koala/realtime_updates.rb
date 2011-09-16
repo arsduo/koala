@@ -71,7 +71,7 @@ module Koala
       end
 
       def list_subscriptions
-        @graph_api.graph_call(subscription_path)["data"]
+        @graph_api.graph_call(subscription_path)
       end
 
       def graph_api

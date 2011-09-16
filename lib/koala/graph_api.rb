@@ -71,9 +71,7 @@ module Koala
 
       def get_connections(id, connection_name, args = {}, options = {})
         # Fetchs the connections for given object.
-        graph_call("#{id}/#{connection_name}", args, "get", options) do |result|
-          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
-        end
+        graph_call("#{id}/#{connection_name}", args, "get", options)
       end
 
       def put_connections(id, connection_name, args = {}, options = {})
@@ -174,9 +172,7 @@ module Koala
 
       def search(search_terms, args = {}, options = {})
         args.merge!({:q => search_terms}) unless search_terms.nil?
-        graph_call("search", args, "get", options) do |result|
-          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
-        end
+        graph_call("search", args, "get", options)
       end
 
       # Convenience Methods
@@ -199,14 +195,12 @@ module Koala
       def get_page(params)
         # Pages through a set of results stored in a GraphCollection
         # Used for connections and search results
-        graph_call(*params) do |result|
-          result ? GraphCollection.new(result, self) : nil # when facebook is down nil can be returned
-        end
+        graph_call(*params)
       end
 
       # Batch API
       def batch(http_options = {}, &block)
-        batch_client = GraphBatchAPI.new(access_token)
+        batch_client = GraphBatchAPI.new(access_token, self)
         if block
           yield batch_client
           batch_client.execute(http_options)
@@ -231,10 +225,15 @@ module Koala
           raise error if error
         end
 
-        # now process as appropriate (get picture header, make GraphCollection, etc.)
+        # turn this into a GraphCollection if it's pageable
+        result = GraphCollection.evaluate(result, self)
+        
+        # now process as appropriate for the given call (get picture header, etc.)
         post_processing ? post_processing.call(result) : result
       end
 
+      private
+      
       def check_response(response)
         # check for Graph API-specific errors
         # this returns an error, which is immediately raised (non-batch)
@@ -243,8 +242,6 @@ module Koala
           APIError.new(error_details)
         end
       end
-
-      private
 
       def parse_media_args(media_args, method)
         # photo and video uploads can accept different types of arguments (see above)

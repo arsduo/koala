@@ -87,10 +87,10 @@ graph_api:
         with_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
-        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[],\"paging\":{}}"}]'
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
-        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[]}"}]'
+        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[],\"paging\":{}}"}]'
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
         with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"body":"{\"id\":\"123\"}"}]'
@@ -113,7 +113,7 @@ graph_api:
         with_token: '[null,{"body":"{}"}]'
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends", "omit_response_on_success" => false}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:
       post:
-        with_token: '[{"body":"{\"data\":[]}"},{"body":"{}"}]'
+        with_token: '[{"body":"{\"data\":[],\"paging\":{}}"},{"body":"{}"}]'
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}]) %>:
       post:
         with_token: '{"error":190,"error_description":"Error validating access token."}'
@@ -211,7 +211,7 @@ graph_api:
     no_args:
       get:
         <<: *token_required
-        with_token: '{"data": [{}]}'
+        with_token: '{"data": [{}], "paging": {}}'
 
   /lukeshepard/picture:
     type=large:
