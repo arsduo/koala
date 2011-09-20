@@ -72,7 +72,6 @@ module Koala
       end
 
       def create_network(network_size, installed = true, permissions = '')
-        network_size = 50 if network_size > 50 # FB's max is 50
         users = (0...network_size).collect { create(installed, permissions) }
         friends = users.clone
         users.each do |user|

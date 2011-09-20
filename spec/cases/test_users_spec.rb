@@ -193,12 +193,6 @@ describe "Koala::Facebook::TestUsers" do
           @user2 = @test_users.create(true, "read_stream,user_interests")
         end
 
-        after :each do
-          [@user1, @user2].each do |u|
-            puts "Unable to delete test user #{u.inspect}" unless @test_users.delete(u)
-          end
-        end
-
         it "should list test users" do
           result = @test_users.list
           result.should be_an(Array)
@@ -254,10 +248,11 @@ describe "Koala::Facebook::TestUsers" do
         end
       end
 
-      it "should limit to a 50 person network" do
-        @test_users.should_receive(:create).exactly(50).times
+      it "has no built-in network size limit" do
+        times = 100
+        @test_users.should_receive(:create).exactly(times).times
         @test_users.stub!(:befriend)
-        @network = @test_users.create_network(51)
+        @network = @test_users.create_network(times)
       end
 
       it "should pass on the installed and permissions parameters to create" do
