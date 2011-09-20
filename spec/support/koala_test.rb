@@ -100,13 +100,32 @@ module KoalaTest
     print "Setting up test users..."
     @test_user_api = Koala::Facebook::TestUsers.new(:app_id => self.app_id, :secret => self.secret)
 
-    # create two test users with specific names and befriend them
-    @live_testing_user = @test_user_api.create(true, testing_permissions, :name => user1_name)
-    @live_testing_friend = @test_user_api.create(true, testing_permissions, :name => user2_name)
-    @test_user_api.befriend(@live_testing_user, @live_testing_friend)
-    self.oauth_token = @live_testing_user["access_token"]
+    RSpec.configure do |config|
+      config.before :all do
+        # before each test module, create two test users with specific names and befriend them
+        KoalaTest.create_test_users
+      end
+      
+      config.after :all do
+        # after each test module, delete the test users to avoid cluttering up the application
+        KoalaTest.destroy_test_users
+      end
+    end
 
     puts "done."
+  end
+
+  def self.create_test_users
+    @live_testing_user = @test_user_api.create(true, KoalaTest.testing_permissions, :name => KoalaTest.user1_name)
+    @live_testing_friend = @test_user_api.create(true, KoalaTest.testing_permissions, :name => KoalaTest.user2_name)
+    @test_user_api.befriend(@live_testing_user, @live_testing_friend)
+    self.oauth_token = @live_testing_user["access_token"]
+  end
+  
+  def self.destroy_test_users
+    [@live_testing_user, @live_testing_friend].each do |u|
+      puts "Unable to delete test user #{u.inspect}" if u && !(@test_user_api.delete(u) rescue false)
+    end
   end
 
   def self.validate_user_info(token)

@@ -13,6 +13,13 @@ describe "Koala::Facebook::TestUsers" do
         raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!"
       end
     end
+    
+    after :each do
+      # clean up any test users
+      ((@network || []) + [@user1, @user2]).each do |u|
+        puts "Unable to delete test user #{u.inspect}" if u && (!@test_users.delete(u) rescue false)
+      end
+    end
 
     describe "when initializing" do
       # basic initialization
@@ -131,11 +138,6 @@ describe "Koala::Facebook::TestUsers" do
           @user2 = @test_users.create(true, "read_stream,user_interests")
         end
 
-        after :each do
-          @test_users.delete(@user1) if @user1
-          @test_users.delete(@user2) if @user2
-        end
-
         it "should delete a user by id" do
           @test_users.delete(@user1['id']).should be_true
           @user1 = nil
@@ -192,8 +194,9 @@ describe "Koala::Facebook::TestUsers" do
         end
 
         after :each do
-          @test_users.delete(@user1)
-          @test_users.delete(@user2)
+          [@user1, @user2].each do |u|
+            puts "Unable to delete test user #{u.inspect}" unless @test_users.delete(u)
+          end
         end
 
         it "should list test users" do
