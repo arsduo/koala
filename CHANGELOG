@@ -4,6 +4,7 @@ New methods:
   -- Old classes are aliased with deprecation warnings (non-breaking change)
 -- TestUsers#update lets you update the name or password of an existing test user
 -- API.get_page_access_token lets you easily fetch the access token for a page you manage (thanks, marcgg!)
+-- Added version.rb (Koala::VERSION)
 Updated methods:
 -- OAuth now parses Facebook's new signed cookie format
 -- API.put_picture now accepts URLs to images (thanks, marcgg!)
