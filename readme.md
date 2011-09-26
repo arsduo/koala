@@ -16,7 +16,7 @@ Facebook Changes on October 1, 2011
 
 To test your application, upgrade to the latest version of Koala (see below) and configure your application according to Facebook's [OAuth 2.0 and HTTPS Migration](https://developers.facebook.com/docs/oauth2-https-migration/) guide.  If you have the appropriate calls to get_user_info_from_cookies (apps using the Javascript SDK) and/or parse_signed_params (for Canvas and tab apps), your application should work without a hitch.
 
-_Note_: in their new secure cookie format, Facebook provides an OAuth code, which Koala automatically exchanges for an access token.  Because this involves a call to Facebook's servers, you should consider storing the user's access token in their session and only calling get_user_info_from_cookies if it's not present.  (Otherwise, you'll be calling out to Facebook each time.)  As we figure out best practices for this, we'll update the wiki.  
+_Note_: in their new secure cookie format, Facebook provides an OAuth code, which Koala automatically exchanges for an access token.  Because this involves a call to Facebook's servers, you should consider storing the user's access token in their session and only calling get_user_info_from_cookies when necessary (access_token not present, you discover it's expired, etc.).  Otherwise, you'll be calling out to Facebook each time the user loads a page, slowing down your site.  (As we figure out best practices for this, we'll update the wiki.)
 
 Installation
 ---
