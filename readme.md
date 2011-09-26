@@ -9,6 +9,15 @@ Koala
 * Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We support JRuby, Rubinius, and REE as well as vanilla Ruby, and use the Faraday library to provide complete flexibility over how HTTP requests are made.)
 * Tested: Koala should have complete test coverage, so you can rely on it.  (Our test coverage is complete and can be run against either mocked responses or the live Facebook servers.)
 
+Facebook Changes on October 1, 2011
+---
+
+**Koala 1.2 supports all of Facebook's new authentication schemes**, which will be introduced on October 1, 2011; the old Javascript library and older authentication schemes will be deprecated at the same time. 
+
+To test your application, upgrade to the latest version of Koala (see below) and configure your application according to Facebook's [OAuth 2.0 and HTTPS Migration](https://developers.facebook.com/docs/oauth2-https-migration/) guide.  If you have the appropriate calls to get_user_info_from_cookies (apps using the Javascript SDK) and/or parse_signed_params (for Canvas and tab apps), your application should work without a hitch.
+
+_Note_: in their new secure cookie format, Facebook provides an OAuth code, which Koala automatically exchanges for an access token.  Because this involves a call to Facebook's servers, you should consider storing the user's access token in their session and only calling get_user_info_from_cookies if it's not present.  (Otherwise, you'll be calling out to Facebook each time.)  As we figure out best practices for this, we'll update the wiki.  
+
 Installation
 ---
 
@@ -34,6 +43,10 @@ The Graph API is the simple, slick new interface to Facebook's data.  Using it w
     profile = @graph.get_object("me")
     friends = @graph.get_connections("me", "friends")
     @graph.put_object("me", "feed", :message => "I am writing on my wall!")
+
+    # you can even use the new Timeline API
+    # see https://developers.facebook.com/docs/beta/opengraph/tutorial/
+    @graph.put_connections("me", "namespace:action", :object => object_url)
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
@@ -105,7 +118,7 @@ You can also get your application's own access token, which can be used without 
     @oauth.get_app_access_token
 
 For those building apps on Facebook, parsing signed requests is simple:
-    @oauth.parse_signed_request(request)
+    @oauth.parse_signed_request(signed_request_string)
 
 Or, if for some horrible reason, you're still using session keys, despair not!  It's easy to turn them into shiny, modern OAuth tokens:
     @oauth.get_token_from_session_key(session_key)
