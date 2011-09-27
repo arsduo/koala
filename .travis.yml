@@ -3,7 +3,8 @@ rvm:
   - 1.9.2
   - 1.9.3
   - ruby-head
-  - rbx
-  - rbx-2.0
+  # rbx is broken on Travis at the moment
+  # - rbx
+  # - rbx-2.0
   - ree
   - jruby
