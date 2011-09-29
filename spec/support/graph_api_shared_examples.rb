@@ -121,6 +121,13 @@ shared_examples_for "Koala GraphAPI" do
     @api.should_receive(:graph_call).with(*query)
     @api.get_page(query)
   end
+  
+  # Beta tier
+  it "can use the beta tier" do
+    result = @api.get_object(KoalaTest.user1, {}, :beta => true)
+    # the results should have an ID and a name, among other things
+    (result["id"] && result["name"]).should_not be_nil
+  end
 end
 
 

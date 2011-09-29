@@ -63,12 +63,12 @@ describe "Koala::HTTPService" do
 
       it "returns the beta REST server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
-        server.should =~ Regexp.new("beta.#{Koala::Facebook::REST_SERVER}")
+        server.should =~ Regexp.new(Koala::Facebook::REST_SERVER.gsub(/\.facebook/, ".beta.facebook"))
       end
 
       it "returns the beta rest server if !options[:rest_api]" do
         server = Koala::HTTPService.server(@options)
-        server.should =~ Regexp.new("beta.#{Koala::Facebook::GRAPH_SERVER}")
+        server.should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER.gsub(/\.facebook/, ".beta.facebook"))
       end
     end
 
