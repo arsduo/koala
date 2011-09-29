@@ -2,7 +2,7 @@ shared_examples_for "Koala GraphAPI" do
   # all Graph API instances should pass these tests, regardless of configuration
 
   # API
-  it "should never use the rest api server" do
+  it "never uses the rest api server" do
     Koala.should_receive(:make_request).with(
       anything,
       anything,
@@ -15,13 +15,13 @@ shared_examples_for "Koala GraphAPI" do
 
   # GRAPH CALL
   describe "graph_call" do
-    it "should pass all arguments to the api method" do
+    it "passes all arguments to the api method" do
       args = [KoalaTest.user1, {}, "get", {:a => :b}]
       @api.should_receive(:api).with(*args)
       @api.graph_call(*args)
     end
 
-    it "should throw an APIError if the result hash has an error key" do
+    it "throws an APIError if the result hash has an error key" do
       Koala.stub(:make_request).and_return(Koala::Response.new(500, {"error" => "An error occurred!"}, {}))
       lambda { @api.graph_call(KoalaTest.user1, {}) }.should raise_exception(Koala::Facebook::APIError)
     end
@@ -49,7 +49,7 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   # SEARCH
-  it "should be able to search" do
+  it "can search" do
     result = @api.search("facebook")
     result.length.should be_an(Integer)
   end
@@ -58,65 +58,65 @@ shared_examples_for "Koala GraphAPI" do
   # access public info
 
   # get_object
-  it "should get public data about a user" do
+  it "gets public data about a user" do
     result = @api.get_object(KoalaTest.user1)
     # the results should have an ID and a name, among other things
     (result["id"] && result["name"]).should_not be_nil
   end
 
-  it "should get public data about a Page" do
+  it "gets public data about a Page" do
     result = @api.get_object(KoalaTest.page)
     # the results should have an ID and a name, among other things
     (result["id"] && result["name"]).should
   end
 
-  it "should return [] from get_objects if passed an empty array" do
+  it "returns [] from get_objects if passed an empty array" do
     results = @api.get_objects([])
     results.should == []
   end
 
-  it "should be able to get multiple objects" do
+  it "gets multiple objects" do
     results = @api.get_objects([KoalaTest.page, KoalaTest.user1])
     results.should have(2).items
   end
 
-  it "should be able to get multiple objects if they're a string" do
+  it "gets multiple objects if they're a string" do
     results = @api.get_objects("contextoptional,#{KoalaTest.user1}")
     results.should have(2).items
   end
 
-  it "should be able to access a user's picture" do
+  it "can access a user's picture" do
     @api.get_picture("chris.baclig").should =~ /http[s]*\:\/\//
   end
 
-  it "should be able to access a user's picture, given a picture type"  do
+  it "can access a user's picture, given a picture type"  do
     @api.get_picture(KoalaTest.user2, {:type => 'large'}).should =~ /^http[s]*\:\/\//
   end
 
-  it "should be able to access connections from public Pages" do
+  it "can access connections from public Pages" do
     result = @api.get_connections(KoalaTest.page, "photos")
     result.should be_a(Array)
   end
 
-  it "should be able to access comments for a URL" do
+  it "can access comments for a URL" do
     result = @api.get_comments_for_urls(["http://developers.facebook.com/blog/post/472"])
     (result["http://developers.facebook.com/blog/post/472"]).should
   end
 
-  it "should be able to access comments for 2 URLs" do
+  it "can access comments for 2 URLs" do
     result = @api.get_comments_for_urls(["http://developers.facebook.com/blog/post/490", "http://developers.facebook.com/blog/post/472"])
     (result["http://developers.facebook.com/blog/post/490"] && result["http://developers.facebook.com/blog/post/472"]).should
   end
 
   # SEARCH
-  it "should be able to search" do
+  it "can search" do
     result = @api.search("facebook")
     result.length.should be_an(Integer)
   end
 
   # PAGING THROUGH COLLECTIONS
   # see also graph_collection_tests
-  it "should make a request for a page when provided a specific set of page params" do
+  it "makes a request for a page when provided a specific set of page params" do
     query = [1, 2]
     @api.should_receive(:graph_call).with(*query)
     @api.get_page(query)
@@ -132,42 +132,42 @@ end
 
 
 shared_examples_for "Koala GraphAPI with an access token" do
-  it "should get private data about a user" do
+  it "gets private data about a user" do
     result = @api.get_object(KoalaTest.user1)
     # updated_time should be a pretty fixed test case
     result["updated_time"].should_not be_nil
   end
 
-  it "should get data about 'me'" do
+  it "gets data about 'me'" do
     result = @api.get_object("me")
     result["updated_time"].should
   end
 
-  it "should be able to get multiple objects" do
+  it "gets multiple objects" do
     result = @api.get_objects([KoalaTest.page, KoalaTest.user1])
     result.length.should == 2
   end
-  it "should be able to access connections from users" do
+  it "can access connections from users" do
     result = @api.get_connections(KoalaTest.user2, "friends")
     result.length.should > 0
   end
 
   # PUT
-  it "should be able to write an object to the graph" do
+  it "can write an object to the graph" do
     result = @api.put_wall_post("Hello, world, from the test suite!")
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
 
   # DELETE
-  it "should be able to delete posts" do
+  it "can delete posts" do
     result = @api.put_wall_post("Hello, world, from the test suite delete method!")
     object_id_to_delete = result["id"]
     delete_result = @api.delete_object(object_id_to_delete)
     delete_result.should == true
   end
 
-  it "should be able to delete likes" do
+  it "can delete likes" do
     result = @api.put_wall_post("Hello, world, from the test suite delete method!")
     @temporary_object_id = result["id"]
     @api.put_like(@temporary_object_id)
@@ -176,7 +176,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   # additional put tests
-  it "should be able to verify messages posted to a wall" do
+  it "can verify messages posted to a wall" do
     message = "the cats are asleep"
     put_result = @api.put_wall_post(message)
     @temporary_object_id = put_result["id"]
@@ -186,14 +186,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
     get_result["message"].should == message
   end
 
-  it "should be able to post a message with an attachment to a feed" do
+  it "can post a message with an attachment to a feed" do
     result = @api.put_wall_post("Hello, world, from the test suite again!", {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"})
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
 
   describe ".put_picture" do
-    it "should be able to post photos to the user's wall with an open file object" do
+    it "can post photos to the user's wall with an open file object" do
       content_type = "image/jpg"
       file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
 
@@ -202,7 +202,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @temporary_object_id.should_not be_nil
     end
 
-    it "should be able to post photos to the user's wall without an open file object" do
+    it "can post photos to the user's wall without an open file object" do
       content_type = "image/jpg",
       file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
 
@@ -211,7 +211,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @temporary_object_id.should_not be_nil
     end
 
-    it "should be able to verify a photo posted to a user's wall" do
+    it "can verify a photo posted to a user's wall" do
       content_type = "image/jpg",
       file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
 
@@ -231,13 +231,13 @@ shared_examples_for "Koala GraphAPI with an access token" do
         @url = "http://img.slate.com/images/redesign2008/slate_logo.gif"
       end
 
-      it "should be able to post photo to the user's wall using a URL" do
+      it "can post photo to the user's wall using a URL" do
         result = @api.put_picture(@url)
         @temporary_object_id = result["id"]
         @temporary_object_id.should_not be_nil
       end
 
-      it "should be able to post photo to the user's wall using a URL and an additional param" do
+      it "can post photo to the user's wall using a URL and an additional param" do
         result = @api.put_picture(@url, :message => "my message")
         @temporary_object_id = result["id"]
         @temporary_object_id.should_not be_nil
@@ -251,7 +251,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @content_type = "video/mpeg4"
     end
 
-    it "should set options[:video] to true" do
+    it "sets options[:video] to true" do
       source = stub("UploadIO")
       Koala::UploadableIO.stub(:new).and_return(source)
       source.stub(:requires_base_http_service).and_return(false)
@@ -259,7 +259,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @api.put_video("foo")
     end
 
-    it "should be able to post videos to the user's wall with an open file object" do
+    it "can post videos to the user's wall with an open file object" do
       file = File.open(@cat_movie)
 
       result = @api.put_video(file, @content_type)
@@ -268,7 +268,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
 
 
-    it "should be able to post videos to the user's wall without an open file object" do
+    it "can post videos to the user's wall without an open file object" do
       result = @api.put_video(@cat_movie, @content_type)
       @temporary_object_id = result["id"]
       @temporary_object_id.should_not be_nil
@@ -279,7 +279,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     # hence we can't do the same verify test we do for photos
   end
 
-  it "should be able to verify a message with an attachment posted to a feed" do
+  it "can verify a message with an attachment posted to a feed" do
     attachment = {"name" => "OAuth Playground", "link" => "http://oauth.twoalex.com/"}
     result = @api.put_wall_post("Hello, world, from the test suite again!", attachment)
     @temporary_object_id = result["id"]
@@ -290,7 +290,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     it_matches.should == true
   end
 
-  it "should be able to comment on an object" do
+  it "can comment on an object" do
     result = @api.put_wall_post("Hello, world, from the test suite, testing comments!")
     @temporary_object_id = result["id"]
 
@@ -299,7 +299,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     comment_result.should_not be_nil
   end
 
-  it "should be able to verify a comment posted about an object" do
+  it "can verify a comment posted about an object" do
     message_text = "Hello, world, from the test suite, testing comments!"
     result = @api.put_wall_post(message_text)
     @temporary_object_id = result["id"]
@@ -313,7 +313,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     get_result["message"].should == comment_text
   end
 
-  it "should be able to like an object" do
+  it "can like an object" do
     result = @api.put_wall_post("Hello, world, from the test suite, testing comments!")
     @temporary_object_id = result["id"]
     like_result = @api.put_like(@temporary_object_id)
@@ -349,7 +349,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :put_video => ["x.mp4", "video/mpeg4", {}, "me"],
       :get_objects => [["x"], {}]
     }.each_pair do |method_name, params|
-      it "should pass http options through for #{method_name}" do
+      it "passes http options through for #{method_name}" do
         options = {:a => 2}
         # graph call should ultimately receive options as the fourth argument
         @api.should_receive(:graph_call).with(anything, anything, anything, options)
@@ -363,7 +363,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
 
     # also test get_picture, which merges a parameter into options
-    it "should pass http options through for get_picture" do
+    it "passes http options through for get_picture" do
       options = {:a => 2}
       # graph call should ultimately receive options as the fourth argument
       @api.should_receive(:graph_call).with(anything, anything, anything, hash_including(options)).and_return({})
@@ -377,34 +377,34 @@ end
 shared_examples_for "Koala GraphAPI with GraphCollection" do
   describe "when getting a collection" do
     # GraphCollection methods
-    it "should get a GraphCollection when getting connections" do
+    it "gets a GraphCollection when getting connections" do
       @result = @api.get_connections(KoalaTest.page, "photos")
       @result.should be_a(Koala::Facebook::GraphCollection)
     end
 
-    it "should return nil if the get_collections call fails with nil" do
+    it "returns nil if the get_collections call fails with nil" do
       # this happens sometimes
       @api.should_receive(:graph_call).and_return(nil)
       @api.get_connections(KoalaTest.page, "photos").should be_nil
     end
 
-    it "should get a GraphCollection when searching" do
+    it "gets a GraphCollection when searching" do
       result = @api.search("facebook")
       result.should be_a(Koala::Facebook::GraphCollection)
     end
 
-    it "should return nil if the search call fails with nil" do
+    it "returns nil if the search call fails with nil" do
       # this happens sometimes
       @api.should_receive(:graph_call).and_return(nil)
       @api.search("facebook").should be_nil
     end
 
-    it "should get a GraphCollection when paging through results" do
+    it "gets a GraphCollection when paging through results" do
       @results = @api.get_page(["search", {"q"=>"facebook", "limit"=>"25", "until"=> KoalaTest.search_time}])
       @results.should be_a(Koala::Facebook::GraphCollection)
     end
 
-    it "should return nil if the page call fails with nil" do
+    it "returns nil if the page call fails with nil" do
       # this happens sometimes
       @api.should_receive(:graph_call).and_return(nil)
       @api.get_page(["search", {"q"=>"facebook", "limit"=>"25", "until"=> KoalaTest.search_time}]).should be_nil
@@ -415,48 +415,48 @@ end
 
 shared_examples_for "Koala GraphAPI without an access token" do
 
-  it "should not get private data about a user" do
+  it "can't get private data about a user" do
     result = @api.get_object("koppel")
     # updated_time should be a pretty fixed test case
     result["updated_time"].should be_nil
   end
 
-  it "should not be able to get data about 'me'" do
+  it "can't get data about 'me'" do
     lambda { @api.get_object("me") }.should raise_error(Koala::Facebook::APIError)
   end
 
-  it "shouldn't be able to access connections from users" do
+  it "can't access connections from users" do
     lambda { @api.get_connections("lukeshepard", "friends") }.should raise_error(Koala::Facebook::APIError)
   end
 
-  it "should not be able to put an object" do
+  it "can't put an object" do
     lambda { @result = @api.put_object("lukeshepard", "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
   end
 
   # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
-  it "should not be able to post to a feed" do
+  it "can't post to a feed" do
     (lambda do
       attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
       @result = @api.put_wall_post("Hello, world", attachment, "contextoptional")
     end).should raise_error(Koala::Facebook::APIError)
   end
 
-  it "should not be able to comment on an object" do
+  it "can't comment on an object" do
     # random public post on the ContextOptional wall
     lambda { @result = @api.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::APIError)
   end
 
-  it "should not be able to like an object" do
+  it "can't like an object" do
     lambda { @api.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
   end
 
   # DELETE
-  it "should not be able to delete posts" do
+  it "can't delete posts" do
     # test post on the Ruby SDK Test application
     lambda { @result = @api.delete_object("115349521819193_113815981982767") }.should raise_error(Koala::Facebook::APIError)
   end
 
-  it "should not be able to delete a like" do
+  it "can't delete a like" do
     lambda { @api.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
   end
 end

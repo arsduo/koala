@@ -77,12 +77,12 @@ describe "Koala::HTTPService" do
         @options = {:video => true}
       end
 
-      it "should return the REST video server if options[:rest_api]" do
+      it "returns the REST video server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
         server.should =~ Regexp.new(Koala::Facebook::REST_SERVER.gsub(/\.facebook/, "-video.facebook"))
       end
 
-      it "should return the graph video server if !options[:rest_api]" do
+      it "returns the graph video server if !options[:rest_api]" do
         server = Koala::HTTPService.server(@options)
         server.should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER.gsub(/\.facebook/, "-video.facebook"))
       end
@@ -90,11 +90,11 @@ describe "Koala::HTTPService" do
   end
 
   describe "#encode_params" do
-    it "should return an empty string if param_hash evaluates to false" do
+    it "returns an empty string if param_hash evaluates to false" do
       Koala::HTTPService.encode_params(nil).should == ''
     end
 
-    it "should convert values to JSON if the value is not a String" do
+    it "converts values to JSON if the value is not a String" do
       val = 'json_value'
       not_a_string = 'not_a_string'
       not_a_string.stub(:is_a?).and_return(false)
@@ -113,7 +113,7 @@ describe "Koala::HTTPService" do
       end.should be_true
     end
 
-    it "should escape all values" do
+    it "escapes all values" do
       args = Hash[*(1..4).map {|i| [i.to_s, "Value #{i}($"]}.flatten]
 
       result = Koala::HTTPService.encode_params(args)
@@ -123,7 +123,7 @@ describe "Koala::HTTPService" do
       end
     end
 
-    it "should convert all keys to Strings" do
+    it "converts all keys to Strings" do
       args = Hash[*(1..4).map {|i| [i, "val#{i}"]}.flatten]
 
       result = Koala::HTTPService.encode_params(args)
@@ -427,16 +427,16 @@ describe "Koala::HTTPService" do
       :net_http => Koala::NetHTTPService
     }.each_pair do |adapter, module_class|
       describe module_class.to_s do
-        it "should respond to deprecated_interface" do
+        it "responds to deprecated_interface" do
            module_class.should respond_to(:deprecated_interface)
         end
       
-        it "should issue a deprecation warning" do
+        it "issues a deprecation warning" do
           Koala::Utils.should_receive(:deprecate)
           module_class.deprecated_interface
         end
       
-        it "should set the default adapter to #{adapter}" do
+        it "sets the default adapter to #{adapter}" do
           module_class.deprecated_interface
           Faraday.default_adapter.should == adapter
         end
