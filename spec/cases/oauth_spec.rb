@@ -66,6 +66,11 @@ describe "Koala::Facebook::OAuth" do
           result.should be_a(Hash)
         end
 
+        it "returns the user_id as a string" do
+          result = @oauth.get_user_from_cookies(@cookie)
+          result.should == "2905623"
+        end
+
         it "returns all the components in the signed request" do
           result = @oauth.get_user_info_from_cookies(@cookie)
           @oauth.parse_signed_request(@cookie.values.first).each_pair do |k, v|

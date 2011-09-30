@@ -27,7 +27,8 @@ module Koala
 
       def get_user_from_cookie(cookies)
         if info = get_user_info_from_cookies(cookies)
-          string = info["uid"]
+          # signed cookie has user_id, unsigned cookie has uid
+          string = info.has_key?("user_id") ? info["user_id"] : info["uid"]
         end
       end
       alias_method :get_user_from_cookies, :get_user_from_cookie
