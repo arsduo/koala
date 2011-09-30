@@ -20,6 +20,7 @@ describe "Koala::HTTPService" do
       @builder = stub("Faraday connection builder")
       @builder.stub(:request)
       @builder.stub(:adapter)
+      @builder.stub(:use)
     end
 
     it "is defined" do
@@ -27,7 +28,7 @@ describe "Koala::HTTPService" do
     end
 
     it "adds multipart" do
-      @builder.should_receive(:request).with(:multipart)
+      @builder.should_receive(:use).with(Koala::MultipartRequest)
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
     end
 

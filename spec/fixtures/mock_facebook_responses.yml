@@ -164,6 +164,9 @@ graph_api:
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
+    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= {"name"=>"Link1'", "text"=>"Left", "href"=>"http://oauth.twoalex.com/"}.to_s %>=<%= {"name"=>"other", "text"=>"Straight ahead"}.to_s %>&type=link:
+      post:
+        with_token: '{"id": "FEED_ITEM_CONTEXT"}'        
 
   /me/photos:
     source=[FILE]:

@@ -19,6 +19,7 @@ require 'koala/test_users'
 
 # HTTP module so we can communicate with Facebook
 require 'koala/http_service'
+require 'koala/multipart_request'
 
 # add KoalaIO class
 require 'koala/uploadable_io'

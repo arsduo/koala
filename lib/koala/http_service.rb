@@ -20,7 +20,7 @@ module Koala
     @http_options ||= {}
     
     DEFAULT_MIDDLEWARE = Proc.new do |builder|
-      builder.request :multipart
+      builder.use Koala::MultipartRequest
       builder.request :url_encoded
       builder.adapter Faraday.default_adapter
     end
