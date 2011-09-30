@@ -66,11 +66,6 @@ describe "Koala::Facebook::OAuth" do
           result.should be_a(Hash)
         end
 
-        it "returns the user_id as a string" do
-          result = @oauth.get_user_from_cookies(@cookie)
-          result.should == "2905623"
-        end
-
         it "returns all the components in the signed request" do
           result = @oauth.get_user_info_from_cookies(@cookie)
           @oauth.parse_signed_request(@cookie.values.first).each_pair do |k, v|
@@ -163,22 +158,53 @@ describe "Koala::Facebook::OAuth" do
     end
 
     describe "get_user_from_cookies" do
-      it "uses get_user_info_from_cookies to parse the cookies" do
-        data = KoalaTest.oauth_test_data["valid_cookies"]
-        @oauth.should_receive(:get_user_info_from_cookies).with(data).and_return({})
-        @oauth.get_user_from_cookies(data)
-      end
+      describe "for signed cookies" do
+        before :each do
+          # we don't actually want to make requests to Facebook to redeem the code
+          @cookie = KoalaTest.oauth_test_data["valid_signed_cookies"]
+          @oauth.stub(:get_access_token_info).and_return("access_token" => "my token")          
+        end
 
-      it "uses return a string if the cookies are valid" do
-        result = @oauth.get_user_from_cookies(KoalaTest.oauth_test_data["valid_cookies"])
-        result.should be_a(String)
-      end
+        it "uses get_user_info_from_cookies to parse the cookies" do
+          @oauth.should_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
+          @oauth.get_user_from_cookies(@cookie)
+        end
 
-      it "returns nil if the cookies are invalid" do
-        # make an invalid string by replacing some values
-        bad_cookie_hash = KoalaTest.oauth_test_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
-        result = @oauth.get_user_from_cookies(bad_cookie_hash)
-        result.should be_nil
+        it "uses return the token string if the cookies are valid" do
+          result = @oauth.get_user_from_cookies(@cookie)
+          result.should == "2905623" # the user who generated the original test cookie
+        end
+
+        it "returns nil if the cookies are invalid" do
+          # make an invalid string by replacing some values
+          bad_cookie_hash = @cookie.inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
+          result = @oauth.get_user_from_cookies(bad_cookie_hash)
+          result.should be_nil
+        end
+      end
+      
+      describe "for unsigned cookies" do
+        before :each do
+          # we don't actually want to make requests to Facebook to redeem the code
+          @cookie = KoalaTest.oauth_test_data["valid_cookies"]
+        end
+
+        it "uses get_user_info_from_cookies to parse the cookies" do
+          @oauth.should_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
+          @oauth.get_user_from_cookies(@cookie)
+        end
+
+        it "uses return a string if the cookies are valid" do
+          result = @oauth.get_user_from_cookies(@cookie)
+          result.should == "2905623" # the user who generated the original test cookie
+        end
+
+        it "returns nil if the cookies are invalid" do
+          # make an invalid string by replacing some values
+          bad_cookie_hash = @cookie.inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
+          result = @oauth.get_user_from_cookies(bad_cookie_hash)
+          result.should be_nil
+        end
       end
     end
   end
