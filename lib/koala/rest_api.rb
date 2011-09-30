@@ -13,6 +13,11 @@ module Koala
           results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
         end
       end
+      
+      def set_app_properties(properties, args = {}, options = {})
+        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "setAppProperties requires an access token"}) unless @access_token
+        rest_call("admin.setAppProperties", args.merge(:properties => MultiJson.encode(properties)), options, "post")
+      end
 
       def rest_call(fb_method, args = {}, options = {}, method = "get")
         options = options.merge!(:rest_api => true, :read_only => READ_ONLY_METHODS.include?(fb_method.to_s))

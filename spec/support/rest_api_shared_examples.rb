@@ -239,7 +239,6 @@ shared_examples_for "Koala RestAPI with an access token" do
     result.first["read_stream"].should == 1
   end
 
-
   it "can access protected information via FQL.multiquery" do
     result = @api.fql_multiquery(
       :query1 => "select post_id from stream where source_id = me()",
@@ -248,6 +247,44 @@ shared_examples_for "Koala RestAPI with an access token" do
     )
     result.size.should == 3
     result.keys.should include("query1", "query2", "query3")
+  end
+  
+  
+  describe ".set_app_properties" do
+    it "sends Facebook the properties JSON-encoded as :properties" do
+      props = {:a => 2, :c => [1, 2, "d"]}
+      @api.should_receive(:rest_call).with(anything, hash_including(:properties => MultiJson.encode(props)), anything, anything)
+      @api.set_app_properties(props)
+    end
+
+    it "calls the admin.setAppProperties method" do
+      @api.should_receive(:rest_call).with("admin.setAppProperties", anything, anything, anything)
+      @api.set_app_properties({})
+    end
+
+    it "includes any other provided arguments" do
+      args = {:c => 3, :d => "a"}
+      @api.should_receive(:rest_call).with(anything, hash_including(args), anything, anything)
+      @api.set_app_properties({:a => 2}, args)
+    end
+
+    it "includes any http_options provided" do
+      opts = {:c => 3, :d => "a"}
+      @api.should_receive(:rest_call).with(anything, anything, opts, anything)
+      @api.set_app_properties({}, {}, opts)
+    end
+    
+    it "makes a POST" do
+      @api.should_receive(:rest_call).with(anything, anything, anything, "post")
+      @api.set_app_properties({})
+    end
+
+    it "can set app properties using the app's access token" do
+      oauth = Koala::Facebook::OAuth.new(KoalaTest.app_id, KoalaTest.secret)
+      app_token = oauth.get_app_access_token
+      @app_api = Koala::Facebook::API.new(app_token)
+      @app_api.set_app_properties(:desktop => 0).should be_true
+    end
   end
 end
 
@@ -284,5 +321,9 @@ shared_examples_for "Koala RestAPI without an access token" do
         )
       }.should raise_error(Koala::Facebook::APIError)
     end
+  end
+  
+  it "can't use set_app_properties" do
+    lambda { @api.set_app_properties(:desktop => 0) }.should raise_error(Koala::Facebook::APIError)
   end
 end

@@ -33,6 +33,10 @@ rest_api:
       get:
         with_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
         no_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
+  /method/admin.setAppProperties:
+    'properties={"desktop":0}':
+      post:
+        with_token: 'true'
 
 
 
