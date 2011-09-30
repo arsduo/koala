@@ -17,7 +17,7 @@ describe "Koala::Facebook::TestUsers" do
     after :each do
       # clean up any test users
       ((@network || []) + [@user1, @user2]).each do |u|
-        puts "Unable to delete test user #{u.inspect}" if u && (!@test_users.delete(u) rescue false)
+        puts "Unable to delete test user #{u.inspect}" if u && !(@test_users.delete(u) rescue false)
       end
     end
 
@@ -90,14 +90,14 @@ describe "Koala::Facebook::TestUsers" do
       describe ".create" do
         it "should create a test user when not given installed" do
           result = @test_users.create(false)
-          @temporary_object_id = result["id"]
+          @user1 = result["id"]
           result.should be_a(Hash)
           (result["id"] && result["access_token"] && result["login_url"]).should
         end
 
         it "should create a test user when not given installed, ignoring permissions" do
           result = @test_users.create(false, "read_stream")
-          @temporary_object_id = result["id"]
+          @user1 = result["id"]
           result.should be_a(Hash)
           (result["id"] && result["access_token"] && result["login_url"]).should
         end
@@ -114,7 +114,7 @@ describe "Koala::Facebook::TestUsers" do
 
         it "should create a test user when given installed and a permission" do
           result = @test_users.create(true, "read_stream")
-          @temporary_object_id = result["id"]
+          @user1 = result["id"]
           result.should be_a(Hash)
           (result["id"] && result["access_token"] && result["login_url"]).should
         end
@@ -165,24 +165,26 @@ describe "Koala::Facebook::TestUsers" do
       describe ".update" do
         before :each do
           @updates = {:name => "Foo Baz"}
+          # we stub out :graph_call, but still need to be able to delete the users
+          @test_users2 = Koala::Facebook::TestUsers.new(:app_id => @test_users.app_id, :app_access_token => @test_users.app_access_token)
         end
 
         it "makes a POST with the test user Graph API " do
-          user = @test_users.create(true)
-          @test_users.graph_api.should_receive(:graph_call).with(anything, anything, "post", anything)
-          @test_users.update(user, @updates)
+          @user1 = @test_users2.create(true)
+          @test_users2.graph_api.should_receive(:graph_call).with(anything, anything, "post", anything)
+          @test_users2.update(@user1, @updates)
         end
 
         it "makes a request to the test user with the update params " do
-          user = @test_users.create(true)
-          @test_users.graph_api.should_receive(:graph_call).with(user["id"], @updates, anything, anything)
-          @test_users.update(user, @updates)
+          @user1 = @test_users2.create(true)
+          @test_users2.graph_api.should_receive(:graph_call).with(@user1["id"], @updates, anything, anything)
+          @test_users2.update(@user1, @updates)
         end
 
         it "works" do
-          user = @test_users.create(true)
-          @test_users.update(user, @updates)
-          user_info = Koala::Facebook::API.new(user["access_token"]).get_object(user["id"])
+          @user1 = @test_users.create(true)
+          @test_users.update(@user1, @updates)
+          user_info = Koala::Facebook::API.new(@user1["access_token"]).get_object(@user1["id"])
           user_info["name"].should == @updates[:name]
         end
       end

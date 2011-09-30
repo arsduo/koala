@@ -31,7 +31,7 @@ module Koala
         # Creates and returns a test user
         args['installed'] = installed
         args['permissions'] = (permissions.is_a?(Array) ? permissions.join(",") : permissions) if installed
-        result = @api.graph_call(accounts_path, args, "post", options)
+        @api.graph_call(accounts_path, args, "post", options)
       end
 
       def list

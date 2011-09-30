@@ -94,19 +94,16 @@ module KoalaTest
   end
   
   def self.setup_test_users
-    # note: we don't have to delete the two test users explicitly, since the test user specs do that for us
-    # technically, this is a point of brittleness and would break if the tests were run out of order
-    # however, for now we can live with it since it would slow tests way too much to constantly recreate our test users
     print "Setting up test users..."
     @test_user_api = Koala::Facebook::TestUsers.new(:app_id => self.app_id, :secret => self.secret)
 
     RSpec.configure do |config|
-      config.before :all do
+      config.before :suite do
         # before each test module, create two test users with specific names and befriend them
         KoalaTest.create_test_users
       end
       
-      config.after :all do
+      config.after :suite do
         # after each test module, delete the test users to avoid cluttering up the application
         KoalaTest.destroy_test_users
       end
@@ -116,10 +113,15 @@ module KoalaTest
   end
 
   def self.create_test_users
-    @live_testing_user = @test_user_api.create(true, KoalaTest.testing_permissions, :name => KoalaTest.user1_name)
-    @live_testing_friend = @test_user_api.create(true, KoalaTest.testing_permissions, :name => KoalaTest.user2_name)
-    @test_user_api.befriend(@live_testing_user, @live_testing_friend)
-    self.oauth_token = @live_testing_user["access_token"]
+    begin
+      @live_testing_user = @test_user_api.create(true, KoalaTest.testing_permissions, :name => KoalaTest.user1_name)
+      @live_testing_friend = @test_user_api.create(true, KoalaTest.testing_permissions, :name => KoalaTest.user2_name)
+      @test_user_api.befriend(@live_testing_user, @live_testing_friend)
+      self.oauth_token = @live_testing_user["access_token"]
+    rescue Exception => e
+      Kernel.warn("Problem creating test users! #{e.message}")
+      raise
+    end    
   end
   
   def self.destroy_test_users
