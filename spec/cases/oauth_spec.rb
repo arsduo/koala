@@ -537,6 +537,12 @@ describe "Koala::Facebook::OAuth" do
       OpenSSL::HMAC.stub!(:hexdigest).and_return("i'm an invalid signature")
       lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
     end
+    
+    it "throws an error if the signature string is empty" do
+      # this occasionally happens due to Facebook error
+      lambda { @oauth.parse_signed_request("") }.should raise_error
+      lambda { @oauth.parse_signed_request("abc-def") }.should raise_error
+    end
 
     it "properly parses requests" do
       @oauth = Koala::Facebook::OAuth.new(@app_id, @secret || @app_secret)

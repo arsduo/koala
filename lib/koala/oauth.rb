@@ -86,6 +86,8 @@ module Koala
       # for a more accurate reference implementation strategy.
       def parse_signed_request(input)
         encoded_sig, encoded_envelope = input.split('.', 2)
+        raise 'SignedRequest: Invalid (incomplete) signature data' unless encoded_sig && encoded_envelope
+
         signature = base64_url_decode(encoded_sig).unpack("H*").first
         envelope = MultiJson.decode(base64_url_decode(encoded_envelope))
 
@@ -95,7 +97,7 @@ module Koala
         hmac = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, @app_secret, encoded_envelope)
         raise 'SignedRequest: Invalid signature' if (signature != hmac)
 
-        return envelope
+        envelope
       end
 
       # from session keys
