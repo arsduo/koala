@@ -12,11 +12,7 @@ Koala
 Facebook Changes on October 1, 2011
 ---
 
-**Koala 1.2 supports all of Facebook's new authentication schemes**, which will be introduced on October 1, 2011; the old Javascript library and older authentication schemes will be deprecated at the same time. 
-
-To test your application, upgrade to the latest version of Koala (see below) and configure your application according to Facebook's [OAuth 2.0 and HTTPS Migration](https://developers.facebook.com/docs/oauth2-https-migration/) guide.  If you have the appropriate calls to get_user_info_from_cookies (apps using the Javascript SDK) and/or parse_signed_params (for Canvas and tab apps), your application should work without a hitch.
-
-_Note_: in their new secure cookie format, Facebook provides an OAuth code, which Koala automatically exchanges for an access token.  Because this involves a call to Facebook's servers, you should consider storing the user's access token in their session and only calling get_user_info_from_cookies when necessary (access_token not present, you discover it's expired, etc.).  Otherwise, you'll be calling out to Facebook each time the user loads a page, slowing down your site.  (As we figure out best practices for this, we'll update the wiki.)
+Koala 1.2 supports all of Facebook's new authentication schemes, which were introduced on October 1, 2011.  If you have the appropriate calls to get_user_info_from_cookies (apps using the Javascript SDK) and/or parse_signed_params (for Canvas and tab apps), your application should work without a hitch.  For more information, see Facebook's [OAuth 2.0 and HTTPS Migration](https://developers.facebook.com/docs/oauth2-https-migration/) guide.  
 
 Installation
 ---
@@ -94,25 +90,31 @@ Of course, you can use the Graph API methods on the same object -- the power of 
 OAuth
 -----
 You can use the Graph and REST APIs without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
+
     @oauth = Koala::Facebook::OAuth.new(app_id, app_secret, callback_url)
 
 If your application uses Koala and the Facebook [JavaScript SDK](http://github.com/facebook/connect-js) (formerly Facebook Connect), you can use the OAuth class to parse the cookies:
+
     @oauth.get_user_from_cookies(cookies) # gets the user's ID
 	  @oauth.get_user_info_from_cookies(cookies) # parses and returns the entire hash
 
 And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
+
 	  # generate authenticating URL
 	  @oauth.url_for_oauth_code
 	  # fetch the access token once you have the code
 	  @oauth.get_access_token(code)
 
 You can also get your application's own access token, which can be used without a user session for subscriptions and certain other requests:
+
     @oauth.get_app_access_token
 
 For those building apps on Facebook, parsing signed requests is simple:
+
     @oauth.parse_signed_request(signed_request_string)
 
 Or, if for some horrible reason, you're still using session keys, despair not!  It's easy to turn them into shiny, modern OAuth tokens:
+
     @oauth.get_token_from_session_key(session_key)
     @oauth.get_tokens_from_session_keys(array_of_session_keys)
 
@@ -160,12 +162,12 @@ Talking to Facebook
 
 Koala uses Faraday to make HTTP requests, which means you have complete control over how your app makes HTTP requests to Facebook.  You can set Faraday options globally or pass them in on a per-request (or both):
 
-  # Set an SSL certificate to avoid Net::HTTP errors
-  Koala.http_service.http_options = {
-    :ssl => { :ca_path => "/etc/ssl/certs" }
-  }
-  # or on a per-request basis
-  @api.get_object(id, args_hash, { :timeout => 10 }
+    # Set an SSL certificate to avoid Net::HTTP errors
+    Koala.http_service.http_options = {
+      :ssl => { :ca_path => "/etc/ssl/certs" }
+    }
+    # or on a per-request basis
+    @api.get_object(id, args_hash, { :timeout => 10 }
   
 The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services wiki page</a> has more information on what options are available, as well as on how to configure your own Faraday middleware stack (for instance, to implement request logging).
 
