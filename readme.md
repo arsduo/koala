@@ -155,6 +155,20 @@ We also support the test users API, allowing you to conjure up fake users and co
     # or, if you want to make a whole community:
     @test_users.create_network(network_size, is_app_installed, common_permissions)
 
+Talking to Facebook
+-----
+
+Koala uses Faraday to make HTTP requests, which means you have complete control over how your app makes HTTP requests to Facebook.  You can set Faraday options globally or pass them in on a per-request (or both):
+
+  # Set an SSL certificate to avoid Net::HTTP errors
+  Koala.http_service.http_options = {
+    :ssl => { :ca_path => "/etc/ssl/certs" }
+  }
+  # or on a per-request basis
+  @api.get_object(id, args_hash, { :timeout => 10 }
+  
+The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services wiki page</a> has more information on what options are available, as well as on how to configure your own Faraday middleware stack (for instance, to implement request logging).
+
 See examples, ask questions
 -----
 Some resources to help you as you play with Koala and the Graph API:
