@@ -1,3 +1,18 @@
+v1.2.1
+New methods:
+-- RestAPI.set_app_properties handles JSON-encoding application properties
+Updated methods:
+-- OAuth.get_user_from_cookie works with the new signed cookie format (thanks, gmccreight!)
+-- Beta server URLs are now correct
+-- OAuth.parse_signed_request now raises an informative error if the signed_request is malformed
+Internal improvements:
+-- Koala::Multipart middleware properly encoding nested parameters (hashes) in POSTs
+-- Updated readme, changelog, etc.
+Testing improvements:
+-- Live tests with test users now clean up all fake users they create
+-- Removed duplicate test cases
+-- Live tests with test users no longer delete each object they create, speeding things up
+
 v1.2
 New methods:
 -- API is now the main API class, contains both Graph and REST methods
