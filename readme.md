@@ -167,7 +167,7 @@ Koala uses Faraday to make HTTP requests, which means you have complete control 
       :ssl => { :ca_path => "/etc/ssl/certs" }
     }
     # or on a per-request basis
-    @api.get_object(id, args_hash, { :timeout => 10 }
+    @api.get_object(id, args_hash, { :timeout => 10 })
   
 The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services wiki page</a> has more information on what options are available, as well as on how to configure your own Faraday middleware stack (for instance, to implement request logging).
 
