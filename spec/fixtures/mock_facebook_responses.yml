@@ -152,6 +152,12 @@ graph_api:
     message=Hello, world, from the test suite, testing comments!:
       post:
         with_token: '{"id": "MOCK_FEED_ITEM"}'
+    message=Hello, world, from the test suite, testing comments again!:
+      post:
+        with_token: '{"id": "MOCK_FEED_ITEM"}'
+    message=Hello, world, from the test suite, testing liking!:
+      post:
+        with_token: '{"id": "MOCK_FEED_ITEM"}'
     message=the cats are asleep:
       post:
         with_token: '{"id": "FEED_ITEM_CATS"}'

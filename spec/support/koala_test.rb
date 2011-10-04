@@ -57,16 +57,16 @@ module KoalaTest
       end
 
       config.after :each do
-        # clean up any objects posted to Facebook
-        if @temporary_object_id && !KoalaTest.mock_interface?
-          api = @api || (@test_users ? @test_users.graph_api : nil)
-          raise "Unable to locate API when passed temporary object to delete!" unless api
+        # if we're working with a real user, clean up any objects posted to Facebook
+        # no need to do so for test users, since they get deleted at the end
+        if @temporary_object_id && KoalaTest.real_user?
+          raise "Unable to locate API when passed temporary object to delete!" unless @api
 
           # wait 10ms to allow Facebook to propagate data so we can delete it
           sleep(0.01)
 
           # clean up any objects we've posted
-          result = (api.delete_object(@temporary_object_id) rescue false)
+          result = (@api.delete_object(@temporary_object_id) rescue false)
           # if we errored out or Facebook returned false, track that
           puts "Unable to delete #{@temporary_object_id}: #{result} (probably a photo or video, which can't be deleted through the API)" unless result
         end
@@ -146,7 +146,7 @@ module KoalaTest
   
   # Info about the testing environment
   def self.real_user?
-    !(mock_interface? || @test_user)
+    !(mock_interface? || @test_user_api)
   end
 
   def self.test_user?

@@ -319,7 +319,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "can verify a comment posted about an object" do
-    message_text = "Hello, world, from the test suite, testing comments!"
+    message_text = "Hello, world, from the test suite, testing comments again!"
     result = @api.put_wall_post(message_text)
     @temporary_object_id = result["id"]
 
@@ -333,7 +333,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "can like an object" do
-    result = @api.put_wall_post("Hello, world, from the test suite, testing comments!")
+    result = @api.put_wall_post("Hello, world, from the test suite, testing liking!")
     @temporary_object_id = result["id"]
     like_result = @api.put_like(@temporary_object_id)
     like_result.should be_true
