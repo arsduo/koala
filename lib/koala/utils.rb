@@ -1,10 +1,13 @@
 module Koala
   module Utils
+
+    DEPRECATION_PREFIX = "KOALA: Deprecation warning: "
     def self.deprecate(message)
-      begin
-        send(:warn, "KOALA: Deprecation warning: #{message}")
-      rescue Exception => err
-        puts "Unable to issue Koala deprecation warning!  #{err.message}"
+      @posted_deprecations ||= []
+      unless @posted_deprecations.include?(message)
+        # only include each message once
+        Kernel.warn("#{DEPRECATION_PREFIX}#{message}")
+        @posted_deprecations << message
       end
     end
   end
