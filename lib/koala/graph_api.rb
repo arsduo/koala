@@ -176,9 +176,13 @@ module Koala
       end
 
       # Convenience Methods
-
-      def get_page_access_token(object_id)
-        result = get_object(object_id, :fields => "access_token") do
+      #
+      # in general, we're trying to avoid adding convenience methods to Koala
+      # except to support cases where the Facebook API requires non-standard input
+      # such as JSON-encoding arguments, posts directly to objects, etc.
+      
+      def get_page_access_token(object_id, args = {}, options = {})
+        result = get_object(object_id, args.merge(:fields => "access_token"), options) do
           result ? result["access_token"] : nil
         end
       end

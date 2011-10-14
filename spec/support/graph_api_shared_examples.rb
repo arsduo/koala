@@ -340,10 +340,21 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   # Page Access Token Support
-  it "gets a page's access token" do
-    # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
-    @api.should_receive(:api).with("my_page", {:fields => "access_token"}, "get", anything)
-    @api.get_page_access_token("my_page")
+  describe "#get_page_access_token" do
+    it "gets the page object with the access_token field" do
+      # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
+      @api.should_receive(:api).with("my_page", hash_including({:fields => "access_token"}), "get", anything)
+      @api.get_page_access_token("my_page")
+    end
+    
+    it "merges in any other arguments" do
+      # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
+      args = {:a => 3}
+      @api.should_receive(:api).with("my_page", hash_including(args), "get", anything)
+      @api.get_page_access_token("my_page", args)
+    end    
+  end
+
   describe "#set_app_restrictions" do
     before :all do
       oauth = Koala::Facebook::OAuth.new(KoalaTest.app_id, KoalaTest.secret)
@@ -390,7 +401,10 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :put_comment => 3,
       :put_like => 2, :delete_like => 2,
       :search => 3,
+      :set_app_restrictions => 4,
+      :get_page_access_token => 3,
       # methods that have special arguments
+      :get_comments_for_urls => [["url1", "url2"], {}],
       :put_picture => ["x.jpg", "image/jpg", {}, "me"],
       :put_video => ["x.mp4", "video/mpeg4", {}, "me"],
       :get_objects => [["x"], {}]
@@ -462,7 +476,7 @@ end
 shared_examples_for "Koala GraphAPI without an access token" do
 
   it "can't get private data about a user" do
-    result = @api.get_object("koppel")
+    result = @api.get_object(KoalaTest.user1)
     # updated_time should be a pretty fixed test case
     result["updated_time"].should be_nil
   end
@@ -472,11 +486,11 @@ shared_examples_for "Koala GraphAPI without an access token" do
   end
 
   it "can't access connections from users" do
-    lambda { @api.get_connections("lukeshepard", "friends") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @api.get_connections(KoalaTest.user2, "friends") }.should raise_error(Koala::Facebook::APIError)
   end
 
   it "can't put an object" do
-    lambda { @result = @api.put_object("lukeshepard", "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @result = @api.put_object(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
   end
 
   # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
