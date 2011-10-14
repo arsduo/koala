@@ -290,6 +290,12 @@ graph_api:
         <<: *token_required
         with_token: '{"access_token": "<%= APP_ACCESS_TOKEN %>"}'
 
+
+  '/<%= APP_ID %>':
+    restrictions=<%= MultiJson.encode({"age_distr" => "13+"}) %>:
+      post:
+        with_token: "true"
+
   # -- OAuth responses --
   /oauth/access_token:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&code=<%= OAUTH_CODE %>&redirect_uri=<%= OAUTH_DATA["callback_url"] %>:

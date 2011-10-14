@@ -344,6 +344,33 @@ shared_examples_for "Koala GraphAPI with an access token" do
     # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
     @api.should_receive(:api).with("my_page", {:fields => "access_token"}, "get", anything)
     @api.get_page_access_token("my_page")
+  describe "#set_app_restrictions" do
+    before :all do
+      oauth = Koala::Facebook::OAuth.new(KoalaTest.app_id, KoalaTest.secret)
+      app_token = oauth.get_app_access_token
+      @app_api = Koala::Facebook::API.new(app_token)
+      @restrictions = {"age_distr" => "13+"}
+    end
+
+    it "makes a POST to /app_id" do
+      @app_api.should_receive(:graph_call).with(KoalaTest.app_id, anything, "post", anything)
+      @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions)
+    end
+    
+    it "JSON-encodes the restrictions" do
+      @app_api.should_receive(:graph_call).with(anything, hash_including(:restrictions => MultiJson.encode(@restrictions)), anything, anything)
+      @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions)
+    end
+    
+    it "includes the other arguments" do
+      args = {:a => 2}
+      @app_api.should_receive(:graph_call).with(anything, hash_including(args), anything, anything)
+      @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions, args)
+    end
+    
+    it "works" do
+      @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions).should be_true
+    end
   end
 
   # test all methods to make sure they pass data through to the API

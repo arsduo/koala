@@ -190,6 +190,9 @@ module Koala
         args.merge!(:ids => urls.respond_to?(:join) ? urls.join(",") : urls)
         get_object("comments", args, options)
       end
+      def set_app_restrictions(app_id, restrictions_hash, args = {}, options = {})
+        graph_call(app_id, args.merge(:restrictions => MultiJson.encode(restrictions_hash)), "post", options)
+      end
 
       # GraphCollection support
       def get_page(params)
