@@ -87,7 +87,7 @@ describe "Koala::Facebook::TestUsers" do
 
       # TEST USER MANAGEMENT
 
-      describe ".create" do
+      describe "#create" do
         it "should create a test user when not given installed" do
           result = @test_users.create(false)
           @user1 = result["id"]
@@ -132,7 +132,7 @@ describe "Koala::Facebook::TestUsers" do
         end
       end
 
-      describe ".delete" do
+      describe "#delete" do
         before :each do
           @user1 = @test_users.create(true, "read_stream")
           @user2 = @test_users.create(true, "read_stream,user_interests")
@@ -153,7 +153,7 @@ describe "Koala::Facebook::TestUsers" do
         end
       end
 
-      describe ".delete_all" do
+      describe "#delete_all" do
         it "should delete all users found by the list commnand" do
           array = [1, 2, 3]
           @test_users.should_receive(:list).and_return(array)
@@ -162,7 +162,7 @@ describe "Koala::Facebook::TestUsers" do
         end
       end
 
-      describe ".update" do
+      describe "#update" do
         before :each do
           @updates = {:name => "Foo Baz"}
           # we stub out :graph_call, but still need to be able to delete the users

@@ -22,7 +22,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       }
     end
 
-    describe "#new" do
+    describe ".new" do
       it "makes http_options accessible" do
         Koala::Facebook::BatchOperation.new(@args).http_options.should == @args[:http_options]
       end
@@ -108,7 +108,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
     end
 
-    describe ".to_batch_params" do
+    describe "#to_batch_params" do
       describe "handling arguments and URLs" do
         shared_examples_for "request with no body" do
           it "adds the args to the URL string, with ? if no args previously present" do
@@ -263,7 +263,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
   end
 
   describe "GraphAPI batch interface" do
-
     it "returns nothing for a batch operation" do
       Koala.stub(:make_request).and_return(Koala::Response.new(200, "[]", {}))
       @api.batch do |batch_api|

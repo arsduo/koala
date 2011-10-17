@@ -212,7 +212,7 @@ describe "Koala::UploadableIO" do
     end
   end
 
-  describe "#binary_content?" do
+  describe ".binary_content?" do
     it "returns true for Rails 3 file uploads" do
       Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_true
     end

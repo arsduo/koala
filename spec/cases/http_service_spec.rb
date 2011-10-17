@@ -90,7 +90,7 @@ describe "Koala::HTTPService" do
     end
   end
 
-  describe "#encode_params" do
+  describe ".encode_params" do
     it "returns an empty string if param_hash evaluates to false" do
       Koala::HTTPService.encode_params(nil).should == ''
     end
@@ -135,7 +135,7 @@ describe "Koala::HTTPService" do
     end
   end
 
-  describe "#make_request" do
+  describe ".make_request" do
     before :each do
       # Setup stubs for make_request to execute without exceptions
       @mock_body = stub('Typhoeus response body')
@@ -273,7 +273,7 @@ describe "Koala::HTTPService" do
       :always_use_ssl => :use_ssl,
       :proxy => :proxy 
     }.each_pair do |deprecated_method, parameter|
-      describe "##{deprecated_method}" do
+      describe ".#{deprecated_method}" do
         context "read" do
           it "reads http_options[:#{parameter}]" do
             value = "foo"
@@ -305,7 +305,7 @@ describe "Koala::HTTPService" do
     
     # ssl options
     [:ca_path, :ca_file, :verify_mode].each do |deprecated_method|
-      describe "##{deprecated_method}" do
+      describe ".#{deprecated_method}" do
         context "read" do
           it "reads http_options[:ssl][:#{deprecated_method}] if http_options[:ssl]" do
             value = "foo"

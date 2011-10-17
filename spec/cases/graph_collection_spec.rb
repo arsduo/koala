@@ -85,7 +85,7 @@ describe Koala::Facebook::GraphCollection do
     end
   end
 
-  describe "#evaluate" do
+  describe ".evaluate" do
     it "returns the original result if it's provided a non-hash result" do
       result = []
       Koala::Facebook::GraphCollection.evaluate(result, @api).should == result

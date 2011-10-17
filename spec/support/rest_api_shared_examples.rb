@@ -250,7 +250,7 @@ shared_examples_for "Koala RestAPI with an access token" do
   end
   
   
-  describe ".set_app_properties" do
+  describe "#set_app_properties" do
     it "sends Facebook the properties JSON-encoded as :properties" do
       props = {:a => 2, :c => [1, 2, "d"]}
       @api.should_receive(:rest_call).with(anything, hash_including(:properties => MultiJson.encode(props)), anything, anything)

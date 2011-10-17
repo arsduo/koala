@@ -277,7 +277,7 @@ describe "Koala::Facebook::OAuth" do
   end
 
   describe "for fetching access tokens" do
-    describe ".get_access_token_info" do
+    describe "#get_access_token_info" do
       it "uses options[:redirect_uri] if provided" do
         uri = "foo"
         Koala.should_receive(:make_request).with(anything, hash_including(:redirect_uri => uri), anything, anything).and_return(Koala::Response.new(200, "", {}))
@@ -311,7 +311,7 @@ describe "Koala::Facebook::OAuth" do
       end
     end
     
-    describe ".get_access_token" do
+    describe "#get_access_token" do
       # TODO refactor these to be proper tests with stubs and tests against real data
       it "passes on any options provided to make_request" do
         options = {:a => 2}

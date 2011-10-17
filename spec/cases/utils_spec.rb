@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Koala::Utils do
-  describe "#deprecate" do    
+  describe ".deprecate" do    
     before :each do
       # unstub deprecate so we can test it
       Koala::Utils.unstub(:deprecate)

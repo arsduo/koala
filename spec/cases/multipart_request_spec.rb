@@ -9,7 +9,7 @@ describe Koala::MultipartRequest do
     Koala::MultipartRequest.mime_type.should == 'multipart/form-data'
   end
   
-  describe ".process_request?" do
+  describe "#process_request?" do
     before :each do
       @env = {}
       @multipart = Koala::MultipartRequest.new
@@ -43,7 +43,7 @@ describe Koala::MultipartRequest do
     end    
   end
   
-  describe ".process_params" do
+  describe "#process_params" do
     before :each do
       @parent = Faraday::Request::Multipart.new
       @multipart = Koala::MultipartRequest.new 
