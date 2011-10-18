@@ -86,7 +86,7 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   it "can access a user's picture" do
-    @api.get_picture("chris.baclig").should =~ /http[s]*\:\/\//
+    @api.get_picture(KoalaTest.user2).should =~ /http[s]*\:\/\//
   end
 
   it "can access a user's picture, given a picture type"  do
@@ -268,7 +268,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
   
 
-  describe ".put_picture" do
+  describe "#put_picture" do
     it "can post photos to the user's wall with an open file object" do
       content_type = "image/jpg"
       file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
