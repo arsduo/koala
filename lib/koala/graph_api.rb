@@ -181,6 +181,17 @@ module Koala
       # except to support cases where the Facebook API requires non-standard input
       # such as JSON-encoding arguments, posts directly to objects, etc.
       
+      def fql_query(query, args = {}, options = {})
+        get_object("fql", args.merge(:q => query), options)
+      end
+
+      def fql_multiquery(queries = {}, args = {}, options = {})
+        if results = get_object("fql", args.merge(:q => MultiJson.encode(queries)), options)
+          # simplify the multiquery result format
+          results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
+        end
+      end
+      
       def get_page_access_token(object_id, args = {}, options = {})
         result = get_object(object_id, args.merge(:fields => "access_token"), options) do
           result ? result["access_token"] : nil

@@ -128,6 +128,63 @@ shared_examples_for "Koala GraphAPI" do
     # the results should have an ID and a name, among other things
     (result["id"] && result["name"]).should_not be_nil
   end
+  
+  # FQL  
+  describe "#fql_query" do
+    it "makes a request to /fql" do
+      @api.should_receive(:get_object).with("fql", anything, anything)
+      @api.fql_query stub('query string')
+    end
+
+    it "passes a query argument" do
+      query = stub('query string')
+      @api.should_receive(:get_object).with(anything, hash_including(:q => query), anything)
+      @api.fql_query(query)
+    end
+
+    it "passes on any other arguments provided" do
+      args = {:a => 2}
+      @api.should_receive(:get_object).with(anything, hash_including(args), anything)
+      @api.fql_query("a query", args)
+    end
+  end
+
+  describe "#fql_multiquery" do
+    it "makes a request to /fql" do
+      @api.should_receive(:get_object).with("fql", anything, anything)
+      @api.fql_multiquery 'query string'
+    end
+
+    it "passes a queries argument" do
+      queries = stub('query string')
+      queries_json = "some JSON"
+      MultiJson.stub(:encode).with(queries).and_return(queries_json)
+
+      @api.should_receive(:get_object).with(anything, hash_including(:q => queries_json), anything)
+      @api.fql_multiquery(queries)
+    end
+
+    it "simplifies the response format" do
+      raw_results = [
+        {"name" => "query1", "fql_result_set" => [1, 2, 3]},
+        {"name" => "query2", "fql_result_set" => [:a, :b, :c]}
+      ]
+      expected_results = {
+        "query1" => [1, 2, 3],
+        "query2" => [:a, :b, :c]
+      }
+
+      @api.stub(:get_object).and_return(raw_results)
+      results = @api.fql_multiquery({:query => true})
+      results.should == expected_results
+    end
+
+    it "passes on any other arguments provided" do
+      args = {:a => 2}
+      @api.should_receive(:get_object).with(anything, hash_including(args), anything)
+      @api.fql_multiquery("a query", args)
+    end
+  end
 end
 
 
@@ -264,7 +321,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
   end
 
-  describe ".put_video" do
+  describe "#put_video" do
     before :each do
       @cat_movie = File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v")
       @content_type = "video/mpeg4"
@@ -384,6 +441,48 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
   end
 
+  it "can access public information via FQL" do
+    result = @api.fql_query("select first_name from user where uid = #{KoalaTest.user2_id}")
+    result.size.should == 1
+    result.first['first_name'].should == KoalaTest.user2_name
+  end
+
+  it "can access public information via FQL.multiquery" do
+    result = @api.fql_multiquery(
+      :query1 => "select first_name from user where uid = #{KoalaTest.user2_id}",
+      :query2 => "select first_name from user where uid = #{KoalaTest.user1_id}"
+    )
+    result.size.should == 2
+    result["query1"].first['first_name'].should == KoalaTest.user2_name
+    result["query2"].first['first_name'].should == KoalaTest.user1_name
+  end
+
+  it "can access protected information via FQL" do
+    # Tests agains the permissions fql table
+
+    # get the current user's ID
+    # we're sneakily using the Graph API, which should be okay since it has its own tests
+    g = Koala::Facebook::API.new(@token)
+    id = g.get_object("me", :fields => "id")["id"]
+
+    # now send a query about your permissions
+    result = @api.fql_query("select read_stream from permissions where uid = #{id}")
+
+    result.size.should == 1
+    # we've verified that you have read_stream permissions, so we can test against that
+    result.first["read_stream"].should == 1
+  end
+
+  it "can access protected information via FQL.multiquery" do
+    result = @api.fql_multiquery(
+      :query1 => "select post_id from stream where source_id = me()",
+      :query2 => "select fromid from comment where post_id in (select post_id from #query1)",
+      :query3 => "select uid, name from user where uid in (select fromid from #query2)"
+    )
+    result.size.should == 3
+    result.keys.should include("query1", "query2", "query3")
+  end
+
   # test all methods to make sure they pass data through to the API
   # we run the tests here (rather than in the common shared example group)
   # since some require access tokens
@@ -403,6 +502,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :search => 3,
       :set_app_restrictions => 4,
       :get_page_access_token => 3,
+      :fql_query => 3, :fql_multiquery => 3,
       # methods that have special arguments
       :get_comments_for_urls => [["url1", "url2"], {}],
       :put_picture => ["x.jpg", "image/jpg", {}, "me"],
@@ -474,7 +574,6 @@ end
 
 
 shared_examples_for "Koala GraphAPI without an access token" do
-
   it "can't get private data about a user" do
     result = @api.get_object(KoalaTest.user1)
     # updated_time should be a pretty fixed test case
@@ -518,5 +617,38 @@ shared_examples_for "Koala GraphAPI without an access token" do
 
   it "can't delete a like" do
     lambda { @api.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
+  end
+  
+  # FQL_QUERY
+  describe "when making a FQL request" do
+    it "can access public information via FQL" do
+      result = @api.fql_query("select first_name from user where uid = #{KoalaTest.user2_id}")
+      result.size.should == 1
+      result.first['first_name'].should == KoalaTest.user2_name
+    end
+
+    it "can access public information via FQL.multiquery" do
+      result = @api.fql_multiquery(
+        :query1 => "select first_name from user where uid = #{KoalaTest.user2_id}",
+        :query2 => "select first_name from user where uid = #{KoalaTest.user1_id}"
+      )
+      result.size.should == 2
+      result["query1"].first['first_name'].should == KoalaTest.user2_name
+      result["query2"].first['first_name'].should == KoalaTest.user1_name
+    end
+
+    it "can't access protected information via FQL" do
+      lambda { @api.fql_query("select read_stream from permissions where uid = #{KoalaTest.user2_id}") }.should raise_error(Koala::Facebook::APIError)
+    end
+
+    it "can't access protected information via FQL.multiquery" do
+      lambda {
+        @api.fql_multiquery(
+          :query1 => "select post_id from stream where source_id = me()",
+          :query2 => "select fromid from comment where post_id in (select post_id from #query1)",
+          :query3 => "select uid, name from user where uid in (select fromid from #query2)"
+        )
+      }.should raise_error(Koala::Facebook::APIError)
+    end
   end
 end

@@ -2,18 +2,7 @@ module Koala
   module Facebook
     REST_SERVER = "api.facebook.com"
 
-    module RestAPIMethods
-      def fql_query(fql, args = {}, options = {})
-        rest_call('fql.query', args.merge(:query => fql), options)
-      end
-
-      def fql_multiquery(queries = {}, args = {}, options = {})
-        if results = rest_call('fql.multiquery', args.merge(:queries => MultiJson.encode(queries)), options)
-          # simplify the multiquery result format
-          results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
-        end
-      end
-      
+    module RestAPIMethods      
       def set_app_properties(properties, args = {}, options = {})
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "setAppProperties requires an access token"}) unless @access_token
         rest_call("admin.setAppProperties", args.merge(:properties => MultiJson.encode(properties)), options, "post")
