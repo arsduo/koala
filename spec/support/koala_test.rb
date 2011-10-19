@@ -186,4 +186,7 @@ module KoalaTest
     "contextoptional"
   end
 
+  def self.app_properties
+    mock_interface? ? {"desktop" => 0} : {"description" => "A test framework for Koala and its users.  (#{rand(10000).to_i})"}
+  end
 end
