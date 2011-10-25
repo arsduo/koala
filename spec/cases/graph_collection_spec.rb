@@ -74,14 +74,30 @@ describe Koala::Facebook::GraphCollection do
   end
 
   describe "when parsing page paramters" do
-    it "should return the base as the first array entry" do
-      base = "url_path"
-      @collection.parse_page_url("anything.com/#{base}?anything").first.should == base
-    end
+    describe "#parse_page_url" do
+      it "should pass the url to the class method" do
+        url = stub("url")
+        Koala::Facebook::GraphCollection.should_receive(:parse_page_url).with(url)
+        @collection.parse_page_url(url)
+      end
 
-    it "should return the arguments as a hash as the last array entry" do
-      args_hash = {"one" => "val_one", "two" => "val_two"}
-      @collection.parse_page_url("anything.com/anything?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").last.should == args_hash
+      it "should return the result of the class method" do
+        parsed_content = stub("parsed_content")
+        Koala::Facebook::GraphCollection.stub(:parse_page_url).and_return(parsed_content)
+        @collection.parse_page_url(stub("url")).should == parsed_content
+      end
+    end
+    
+    describe ".parse_page_url" do    
+      it "should return the base as the first array entry" do
+        base = "url_path"
+        Koala::Facebook::GraphCollection.parse_page_url("anything.com/#{base}?anything").first.should == base
+      end
+
+      it "should return the arguments as a hash as the last array entry" do
+        args_hash = {"one" => "val_one", "two" => "val_two"}
+        Koala::Facebook::GraphCollection.parse_page_url("anything.com/anything?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").last.should == args_hash
+      end
     end
   end
 

@@ -41,8 +41,12 @@ module Koala
           parse_page_url(@paging[this])
         end
       end
-
+      
       def parse_page_url(url)
+        GraphCollection.parse_page_url(url)
+      end
+
+      def self.parse_page_url(url)
         match = url.match(/.com\/(.*)\?(.*)/)
         base = match[1]
         args = match[2]
