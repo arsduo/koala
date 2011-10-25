@@ -4,6 +4,7 @@ module KoalaTest
   class << self
     attr_accessor :oauth_token, :app_id, :secret, :app_access_token, :code, :session_key
     attr_accessor :oauth_test_data, :subscription_test_data, :search_time
+    attr_accessor :test_user_api
   end
     
   # Test setup
@@ -159,10 +160,13 @@ module KoalaTest
 
   # Data for testing
   def self.user1
+    # user ID, either numeric or username
     test_user? ? @live_testing_user["id"] : "koppel"
   end
 
   def self.user1_id
+    # numerical ID, used for FQL
+    # (otherwise the two IDs are interchangeable)
     test_user? ? @live_testing_user["id"] : 2905623
   end
 
@@ -171,10 +175,12 @@ module KoalaTest
   end
 
   def self.user2
+    # see notes for user1
     test_user? ? @live_testing_friend["id"] : "lukeshepard"
   end
 
   def self.user2_id
+    # see notes for user1
     test_user? ? @live_testing_friend["id"] : 2901279
   end
 
