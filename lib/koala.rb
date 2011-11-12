@@ -100,8 +100,9 @@ module Koala
     # Errors
 
     class APIError < StandardError
-      attr_accessor :fb_error_type
+      attr_accessor :fb_error_type, :raw_response
       def initialize(details = {})
+        self.raw_response = details
         self.fb_error_type = details["type"]
         super("#{fb_error_type}: #{details["message"]}")
       end
