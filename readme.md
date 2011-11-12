@@ -6,13 +6,8 @@ Koala
 
 * Lightweight: Koala should be as light and simple as Facebook’s own libraries, providing API accessors and returning simple JSON.
 * Fast: Koala should, out of the box, be quick. Out of the box, we use Facebook's faster read-only servers when possible and if available, the Typhoeus gem to make snappy Facebook requests.  Of course, that brings us to our next topic:
-* Flexible: Koala should be useful to everyone, regardless of their current configuration.  (We support JRuby, Rubinius, and REE as well as vanilla Ruby, and use the Faraday library to provide complete flexibility over how HTTP requests are made.)
-* Tested: Koala should have complete test coverage, so you can rely on it.  (Our test coverage is complete and can be run against either mocked responses or the live Facebook servers.)
-
-Facebook Changes on October 1, 2011
----
-
-Koala 1.2 supports all of Facebook's new authentication schemes, which were introduced on October 1, 2011.  If you have the appropriate calls to get_user_info_from_cookies (apps using the Javascript SDK) and/or parse_signed_params (for Canvas and tab apps), your application should work without a hitch.  For more information, see Facebook's [OAuth 2.0 and HTTPS Migration](https://developers.facebook.com/docs/oauth2-https-migration/) guide.  
+* Flexible: Koala should be useful to everyone, regardless of their current configuration.  We support JRuby, Rubinius, and REE as well as vanilla Ruby (1.8.7, 1.9.2, and 1.9.3), and use the Faraday library to provide complete flexibility over how HTTP requests are made.
+* Tested: Koala should have complete test coverage, so you can rely on it.  Our test coverage is complete and can be run against either mocked responses or the live Facebook servers; we're also on [Travis CI](travis-ci.org/arsduo/koala/).
 
 Installation
 ---
@@ -134,7 +129,7 @@ Koala makes it easy to interact with your applications using the RealtimeUpdates
 You can do just about anything with your real-time update subscriptions using the RealtimeUpdates class:
 
     # Add/modify a subscription to updates for when the first_name or last_name fields of any of your users is changed
-    @updates.subscribe("user", "first_name, last_name", callback_token, verify_token)
+    @updates.subscribe("user", "first_name, last_name", callback_url, verify_token)
 
     # Get an array of your current subscriptions (one hash for each object you've subscribed to)
     @updates.list_subscriptions
