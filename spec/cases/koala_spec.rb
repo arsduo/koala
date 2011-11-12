@@ -1,13 +1,31 @@
 require 'spec_helper'
 
-describe "Koala" do
-  it "has a version" do
-    Koala.const_defined?("VERSION").should be_true
-  end
+describe Koala do
+
   
   it "has an http_service accessor" do
     Koala.should respond_to(:http_service)
     Koala.should respond_to(:http_service=)
+  end
+  
+  describe "constants" do
+    it "has a version" do
+      Koala.const_defined?("VERSION").should be_true
+    end
+
+    describe Koala::Facebook do      
+      it "defines GRAPH_SERVER" do
+        Koala::Facebook::GRAPH_SERVER.should == "graph.facebook.com"
+      end
+
+      it "defines REST_SERVER" do
+        Koala::Facebook::REST_SERVER.should == "api.facebook.com"
+      end
+      
+      it "defines DIALOG_HOST" do
+        Koala::Facebook::DIALOG_HOST.should == "www.facebook.com"
+      end
+    end
   end
   
   context "for deprecated services" do
