@@ -214,37 +214,37 @@ describe "Koala::Facebook::OAuth" do
     describe "#url_for_oauth_code" do
       it "generates a properly formatted OAuth code URL with the default values" do
         url = @oauth.url_for_oauth_code
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when a callback is given" do
         callback = "foo.com"
         url = @oauth.url_for_oauth_code(:callback => callback)
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{callback}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{callback}")
       end
 
       it "generates a properly formatted OAuth code URL when permissions are requested as a string" do
         permissions = "publish_stream,read_stream"
         url = @oauth.url_for_oauth_code(:permissions => permissions)
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape @callback_url}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when permissions are requested as a string" do
         permissions = ["publish_stream", "read_stream"]
         url = @oauth.url_for_oauth_code(:permissions => permissions)
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions.join(",")}&redirect_uri=#{CGI.escape @callback_url}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions.join(",")}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when both permissions and callback are provided" do
         permissions = "publish_stream,read_stream"
         callback = "foo.com"
         url = @oauth.url_for_oauth_code(:callback => callback, :permissions => permissions)
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape callback}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape callback}")
       end
 
       it "generates a properly formatted OAuth code URL when a display is given as a string" do
         url = @oauth.url_for_oauth_code(:display => "page")
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&display=page&redirect_uri=#{CGI.escape @callback_url}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&display=page&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "raises an exception if no callback is given in initialization or the call" do
@@ -272,13 +272,13 @@ describe "Koala::Facebook::OAuth" do
       
       it "generates a properly formatted OAuth token URL when provided a code" do
         url = @oauth.url_for_access_token(@code)
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}").should be_true
       end
 
       it "generates a properly formatted OAuth token URL when provided a callback" do
         callback = "foo.com"
         url = @oauth.url_for_access_token(@code, :callback => callback)
-        url.should == "https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape callback}"
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape callback}").should be_true
       end
 
       it "includes any additional options as URL parameters, appropriately escaped" do
@@ -325,22 +325,22 @@ describe "Koala::Facebook::OAuth" do
         # slightly brittle (e.g. if parameter order changes), but still useful
         it "can generate a send dialog" do
           url = @oauth.url_for_dialog("send", :name => "People Argue Just to Win", :link => "http://www.nytimes.com/2011/06/15/arts/people-argue-just-to-win-scholars-assert.html")
-          url.should == "http://www.facebook.com/dialog/send?app_id=#{@app_id}&client_id=#{@app_id}&name=People+Argue+Just+to+Win&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&redirect_uri=#{CGI.escape @callback_url}" 
+          url.should match_url("http://www.facebook.com/dialog/send?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
         end
       
         it "can generate a feed dialog" do
           url = @oauth.url_for_dialog("feed", :name => "People Argue Just to Win", :link => "http://www.nytimes.com/2011/06/15/arts/people-argue-just-to-win-scholars-assert.html")
-          url.should == "http://www.facebook.com/dialog/feed?app_id=#{@app_id}&client_id=#{@app_id}&name=People+Argue+Just+to+Win&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&redirect_uri=#{CGI.escape @callback_url}" 
+          url.should match_url("http://www.facebook.com/dialog/feed?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
         end
       
         it "can generate a oauth dialog" do
           url = @oauth.url_for_dialog("oauth", :scope => "email", :response_type => "token")
-          url.should == "http://www.facebook.com/dialog/oauth?app_id=#{@app_id}&client_id=#{@app_id}&scope=email&response_type=token&redirect_uri=#{CGI.escape @callback_url}" 
+          url.should match_url("http://www.facebook.com/dialog/oauth?app_id=#{@app_id}&client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}&response_type=token&scope=email")
         end
       
         it "can generate a pay dialog" do
           url = @oauth.url_for_dialog("pay", :order_id => "foo", :credits_purchase => false)
-          url.should == "http://www.facebook.com/dialog/pay?app_id=#{@app_id}&client_id=#{@app_id}&order_id=foo&credits_purchase=false&redirect_uri=#{CGI.escape @callback_url}" 
+          url.should match_url("http://www.facebook.com/dialog/pay?app_id=#{@app_id}&client_id=#{@app_id}&order_id=foo&credits_purchase=false&redirect_uri=#{CGI.escape @callback_url}")
         end
       end
     end

@@ -11,9 +11,8 @@ module Koala
   end
 
   module HTTPService
-    # common functionality for all HTTP services
-
     class << self
+
       attr_accessor :faraday_middleware, :http_options
     end
 
