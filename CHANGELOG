@@ -6,7 +6,7 @@ New methods:
 Updated methods:
 -- OAuth#url_for_access_token and #url_for_oauth_code now include any provided options as URL parameters
 -- APIError#raw_response allows access to the raw error response received from Facebook
--- Utils#deprecate only prints each message once (no more spamming)
+-- Utils.deprecate only prints each message once (no more spamming)
 -- API#get_page_access_token now accepts additional arguments and HTTP options (like other calls)
 Internal improvements:
 -- FQL queries now use the Graph API behind-the-scenes
@@ -14,6 +14,7 @@ Testing improvements:
 -- Expanded/improved test coverage
 -- The test suite no longer users any hard-coded user IDs
 -- KoalaTest.test_user_api allows access to the TestUsers instance
+-- Configured tests to run in random order using RSpec 2.8.0rc1 
 
 v1.2.1
 New methods:
