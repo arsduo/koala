@@ -38,7 +38,8 @@ module Koala
 
       def check_graph_batch_api_response(response)
         if response.is_a?(Hash) && response["error"] && !response["error"].is_a?(Hash)
-          APIError.new("type" => "Error #{response["error"]}", "message" => response["error_description"])
+          # old error format -- see http://developers.facebook.com/blog/post/596/
+          APIError.new({"type" => "Error #{response["error"]}", "message" => response["error_description"]}.merge(response))
         else
           check_graph_api_response(response)
         end
