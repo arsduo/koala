@@ -177,7 +177,7 @@ Some resources to help you as you play with Koala and the Graph API:
 * The <a href="http://groups.google.com/group/koala-users">Koala users group</a> on Google Groups, the place for your Koala and API questions
 * Facebook's <a href="http://developers.facebook.com/tools/explorer/">Graph API Explorer</a>, where you can play with the Graph API in your browser
 * The Koala-powered <a href="http://oauth.twoalex.com" target="_blank">OAuth Playground</a>, where you can easily generate OAuth access tokens and any other data needed to test out the APIs or OAuth
-* Follow Koala on <a href="http://www.facebook.com/pages/Koala/315368291823667?sk=info">Facebook</a> and <a href="https://twitter.com/#!/koala_fb">Twitter</a> for SDK updates and occasional news about Facebook API changes.
+* Follow Koala on <a href="http://www.facebook.com/pages/Koala/315368291823667">Facebook</a> and <a href="https://twitter.com/#!/koala_fb">Twitter</a> for SDK updates and occasional news about Facebook API changes.
 
 
 Testing
