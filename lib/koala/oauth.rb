@@ -1,3 +1,7 @@
+# OpenSSL and Base64 are required to support signed_request
+require 'openssl'
+require 'base64'
+
 module Koala
   module Facebook
     

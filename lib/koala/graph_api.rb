@@ -1,3 +1,5 @@
+require 'koala/graph_collection'
+
 module Koala
   module Facebook
     GRAPH_SERVER = "graph.facebook.com"

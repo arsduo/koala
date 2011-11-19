@@ -1,4 +1,5 @@
 require 'faraday'
+require 'koala/multipart_request'
 
 module Koala
   class Response
