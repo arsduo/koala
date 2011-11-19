@@ -1,22 +1,17 @@
+require 'koala/api'
+require 'koala/batch_operation'
+
 module Koala
   module Facebook
-      module GraphBatchAPIMethods
+    # @private
+    class GraphBatchAPI < API
+      # inside a batch call we can do anything a regular Graph API can do
+      include GraphAPIMethods
 
-      def self.included(base)
-        base.class_eval do
-          attr_reader :original_api
-          
-          def initialize(access_token, api)
-            super(access_token)
-            @original_api = api
-          end
-
-          alias_method :graph_call_outside_batch, :graph_call
-          alias_method :graph_call, :graph_call_in_batch
-
-          alias_method :check_graph_api_response, :check_response
-          alias_method :check_response, :check_graph_batch_api_response
-        end
+      attr_reader :original_api
+      def initialize(access_token, api)
+        super(access_token)
+        @original_api = api
       end
 
       def batch_calls
@@ -45,6 +40,15 @@ module Koala
         end
       end
 
+      # redefine the graph_call and check_response methods
+      # so we can use this API inside the batch block just like any regular Graph API  
+      alias_method :graph_call_outside_batch, :graph_call
+      alias_method :graph_call, :graph_call_in_batch
+
+      alias_method :check_graph_api_response, :check_response
+      alias_method :check_response, :check_graph_batch_api_response
+
+      # execute the queued batch calls
       def execute(http_options = {})
         return [] unless batch_calls.length > 0
         # Turn the call args collected into what facebook expects

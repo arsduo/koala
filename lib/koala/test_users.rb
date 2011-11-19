@@ -1,15 +1,10 @@
 require 'koala'
-
 module Koala
   module Facebook
-    module TestUserMethods
+    class TestUsers
 
-      def self.included(base)
-        base.class_eval do
-          # make the Graph API accessible in case someone wants to make other calls to interact with their users
-          attr_reader :api, :app_id, :app_access_token, :secret
-        end
-      end
+      # make the Graph API accessible in case someone wants to make other calls to interact with their users
+      attr_reader :api, :app_id, :app_access_token, :secret
 
       def initialize(options = {})
         @app_id = options[:app_id]
