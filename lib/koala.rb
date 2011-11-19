@@ -4,19 +4,12 @@ require 'multi_json'
 
 # include koala modules
 require 'koala/api'
-require 'koala/graph_batch_api'
 require 'koala/oauth'
 require 'koala/realtime_updates'
 require 'koala/test_users'
 
-# legacy support for old pre-1.2 API interface
-require 'koala/legacy'
-
 # HTTP module so we can communicate with Facebook
 require 'koala/http_service'
-
-# add KoalaIO class
-require 'koala/uploadable_io'
 
 # miscellaneous
 require 'koala/utils'

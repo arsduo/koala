@@ -1,5 +1,6 @@
-require 'koala/graph_api'
-require 'koala/rest_api'
+require 'koala/api/graph_api'
+require 'koala/api/rest_api'
+# graph_batch_api and legacy are required at the bottom, since they depend on API being defined
 
 module Koala
   module Facebook
@@ -74,3 +75,7 @@ module Koala
     end
   end
 end
+
+require 'koala/api/graph_batch_api'
+# legacy support for old pre-1.2 API interfaces
+require 'koala/api/legacy'

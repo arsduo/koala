@@ -1,5 +1,5 @@
 require 'koala/api'
-require 'koala/batch_operation'
+require 'koala/api/batch_operation'
 
 module Koala
   module Facebook

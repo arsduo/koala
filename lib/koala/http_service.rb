@@ -1,5 +1,6 @@
 require 'faraday'
-require 'koala/multipart_request'
+require 'koala/http_service/multipart_request'
+require 'koala/http_service/uploadable_io'
 
 module Koala
   class Response
@@ -13,7 +14,6 @@ module Koala
 
   module HTTPService
     class << self
-
       attr_accessor :faraday_middleware, :http_options
     end
 

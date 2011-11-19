@@ -1,4 +1,5 @@
-require 'koala/graph_collection'
+require 'koala/api/graph_collection'
+require 'koala/http_service/uploadable_io'
 
 module Koala
   module Facebook
@@ -106,7 +107,7 @@ module Koala
       #   put_picture(picture_url, ...)
       #
       # You can pass in uploaded files directly from Rails or Sinatra.
-      # (See lib/koala/uploadable_io.rb for supported frameworks)
+      # (See lib/koala/http_service/uploadable_io.rb for supported frameworks)
       #
       # Optional parameters can be added to the end of the argument list:
       # - args:       a hash of request parameters (default: {})
