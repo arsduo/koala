@@ -64,76 +64,92 @@ module Koala
     # deprecations
     # not elegant or compact code, but temporary
     
+    # @private
     def self.always_use_ssl
       Koala::Utils.deprecate("HTTPService.always_use_ssl is now HTTPService.http_options[:use_ssl]; always_use_ssl will be removed in a future version.")
       http_options[:use_ssl]
     end
 
+    # @private
     def self.always_use_ssl=(value)
       Koala::Utils.deprecate("HTTPService.always_use_ssl is now HTTPService.http_options[:use_ssl]; always_use_ssl will be removed in a future version.")
       http_options[:use_ssl] = value
     end
     
+    # @private
     def self.timeout
       Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.http_options[:timeout]; .timeout will be removed in a future version.")
       http_options[:timeout]
     end
 
+    # @private
     def self.timeout=(value)
       Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.http_options[:timeout]; .timeout will be removed in a future version.")
       http_options[:timeout] = value
     end
     
+    # @private
     def self.timeout
       Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.http_options[:timeout]; .timeout will be removed in a future version.")
       http_options[:timeout]
     end
 
+    # @private
     def self.timeout=(value)
       Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.http_options[:timeout]; .timeout will be removed in a future version.")
       http_options[:timeout] = value
     end
     
+    # @private
     def self.proxy
       Koala::Utils.deprecate("HTTPService.proxy is now HTTPService.http_options[:proxy]; .proxy will be removed in a future version.")
       http_options[:proxy]
     end
 
+    # @private
     def self.proxy=(value)
       Koala::Utils.deprecate("HTTPService.proxy is now HTTPService.http_options[:proxy]; .proxy will be removed in a future version.")
       http_options[:proxy] = value
     end
     
+    # @private
     def self.ca_path
       Koala::Utils.deprecate("HTTPService.ca_path is now (HTTPService.http_options[:ssl] ||= {})[:ca_path]; .ca_path will be removed in a future version.")
       (http_options[:ssl] || {})[:ca_path]
     end
 
+    # @private
     def self.ca_path=(value)
       Koala::Utils.deprecate("HTTPService.ca_path is now (HTTPService.http_options[:ssl] ||= {})[:ca_path]; .ca_path will be removed in a future version.")
       (http_options[:ssl] ||= {})[:ca_path] = value
     end
     
+    # @private
     def self.ca_file
       Koala::Utils.deprecate("HTTPService.ca_file is now (HTTPService.http_options[:ssl] ||= {})[:ca_file]; .ca_file will be removed in a future version.")
       (http_options[:ssl] || {})[:ca_file]
     end
 
+    # @private
     def self.ca_file=(value)
       Koala::Utils.deprecate("HTTPService.ca_file is now (HTTPService.http_options[:ssl] ||= {})[:ca_file]; .ca_file will be removed in a future version.")
       (http_options[:ssl] ||= {})[:ca_file] = value
     end
 
+    # @private
     def self.verify_mode
       Koala::Utils.deprecate("HTTPService.verify_mode is now (HTTPService.http_options[:ssl] ||= {})[:verify_mode]; .verify_mode will be removed in a future version.")
       (http_options[:ssl] || {})[:verify_mode]
     end
 
+    # @private
     def self.verify_mode=(value)
       Koala::Utils.deprecate("HTTPService.verify_mode is now (HTTPService.http_options[:ssl] ||= {})[:verify_mode]; .verify_mode will be removed in a future version.")
       (http_options[:ssl] ||= {})[:verify_mode] = value
     end
 
+    private 
+    
     def self.process_options(options)
       if typhoeus_options = options.delete(:typhoeus_options)
         Koala::Utils.deprecate("typhoeus_options should now be included directly in the http_options hash.  Support for this key will be removed in a future version.")
@@ -159,6 +175,7 @@ module Koala
     end   
   end
   
+  # @private
   module TyphoeusService
     def self.deprecated_interface
       # support old-style interface with a warning
@@ -167,6 +184,7 @@ module Koala
     end
   end
 
+  # @private
   module NetHTTPService
     def self.deprecated_interface
       # support old-style interface with a warning

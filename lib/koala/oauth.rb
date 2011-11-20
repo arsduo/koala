@@ -23,7 +23,7 @@ module Koala
       
       # Parses the cookie set Facebook's JavaScript SDK.
       #
-      # @note to parse Facebook's new signed cookie format, this method makes a request to Facebook each time.
+      # @note in parsing Facebook's new signed cookie format this method has to make a request to Facebook.
       #       We recommend storing authenticated user info in your Rails session (or equivalent) and only
       #       calling this when needed.
       #
@@ -92,7 +92,7 @@ module Koala
       # 
       # @note (see #url_for_oauth_code)
       #
-      # @param code the OAuth code received from Facebook
+      # @param code an OAuth code received from Facebook
       # @param options any additional query parameters to add to the URL
       #
       # @raise (see #url_for_oauth_code)
@@ -125,12 +125,32 @@ module Koala
       
       # access tokens
       
+      # Fetches an access token, token expiration, and other info from Facebook.
+      # Useful when you've received an OAuth code using the server-side authentication process.
+      # @see url_for_oauth_code
+      # 
+      # @param code (see #url_for_access_token)
+      # @param options any additional parameters to send to Facebook when redeeming the token
+      # 
+      # @raise Koala::Facebook::APIError if Facebook returns an error response 
+      # 
+      # @return a hash of the access token info returned by Facebook (token, expiration, etc.) 
       def get_access_token_info(code, options = {})
         # convenience method to get a parsed token from Facebook for a given code
         # should this require an OAuth callback URL?
         get_token_from_server({:code => code, :redirect_uri => options[:redirect_uri] || @oauth_callback_url}, false, options)
       end
 
+      
+      # Fetches the access token (ignoring expiration and other info) from Facebook.
+      # Useful when you've received an OAuth code using the server-side authentication process.
+      # @see get_access_token_info
+      # 
+      # @param (see #get_access_token_info)
+      #
+      # @raise (see #get_access_token_info)
+      #
+      # @return the access token provided by Facebook
       def get_access_token(code, options = {})
         # upstream methods will throw errors if needed
         if info = get_access_token_info(code, options)
