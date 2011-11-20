@@ -15,8 +15,11 @@ require 'koala/http_service'
 require 'koala/utils'
 require 'koala/version'
 
-# @author Alex Koppel
 module Koala
+  # Ruby client library for the Facebook Platform.
+  # http://github.com/arsduo/koala
+  # Copyright 2010-2011 Alex Koppel
+  
   class KoalaError < StandardError; end
 
   # Making HTTP requests
