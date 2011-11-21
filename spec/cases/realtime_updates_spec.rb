@@ -26,31 +26,31 @@ describe "Koala::Facebook::RealtimeUpdates" do
 
   describe "when initializing" do
     # basic initialization
-    it "should initialize properly with an app_id and an app_access_token" do
+    it "initializes properly with an app_id and an app_access_token" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
       updates.should be_a(Koala::Facebook::RealtimeUpdates)
     end
     
     # attributes
-    it "should allow read access to app_id" do
+    it "allows read access to app_id" do
       # in Ruby 1.9, .method returns symbols 
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:app_id)
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:app_id=)
     end
 
-    it "should allow read access to app_access_token" do
+    it "allows read access to app_access_token" do
       # in Ruby 1.9, .method returns symbols 
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:app_access_token)
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:app_access_token=)
     end
 
-    it "should allow read access to secret" do
+    it "allows read access to secret" do
       # in Ruby 1.9, .method returns symbols 
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:secret)
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:secret=)
     end
 
-    it "should allow read access to api" do
+    it "allows read access to api" do
       # in Ruby 1.9, .method returns symbols 
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:api)
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:api=)
@@ -69,23 +69,30 @@ describe "Koala::Facebook::RealtimeUpdates" do
     end
     
     # init with secret / fetching the token
-    it "should initialize properly with an app_id and a secret" do 
+    it "initializes properly with an app_id and a secret" do 
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
       updates.should be_a(Koala::Facebook::RealtimeUpdates)      
     end
 
-    it "should fetch an app_token from Facebook when provided an app_id and a secret" do 
+    it "fetches an app_token from Facebook when provided an app_id and a secret" do 
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
       updates.app_access_token.should_not be_nil
     end
-    
-    it "should use the OAuth class to fetch a token when provided an app_id and a secret" do
+        
+    it "uses the OAuth class to fetch a token when provided an app_id and a secret" do
       oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
       token = oauth.get_app_access_token
       oauth.should_receive(:get_app_access_token).and_return(token)
       Koala::Facebook::OAuth.should_receive(:new).with(@app_id, @secret).and_return(oauth) 
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
     end
+    
+    it "sets up the with the app acces token" do 
+      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
+      updates.api.should be_a(Koala::Facebook::API)
+      updates.api.access_token.should == @app_access_token
+    end    
+    
   end
 
   describe "when used" do
@@ -93,48 +100,48 @@ describe "Koala::Facebook::RealtimeUpdates" do
       @updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
     end
     
-    it "should send a subscription request to a valid server" do
+    it "sends a subscription request to a valid server" do
       result = @updates.subscribe("user", "name", @subscription_path, @verify_token)
       result.should be_true
     end
     
-    it "should send a subscription request to a valid server" do
+    it "sends a subscription request to a valid server" do
       result = @updates.subscribe("user", "name", @subscription_path, @verify_token)
       result.should be_true
     end
     
-    it "should send a subscription request to an invalid path on a valid server" do
+    it "sends a subscription request to an invalid path on a valid server" do
       lambda { result = @updates.subscribe("user", "name", @subscription_path + "foo", @verify_token) }.should raise_exception(Koala::Facebook::APIError)
     end
     
-    it "should fail to send a subscription request to an invalid server" do
+    it "fails to send a subscription request to an invalid server" do
       lambda { @updates.subscribe("user", "name", "foo", @verify_token) }.should raise_exception(Koala::Facebook::APIError)
     end
   
-    it "should unsubscribe a valid individual object successfully" do 
+    it "unsubscribes a valid individual object successfully" do 
       @updates.unsubscribe("user").should be_true
     end
 
-    it "should unsubscribe all subscriptions successfully" do 
+    it "unsubscribes all subscriptions successfully" do 
       @updates.unsubscribe.should be_true
     end
 
-    it "should fail when an invalid object is provided to unsubscribe" do 
+    it "fails when an invalid object is provided to unsubscribe" do 
       lambda { @updates.unsubscribe("kittens") }.should raise_error(Koala::Facebook::APIError)
     end
     
-    it "should is subscriptions properly" do
+    it "lists subscriptions properly" do
       @updates.list_subscriptions.should be_a(Array)
     end
   end # describe "when used"
   
   describe "when meeting challenge" do
-    it "should return false if hub.mode isn't subscribe" do
+    it "returns false if hub.mode isn't subscribe" do
       params = {'hub.mode' => 'not subscribe'}
       Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be_false
     end
     
-    it "should return false if not given a verify_token or block" do
+    it "returns false if not given a verify_token or block" do
       params = {'hub.mode' => 'subscribe'}
       Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be_false
     end
@@ -150,11 +157,11 @@ describe "Koala::Facebook::RealtimeUpdates" do
           @params['hub.verify_token'] = @token
         end
         
-        it "should return false if the given verify token doesn't match" do
+        it "returns false if the given verify token doesn't match" do
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token + '1').should be_false
         end
         
-        it "should return the challenge if the given verify token matches" do
+        it "returns the challenge if the given verify token matches" do
           @params['hub.challenge'] = 'challenge val'
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token).should == @params['hub.challenge']
         end
@@ -165,25 +172,25 @@ describe "Koala::Facebook::RealtimeUpdates" do
           @params['hub.verify_token'] = @token
         end
           
-        it "should give the block the token as a parameter" do
+        it "gives the block the token as a parameter" do
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             token.should == @token
           end
         end
         
-        it "should return false if the given block return false" do
+        it "returns false if the given block return false" do
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             false
           end.should be_false
         end
         
-        it "should return false if the given block returns nil" do
+        it "returns false if the given block returns nil" do
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             nil
           end.should be_false
         end
         
-        it "should return the challenge if the given block returns true" do
+        it "returns the challenge if the given block returns true" do
           @params['hub.challenge'] = 'challenge val'
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             true
