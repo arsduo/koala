@@ -26,7 +26,7 @@ module Koala
       # @see RestAPIMethods#rest_call
       #
       # @param path the server path for this request (leading / is prepended if not present)
-      # @param args arguments to be sent to Facebook for this request
+      # @param args arguments to be sent to Facebook
       # @param verb the HTTP method to use
       # @param options request-related options for Koala and Faraday. 
       #                See https://github.com/arsduo/koala/wiki/HTTP-Services for additional options.

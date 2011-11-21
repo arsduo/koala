@@ -5,6 +5,8 @@ require 'koala/http_service/uploadable_io'
 module Koala
   class Response
     attr_reader :status, :body, :headers
+    
+    # Creates a new Response object, which standardizes the response received by Facebook for use within Koala.
     def initialize(status, body, headers)
       @status = status
       @body = body
@@ -14,17 +16,32 @@ module Koala
 
   module HTTPService
     class << self
-      attr_accessor :faraday_middleware, :http_options
+      # A customized stack of Faraday middleware that will be used to make each request.
+      attr_accessor :faraday_middleware
+      # A default set of HTTP options (see https://github.com/arsduo/koala/wiki/HTTP-Services)
+      attr_accessor :http_options
     end
 
     @http_options ||= {}
     
+    # Koala's default middleware stack. 
+    # We encode requests in a Facebook-compatible multipart request, 
+    # and use whichever adapter has been configured for this application.
     DEFAULT_MIDDLEWARE = Proc.new do |builder|
       builder.use Koala::MultipartRequest
       builder.request :url_encoded
       builder.adapter Faraday.default_adapter
     end
 
+    # The address of the appropriate Facebook server.
+    #
+    # @param options various flags to indicate which server to use.
+    # @option options :rest_api use the old REST API instead of the Graph API
+    # @option options :video use the server designated for video uploads
+    # @option options :beta use the beta tier
+    # @option options :use_ssl force https, even if not needed
+    # 
+    # @return a complete server address with protocol
     def self.server(options = {})
       server = "#{options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER}"
       server.gsub!(/\.facebook/, "-video.facebook") if options[:video]
@@ -32,6 +49,23 @@ module Koala
       "#{options[:use_ssl] ? "https" : "http"}://#{server}"
     end
 
+    # Makes a request directly to Facebook.
+    # @note You'll rarely need to call this method directly.
+    #
+    # @see API#api
+    # @see GraphAPIMethods#graph_call
+    # @see RestAPIMethods#rest_call
+    #
+    # @param path the server path for this request
+    # @param args (see API#api)
+    # @param verb the HTTP method to use.  
+    #             If not get or post, this will be turned into a POST request with the appropriate :method
+    #              specified in the arguments.           
+    # @param options (see API#api)
+    #
+    # @raise an appropriate connection error if unable to make the request to Facebook
+    #
+    # @return a {Koala::Response} object representing the results from Facebook
     def self.make_request(path, args, verb, options = {})
       # if the verb isn't get or post, send it as a post argument
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"

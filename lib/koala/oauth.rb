@@ -16,7 +16,7 @@ module Koala
       # @param app_secret a Facebook application secret
       # @param oauth_callback_url the URL in your app to which users authenticating with OAuth will be sent
       def initialize(app_id, app_secret, oauth_callback_url = nil)
-        @app_id = app_id.to_s
+        @app_id = app_id
         @app_secret = app_secret
         @oauth_callback_url = oauth_callback_url
       end
@@ -63,7 +63,8 @@ module Koala
       #
       # @see #url_for_access_token
       #
-      # @note The URL methods should only be used if your application can't use the Facebook Javascript SDK,
+      # @note The server-side authentication and dialog methods should only be used 
+      #       if your application can't use the Facebook Javascript SDK,
       #       which provides a much better user experience.
       #       See http://developers.facebook.com/docs/reference/javascript/.
       #
@@ -128,6 +129,8 @@ module Koala
       # Fetches an access token, token expiration, and other info from Facebook.
       # Useful when you've received an OAuth code using the server-side authentication process.
       # @see url_for_oauth_code
+      #
+      # @note (see #url_for_oauth_code)
       # 
       # @param code (see #url_for_access_token)
       # @param options any additional parameters to send to Facebook when redeeming the token
@@ -146,11 +149,13 @@ module Koala
       # Useful when you've received an OAuth code using the server-side authentication process.
       # @see get_access_token_info
       # 
+      # @note (see #url_for_oauth_code)
+      # 
       # @param (see #get_access_token_info)
       #
       # @raise (see #get_access_token_info)
       #
-      # @return the access token provided by Facebook
+      # @return the access token
       def get_access_token(code, options = {})
         # upstream methods will throw errors if needed
         if info = get_access_token_info(code, options)
@@ -158,22 +163,36 @@ module Koala
         end
       end
 
+      # Fetches the application's access token, along with any other information provided by Facebook.
+      # See http://developers.facebook.com/docs/authentication/ (search for App Login).
+      # 
+      # @param options any additional parameters to send to Facebook when redeeming the token
+      #
+      # @return the application access token and other information (expiration, etc.)
       def get_app_access_token_info(options = {})
         # convenience method to get a the application's sessionless access token
         get_token_from_server({:type => 'client_cred'}, true, options)
       end
 
+      # Fetches the application's access token (ignoring expiration and other info).
+      # @see get_app_access_token_info
+      # 
+      # @param (see #get_app_access_token_info)
+      #
+      # @return the application access token
       def get_app_access_token(options = {})
         if info = get_app_access_token_info(options)
           string = info["access_token"]
         end
       end
 
-      # Originally provided directly by Facebook, however this has changed
-      # as their concept of crypto changed. For historic purposes, this is their proposal:
-      # https://developers.facebook.com/docs/authentication/canvas/encryption_proposal/
-      # Currently see https://github.com/facebook/php-sdk/blob/master/src/facebook.php#L758
-      # for a more accurate reference implementation strategy.
+      # Parses a signed request string provided by Facebook to canvas apps or in a secure cookie.
+      #
+      # @param input the signed request from Facebook
+      # 
+      # @raise RuntimeError if the signature is incomplete, invalid, or using an unsupported algorithm
+      # 
+      # @return a hash of the validated request information 
       def parse_signed_request(input)
         encoded_sig, encoded_envelope = input.split('.', 2)
         raise 'SignedRequest: Invalid (incomplete) signature data' unless encoded_sig && encoded_envelope
@@ -190,8 +209,11 @@ module Koala
         envelope
       end
 
-      # from session keys
+      # Old session key code
+      # @deprecated Facebook no longer provides session keys
       def get_token_info_from_session_keys(sessions, options = {})
+        Koala::Utils.deprecate("Facebook no longer provides session keys. The relevant OAuth methods will be removed in the next release.")
+
         # fetch the OAuth tokens from Facebook
         response = fetch_token_string({
           :type => 'client_cred',
@@ -209,6 +231,7 @@ module Koala
         MultiJson.decode(response)
       end
 
+      # @deprecated (see #get_token_info_from_session_keys)
       def get_tokens_from_session_keys(sessions, options = {})
         # get the original hash results
         results = get_token_info_from_session_keys(sessions, options)
@@ -216,6 +239,7 @@ module Koala
         results.collect { |r| r ? r["access_token"] : nil }
       end
 
+      # @deprecated (see #get_token_info_from_session_keys)
       def get_token_from_session_key(session, options = {})
         # convenience method for a single key
         # gets the overlaoded strings automatically
