@@ -1,23 +1,27 @@
 module Koala
   module Facebook
     class RealtimeUpdates
-      # note: to subscribe to real-time updates, you must have an application access token
+      # Manage realtime callbacks for changes to users' information.
+      # See http://developers.facebook.com/docs/reference/api/realtime.
+      #
+      # @note: to subscribe to real-time updates, you must have an application access token
+      #        or provide the app secret when initializing your RealtimeUpdates object.
 
+      # Application information.
+      attr_reader :app_id, :app_access_token, :secret
       # The application API interface used to communicate with Facebook. 
       attr_reader :api
 
-      # The configuration provided at initialization.
-      attr_reader :app_id, :app_access_token, :secret
-
-      # Create a new RealtimeUpdates instance.
+      # Create a new RealtimeUpdates instance.  
+      # If you don't have your app's access token, provide the app's secret and 
+      # Koala will make a request to Facebook for the appropriate token.
       # 
       # @param options initialization options.
       # @option options :app_id the application's ID.
       # @option options :app_access_token an application access token, if known.
-      # @option options :secret the application's secret. If an app access token is not provided, this will be used to fetch it from Facebook.
-      # 
-      # @raise ArgumentError if the application ID and one of the app access token or the secret are not provided.
+      # @option options :secret the application's secret.  
       #
+      # @raise ArgumentError if the application ID and one of the app access token or the secret are not provided.
       def initialize(options = {})
         @app_id = options[:app_id]
         @app_access_token = options[:app_access_token]
@@ -35,9 +39,19 @@ module Koala
         @api = API.new(@app_access_token)
       end
 
-      # subscribes for realtime updates
-      # your callback_url must be set up to handle the verification request or the subscription will not be set up
-      # http://developers.facebook.com/docs/api/realtime
+      # Subscribe to realtime updates for certain fields on a given object (user, page, etc.).  
+      # See {http://developers.facebook.com/docs/reference/api/realtime the realtime updates documentation}
+      # for more information on what objects and fields you can register for.
+      #
+      # @note Your callback_url must be set up to handle the verification request or the subscription will not be set up
+      #
+      # @param object a Facebook ID (name or number)
+      # @param fields the fields you want your app to be updated about
+      # @param callback_url the URL Facebook should ping when an update is available
+      # @param verify_token a token included in the verification request, allowing you to ensure the call is genuine 
+      #                     (see the docs for more information)
+      #
+      # @return true if successful, false (or an APIError) otherwise.
       def subscribe(object, fields, callback_url, verify_token)
         args = {
           :object => object,
