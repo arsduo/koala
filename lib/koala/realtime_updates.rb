@@ -63,28 +63,44 @@ module Koala
         @api.graph_call(subscription_path, args, 'post', :http_component => :status) == 200
       end
 
-      # removes subscription for object
-      # if object is nil, it will remove all subscriptions
+      # Unsubscribe from updates for a particular object or from updates. 
+      #
+      # @param object the object whose subscriptions to delete. 
+      #               If no object is provided, all subscriptions will be removed.
+      #
+      # @return true if the unsubscription is successful, false (or an APIError) otherwise.
       def unsubscribe(object = nil)
         args = {}
         args[:object] = object if object
         @api.graph_call(subscription_path, args, 'delete', :http_component => :status) == 200
       end
 
+      # List all active subscriptions for this application.
+      # 
+      # @return [Array] a list of active subscriptions
       def list_subscriptions
         @api.graph_call(subscription_path)
       end
 
+      # @private
       def graph_api
         Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
         @api
       end
       
-      # parses the challenge params and makes sure the call is legitimate
-      # returns the challenge string to be sent back to facebook if true
-      # returns false otherwise
-      # this is a class method, since you don't need to know anything about the app
-      # saves a potential trip fetching the app access token
+      # As a security measure (to prevent DDoS attacks), Facebook sends a verification request to your server
+      # after you request a subscription.
+      # This method parses the challenge params and makes sure the call is legitimate.
+      #
+      # @param params the request parameters sent by Facebook.  (You can pass in a Rails params hash.)
+      # @param verify_token the verify token sent in the {#subscribe subscription request}, if you provided one
+      # 
+      # @yield verify_token if you need to compute the verification token
+      #                     (for instance, if your callback URL includes a record ID, which you look up
+      #                     and use to calculate a hash), you can pass meet_challenge a block, which 
+      #                     will receive the verify_token received back from Facebook.
+      # 
+      # @return the challenge string to be sent back to Facebook, or false if the request is invalid.
       def self.meet_challenge(params, verify_token = nil, &verification_block)
         if params["hub.mode"] == "subscribe" &&
             # you can make sure this is legitimate through two ways
