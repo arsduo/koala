@@ -350,17 +350,17 @@ describe "Koala::Facebook::OAuth" do
     describe "#get_access_token_info" do
       it "uses options[:redirect_uri] if provided" do
         uri = "foo"
-        Koala.should_receive(:make_request).with(anything, hash_including(:redirect_uri => uri), anything, anything).and_return(Koala::Response.new(200, "", {}))
+        Koala.should_receive(:make_request).with(anything, hash_including(:redirect_uri => uri), anything, anything).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.get_access_token_info(@code, :redirect_uri => uri)
       end
       
       it "uses the redirect_uri used to create the @oauth if no :redirect_uri option is provided" do
-        Koala.should_receive(:make_request).with(anything, hash_including(:redirect_uri => @callback_url), anything, anything).and_return(Koala::Response.new(200, "", {}))
+        Koala.should_receive(:make_request).with(anything, hash_including(:redirect_uri => @callback_url), anything, anything).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.get_access_token_info(@code)        
       end
       
       it "makes a GET request" do
-        Koala.should_receive(:make_request).with(anything, anything, "get", anything).and_return(Koala::Response.new(200, "", {}))
+        Koala.should_receive(:make_request).with(anything, anything, "get", anything).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.get_access_token_info(@code)                
       end
 
@@ -385,7 +385,7 @@ describe "Koala::Facebook::OAuth" do
       # TODO refactor these to be proper tests with stubs and tests against real data
       it "passes on any options provided to make_request" do
         options = {:a => 2}
-        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "", {}))
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.get_access_token(@code, options)
       end
 
@@ -424,7 +424,7 @@ describe "Koala::Facebook::OAuth" do
 
       it "passes on any options provided to make_request" do
         options = {:a => 2}
-        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "", {}))
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.get_app_access_token_info(options)
       end
     end
@@ -443,7 +443,7 @@ describe "Koala::Facebook::OAuth" do
 
       it "passes on any options provided to make_request" do
         options = {:a => 2}
-        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "", {}))
+        Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.get_app_access_token(options)
       end
     end
@@ -524,7 +524,7 @@ describe "Koala::Facebook::OAuth" do
 
         it "passes on any options provided to make_request" do
           options = {:a => 2}
-          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "[{}]", {}))
           @oauth.get_token_info_from_session_keys([], options)
         end
       end
@@ -556,7 +556,7 @@ describe "Koala::Facebook::OAuth" do
 
         it "passes on any options provided to make_request" do
           options = {:a => 2}
-          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "[{}]", {}))
           @oauth.get_tokens_from_session_keys([], options)
         end
       end
@@ -586,7 +586,7 @@ describe "Koala::Facebook::OAuth" do
 
         it "passes on any options provided to make_request" do
           options = {:a => 2}
-          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::Response.new(200, "[{}]", {}))
+          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "[{}]", {}))
           @oauth.get_token_from_session_key("", options)
         end
       end

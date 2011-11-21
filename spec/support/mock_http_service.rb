@@ -56,9 +56,9 @@ module Koala
 
         # create response class object
         response_object = if response.is_a? String
-            Koala::Response.new(200, response, {})
+            Koala::HTTPService::Response.new(200, response, {})
           else
-            Koala::Response.new(response["code"] || 200, response["body"] || "", response["headers"] || {})
+            Koala::HTTPService::Response.new(response["code"] || 200, response["body"] || "", response["headers"] || {})
           end
 
       rescue NoMethodError

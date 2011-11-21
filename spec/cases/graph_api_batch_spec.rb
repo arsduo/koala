@@ -264,7 +264,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
   describe "GraphAPI batch interface" do
     it "returns nothing for a batch operation" do
-      Koala.stub(:make_request).and_return(Koala::Response.new(200, "[]", {}))
+      Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, "[]", {}))
       @api.batch do |batch_api|
         batch_api.get_object('me').should be_nil
       end
@@ -272,7 +272,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
     describe "#batch" do
       before :each do
-        @fake_response = Koala::Response.new(200, "[]", {})
+        @fake_response = Koala::HTTPService::Response.new(200, "[]", {})
         Koala.stub(:make_request).and_return(@fake_response)
       end
 
@@ -366,7 +366,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       describe "processing the request" do
         it "returns the result headers as a hash if http_component is headers" do
-          Koala.stub(:make_request).and_return(Koala::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
+          Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
           result = @api.batch do |batch_api|
             batch_api.get_object(KoalaTest.user1, {}, :http_component => :headers)
           end
@@ -375,7 +375,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         
         describe "if it errors" do
           it "raises an APIError if the response is not 200" do
-            Koala.stub(:make_request).and_return(Koala::Response.new(500, "[]", {}))
+            Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, "[]", {}))
             expect { 
               Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
             }.to raise_exception(Koala::Facebook::APIError)
@@ -383,7 +383,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
           context "with the old style" do
             before :each do
-              Koala.stub(:make_request).and_return(Koala::Response.new(200, '{"error":190,"error_description":"Error validating access token."}', {}))
+              Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, '{"error":190,"error_description":"Error validating access token."}', {}))
             end
             
             it "throws an error if the response is an old Batch API-style error" do
@@ -411,7 +411,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           
           context "with the new style" do          
             before :each do
-              Koala.stub(:make_request).and_return(Koala::Response.new(200, '{"error":{"message":"Request 0 cannot depend on an  unresolved request with  name f. Requests can only depend on preceding requests","type":"GraphBatchException"}}', {}))
+              Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, '{"error":{"message":"Request 0 cannot depend on an  unresolved request with  name f. Requests can only depend on preceding requests","type":"GraphBatchException"}}', {}))
             end
 
             it "throws an error if the response is a new Graph API-style error" do
@@ -431,7 +431,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         end
 
         it "returns the result status if http_component is status" do
-          Koala.stub(:make_request).and_return(Koala::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
+          Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
           result = @api.batch do |batch_api|
             batch_api.get_object(KoalaTest.user1, {}, :http_component => :status)
           end

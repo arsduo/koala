@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-describe Koala::MultipartRequest do
+describe Koala::HTTPService::MultipartRequest do
   it "is a subclass of Faraday::Request::Multipart" do
-    Koala::MultipartRequest.superclass.should == Faraday::Request::Multipart
+    Koala::HTTPService::MultipartRequest.superclass.should == Faraday::Request::Multipart
   end
   
   it "defines mime_type as multipart/form-data" do
-    Koala::MultipartRequest.mime_type.should == 'multipart/form-data'
+    Koala::HTTPService::MultipartRequest.mime_type.should == 'multipart/form-data'
   end
   
   describe "#process_request?" do
     before :each do
       @env = {}
-      @multipart = Koala::MultipartRequest.new
+      @multipart = Koala::HTTPService::MultipartRequest.new
       @multipart.stub(:request_type).and_return("")
     end
     
@@ -46,7 +46,7 @@ describe Koala::MultipartRequest do
   describe "#process_params" do
     before :each do
       @parent = Faraday::Request::Multipart.new
-      @multipart = Koala::MultipartRequest.new 
+      @multipart = Koala::HTTPService::MultipartRequest.new 
       @block = lambda {|k, v| "#{k}=#{v}"}     
     end
     

@@ -11,7 +11,7 @@ describe "Koala::Facebook::API" do
       hash_not_including('access_token' => 1),
       anything,
       anything
-    ).and_return(Koala::Response.new(200, "", ""))
+    ).and_return(Koala::HTTPService::Response.new(200, "", ""))
 
     @service.api('anything')
   end
@@ -25,7 +25,7 @@ describe "Koala::Facebook::API" do
       hash_including('access_token' => token),
       anything,
       anything
-    ).and_return(Koala::Response.new(200, "", ""))
+    ).and_return(Koala::HTTPService::Response.new(200, "", ""))
 
     service.api('anything')
   end
@@ -36,7 +36,7 @@ describe "Koala::Facebook::API" do
     service.access_token.should == token
   end
 
-  it "gets the attribute of a Koala::Response given by the http_component parameter" do
+  it "gets the attribute of a Koala::HTTPService::Response given by the http_component parameter" do
     http_component = :method_name
 
     response = mock('Mock KoalaResponse', :body => '', :status => 200)
@@ -59,7 +59,7 @@ describe "Koala::Facebook::API" do
 
   it "executes an error checking block if provided" do
     body = '{}'
-    Koala.stub(:make_request).and_return(Koala::Response.new(200, body, {}))
+    Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, body, {}))
 
     yield_test = mock('Yield Tester')
     yield_test.should_receive(:pass)
@@ -71,29 +71,29 @@ describe "Koala::Facebook::API" do
   end
 
   it "raises an API error if the HTTP response code is greater than or equal to 500" do
-    Koala.stub(:make_request).and_return(Koala::Response.new(500, 'response body', {}))
+    Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, 'response body', {}))
 
     lambda { @service.api('anything') }.should raise_exception(Koala::Facebook::APIError)
   end
 
   it "handles rogue true/false as responses" do
-    Koala.should_receive(:make_request).and_return(Koala::Response.new(200, 'true', {}))
+    Koala.should_receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
     @service.api('anything').should be_true
 
-    Koala.should_receive(:make_request).and_return(Koala::Response.new(200, 'false', {}))
+    Koala.should_receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'false', {}))
     @service.api('anything').should be_false
   end
 
   describe "with regard to leading slashes" do
     it "adds a leading / to the path if not present" do
       path = "anything"
-      Koala.should_receive(:make_request).with("/#{path}", anything, anything, anything).and_return(Koala::Response.new(200, 'true', {}))
+      Koala.should_receive(:make_request).with("/#{path}", anything, anything, anything).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
       @service.api(path)
     end
 
     it "doesn't change the path if a leading / is present" do
       path = "/anything"
-      Koala.should_receive(:make_request).with(path, anything, anything, anything).and_return(Koala::Response.new(200, 'true', {}))
+      Koala.should_receive(:make_request).with(path, anything, anything, anything).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
       @service.api(path)
     end
   end

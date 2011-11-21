@@ -8,7 +8,7 @@ shared_examples_for "Koala GraphAPI" do
       anything,
       anything,
       hash_not_including(:rest_api => true)
-    ).and_return(Koala::Response.new(200, "", {}))
+    ).and_return(Koala::HTTPService::Response.new(200, "", {}))
 
     @api.api("anything")
   end
@@ -22,7 +22,7 @@ shared_examples_for "Koala GraphAPI" do
     end
 
     it "throws an APIError if the result hash has an error key" do
-      Koala.stub(:make_request).and_return(Koala::Response.new(500, {"error" => "An error occurred!"}, {}))
+      Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, {"error" => "An error occurred!"}, {}))
       lambda { @api.graph_call(KoalaTest.user1, {}) }.should raise_exception(Koala::Facebook::APIError)
     end
     
@@ -331,7 +331,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       source = stub("UploadIO")
       Koala::UploadableIO.stub(:new).and_return(source)
       source.stub(:requires_base_http_service).and_return(false)
-      Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:video => true)).and_return(Koala::Response.new(200, "[]", {}))
+      Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:video => true)).and_return(Koala::HTTPService::Response.new(200, "[]", {}))
       @api.put_video("foo")
     end
 

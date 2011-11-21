@@ -1,20 +1,10 @@
 require 'faraday'
 require 'koala/http_service/multipart_request'
 require 'koala/http_service/uploadable_io'
+require 'koala/http_service/response'
 
 module Koala
-  class Response
-    attr_reader :status, :body, :headers
-    
-    # Creates a new Response object, which standardizes the response received by Facebook for use within Koala.
-    def initialize(status, body, headers)
-      @status = status
-      @body = body
-      @headers = headers
-    end
-  end
-
-  module HTTPService
+  module HTTPService    
     class << self
       # A customized stack of Faraday middleware that will be used to make each request.
       attr_accessor :faraday_middleware
@@ -28,7 +18,7 @@ module Koala
     # We encode requests in a Facebook-compatible multipart request, 
     # and use whichever adapter has been configured for this application.
     DEFAULT_MIDDLEWARE = Proc.new do |builder|
-      builder.use Koala::MultipartRequest
+      builder.use Koala::HTTPService::MultipartRequest
       builder.request :url_encoded
       builder.adapter Faraday.default_adapter
     end
@@ -65,7 +55,7 @@ module Koala
     #
     # @raise an appropriate connection error if unable to make the request to Facebook
     #
-    # @return a {Koala::Response} object representing the results from Facebook
+    # @return [Koala::HTTPService::Response] a response object representing the results from Facebook
     def self.make_request(path, args, verb, options = {})
       # if the verb isn't get or post, send it as a post argument
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
@@ -82,7 +72,7 @@ module Koala
       conn = Faraday.new(server(request_options), request_options, &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
       response = conn.send(verb, path, (verb == "post" ? params : {}))
-      Koala::Response.new(response.status.to_i, response.body, response.headers)
+      Koala::HTTPService::Response.new(response.status.to_i, response.body, response.headers)
     end
 
     # Encodes a given hash into a query string.  
