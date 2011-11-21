@@ -52,16 +52,16 @@ module Koala
     # Makes a request directly to Facebook.
     # @note You'll rarely need to call this method directly.
     #
-    # @see API#api
-    # @see GraphAPIMethods#graph_call
-    # @see RestAPIMethods#rest_call
+    # @see Koala::Facebook::API#api
+    # @see Koala::Facebook::GraphAPIMethods#graph_call
+    # @see Koala::Facebook::RestAPIMethods#rest_call
     #
     # @param path the server path for this request
-    # @param args (see API#api)
+    # @param args (see Koala::Facebook::API#api)
     # @param verb the HTTP method to use.  
     #             If not get or post, this will be turned into a POST request with the appropriate :method
-    #              specified in the arguments.           
-    # @param options (see API#api)
+    #             specified in the arguments.           
+    # @param options (see Koala::Facebook::API#api)
     #
     # @raise an appropriate connection error if unable to make the request to Facebook
     #
@@ -85,10 +85,17 @@ module Koala
       Koala::Response.new(response.status.to_i, response.body, response.headers)
     end
 
+    # Encodes a given hash into a query string.  
+    # This is used mainly by the Batch API nowadays, since Faraday handles this for regular cases.
+    # 
+    # @param params_hash a hash of values to CGI-encode and appropriately join
+    # 
+    # @example
+    #   Koala.http_service.encode_params({:a => 2, :b => "My String"})
+    #   => "a=2&b=My+String"
+    #
+    # @return the appropriately-encoded string
     def self.encode_params(param_hash)
-      # unfortunately, we can't use to_query because that's Rails, not Ruby
-      # if no hash (e.g. no auth token) return empty string
-      # this is used mainly by the Batch API nowadays
       ((param_hash || {}).collect do |key_and_value|
         key_and_value[1] = MultiJson.encode(key_and_value[1]) unless key_and_value[1].is_a? String
         "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
