@@ -210,7 +210,8 @@ module Koala
       end
 
       # Old session key code
-      # @deprecated Facebook no longer provides session keys
+      
+      # @deprecated Facebook no longer provides session keys.
       def get_token_info_from_session_keys(sessions, options = {})
         Koala::Utils.deprecate("Facebook no longer provides session keys. The relevant OAuth methods will be removed in the next release.")
 

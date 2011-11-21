@@ -29,7 +29,7 @@ module KoalaTest
       KoalaTest.setup_test_data(live_data)
 
       # allow live tests with different adapters
-      adapter = ENV['ADAPTER'] || "typhoeus"# use Typhoeus by default if available
+      adapter = ENV['ADAPTER'] || "typhoeus" # use Typhoeus by default if available
       begin
         require adapter
         Faraday.default_adapter = adapter.to_sym

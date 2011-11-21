@@ -3,8 +3,21 @@ module Koala
     class RealtimeUpdates
       # note: to subscribe to real-time updates, you must have an application access token
 
-      attr_reader :api, :app_id, :app_access_token, :secret
+      # The application API interface used to communicate with Facebook. 
+      attr_reader :api
 
+      # The configuration provided at initialization.
+      attr_reader :app_id, :app_access_token, :secret
+
+      # Create a new RealtimeUpdates instance.
+      # 
+      # @param options initialization options.
+      # @option options :app_id the application's ID.
+      # @option options :app_access_token an application access token, if known.
+      # @option options :secret the application's secret. If an app access token is not provided, this will be used to fetch it from Facebook.
+      # 
+      # @raise ArgumentError if the application ID and one of the app access token or the secret are not provided.
+      #
       def initialize(options = {})
         @app_id = options[:app_id]
         @app_access_token = options[:app_access_token]
