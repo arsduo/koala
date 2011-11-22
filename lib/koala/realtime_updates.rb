@@ -51,35 +51,30 @@ module Koala
       # subscribes for realtime updates
       # your callback_url must be set up to handle the verification request or the subscription will not be set up
       # http://developers.facebook.com/docs/api/realtime
-      def subscribe(object, fields, callback_url, verify_token)
+      def subscribe(object, fields, callback_url, verify_token, options = {})
         args = {
           :object => object,
           :fields => fields,
           :callback_url => callback_url,
-          :verify_token => verify_token
-        }
+        }.merge(verify_token ? {:verify_token => verify_token} : {})
         # a subscription is a success if Facebook returns a 200 (after hitting your server for verification)
-        @api.graph_call(subscription_path, args, 'post', :http_component => :status) == 200
+        @api.graph_call(subscription_path, args, 'post', options.merge(:http_component => :status)) == 200
       end
 
       # removes subscription for object
       # if object is nil, it will remove all subscriptions
-      def unsubscribe(object = nil)
-        args = {}
-        args[:object] = object if object
-        @api.graph_call(subscription_path, args, 'delete', :http_component => :status) == 200
+      def unsubscribe(object = nil, options = {})
+        @api.graph_call(subscription_path, object ? {:object => object} : {}, "delete", options.merge(:http_component => :status)) == 200
       end
 
-      def list_subscriptions
-        @api.graph_call(subscription_path)
+      def list_subscriptions(options = {})
+        @api.graph_call(subscription_path, {}, "get", options)
       end
 
       def graph_api
         Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
         @api
       end
-
-      protected
 
       def subscription_path
         @subscription_path ||= "#{@app_id}/subscriptions"

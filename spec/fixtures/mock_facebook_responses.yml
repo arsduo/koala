@@ -333,6 +333,10 @@ graph_api:
       post:
         with_token:
           code: 200
+    callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>&fields=name&object=user:
+      post:
+        with_token:
+          code: 200
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
       post:
         with_token: '{"error":{"type":"Exception","message":"(#2200) subscription validation failed"}}'
