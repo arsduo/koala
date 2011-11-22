@@ -7,10 +7,9 @@ module Koala
       # @note: to subscribe to real-time updates, you must have an application access token
       #        or provide the app secret when initializing your RealtimeUpdates object.
 
-      # Application information.
-      attr_reader :app_id, :app_access_token, :secret
       # The application API interface used to communicate with Facebook. 
       attr_reader :api
+      attr_reader :app_id, :app_access_token, :secret
 
       # Create a new RealtimeUpdates instance.  
       # If you don't have your app's access token, provide the app's secret and 
@@ -43,13 +42,14 @@ module Koala
       # See {http://developers.facebook.com/docs/reference/api/realtime the realtime updates documentation}
       # for more information on what objects and fields you can register for.
       #
-      # @note Your callback_url must be set up to handle the verification request or the subscription will not be set up
+      # @note Your callback_url must be set up to handle the verification request or the subscription will not be set up.
       #
       # @param object a Facebook ID (name or number)
       # @param fields the fields you want your app to be updated about
       # @param callback_url the URL Facebook should ping when an update is available
       # @param verify_token a token included in the verification request, allowing you to ensure the call is genuine 
       #                     (see the docs for more information)
+      # @param options (see Koala::HTTPService.make_request)
       #
       # @return true if successful, false (or an APIError) otherwise.
       def subscribe(object, fields, callback_url, verify_token, options = {})
@@ -66,6 +66,7 @@ module Koala
       #
       # @param object the object whose subscriptions to delete. 
       #               If no object is provided, all subscriptions will be removed.
+      # @param options (see Koala::HTTPService.make_request)
       #
       # @return true if the unsubscription is successful, false (or an APIError) otherwise.
       def unsubscribe(object = nil, options = {})
@@ -74,6 +75,8 @@ module Koala
 
       # List all active subscriptions for this application.
       # 
+      # @param options (see Koala::HTTPService.make_request) 
+      #
       # @return [Array] a list of active subscriptions
       def list_subscriptions(options = {})
         @api.graph_call(subscription_path, {}, "get", options)
@@ -107,7 +110,8 @@ module Koala
           false
         end
       end
-
+      
+      # The Facebook subscription management URL for your application.
       def subscription_path
         @subscription_path ||= "#{@app_id}/subscriptions"
       end

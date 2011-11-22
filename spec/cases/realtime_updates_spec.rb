@@ -183,8 +183,8 @@ describe "Koala::Facebook::RealtimeUpdates" do
     it "requests the status component" do
       @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(:http_component => :status))
       @updates.unsubscribe("user")
-    end
-    
+    end
+        
     it "accepts an options hash" do
       options = {:a => 2, :b => "C"}
       @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(options))
