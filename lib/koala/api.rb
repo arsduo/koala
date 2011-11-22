@@ -4,7 +4,6 @@ require 'koala/api/rest_api'
 
 module Koala
   module Facebook
-
     class API
       # Creates a new API client.
       # @param [String] access_token access token

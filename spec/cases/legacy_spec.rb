@@ -95,5 +95,13 @@ describe "legacy APIs" do
     it "allows you to access Koala::Response through the Koala module" do
       Koala::UploadableIO.should == Koala::HTTPService::UploadableIO
     end
+    
+    it "allows you to access Koala::Facebook::GraphBatchAPI::BatchOperation through the Koala::Facebook module" do
+      Koala::Facebook::BatchOperation.should == Koala::Facebook::GraphBatchAPI::BatchOperation
+    end 
+    
+    it "allows you to access Koala::Facebook::API::GraphCollection through the Koala::Facebook module" do
+      Koala::Facebook::GraphCollection.should == Koala::Facebook::API::GraphCollection
+    end   
   end
 end
