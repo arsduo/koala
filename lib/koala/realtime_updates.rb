@@ -52,15 +52,14 @@ module Koala
       #                     (see the docs for more information)
       #
       # @return true if successful, false (or an APIError) otherwise.
-      def subscribe(object, fields, callback_url, verify_token)
+      def subscribe(object, fields, callback_url, verify_token, options = {})
         args = {
           :object => object,
           :fields => fields,
           :callback_url => callback_url,
-          :verify_token => verify_token
-        }
+        }.merge(verify_token ? {:verify_token => verify_token} : {})
         # a subscription is a success if Facebook returns a 200 (after hitting your server for verification)
-        @api.graph_call(subscription_path, args, 'post', :http_component => :status) == 200
+        @api.graph_call(subscription_path, args, 'post', options.merge(:http_component => :status)) == 200
       end
 
       # Unsubscribe from updates for a particular object or from updates. 
@@ -69,25 +68,17 @@ module Koala
       #               If no object is provided, all subscriptions will be removed.
       #
       # @return true if the unsubscription is successful, false (or an APIError) otherwise.
-      def unsubscribe(object = nil)
-        args = {}
-        args[:object] = object if object
-        @api.graph_call(subscription_path, args, 'delete', :http_component => :status) == 200
+      def unsubscribe(object = nil, options = {})
+        @api.graph_call(subscription_path, object ? {:object => object} : {}, "delete", options.merge(:http_component => :status)) == 200
       end
 
       # List all active subscriptions for this application.
       # 
       # @return [Array] a list of active subscriptions
-      def list_subscriptions
-        @api.graph_call(subscription_path)
+      def list_subscriptions(options = {})
+        @api.graph_call(subscription_path, {}, "get", options)
       end
 
-      # @private
-      def graph_api
-        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
-        @api
-      end
-      
       # As a security measure (to prevent DDoS attacks), Facebook sends a verification request to your server
       # after you request a subscription.
       # This method parses the challenge params and makes sure the call is legitimate.
@@ -117,10 +108,14 @@ module Koala
         end
       end
 
-      protected
-
       def subscription_path
         @subscription_path ||= "#{@app_id}/subscriptions"
+      end
+      
+      # @private
+      def graph_api
+        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
+        @api
       end
     end
   end
