@@ -67,9 +67,13 @@ module Koala
         # and cause MultiJson.decode to fail -- so we account for that by wrapping the result in []
         body = MultiJson.decode("[#{result.body.to_s}]")[0]
         yield body if error_checking_block
-
+        
         # if we want a component other than the body (e.g. redirect header for images), return that
-        options[:http_component] ? result.send(options[:http_component]) : body
+        if component = options[:http_component]
+          component == :response ? result : result.send(options[:http_component])
+        else
+          body
+        end
       end
     end
 

@@ -40,11 +40,18 @@ describe "Koala::Facebook::API" do
     http_component = :method_name
 
     response = mock('Mock KoalaResponse', :body => '', :status => 200)
-    response.should_receive(http_component).and_return('')
-
+    result = stub("result")
+    response.stub(http_component).and_return(result)
     Koala.stub(:make_request).and_return(response)
 
-    @service.api('anything', {}, 'get', :http_component => http_component)
+    @service.api('anything', {}, 'get', :http_component => http_component).should == result
+  end
+
+  it "returns the entire response if http_component => :response" do
+    http_component = :response
+    response = mock('Mock KoalaResponse', :body => '', :status => 200)
+    Koala.stub(:make_request).and_return(response)    
+    @service.api('anything', {}, 'get', :http_component => http_component).should == response
   end
 
   it "returns the body of the request as JSON if no http_component is given" do
