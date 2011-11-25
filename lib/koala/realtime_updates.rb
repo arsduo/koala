@@ -8,6 +8,7 @@ module Koala
       #        or provide the app secret when initializing your RealtimeUpdates object.
 
       # The application API interface used to communicate with Facebook. 
+      # @return [Koala::Facebook::API] 
       attr_reader :api
       attr_reader :app_id, :app_access_token, :secret
 

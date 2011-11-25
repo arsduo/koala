@@ -16,9 +16,9 @@ require 'koala/utils'
 require 'koala/version'
 
 module Koala
-  # Ruby client library for the Facebook Platform.
-  # http://github.com/arsduo/koala
-  # Copyright 2010-2011 Alex Koppel
+  # A Ruby client library for the Facebook Platform.
+  # See http://github.com/arsduo/koala/wiki for a general introduction to Koala
+  # and the Graph API.
   
   class KoalaError < StandardError; end
 
