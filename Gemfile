@@ -1,5 +1,9 @@
 source :rubygems
 
+group :development do
+  gem "yard"
+end
+
 group :development, :test do
   gem "typhoeus"
 

@@ -98,7 +98,7 @@ module Koala
       # @param args any additional arguments
       # @param options (see #get_object)
       # 
-      # @return [Koala::Facebook::API::GraphCollection] an array of object hashes 
+      # @return [Koala::Facebook::API::GraphCollection] an array of object hashes (in most cases)
       def get_connections(id, connection_name, args = {}, options = {})
         # Fetchs the connections for given object.
         graph_call("#{id}/#{connection_name}", args, "get", options)
@@ -350,14 +350,45 @@ module Koala
         graph_call(app_id, args.merge(:restrictions => MultiJson.encode(restrictions_hash)), "post", options)
       end
 
-      # GraphCollection support
+      # Certain calls such as {#get_connections} return an array of results which you can page through
+      # forwards and backwards (to see more feed stories, search results, etc.).
+      # Those methods use get_page to request another set of results from Facebook.
+      # 
+      # @note You'll rarely need to use this method unless you're using Sinatra or another non-Rails framework
+      #       (see {Koala::Facebook::GraphCollection GraphCollection} for more information).    
+      #
+      # @param params an array of arguments to graph_call
+      #               as returned by {Koala::Facebook::GraphCollection.parse_page_url}.
+      #
+      # @return Koala::Facebook::GraphCollection the appropriate page of results (an empty array if there are none)
       def get_page(params)
-        # Pages through a set of results stored in a GraphCollection
-        # Used for connections and search results
         graph_call(*params)
       end
 
-      # Batch API
+      # Execute a set of Graph API calls as a batch. 
+      # See {SITE} for more information and examples.
+      # Also see {Koala::Facebook::GraphBatchAPI GraphBatchAPI} for 
+      # more information on batch request arguments.
+      # 
+      # @param http_options HTTP options for the entire request.
+      #
+      # @yield batch_api [Koala::Facebook::GraphBatchAPI] an API subclass
+      #                  whose requests will be queued and executed together at the end of the block
+      #
+      # @raise [Koala::Facebook::APIError] only if there is a problem with the overall batch request
+      #                                    (e.g. connectivity failure, an operation with a missing dependency).
+      #                                    Individual calls that error out will be represented as an unraised
+      #                                    APIError in the appropriate spot in the results array.
+      #
+      # @example
+      #         results = @api.batch do |batch_api|
+      #          batch_api.get_object('me')
+      #          batch_api.get_object(KoalaTest.user1)
+      #         end
+      #         # => [{"id" => my_id, ...}, {"id"" => koppel_id, ...}]
+      #
+      # @return an array of results from your batch calls (as if you'd made them individually), 
+      #         arranged in the same order they're made.
       def batch(http_options = {}, &block)
         batch_client = GraphBatchAPI.new(access_token, self)
         if block
