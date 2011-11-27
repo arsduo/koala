@@ -8,12 +8,12 @@ module Koala
         
         # The raw paging information from Facebook (next/previous URLs).
         attr_reader :paging
-        # [Koala::Facebook::GraphAPI] the api used to make requests.
+        # @return [Koala::Facebook::GraphAPI] the api used to make requests.
         attr_reader :api
         # The entire raw response from Facebook.
         attr_reader :raw_response
     
-        # Initialize the Graph Collection array and store various useful information.
+        # Initialize the array of results and store various additional paging-related information.
         # 
         # @param response the response from Facebook (a hash whose "data" key is an array)
         # @param api the Graph {Koala::Facebook::API API} instance to use to make calls
@@ -37,28 +37,55 @@ module Koala
           response.is_a?(Hash) && response["data"].is_a?(Array) ? self.new(response, api) : response
         end
         
-        # defines methods for NEXT and PREVIOUS pages
-        %w{next previous}.each do |this|
-
-          # def next_page
-          # def previous_page
-          define_method "#{this.to_sym}_page" do
-            base, args = send("#{this}_page_params")
-            base ? @api.get_page([base, args]) : nil
-          end
-
-          # def next_page_params
-          # def previous_page_params
-          define_method "#{this.to_sym}_page_params" do
-            return nil unless @paging and @paging[this]
-            parse_page_url(@paging[this])
-          end
+        # Retrieve the next page of results.
+        # 
+        # @return a GraphCollection array of additional results (an empty array if there are no more results)
+        def next_page
+          base, args = next_page_params
+          base ? @api.get_page([base, args]) : nil
         end
-      
+        
+        # Retrieve the previous page of results.
+        # 
+        # @return a GraphCollection array of additional results (an empty array if there are no earlier results)
+        def previous_page
+          base, args = previous_page_params
+          base ? @api.get_page([base, args]) : nil
+        end
+        
+        # Arguments that can be sent to {Koala::Facebook::API#graph_call} to retrieve the next page of results. 
+        # 
+        # @example
+        #           @api.graph_call(*collection.next_page_params)
+        #
+        # @return an array of arguments, or nil if there are no more pages
+        def next_page_params
+          @paging && @paging["next"] ? parse_page_url(@paging["next"]) : nil
+        end
+        
+        # Arguments that can be sent to {Koala::Facebook::API#graph_call} to retrieve the previous page of results. 
+        # 
+        # @example
+        #           @api.graph_call(*collection.previous_page_params)
+        #
+        # @return an array of arguments, or nil if there are no previous pages
+        def previous_page_params
+          @paging && @paging["previous"] ? parse_page_url(@paging["previous"]) : nil
+        end
+        
+        # @private
         def parse_page_url(url)
           GraphCollection.parse_page_url(url)
         end
 
+        # Parse the previous and next page URLs Facebook provides in pageable results.
+        # You'll mainly need to use this when using a non-Rails framework (one without url_for);
+        # to store paging information between page loads, pass the URL (from GraphCollection#paging)
+        # and use parse_page_url to turn it into parameters useful for {Koala::Facebook::API#get_page}.
+        #
+        # @param url the paging URL to turn into graph_call parameters
+        #
+        # @return an array of parameters that can be provided via graph_call(*parsed_params)
         def self.parse_page_url(url)
           match = url.match(/.com\/(.*)\?(.*)/)
           base = match[1]

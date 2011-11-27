@@ -65,7 +65,9 @@ module Koala
         graph_call("", args.merge("ids" => ids.respond_to?(:join) ? ids.join(",") : ids), "get", options)
       end
 
+      # Write an object to the Graph for a specific user.
       # @see #put_connections
+      #
       # @note put_object is (for historical reasons) the same as put_connections.
       #       Please use put_connections; in a future version of Koala (2.0?),
       #       put_object will issue a POST directly to an individual object, not to a connection. 
@@ -366,9 +368,8 @@ module Koala
       end
 
       # Execute a set of Graph API calls as a batch. 
-      # See {SITE} for more information and examples.
-      # Also see {Koala::Facebook::GraphBatchAPI GraphBatchAPI} for 
-      # more information on batch request arguments.
+      # See {https://github.com/arsduo/koala/wiki/Batch-requests batch request documentation} 
+      # for more information and examples.
       # 
       # @param http_options HTTP options for the entire request.
       #
