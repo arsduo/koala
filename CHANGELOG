@@ -15,7 +15,8 @@ Internal improvements:
 -- FQL queries now use the Graph API behind-the-scenes
 -- Cleaned up file and class organization, with aliases for backward compatibility
 -- Added YARD documentation throughout
--- Fixed bugs in RealtimeUpdates, 
+-- Fixed bugs in RealtimeUpdates, TestUsers, elsewhere
+-- Reorganized file and class structure non-destructively
 Testing improvements:
 -- Expanded/improved test coverage
 -- The test suite no longer users any hard-coded user IDs

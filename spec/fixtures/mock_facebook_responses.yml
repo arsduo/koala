@@ -262,10 +262,10 @@ graph_api:
         no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
 
   /fql:
-    q=select first_name from user where uid = 2901279:
+    q=select uid, first_name from user where uid = 2901279:
       get:
-        no_token: '[{"first_name":"Luke"}]'
-        with_token: '[{"first_name":"Luke"}]'
+        no_token: '[{"uid":2901279,"first_name":"Luke"}]'
+        with_token: '[{"uid":2901279,"first_name":"Luke"}]'
     q=select read_stream from permissions where uid = 2901279:
       get:
         <<: *token_required
@@ -274,10 +274,10 @@ graph_api:
       get:
         <<: *token_required
         with_token: '[{"name":"query1", "fql_result_set":[]},{"name":"query2", "fql_result_set":[]},{"name":"query3", "fql_result_set":[]}]'
-    'q=<%= MultiJson.encode({"query1" => "select first_name from user where uid = 2901279", "query2" => "select first_name from user where uid = 2905623"}) %>':
+    'q=<%= MultiJson.encode({"query1" => "select uid, first_name from user where uid = 2901279", "query2" => "select uid, first_name from user where uid = 2905623"}) %>':
       get:
-        with_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
-        no_token: '[{"name":"query1", "fql_result_set":[{"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"first_name":"Alex"}]}]'
+        with_token: '[{"name":"query1", "fql_result_set":[{"uid":2901279,"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"uid":"2905623","first_name":"Alex"}]}]'
+        no_token: '[{"name":"query1", "fql_result_set":[{"uid":2901279,"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"uid":"2905623","first_name":"Alex"}]}]'
 
 
   '/115349521819193_113815981982767':
