@@ -166,12 +166,12 @@ describe "Koala::Facebook::OAuth" do
           @oauth.stub(:get_access_token_info).and_return("access_token" => "my token")          
         end
 
-        it "uses get_user_info_from_cookies to parse the cookies" do
-          @oauth.should_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
+        it "not uses get_user_info_from_cookies to parse the cookies" do
+          @oauth.should_not_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
           @oauth.get_user_from_cookies(@cookie)
         end
 
-        it "uses return the token string if the cookies are valid" do
+        it "uses return the facebook user id string if the cookies are valid" do
           result = @oauth.get_user_from_cookies(@cookie)
           result.should == "2905623" # the user who generated the original test cookie
         end
