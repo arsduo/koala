@@ -48,9 +48,12 @@ module Koala
       #
       # @return the authenticated user's Facebook ID, or nil.
       def get_user_from_cookie(cookies)
-        if info = get_user_info_from_cookies(cookies)
-          # signed cookie has user_id, unsigned cookie has uid
-          string = info["user_id"] || info["uid"]
+        if signed_cookie = cookies["fbsr_#{@app_id}"]
+          components = parse_signed_request(signed_cookie)
+          string = components["user_id"] if components
+        elsif info = get_user_info_from_cookies(cookies)
+          # Parsing unsigned cookie
+          string = info["uid"]
         end
       end
       alias_method :get_user_from_cookies, :get_user_from_cookie
