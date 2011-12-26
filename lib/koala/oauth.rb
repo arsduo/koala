@@ -288,7 +288,7 @@ module Koala
       
       def parse_signed_cookie(fb_cookie)
         components = parse_signed_request(fb_cookie)
-        if (code = components["code"])
+        if code = components["code"]
           begin
             token_info = get_access_token_info(code, :redirect_uri => '')
           rescue Koala::Facebook::APIError => err
