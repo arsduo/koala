@@ -2,6 +2,14 @@ require 'spec_helper'
 
 # Support for legacy / deprecated interfaces
 describe "legacy APIs" do
+
+  it "deprecates the REST API" do
+    api = Koala::Facebook::API.new
+    api.stub(:api)
+    Koala::Utils.should_receive(:deprecate)
+    api.rest_call("stuff")
+  end
+
   describe Koala::Facebook::GraphAPI do
     describe "class consolidation" do
       before :each do

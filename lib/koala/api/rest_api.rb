@@ -38,6 +38,8 @@ module Koala
       # 
       # @return the result from Facebook
       def rest_call(fb_method, args = {}, options = {}, verb = "get")
+        Koala::Utils.deprecate("The REST API is now deprecated; please use the equivalent Graph API methods instead.  See http://developers.facebook.com/blog/post/616/.")
+
         options = options.merge!(:rest_api => true, :read_only => READ_ONLY_METHODS.include?(fb_method.to_s))
 
         api("method/#{fb_method}", args.merge('format' => 'json'), verb, options) do |response|
