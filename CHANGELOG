@@ -5,12 +5,15 @@ New methods:
 -- GraphCollection.parse_page_url now exposes useful functionality for non-Rails apps
 -- RealtimeUpdates#subscription_path and TestUsers#test_user_accounts_path are now public
 Updated methods:
+-- REST API methods are now deprecated (see http://developers.facebook.com/blog/post/616/)
 -- OAuth#url_for_access_token and #url_for_oauth_code now include any provided options as URL parameters
 -- APIError#raw_response allows access to the raw error response received from Facebook
 -- Utils.deprecate only prints each message once (no more spamming)
 -- API#get_page_access_token now accepts additional arguments and HTTP options (like other calls)
 -- TestUsers and RealtimeUpdates methods now take http_options arguments
 -- All methods with http_options can now take :http_component => :response for the complete response
+-- OAuth#get_user_info_from_cookies returns nil rather than an error if the cookies are expired (thanks, herzio)
+-- TestUsers#delete_all now uses the Batch API and is much faster
 Internal improvements:
 -- FQL queries now use the Graph API behind-the-scenes
 -- Cleaned up file and class organization, with aliases for backward compatibility
