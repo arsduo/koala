@@ -31,14 +31,14 @@ module Koala
       #                     You can pass Rack/Rails/Sinatra's cookie hash directly to this method.
       #
       # @return the authenticated user's information as a hash, or nil.
-      def get_user_info_from_cookie(cookie_hash)
+      def get_user_info_from_cookies(cookie_hash)
         if signed_cookie = cookie_hash["fbsr_#{@app_id}"]
           parse_signed_cookie(signed_cookie)
         elsif unsigned_cookie = cookie_hash["fbs_#{@app_id}"]
           parse_unsigned_cookie(unsigned_cookie)
         end
       end
-      alias_method :get_user_info_from_cookies, :get_user_info_from_cookie
+      alias_method :get_user_info_from_cookie, :get_user_info_from_cookies
 
       # Parses the cookie set Facebook's JavaScript SDK and returns only the user ID.
       #
@@ -47,16 +47,17 @@ module Koala
       # @param (see #get_user_info_from_cookie)
       #
       # @return the authenticated user's Facebook ID, or nil.
-      def get_user_from_cookie(cookies)
+      def get_user_from_cookies(cookies)
         if signed_cookie = cookies["fbsr_#{@app_id}"]
-          components = parse_signed_request(signed_cookie)
-          string = components["user_id"] if components
+          if components = parse_signed_request(signed_cookie)
+            components["user_id"]
+          end
         elsif info = get_user_info_from_cookies(cookies)
           # Parsing unsigned cookie
-          string = info["uid"]
+          info["uid"]
         end
       end
-      alias_method :get_user_from_cookies, :get_user_from_cookie
+      alias_method :get_user_from_cookie, :get_user_from_cookies
 
       # URLs
       
@@ -287,8 +288,15 @@ module Koala
       
       def parse_signed_cookie(fb_cookie)
         components = parse_signed_request(fb_cookie)
-        if (code = components["code"]) && token_info = get_access_token_info(code, :redirect_uri => '')
-          components.merge(token_info)
+        if (code = components["code"])
+          begin
+            token_info = get_access_token_info(code, :redirect_uri => '')
+          rescue Koala::Facebook::APIError => err
+            return nil if err.message =~ /Code was invalid or expired/
+            raise
+          end
+
+          components.merge(token_info) if token_info
         else
           nil
         end

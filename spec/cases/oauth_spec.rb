@@ -104,9 +104,25 @@ describe "Koala::Facebook::OAuth" do
             @oauth.get_user_info_from_cookies(@cookie)["access_token"].should == @token
           end
           
-          it "returns nil if the call to FB fails" do
+          it "returns nil if the call to FB returns no data" do
             @oauth.stub(:get_access_token_info).and_return(nil)
             @oauth.get_user_info_from_cookies(@cookie).should be_nil
+          end
+
+          it "returns nil if the call to FB returns an expired code error" do
+            @oauth.stub(:get_access_token_info).and_raise(Koala::Facebook::APIError.new(
+              "type" => "OAuthException",
+              "message" => "Code was invalid or expired. Session has expired at unix time 1324044000. The current unix time is 1324300957."
+            ))
+            @oauth.get_user_info_from_cookies(@cookie).should be_nil
+          end
+
+          it "raises the error if the call to FB returns a different error" do
+            @oauth.stub(:get_access_token_info).and_raise(Koala::Facebook::APIError.new(
+              "type" => "OtherError",
+              "message" => "A Facebook Error"
+            ))
+            expect { @oauth.get_user_info_from_cookies(@cookie) }.to raise_exception(Koala::Facebook::APIError)
           end
         end
         
@@ -166,7 +182,7 @@ describe "Koala::Facebook::OAuth" do
           @oauth.stub(:get_access_token_info).and_return("access_token" => "my token")          
         end
 
-        it "not uses get_user_info_from_cookies to parse the cookies" do
+        it "does not uses get_user_info_from_cookies to parse the cookies" do
           @oauth.should_not_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
           @oauth.get_user_from_cookies(@cookie)
         end
