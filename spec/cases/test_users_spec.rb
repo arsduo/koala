@@ -179,19 +179,27 @@ describe "Koala::Facebook::TestUsers" do
     end
 
     describe "#delete_all" do
-      it "deletes all users found by the list commnand" do
-        array = [1, 2, 3]
-        @test_users.should_receive(:list).and_return(array)
-        array.each {|i| @test_users.should_receive(:delete).with(i, anything) }
+      it "deletes the batch API to deleten all users found by the list commnand" do
+        array = 200.times.collect { {"id" => rand}}
+        @test_users.should_receive(:list).and_return(array, [])
+        batch_api = stub("batch API")
+        @test_users.api.should_receive(:batch).and_yield(batch_api).any_number_of_times
+        array.each {|item| batch_api.should_receive(:delete_object).with(item["id"]) }
         @test_users.delete_all
       end
       
-      it "accepts http options that get passed to both list and delete" do
-        array = [1, 2, 3]
+      it "accepts http options that get passed to both list and the batch call" do
         options = {:some_http_option => true}
-        @test_users.should_receive(:list).with(options).and_return(array)
-        array.each {|i| @test_users.should_receive(:delete).with(anything, options) }
+        @test_users.should_receive(:list).with(options).and_return([{"id" => rand}], [])
+        @test_users.api.should_receive(:batch).with(options)
         @test_users.delete_all(options)
+      end  
+      
+      it "breaks if Facebook sends back the same list twice" do
+        list = [{"id" => rand}]
+        @test_users.should_receive(:list).any_number_of_times.and_return(list)
+        @test_users.api.should_receive(:batch).once
+        @test_users.delete_all
       end        
     end
 

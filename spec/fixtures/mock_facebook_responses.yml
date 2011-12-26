@@ -426,7 +426,7 @@ graph_api:
         with_token: '{"id": "888888888", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}'
     no_args:
       get:
-        with_token: '{"data":[{"id": "999999999", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}]}'
+        with_token: '{"data":[{"id": "999999999", "access_token":"<%= ACCESS_TOKEN %>", "login_url":"https://www.facebook.com/platform/test_account.."}, {"id": "888888888", "access_token":"119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.", "login_url":"https://www.facebook.com/platform/test_account.."}], "paging":{"next":"https://graph.facebook.com/119908831367602/accounts/test-users?access_token=119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw&limit=50&offset=50&__after_id=100003241848740"}}'
 
   /999999999:
     no_args:

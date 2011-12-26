@@ -1,4 +1,5 @@
 require 'koala'
+
 module Koala
   module Facebook
     
@@ -81,7 +82,7 @@ module Koala
         @api.delete_object(test_user, options)
       end
 
-      # Deletes all test users.
+      # Deletes all test users in batches of 50.
       # 
       # @note if you have a lot of test users (> 20), this operation can take a long time.
       #
@@ -89,7 +90,20 @@ module Koala
       # 
       # @return a list of the test users that have been deleted
       def delete_all(options = {})
-        list(options).each {|u| delete(u, options)}
+        # ideally we'd save a call by checking next_page_params, but at the time of writing
+        # Facebook isn't consistently returning full pages after the first one
+        previous_list = nil
+        while (test_user_list = list(options)).length > 0
+          # avoid infinite loops if Facebook returns buggy users you can't delete
+          # see http://developers.facebook.com/bugs/223629371047398
+          break if test_user_list == previous_list
+
+          test_user_list.each_slice(50) do |users| 
+            self.api.batch(options) {|batch_api| users.each {|u| batch_api.delete_object(u["id"]) }}
+          end
+          
+          previous_list = test_user_list
+        end
       end
 
       # Updates a test user's attributes.
