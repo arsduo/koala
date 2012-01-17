@@ -123,6 +123,13 @@ describe "Koala::HTTPService" do
         val.should == CGI.escape(args[key])
       end
     end
+    
+    it "encodes parameters in alphabetical order" do
+      args = {:b => '2', 'a' => '1'}
+      
+      result = Koala::HTTPService.encode_params(args)
+      result.split('&').map{|key_val| key_val.split('=')[0]}.should == ['a', 'b']
+    end
 
     it "converts all keys to Strings" do
       args = Hash[*(1..4).map {|i| [i, "val#{i}"]}.flatten]
