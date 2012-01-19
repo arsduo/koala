@@ -32,7 +32,7 @@ The Graph API is the simple, slick new interface to Facebook's data.  Using it w
     @graph.put_object("me", "feed", :message => "I am writing on my wall!")
    
     # three-part queries are easy too!
-    @graph.get_connection("me", "mutualfriends/#{friend_id}")
+    @graph.get_connections("me", "mutualfriends/#{friend_id}")
     
     # you can even use the new Timeline API
     # see https://developers.facebook.com/docs/beta/opengraph/tutorial/
