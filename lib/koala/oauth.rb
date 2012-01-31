@@ -190,6 +190,32 @@ module Koala
         end
       end
 
+      # Fetches an access_token with extended expiration time, along with any other information provided by Facebook.
+      # See https://developers.facebook.com/docs/offline-access-deprecation/#extend_token (search for fb_exchange_token).
+      #
+      # @param access_token the access token to exchange
+      # @param options any additional parameters to send to Facebook when exchanging tokens.
+      #
+      # @return the access token with extended expiration time and other information (expiration, etc.)
+      def get_exchange_access_token_info(access_token, options = {})
+        get_token_from_server({
+          :grant_type => 'fb_exchange_token',
+          :fb_exchange_token => access_token
+        }, true, options)
+      end
+
+      # Fetches an access token with extended expiration time (ignoring expiration and other info).
+      # @see get_exchange_access_token_info
+      #
+      # @param (see #get_exchange_access_token_info)
+      #
+      # @return A new access token or the existing one, set to expire in 60 days.
+      def get_exchange_access_token(access_token, options = {})
+        if info = get_exchange_access_token_info(access_token, options)
+          info["access_token"]
+        end
+      end
+
       # Parses a signed request string provided by Facebook to canvas apps or in a secure cookie.
       #
       # @param input the signed request from Facebook
