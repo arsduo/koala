@@ -5,7 +5,7 @@ group :development do
 end
 
 group :development, :test do
-  gem "typhoeus"
+  gem "typhoeus" unless defined? JRUBY_VERSION
 
   # Testing infrastructure
   gem 'guard'
@@ -19,8 +19,6 @@ group :development, :test do
   end
 end
 
-if defined? JRUBY_VERSION
-  gem "jruby-openssl"
-end
+gem "jruby-openssl" if defined? JRUBY_VERSION
 
 gemspec
