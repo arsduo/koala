@@ -10,6 +10,7 @@ group :development, :test do
   # Testing infrastructure
   gem 'guard'
   gem 'guard-rspec'
+  gem "parallel_tests"
 
   if RUBY_PLATFORM =~ /darwin/
     # OS X integration
