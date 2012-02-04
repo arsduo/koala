@@ -17,7 +17,7 @@ module Koala
     # token, this will fetch the profile of the active user and the list
     # of the user's friends:
     #
-    # @example 
+    # @example
     #         graph = Koala::Facebook::API.new(access_token)
     #         user = graph.get_object("me")
     #         friends = graph.get_connections(user["id"], "friends")
@@ -25,7 +25,7 @@ module Koala
     # You can see a list of all of the objects and connections supported
     # by the API at http://developers.facebook.com/docs/reference/api/.
     #
-    # You can obtain an access token via OAuth or by using the Facebook JavaScript SDK.  
+    # You can obtain an access token via OAuth or by using the Facebook JavaScript SDK.
     # If you're using the JavaScript SDK, you can use the
     # {Koala::Facebook::OAuth#get_user_from_cookie} method to get the OAuth access token
     # for the active user from the cookie provided by Facebook.
@@ -35,12 +35,12 @@ module Koala
       # Objects
 
       # Get information about a Facebook object.
-      # 
+      #
       # @param id the object ID (string or number)
-      # @param args any additional arguments 
+      # @param args any additional arguments
       #         (fields, metadata, etc. -- see {http://developers.facebook.com/docs/reference/api/ Facebook's documentation})
       # @param options (see Koala::Facebook::API#api)
-      # 
+      #
       # @raise [Koala::Facebook::APIError] if the ID is invalid or you don't have access to that object
       #
       # @return a hash of object data
@@ -50,11 +50,11 @@ module Koala
       end
 
       # Get information about multiple Facebook objects in one call.
-      # 
+      #
       # @param ids an array or comma-separated string of object IDs
       # @param args (see #get_object)
       # @param options (see Koala::Facebook::API#api)
-      # 
+      #
       # @raise [Koala::Facebook::APIError] if any ID is invalid or you don't have access to that object
       #
       # @return an array of object data hashes
@@ -70,14 +70,14 @@ module Koala
       #
       # @note put_object is (for historical reasons) the same as put_connections.
       #       Please use put_connections; in a future version of Koala (2.0?),
-      #       put_object will issue a POST directly to an individual object, not to a connection. 
+      #       put_object will issue a POST directly to an individual object, not to a connection.
       def put_object(parent_object, connection_name, args = {}, options = {})
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
         graph_call("#{parent_object}/#{connection_name}", args, "post", options)
       end
 
       # Delete an object from the Graph if you have appropriate permissions.
-      # 
+      #
       # @param id (see #get_object)
       # @param options (see #get_object)
       #
@@ -91,15 +91,15 @@ module Koala
       # Fetch information about a given connection (e.g. type of activity -- feed, events, photos, etc.)
       # for a specific user.
       # See {http://developers.facebook.com/docs/api Facebook's documentation} for a complete list of connections.
-      # 
-      # @note to access connections like /user_id/CONNECTION/other_user_id, 
+      #
+      # @note to access connections like /user_id/CONNECTION/other_user_id,
       #       simply pass "CONNECTION/other_user_id" as the connection_name
       #
       # @param id (see #get_object)
-      # @param connection_name what 
+      # @param connection_name what
       # @param args any additional arguments
       # @param options (see #get_object)
-      # 
+      #
       # @return [Koala::Facebook::API::GraphCollection] an array of object hashes (in most cases)
       def get_connection(id, connection_name, args = {}, options = {})
         # Fetchs the connections for given object.
@@ -109,7 +109,7 @@ module Koala
 
 
       # Write an object to the Graph for a specific user.
-      # See {http://developers.facebook.com/docs/api#publishing Facebook's documentation} 
+      # See {http://developers.facebook.com/docs/api#publishing Facebook's documentation}
       # for all the supported writeable objects.
       #
       # @note (see #get_connections)
@@ -138,9 +138,9 @@ module Koala
       # Delete an object's connection (for instance, unliking the object).
       #
       # @note (see #get_connections)
-      # 
+      #
       # @param id (see #get_object)
-      # @param connection_name (see #get_connections) 
+      # @param connection_name (see #get_connections)
       # @args (see #get_connections)
       # @param options (see #get_object)
       #
@@ -151,8 +151,8 @@ module Koala
         graph_call("#{id}/#{connection_name}", args, "delete", options)
       end
 
-      # Fetches a photo.  
-      # (Facebook returns the src of the photo as a response header; this method parses that properly, 
+      # Fetches a photo.
+      # (Facebook returns the src of the photo as a response header; this method parses that properly,
       # unlike using get_connections("photo").)
       #
       # @note to delete photos or videos, use delete_object(id)
@@ -200,7 +200,7 @@ module Koala
         put_object(*args)
       end
 
-      # Write directly to the user's wall.  
+      # Write directly to the user's wall.
       # Convenience method equivalent to put_object(id, "feed").
       #
       # To get wall posts, use get_connections(user, "feed")
@@ -221,13 +221,13 @@ module Koala
       #         "picture" => "http://www.example.com/thumbnail.jpg"
       #       })
       #
-      # @see #put_connections      
+      # @see #put_connections
       # @return (see #put_connections)
       def put_wall_post(message, attachment = {}, target_id = "me", options = {})
         self.put_object(target_id, "feed", attachment.merge({:message => message}), options)
       end
 
-      # Comment on a given object.  
+      # Comment on a given object.
       # Convenience method equivalent to put_connection(id, "comments").
       #
       # To delete comments, use delete_object(comment_id).
@@ -243,7 +243,7 @@ module Koala
         self.put_object(id, "comments", {:message => message}, options)
       end
 
-      # Like a given object.  
+      # Like a given object.
       # Convenience method equivalent to put_connections(id, "likes").
       #
       # To get a list of a user's or object's likes, use get_connections(id, "likes").
@@ -257,7 +257,7 @@ module Koala
         self.put_object(id, "likes", {}, options)
       end
 
-      # Unlike a given object.  
+      # Unlike a given object.
       # Convenience method equivalent to delete_connection(id, "likes").
       #
       # @param id (see #get_object)
@@ -276,7 +276,7 @@ module Koala
       # @param search_terms the query to search for
       # @param args additional arguments, such as type, fields, etc.
       # @param options (see #get_object)
-      # 
+      #
       # @return [Koala::Facebook::API::GraphCollection] an array of search results
       def search(search_terms, args = {}, options = {})
         args.merge!({:q => search_terms}) unless search_terms.nil?
@@ -287,10 +287,10 @@ module Koala
       # In general, we're trying to avoid adding convenience methods to Koala
       # except to support cases where the Facebook API requires non-standard input
       # such as JSON-encoding arguments, posts directly to objects, etc.
-      
-      # Make an FQL query.  
+
+      # Make an FQL query.
       # Convenience method equivalent to get_object("fql", :q => query).
-      # 
+      #
       # @param query the FQL query to perform
       # @param args (see #get_object)
       # @param options (see #get_object)
@@ -299,15 +299,15 @@ module Koala
       end
 
       # Make an FQL multiquery.
-      # This method simplifies the result returned from multiquery into a more logical format.      
-      # 
+      # This method simplifies the result returned from multiquery into a more logical format.
+      #
       # @param queries a hash of query names => FQL queries
       # @param args (see #get_object)
       # @param options (see #get_object)
       #
       # @example
       #     @api.fql_multiquery({
-      #       "query1" => "select post_id from stream where source_id = me()", 
+      #       "query1" => "select post_id from stream where source_id = me()",
       #       "query2" => "select fromid from comment where post_id in (select post_id from #query1)"
       #     })
       #     # returns {"query1" => [obj1, obj2, ...], "query2" => [obj3, ...]}
@@ -320,15 +320,15 @@ module Koala
           results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
         end
       end
-      
+
       # Get a page's access token, allowing you to act as the page.
       # Convenience method for @api.get_object(page_id, :fields => "access_token").
       #
       # @param id the page ID
       # @param args (see #get_object)
-      # @param options (see #get_object)      
+      # @param options (see #get_object)
       #
-      # @return the page's access token (discarding expiration and any other information)      
+      # @return the page's access token (discarding expiration and any other information)
       def get_page_access_token(id, args = {}, options = {})
         result = get_object(id, args.merge(:fields => "access_token"), options) do
           result ? result["access_token"] : nil
@@ -341,14 +341,14 @@ module Koala
       # @param urls the URLs for which you want comments
       # @param args (see #get_object)
       # @param options (see #get_object)
-      # 
+      #
       # @returns a hash of urls => comment arrays
       def get_comments_for_urls(urls = [], args = {}, options = {})
         return [] if urls.empty?
         args.merge!(:ids => urls.respond_to?(:join) ? urls.join(",") : urls)
         get_object("comments", args, options)
       end
-      
+
       def set_app_restrictions(app_id, restrictions_hash, args = {}, options = {})
         graph_call(app_id, args.merge(:restrictions => MultiJson.encode(restrictions_hash)), "post", options)
       end
@@ -356,9 +356,9 @@ module Koala
       # Certain calls such as {#get_connections} return an array of results which you can page through
       # forwards and backwards (to see more feed stories, search results, etc.).
       # Those methods use get_page to request another set of results from Facebook.
-      # 
+      #
       # @note You'll rarely need to use this method unless you're using Sinatra or another non-Rails framework
-      #       (see {Koala::Facebook::GraphCollection GraphCollection} for more information).    
+      #       (see {Koala::Facebook::GraphCollection GraphCollection} for more information).
       #
       # @param params an array of arguments to graph_call
       #               as returned by {Koala::Facebook::GraphCollection.parse_page_url}.
@@ -368,10 +368,10 @@ module Koala
         graph_call(*params)
       end
 
-      # Execute a set of Graph API calls as a batch. 
-      # See {https://github.com/arsduo/koala/wiki/Batch-requests batch request documentation} 
+      # Execute a set of Graph API calls as a batch.
+      # See {https://github.com/arsduo/koala/wiki/Batch-requests batch request documentation}
       # for more information and examples.
-      # 
+      #
       # @param http_options HTTP options for the entire request.
       #
       # @yield batch_api [Koala::Facebook::GraphBatchAPI] an API subclass
@@ -389,7 +389,7 @@ module Koala
       #         end
       #         # => [{"id" => my_id, ...}, {"id"" => koppel_id, ...}]
       #
-      # @return an array of results from your batch calls (as if you'd made them individually), 
+      # @return an array of results from your batch calls (as if you'd made them individually),
       #         arranged in the same order they're made.
       def batch(http_options = {}, &block)
         batch_client = GraphBatchAPI.new(access_token, self)
@@ -400,7 +400,7 @@ module Koala
           batch_client
         end
       end
-      
+
       # Make a call directly to the Graph API.
       # (See any of the other methods for example invocations.)
       #
@@ -409,12 +409,12 @@ module Koala
       # @param verb the type of HTTP request to make (get, post, delete, etc.)
       # @options (see #get_object)
       #
-      # @yield response when making a batch API call, you can pass in a block 
-      #        that parses the results, allowing for cleaner code.  
+      # @yield response when making a batch API call, you can pass in a block
+      #        that parses the results, allowing for cleaner code.
       #        The block's return value is returned in the batch results.
       #        See the code for {#get_picture} or {#fql_multiquery} for examples.
       #        (Not needed in regular calls; you'll probably rarely use this.)
-      # 
+      #
       # @raise [Koala::Facebook::APIError] if Facebook returns an error
       #
       # @return the result from Facebook
@@ -426,13 +426,13 @@ module Koala
 
         # turn this into a GraphCollection if it's pageable
         result = GraphCollection.evaluate(result, self)
-        
+
         # now process as appropriate for the given call (get picture header, etc.)
         post_processing ? post_processing.call(result) : result
       end
 
       private
-      
+
       def check_response(response)
         # check for Graph API-specific errors
         # this returns an error, which is immediately raised (non-batch)
