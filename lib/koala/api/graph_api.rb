@@ -101,10 +101,11 @@ module Koala
       # @param options (see #get_object)
       # 
       # @return [Koala::Facebook::API::GraphCollection] an array of object hashes (in most cases)
-      def get_connections(id, connection_name, args = {}, options = {})
+      def get_connection(id, connection_name, args = {}, options = {})
         # Fetchs the connections for given object.
         graph_call("#{id}/#{connection_name}", args, "get", options)
       end
+      alias_method :get_connections, :get_connection
 
 
       # Write an object to the Graph for a specific user.
