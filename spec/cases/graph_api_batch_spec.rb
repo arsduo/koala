@@ -516,7 +516,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
     it "inserts errors in the appropriate place, without breaking other results" do
       failed_call, koppel = @api.batch do |batch_api|
-        batch_api.get_connections("2", 'invalidconnection')
+        batch_api.get_connection("2", "invalidconnection")
         batch_api.get_object(KoalaTest.user1, {}, {"access_token" => @app_api.access_token})
       end
       failed_call.should be_a(Koala::Facebook::APIError)

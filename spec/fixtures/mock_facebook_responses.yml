@@ -80,7 +80,7 @@ graph_api:
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
         with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[],\"paging\":{}}"}]'
-    batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
+    batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"2/invalidconnection"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
         with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"body":"{\"id\":\"123\"}"}]'
     batch=<%= MultiJson.encode([{"method"=>"post", "relative_url"=>"FEED_ITEM_BATCH/likes"}, {"method"=>"delete", "relative_url"=> "FEED_ITEM_BATCH"}]) %>:
@@ -157,7 +157,7 @@ graph_api:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
     link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= {"name"=>"Link1'", "text"=>"Left", "href"=>"http://oauth.twoalex.com/"}.to_s %>=<%= {"name"=>"other", "text"=>"Straight ahead"}.to_s %>&type=link:
       post:
-        with_token: '{"id": "FEED_ITEM_CONTEXT"}'        
+        with_token: '{"id": "FEED_ITEM_CONTEXT"}'
 
   /me/photos:
     source=[FILE]:
