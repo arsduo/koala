@@ -112,7 +112,7 @@ module Koala
       # See {http://developers.facebook.com/docs/api#publishing Facebook's documentation}
       # for all the supported writeable objects.
       #
-      # @note (see #get_connections)
+      # @note (see #get_connection)
       #
       # @example
       #         graph.put_object("me", "feed", :message => "Hello, world")
@@ -124,8 +124,8 @@ module Koala
       # extended permissions.
       #
       # @param id (see #get_object)
-      # @param connection_name (see #get_connections)
-      # @param args (see #get_connections)
+      # @param connection_name (see #get_connection)
+      # @param args (see #get_connection)
       # @param options (see #get_object)
       #
       # @return a hash containing the new object's id
@@ -137,11 +137,11 @@ module Koala
 
       # Delete an object's connection (for instance, unliking the object).
       #
-      # @note (see #get_connections)
+      # @note (see #get_connection)
       #
       # @param id (see #get_object)
-      # @param connection_name (see #get_connections)
-      # @args (see #get_connections)
+      # @param connection_name (see #get_connection)
+      # @args (see #get_connection)
       # @param options (see #get_object)
       #
       # @return (see #delete_object)
