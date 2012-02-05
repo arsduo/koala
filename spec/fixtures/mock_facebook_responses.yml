@@ -94,7 +94,7 @@ graph_api:
     batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}]) %>:
       post:
         with_token: '[null,{"body":"{\"id\":\"123\"}"}]'
-    batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}]) %>:
+    batch=<%= MultiJson.encode([{"method"=>"get", "relative_url"=>"2/invalidconnection", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}]) %>:
       post:
         with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
     batch=<%= MultiJson.encode([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:

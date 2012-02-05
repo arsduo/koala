@@ -602,12 +602,12 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
 
       it "properly handles dependencies that fail" do
-        data, koppel = @api.batch do |batch_api|
-          batch_api.get_connections(@app_id, 'insights', {}, :batch_args => {:name => "getdata"})
+        failed_call, koppel = @api.batch do |batch_api|
+          batch_api.get_connections("2", "invalidconnection", {}, :batch_args => {:name => "getdata"})
           batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getdata"})
         end
 
-        data.should be_a(Koala::Facebook::APIError)
+        failed_call.should be_a(Koala::Facebook::APIError)
         koppel.should be_nil
       end
 
