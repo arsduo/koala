@@ -155,6 +155,9 @@ module Koala
       # (Facebook returns the src of the photo as a response header; this method parses that properly,
       # unlike using get_connections("photo").)
       #
+      # @param options options for Facebook (see #get_object).
+      #                        To get a different size photo, pass :type => size (small, normal, large, square).
+      #
       # @note to delete photos or videos, use delete_object(id)
       #
       # @return the URL to the image
