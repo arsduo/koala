@@ -197,7 +197,7 @@ module Koala
       # @param options any additional parameters to send to Facebook when exchanging tokens.
       #
       # @return the access token with extended expiration time and other information (expiration, etc.)
-      def get_exchange_access_token_info(access_token, options = {})
+      def exchange_access_token_info(access_token, options = {})
         get_token_from_server({
           :grant_type => 'fb_exchange_token',
           :fb_exchange_token => access_token
@@ -205,13 +205,13 @@ module Koala
       end
 
       # Fetches an access token with extended expiration time (ignoring expiration and other info).
-      # @see get_exchange_access_token_info
+      # @see exchange_access_token_info
       #
-      # @param (see #get_exchange_access_token_info)
+      # @param (see #exchange_access_token_info)
       #
       # @return A new access token or the existing one, set to expire in 60 days.
-      def get_exchange_access_token(access_token, options = {})
-        if info = get_exchange_access_token_info(access_token, options)
+      def exchange_access_token(access_token, options = {})
+        if info = exchange_access_token_info(access_token, options)
           info["access_token"]
         end
       end
