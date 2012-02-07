@@ -23,6 +23,7 @@ oauth_test_data:
   app_id: 119908831367602
   secret: e45e55a333eec232d4206d2703de1307
   callback_url: http://oauth.twoalex.com/
+  access_token: "119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk."
   app_access_token: 119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.
   raw_token_string: "access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.&expires=6621"
   raw_offline_access_token_string: access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.
