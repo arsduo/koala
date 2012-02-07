@@ -62,7 +62,7 @@ describe "Koala::Facebook::OAuth" do
           @token = "my token"
           @oauth.stub(:get_access_token_info).and_return("access_token" => @token)
         end
-        
+
         it "parses valid cookies" do
           result = @oauth.get_user_info_from_cookies(@cookie)
           result.should be_a(Hash)
@@ -72,9 +72,9 @@ describe "Koala::Facebook::OAuth" do
           result = @oauth.get_user_info_from_cookies(@cookie)
           @oauth.parse_signed_request(@cookie.values.first).each_pair do |k, v|
             result[k].should == v
-          end          
+          end
         end
-        
+
         it "makes a request to Facebook to redeem the code if present" do
           code = "foo"
           @oauth.stub(:parse_signed_request).and_return({"code" => code})
@@ -99,12 +99,12 @@ describe "Koala::Facebook::OAuth" do
             @oauth.get_user_info_from_cookies(@cookie).should be_nil
           end
         end
-        
+
         context "if the code is present" do
           it "adds the access_token into the hash" do
             @oauth.get_user_info_from_cookies(@cookie)["access_token"].should == @token
           end
-          
+
           it "returns nil if the call to FB returns no data" do
             @oauth.stub(:get_access_token_info).and_return(nil)
             @oauth.get_user_info_from_cookies(@cookie).should be_nil
@@ -126,7 +126,7 @@ describe "Koala::Facebook::OAuth" do
             expect { @oauth.get_user_info_from_cookies(@cookie) }.to raise_exception(Koala::Facebook::APIError)
           end
         end
-        
+
         it "doesn't parse invalid cookies" do
           # make an invalid string by replacing some values
           bad_cookie_hash = @cookie.inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
@@ -134,7 +134,7 @@ describe "Koala::Facebook::OAuth" do
           result.should be_nil
         end
       end
-      
+
       context "for unsigned cookies" do
         it "properly parses valid cookies" do
           result = @oauth.get_user_info_from_cookies(KoalaTest.oauth_test_data["valid_cookies"])
@@ -162,7 +162,7 @@ describe "Koala::Facebook::OAuth" do
 
         it "doesn't parse expired cookies" do
           new_time = @time.to_i * 2
-          @time.stub(:to_i).and_return(new_time)          
+          @time.stub(:to_i).and_return(new_time)
           @oauth.get_user_info_from_cookies(KoalaTest.oauth_test_data["valid_cookies"]).should be_nil
         end
 
@@ -180,7 +180,7 @@ describe "Koala::Facebook::OAuth" do
         before :each do
           # we don't actually want to make requests to Facebook to redeem the code
           @cookie = KoalaTest.oauth_test_data["valid_signed_cookies"]
-          @oauth.stub(:get_access_token_info).and_return("access_token" => "my token")          
+          @oauth.stub(:get_access_token_info).and_return("access_token" => "my token")
         end
 
         it "does not uses get_user_info_from_cookies to parse the cookies" do
@@ -200,7 +200,7 @@ describe "Koala::Facebook::OAuth" do
           result.should be_nil
         end
       end
-      
+
       describe "for unsigned cookies" do
         before :each do
           # we don't actually want to make requests to Facebook to redeem the code
@@ -268,14 +268,14 @@ describe "Koala::Facebook::OAuth" do
         oauth2 = Koala::Facebook::OAuth.new(@app_id, @secret)
         lambda { oauth2.url_for_oauth_code }.should raise_error(ArgumentError)
       end
-      
+
       it "includes any additional options as URL parameters, appropriately escaped" do
         params = {
           :url => "http://foo.bar?c=2",
           :email => "cdc@b.com"
         }
         url = @oauth.url_for_oauth_code(params)
-        params.each_pair do |key, value| 
+        params.each_pair do |key, value|
           url.should =~ /[\&\?]#{key}=#{CGI.escape value}/
         end
       end
@@ -286,7 +286,7 @@ describe "Koala::Facebook::OAuth" do
         # since we're just composing a URL here, we don't need to have a real code
         @code ||= "test_code"
       end
-      
+
       it "generates a properly formatted OAuth token URL when provided a code" do
         url = @oauth.url_for_access_token(@code)
         url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}").should be_true
@@ -304,18 +304,18 @@ describe "Koala::Facebook::OAuth" do
           :email => "cdc@b.com"
         }
         url = @oauth.url_for_access_token(@code, params)
-        params.each_pair do |key, value| 
+        params.each_pair do |key, value|
           url.should =~ /[\&\?]#{key}=#{CGI.escape value}/
         end
       end
     end
-    
+
     describe "#url_for_dialog" do
       it "builds the base properly" do
         dialog_type = "my_dialog_type"
         @oauth.url_for_dialog(dialog_type).should =~ /^http:\/\/#{Koala::Facebook::DIALOG_HOST}\/dialog\/#{dialog_type}/
       end
-      
+
       it "adds the app_id/client_id to the url" do
         automatic_params = {:app_id => @app_id, :client_id => @client_id}
         url = @oauth.url_for_dialog("foo", automatic_params)
@@ -324,19 +324,19 @@ describe "Koala::Facebook::OAuth" do
           url.should =~ /[\&\?]#{key}=#{CGI.escape value.to_s}/
         end
       end
-            
+
       it "includes any additional options as URL parameters, appropriately escaped" do
         params = {
           :url => "http://foo.bar?c=2",
           :email => "cdc@b.com"
         }
         url = @oauth.url_for_dialog("friends", params)
-        params.each_pair do |key, value| 
+        params.each_pair do |key, value|
           # we're slightly simplifying how encode_params works, but strings/ints, it's okay
           url.should =~ /[\&\?]#{key}=#{CGI.escape value.to_s}/
         end
       end
-      
+
       describe "real examples from FB documentation" do
         # see http://developers.facebook.com/docs/reference/dialogs/
         # slightly brittle (e.g. if parameter order changes), but still useful
@@ -344,17 +344,17 @@ describe "Koala::Facebook::OAuth" do
           url = @oauth.url_for_dialog("send", :name => "People Argue Just to Win", :link => "http://www.nytimes.com/2011/06/15/arts/people-argue-just-to-win-scholars-assert.html")
           url.should match_url("http://www.facebook.com/dialog/send?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
         end
-      
+
         it "can generate a feed dialog" do
           url = @oauth.url_for_dialog("feed", :name => "People Argue Just to Win", :link => "http://www.nytimes.com/2011/06/15/arts/people-argue-just-to-win-scholars-assert.html")
           url.should match_url("http://www.facebook.com/dialog/feed?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
         end
-      
+
         it "can generate a oauth dialog" do
           url = @oauth.url_for_dialog("oauth", :scope => "email", :response_type => "token")
           url.should match_url("http://www.facebook.com/dialog/oauth?app_id=#{@app_id}&client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}&response_type=token&scope=email")
         end
-      
+
         it "can generate a pay dialog" do
           url = @oauth.url_for_dialog("pay", :order_id => "foo", :credits_purchase => false)
           url.should match_url("http://www.facebook.com/dialog/pay?app_id=#{@app_id}&client_id=#{@app_id}&order_id=foo&credits_purchase=false&redirect_uri=#{CGI.escape @callback_url}")
@@ -370,15 +370,15 @@ describe "Koala::Facebook::OAuth" do
         Koala.should_receive(:make_request).with(anything, hash_including(:redirect_uri => uri), anything, anything).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.get_access_token_info(@code, :redirect_uri => uri)
       end
-      
+
       it "uses the redirect_uri used to create the @oauth if no :redirect_uri option is provided" do
         Koala.should_receive(:make_request).with(anything, hash_including(:redirect_uri => @callback_url), anything, anything).and_return(Koala::HTTPService::Response.new(200, "", {}))
-        @oauth.get_access_token_info(@code)        
+        @oauth.get_access_token_info(@code)
       end
-      
+
       it "makes a GET request" do
         Koala.should_receive(:make_request).with(anything, anything, "get", anything).and_return(Koala::HTTPService::Response.new(200, "", {}))
-        @oauth.get_access_token_info(@code)                
+        @oauth.get_access_token_info(@code)
       end
 
       if KoalaTest.code
@@ -391,13 +391,13 @@ describe "Koala::Facebook::OAuth" do
           result = @oauth.get_access_token_info(@code)
           result["access_token"].should
         end
-        
+
         it "raises an error when get_access_token is called with a bad code" do
           lambda { @oauth.get_access_token_info("foo") }.should raise_error(Koala::Facebook::APIError)
         end
       end
     end
-    
+
     describe "#get_access_token" do
       # TODO refactor these to be proper tests with stubs and tests against real data
       it "passes on any options provided to make_request" do
@@ -423,7 +423,7 @@ describe "Koala::Facebook::OAuth" do
         end
       end
     end
-    
+
     unless KoalaTest.code
       it "Some OAuth code tests will not be run since the code field in facebook_data.yml is blank."
     end
@@ -465,40 +465,35 @@ describe "Koala::Facebook::OAuth" do
       end
     end
 
-    describe "get_exchange_access_token_info" do
+    describe "exchange_access_token_info" do
       it "properly gets and parses an app's access token as a hash" do
-        result = @oauth.get_exchange_access_token_info(@access_token)
+        result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
         result.should be_a(Hash)
       end
 
       it "includes the access token" do
-        result = @oauth.get_exchange_access_token_info(@access_token)
+        result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
         result["access_token"].should
       end
 
       it "passes on any options provided to make_request" do
         options = {:a => 2}
         Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
-        @oauth.get_exchange_access_token_info(@access_token, options)
+        @oauth.exchange_access_token_info(KoalaTest.oauth_token, options)
       end
     end
 
-    describe "get_exchange_access_token" do
+    describe "exchange_access_token" do
       it "uses get_access_token_info to get and parse an access token token results" do
-        result = @oauth.get_exchange_access_token(@access_token)
-        result.should be_a(String)
-      end
-
-      it "returns the access token as a string" do
-        result = @oauth.get_exchange_access_token(@access_token)
-        original = @oauth.get_exchange_access_token_info(@access_token)
+        result = @oauth.exchange_access_token(KoalaTest.oauth_token)
+        original = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
         result.should == original["access_token"]
       end
 
       it "passes on any options provided to make_request" do
         options = {:a => 2}
         Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
-        @oauth.get_exchange_access_token(@access_token, options)
+        @oauth.exchange_access_token(KoalaTest.oauth_token, options)
       end
     end
 
@@ -661,7 +656,7 @@ describe "Koala::Facebook::OAuth" do
       OpenSSL::HMAC.stub!(:hexdigest).and_return("i'm an invalid signature")
       lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
     end
-    
+
     it "throws an error if the signature string is empty" do
       # this occasionally happens due to Facebook error
       lambda { @oauth.parse_signed_request("") }.should raise_error
