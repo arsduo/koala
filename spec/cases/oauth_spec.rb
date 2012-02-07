@@ -467,38 +467,38 @@ describe "Koala::Facebook::OAuth" do
 
     describe "get_exchange_access_token_info" do
       it "properly gets and parses an app's access token as a hash" do
-        result = @oauth.get_exchange_access_token_info(@access_token)
+        result = @oauth.get_exchange_access_token_info(KoalaTest.oauth_token)
         result.should be_a(Hash)
       end
 
       it "includes the access token" do
-        result = @oauth.get_exchange_access_token_info(@access_token)
+        result = @oauth.get_exchange_access_token_info(KoalaTest.oauth_token)
         result["access_token"].should
       end
 
       it "passes on any options provided to make_request" do
         options = {:a => 2}
         Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
-        @oauth.get_exchange_access_token_info(@access_token, options)
+        @oauth.get_exchange_access_token_info(KoalaTest.oauth_token, options)
       end
     end
 
     describe "get_exchange_access_token" do
       it "uses get_access_token_info to get and parse an access token token results" do
-        result = @oauth.get_exchange_access_token(@access_token)
+        result = @oauth.get_exchange_access_token(KoalaTest.oauth_token)
         result.should be_a(String)
       end
 
       it "returns the access token as a string" do
-        result = @oauth.get_exchange_access_token(@access_token)
-        original = @oauth.get_exchange_access_token_info(@access_token)
+        result = @oauth.get_exchange_access_token(KoalaTest.oauth_token)
+        original = @oauth.get_exchange_access_token_info(KoalaTest.oauth_token)
         result.should == original["access_token"]
       end
 
       it "passes on any options provided to make_request" do
         options = {:a => 2}
         Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
-        @oauth.get_exchange_access_token(@access_token, options)
+        @oauth.get_exchange_access_token(KoalaTest.oauth_token, options)
       end
     end
 
