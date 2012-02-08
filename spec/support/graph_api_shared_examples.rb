@@ -25,27 +25,27 @@ shared_examples_for "Koala GraphAPI" do
       Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, {"error" => "An error occurred!"}, {}))
       lambda { @api.graph_call(KoalaTest.user1, {}) }.should raise_exception(Koala::Facebook::APIError)
     end
-    
+
     it "passes the results through GraphCollection.evaluate" do
       result = {}
       @api.stub(:api).and_return(result)
       Koala::Facebook::GraphCollection.should_receive(:evaluate).with(result, @api)
       @api.graph_call("/me")
     end
-    
+
     it "returns the results of GraphCollection.evaluate" do
       expected = {}
       @api.stub(:api).and_return([])
       Koala::Facebook::GraphCollection.should_receive(:evaluate).and_return(expected)
       @api.graph_call("/me").should == expected
     end
-    
+
     it "returns the post_processing block's results if one is supplied" do
       other_result = [:a, 2, :three]
       block = Proc.new {|r| other_result}
       @api.stub(:api).and_return({})
       @api.graph_call("/me", {}, "get", {}, &block).should == other_result
-    end 
+    end
   end
 
   # SEARCH
@@ -121,15 +121,15 @@ shared_examples_for "Koala GraphAPI" do
     @api.should_receive(:graph_call).with(*query)
     @api.get_page(query)
   end
-  
+
   # Beta tier
   it "can use the beta tier" do
     result = @api.get_object(KoalaTest.user1, {}, :beta => true)
     # the results should have an ID and a name, among other things
     (result["id"] && result["name"]).should_not be_nil
   end
-  
-  # FQL  
+
+  # FQL
   describe "#fql_query" do
     it "makes a request to /fql" do
       @api.should_receive(:get_object).with("fql", anything, anything)
@@ -248,7 +248,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
-  
+
   it "can post a message whose attachment has a properties dictionary" do
     url = KoalaTest.oauth_test_data["callback_url"]
     options = {
@@ -259,14 +259,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
     "properties" => [
         {"name" => "Link1'", "text" => "Left", "href" => url},
         {"name" => "other", "text" => "Straight ahead"}
-      ]    
+      ]
     }
 
     result = @api.put_wall_post("body", options)
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
-  
+
 
   describe "#put_picture" do
     it "can post photos to the user's wall with an open file object" do
@@ -403,13 +403,13 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @api.should_receive(:api).with("my_page", hash_including({:fields => "access_token"}), "get", anything)
       @api.get_page_access_token("my_page")
     end
-    
+
     it "merges in any other arguments" do
       # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
       args = {:a => 3}
       @api.should_receive(:api).with("my_page", hash_including(args), "get", anything)
       @api.get_page_access_token("my_page", args)
-    end    
+    end
   end
 
   describe "#set_app_restrictions" do
@@ -424,18 +424,18 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @app_api.should_receive(:graph_call).with(KoalaTest.app_id, anything, "post", anything)
       @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions)
     end
-    
+
     it "JSON-encodes the restrictions" do
       @app_api.should_receive(:graph_call).with(anything, hash_including(:restrictions => MultiJson.encode(@restrictions)), anything, anything)
       @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions)
     end
-    
+
     it "includes the other arguments" do
       args = {:a => 2}
       @app_api.should_receive(:graph_call).with(anything, hash_including(args), anything, anything)
       @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions, args)
     end
-    
+
     it "works" do
       @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions).should be_true
     end
@@ -447,7 +447,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result.first['first_name'].should == KoalaTest.user2_name
     result.first['uid'].should == KoalaTest.user2_id.to_i
   end
-  
+
   it "can access public information via FQL.multiquery" do
     result = @api.fql_multiquery(
       :query1 => "select uid, first_name from user where uid = #{KoalaTest.user2_id}",
@@ -621,7 +621,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
   it "can't delete a like" do
     lambda { @api.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
   end
-  
+
   # FQL_QUERY
   describe "when making a FQL request" do
     it "can access public information via FQL" do
