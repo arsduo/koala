@@ -225,7 +225,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "can delete likes" do
-    result = @api.put_wall_post("Hello, world, from the test suite delete method!")
+    result = @api.put_wall_post("Hello, world, from the test suite delete like method!")
     @temporary_object_id = result["id"]
     @api.put_like(@temporary_object_id)
     delete_like_result = @api.delete_like(@temporary_object_id)
@@ -441,12 +441,10 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
   end
 
-  it "changes tests to first_name when FB repairs its bug" 
-
   it "can access public information via FQL" do
     result = @api.fql_query("select uid, first_name from user where uid = #{KoalaTest.user2_id}")
     result.size.should == 1
-    # result.first['first_name'].should == KoalaTest.user2_name
+    result.first['first_name'].should == KoalaTest.user2_name
     result.first['uid'].should == KoalaTest.user2_id.to_i
   end
   

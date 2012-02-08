@@ -149,6 +149,9 @@ graph_api:
     message=Hello, world, from the test suite delete method!:
       post:
         with_token: '{"id": "FEED_ITEM_DELETE"}'
+    message=Hello, world, from the test suite delete like method!:
+      post:
+        with_token: '{"id": "FEED_ITEM_DELETE"}'
     message=Hello, world, from the test suite batch API!:
       post:
         with_token: '{"id": "FEED_ITEM_BATCH"}'
