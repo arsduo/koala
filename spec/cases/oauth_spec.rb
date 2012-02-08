@@ -466,14 +466,18 @@ describe "Koala::Facebook::OAuth" do
     end
 
     describe "exchange_access_token_info" do
-      it "properly gets and parses an app's access token as a hash" do
-        result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
-        result.should be_a(Hash)
-      end
+      if KoalaTest.mock_interface? || KoalaTest.oauth_token
+        it "properly gets and parses an app's access token as a hash" do
+          result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
+          result.should be_a(Hash)
+        end
 
-      it "includes the access token" do
-        result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
-        result["access_token"].should
+        it "includes the access token" do
+          result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
+          result["access_token"].should
+        end
+      else
+        pending "Some OAuth token exchange tests will not be run since the access token field in facebook_data.yml is blank."
       end
 
       it "passes on any options provided to make_request" do
@@ -481,13 +485,17 @@ describe "Koala::Facebook::OAuth" do
         Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
         @oauth.exchange_access_token_info(KoalaTest.oauth_token, options)
       end
+
+      it "raises an error when exchange_access_token_info is called with a bad code" do
+        lambda { @oauth.exchange_access_token_info("foo") }.should raise_error(Koala::Facebook::APIError)
+      end
     end
 
     describe "exchange_access_token" do
       it "uses get_access_token_info to get and parse an access token token results" do
-        result = @oauth.exchange_access_token(KoalaTest.oauth_token)
-        original = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
-        result.should == original["access_token"]
+        hash = {"access_token" => Time.now.to_i * rand}
+        @oauth.stub(:exchange_access_token_info).and_return(hash)
+        @oauth.exchange_access_token(KoalaTest.oauth_token).should == hash["access_token"]
       end
 
       it "passes on any options provided to make_request" do
@@ -498,7 +506,6 @@ describe "Koala::Facebook::OAuth" do
     end
 
     describe "protected methods" do
-
       # protected methods
       # since these are pretty fundamental and pretty testable, we want to test them
 

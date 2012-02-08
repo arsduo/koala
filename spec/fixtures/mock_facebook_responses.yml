@@ -311,6 +311,9 @@ graph_api:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&fb_exchange_token=<%= ACCESS_TOKEN %>&grant_type=fb_exchange_token:
       post:
         no_token: access_token=<%= ACCESS_TOKEN %>&expires=5184000
+    client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&fb_exchange_token=foo&grant_type=fb_exchange_token:
+      post:
+        <<: *oauth_error
   /oauth/exchange_sessions:
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&sessions=<%= OAUTH_DATA["session_key"] %>&type=client_cred:
       post:

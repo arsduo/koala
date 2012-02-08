@@ -19,7 +19,7 @@ module Koala
     TEST_DATA.merge!('oauth_token' => Koala::MockHTTPService::ACCESS_TOKEN)
     TEST_DATA['oauth_test_data'].merge!('code' => Koala::MockHTTPService::OAUTH_CODE)
     TEST_DATA['search_time'] = (Time.now - 3600).to_s
-    
+
     # Useful in mock_facebook_responses.yml
     OAUTH_DATA = TEST_DATA['oauth_test_data']
     OAUTH_DATA.merge!({
@@ -40,7 +40,6 @@ module Koala
       verb ||= 'get'
       server = options[:rest_api] ? 'rest_api' : 'graph_api'
       token = args.delete('access_token')
-      args[:fb_exchange_token] = ACCESS_TOKEN if args.has_key?(:fb_exchange_token)
       with_token = (token == ACCESS_TOKEN || token == APP_ACCESS_TOKEN) ? 'with_token' : 'no_token'
 
       # Assume format is always JSON

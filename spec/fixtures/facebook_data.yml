@@ -23,7 +23,6 @@ oauth_test_data:
   app_id: 119908831367602
   secret: e45e55a333eec232d4206d2703de1307
   callback_url: http://oauth.twoalex.com/
-  access_token: "119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk."
   app_access_token: 119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.
   raw_token_string: "access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.&expires=6621"
   raw_offline_access_token_string: access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.
@@ -34,7 +33,7 @@ oauth_test_data:
   offline_access_cookies:
     # note: I've revoked the offline access for security reasons, so you can't make calls against this :)
     fbs_119908831367602: '"access_token=119908831367602|08170230801eb225068e7a70-2905623|Q3LDCYYF8CX9cstxnZLsxiR0nwg.&expires=0&secret=78abaee300b392e275072a9f2727d436&session_key=08170230801eb225068e7a70-2905623&sig=423b8aa4b6fa1f9a571955f8e929d567&uid=2905623"'
-  valid_signed_cookies: 
+  valid_signed_cookies:
     "fbsr_119908831367602": "f1--LHwjHVCxfs97hRHL-4cF-0jNxZRc6MGzo1qHLb0.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImNvZGUiOiIyLkFRQm90a0pBWlhVY1l3RkMuMzYwMC4xMzE0ODEzNjAwLjEtMjkwNTYyM3x4V2xya0d0UmJIZlpIclRnVWwxQmxJcVhRbjQiLCJpc3N1ZWRfYXQiOjEzMTQ4MDY2NTUsInVzZXJfaWQiOiIyOTA1NjIzIn0"
 
 
