@@ -101,11 +101,11 @@ module Koala
             # you can make sure this is legitimate through two ways
             # if your store the token across the calls, you can pass in the token value
             # and we'll make sure it matches
-            (verify_token && params["hub.verify_token"] == verify_token) ||
+            ((verify_token && params["hub.verify_token"] == verify_token) ||
             # alternately, if you sent a specially-constructed value (such as a hash of various secret values)
             # you can pass in a block, which we'll call with the verify_token sent by Facebook
             # if it's legit, return anything that evaluates to true; otherwise, return nil or false
-            (verification_block && yield(params["hub.verify_token"]))
+            (verification_block && yield(params["hub.verify_token"])))
           params["hub.challenge"]
         else
           false

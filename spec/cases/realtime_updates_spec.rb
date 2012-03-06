@@ -243,6 +243,13 @@ describe "Koala::Facebook::RealtimeUpdates" do
       params = {'hub.mode' => 'not subscribe'}
       Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be_false
     end
+
+    it "doesn't evaluate the block if hub.mode isn't subscribe" do
+      params = {'hub.mode' => 'not subscribe'}
+      block_evaluated = false
+      Koala::Facebook::RealtimeUpdates.meet_challenge(params){|token| block_evaluated = true}
+      block_evaluated.should be_false
+    end
     
     it "returns false if not given a verify_token or block" do
       params = {'hub.mode' => 'subscribe'}
