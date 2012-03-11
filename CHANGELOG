@@ -5,12 +5,12 @@ Updated methods:
 -- HTTPServices#encode_params sorts parameters to aid in URL comparison (thanks, sholden!)
 -- get_connections is now aliased as get_connection (use whichever makes sense to you)
 Internal improvements:
--- Fixed a readme typo (thanks, brycethornton!)
+-- Fixed typos (thanks, brycethornton and jpemberthy!)
+-- RealtimeUpdates will no longer execute challenge block unnecessarily (thanks, iainbeeston!)
 Testing improvements:
 -- Added parallel_tests to development gem file
 -- Fixed failing live tests
 -- Koala now tests against JRuby and Rubinius in 1.9 mode on Travis-CI
-
 
 v1.3
 New methods:
