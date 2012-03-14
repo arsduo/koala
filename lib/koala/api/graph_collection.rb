@@ -87,10 +87,11 @@ module Koala
         #
         # @return an array of parameters that can be provided via graph_call(*parsed_params)
         def self.parse_page_url(url)
-          match = url.match(/.com\/(.*)\?(.*)/)
-          base = match[1]
-          args = match[2]
-          params = CGI.parse(args)
+          uri = URI.parse(url)
+
+          base = uri.path.sub(/^\//, '')
+          params = CGI.parse(uri.query)
+
           new_params = {}
           params.each_pair do |key,value|
             new_params[key] = value.join ","

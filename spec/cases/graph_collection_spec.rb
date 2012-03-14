@@ -91,12 +91,12 @@ describe Koala::Facebook::GraphCollection do
     describe ".parse_page_url" do    
       it "should return the base as the first array entry" do
         base = "url_path"
-        Koala::Facebook::GraphCollection.parse_page_url("anything.com/#{base}?anything").first.should == base
+        Koala::Facebook::GraphCollection.parse_page_url("http://anything.net/#{base}?anything").first.should == base
       end
 
       it "should return the arguments as a hash as the last array entry" do
         args_hash = {"one" => "val_one", "two" => "val_two"}
-        Koala::Facebook::GraphCollection.parse_page_url("anything.com/anything?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").last.should == args_hash
+        Koala::Facebook::GraphCollection.parse_page_url("http://anything.net/anything?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").last.should == args_hash
       end
     end
   end
