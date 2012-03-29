@@ -244,6 +244,13 @@ describe "Koala::HTTPService" do
         @mock_connection.should_receive(:get).with(anything, {}).and_return(@mock_http_response)
         Koala::HTTPService.make_request("anything", args, "get")
       end
+      
+      it "logs verb, url and params to debug" do
+        args = {"a" => :b, "c" => 3}
+        log_message = "GET: anything params: #{args}"
+        Koala::Utils.logger.should_receive(:debug).with(log_message)
+        Koala::HTTPService.make_request("anything", args, "get")
+      end
     end
 
     describe "for POSTs" do
@@ -261,6 +268,13 @@ describe "Koala::HTTPService" do
         u.stub(:to_upload_io).and_return(upload_io)
         @mock_connection.should_receive(:post).with(anything, hash_including("source" => upload_io)).and_return(@mock_http_response)
         Koala::HTTPService.make_request("anything", {:source => u}, "post")
+      end
+
+      it "logs verb, url and params to debug" do
+        args = {"a" => :b, "c" => 3}
+        log_message = "POST: anything params: #{args}"
+        Koala::Utils.logger.should_receive(:debug).with(log_message)
+        Koala::HTTPService.make_request("anything", args, "post")
       end
     end
   end
