@@ -72,6 +72,9 @@ module Koala
       conn = Faraday.new(server(request_options), request_options, &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
       response = conn.send(verb, path, (verb == "post" ? params : {}))
+    
+      # Log URL information
+      Koala::Utils.debug "#{verb.upcase}: #{path} params: #{params}"
       Koala::HTTPService::Response.new(response.status.to_i, response.body, response.headers)
     end
 

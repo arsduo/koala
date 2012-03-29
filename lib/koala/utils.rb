@@ -1,12 +1,26 @@
 module Koala
   module Utils
+    
+    # Add a logger
+    # Uses the ruby logger as default
+    require 'logger'
+    require 'forwardable'
 
+    extend Forwardable
+    extend self
+
+    def_delegators :logger, :debug, :info, :warn, :error, :fatal, :level, :level=
+
+    attr_accessor :logger 
+    self.logger = Logger.new(STDOUT)
+    self.logger.level = Logger::ERROR
+    
     # @private
     DEPRECATION_PREFIX = "KOALA: Deprecation warning: "
 
     # Prints a deprecation message.  
     # Each individual message will only be printed once to avoid spamming.
-    def self.deprecate(message)
+    def deprecate(message)
       @posted_deprecations ||= []
       unless @posted_deprecations.include?(message)
         # only include each message once
