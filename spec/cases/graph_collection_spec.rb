@@ -13,11 +13,11 @@ describe Koala::Facebook::GraphCollection do
   it "subclasses Array" do
     Koala::Facebook::GraphCollection.ancestors.should include(Array)
   end
-  
+
   it "creates an array-like object" do
     Koala::Facebook::GraphCollection.new(@result, @api).should be_an(Array)
   end
-  
+
   it "contains the result data" do
     @result["data"].each_with_index {|r, i| @collection[i].should == r}
   end
@@ -26,19 +26,19 @@ describe Koala::Facebook::GraphCollection do
     @collection.methods.map(&:to_sym).should include(:paging)
     @collection.methods.map(&:to_sym).should_not include(:paging=)
   end
-  
+
   it "sets paging to results['paging']" do
     @collection.paging.should == @result["paging"]
   end
-  
+
   it "sets raw_response to the original results" do
     @collection.raw_response.should == @result
   end
-  
+
   it "sets the API to the provided API" do
     @collection.api.should == @api
   end
-    
+
   describe "when getting a whole page" do
     before(:each) do
       @second_page = {
@@ -87,16 +87,22 @@ describe Koala::Facebook::GraphCollection do
         @collection.parse_page_url(stub("url")).should == parsed_content
       end
     end
-    
-    describe ".parse_page_url" do    
+
+    describe ".parse_page_url" do
       it "should return the base as the first array entry" do
         base = "url_path"
-        Koala::Facebook::GraphCollection.parse_page_url("http://anything.net/#{base}?anything").first.should == base
+        Koala::Facebook::GraphCollection.parse_page_url("http://facebook.com/#{base}?anything").first.should == base
       end
 
       it "should return the arguments as a hash as the last array entry" do
         args_hash = {"one" => "val_one", "two" => "val_two"}
-        Koala::Facebook::GraphCollection.parse_page_url("http://anything.net/anything?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").last.should == args_hash
+        Koala::Facebook::GraphCollection.parse_page_url("http://facebook.com/anything?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").last.should == args_hash
+      end
+
+      it "works with non-.com addresses" do
+        base = "url_path"
+        args_hash = {"one" => "val_one", "two" => "val_two"}
+        Koala::Facebook::GraphCollection.parse_page_url("http://facebook.com/#{base}?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").should == [base, args_hash]
       end
     end
   end
@@ -106,22 +112,22 @@ describe Koala::Facebook::GraphCollection do
       result = []
       Koala::Facebook::GraphCollection.evaluate(result, @api).should == result
     end
-    
+
     it "returns the original result if it's provided a nil result" do
       result = nil
       Koala::Facebook::GraphCollection.evaluate(result, @api).should == result
     end
-    
+
     it "returns the original result if the result doesn't have a data key" do
       result = {"paging" => {}}
       Koala::Facebook::GraphCollection.evaluate(result, @api).should == result
     end
-    
+
     it "returns the original result if the result's data key isn't an array" do
       result = {"data" => {}, "paging" => {}}
       Koala::Facebook::GraphCollection.evaluate(result, @api).should == result
     end
-        
+
     it "returns a new GraphCollection of the result if it has an array data key and a paging key" do
       result = {"data" => [], "paging" => {}}
       expected = :foo

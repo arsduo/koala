@@ -1,5 +1,8 @@
-
 v1.5
+Updated methods:
+-- GraphCollection.parse_page_url now uses the URI library and can parse any address (thanks, bnorton!)
+--
+
 v1.4
 New methods:
 -- OAuth#exchange_access_token(_info) allows you to extend access tokens you receive (thanks, etiennebarrie!)
