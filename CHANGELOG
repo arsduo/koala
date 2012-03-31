@@ -1,6 +1,8 @@
+
+v1.5
 v1.4
 New methods:
--- OAuth#exchange_access_token(_info) allows you to extend access tokens you receive (thanks,   etiennebarrie!)
+-- OAuth#exchange_access_token(_info) allows you to extend access tokens you receive (thanks, etiennebarrie!)
 Updated methods:
 -- HTTPServices#encode_params sorts parameters to aid in URL comparison (thanks, sholden!)
 -- get_connections is now aliased as get_connection (use whichever makes sense to you)
