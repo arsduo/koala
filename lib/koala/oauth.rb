@@ -325,6 +325,7 @@ module Koala
 
           components.merge(token_info) if token_info
         else
+          Koala::Utils.logger.warn("Signed cookie didn't contain Facebook OAuth code! Components: #{components}")
           nil
         end
       end

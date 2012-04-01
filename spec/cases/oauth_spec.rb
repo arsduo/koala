@@ -98,6 +98,12 @@ describe "Koala::Facebook::OAuth" do
             @oauth.stub(:parse_signed_request).and_return({})
             @oauth.get_user_info_from_cookies(@cookie).should be_nil
           end
+
+          it "logs a warning" do
+            @oauth.stub(:parse_signed_request).and_return({})
+            Koala::Utils.logger.should_receive(:warn)
+            @oauth.get_user_info_from_cookies(@cookie)
+          end
         end
 
         context "if the code is present" do
