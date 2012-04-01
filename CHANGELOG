@@ -3,9 +3,10 @@ New methods:
 -- Added Koala::Utils.logger to enable debugging (thanks, KentonWhite!)
 Updated methods:
 -- GraphCollection.parse_page_url now uses the URI library and can parse any address (thanks, bnorton!)
---
 Internal improvements:
 -- Update MultiJson dependency to 1.2.0, which supports the Oj library (thanks, zinenko!)
+-- Fixed typos (thanks, nathanbertram!)
+
 
 v1.4
 New methods:
