@@ -6,7 +6,7 @@ Updated methods:
 Internal improvements:
 -- Update MultiJson dependency to 1.2.0, which supports the Oj library (thanks, zinenko!)
 -- Fixed typos (thanks, nathanbertram!)
-
+-- Cleaned up gemspec
 
 v1.4
 New methods:
