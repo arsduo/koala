@@ -246,7 +246,7 @@ describe "Koala::HTTPService" do
       end
 
       it "logs verb, url and params to debug" do
-        args = {"a" => :b, "c" => 3}
+        args = KoalaTest::OrderedHash.new({"a" => :b, "c" => 3})
         log_message = "GET: anything params: #{args.inspect}"
         Koala::Utils.logger.should_receive(:debug).with(log_message)
         Koala::HTTPService.make_request("anything", args, "get")
@@ -272,7 +272,7 @@ describe "Koala::HTTPService" do
 
       it "logs verb, url and params to debug" do
         args = {"a" => :b, "c" => 3}
-        log_message = "POST: anything params: #{args}"
+        log_message = "POST: anything params: #{args.inspect}"
         Koala::Utils.logger.should_receive(:debug).with(log_message)
         Koala::HTTPService.make_request("anything", args, "post")
       end

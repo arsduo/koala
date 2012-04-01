@@ -1,7 +1,7 @@
 module KoalaTest
   # directly taken from Rails 3.1's OrderedHash
   # see https://github.com/rails/rails/blob/master/activesupport/lib/active_support/ordered_hash.rb
-  
+
   # The order of iteration over hashes in Ruby 1.8 is undefined. For example, you do not know the
   # order in which +keys+ will return keys, or +each+ yield pairs. <tt>ActiveSupport::OrderedHash</tt>
   # implements a hash that preserves insertion order, as in Ruby 1.9:
@@ -190,10 +190,6 @@ module KoalaTest
 
       def invert
         OrderedHash[self.to_a.map!{|key_value_pair| key_value_pair.reverse}]
-      end
-
-      def inspect
-        "#<OrderedHash #{super}>"
       end
 
       private
