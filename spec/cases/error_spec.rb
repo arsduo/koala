@@ -5,24 +5,27 @@ describe Koala::Facebook::APIError do
     Koala::Facebook::APIError.new.should be_a(StandardError)
   end
 
-  it "has an accessor for fb_error_type" do
-    Koala::Facebook::APIError.instance_methods.map(&:to_sym).should include(:fb_error_type)
-    Koala::Facebook::APIError.instance_methods.map(&:to_sym).should include(:fb_error_type=)
-  end
-
-  it "has an accessor for raw_response" do
-    Koala::Facebook::APIError.instance_methods.map(&:to_sym).should include(:raw_response)
-    Koala::Facebook::APIError.instance_methods.map(&:to_sym).should include(:raw_response=)
+  [:fb_error_type, :fb_error_code, :fb_error_message, :raw_response].each do |accessor|
+    it "has an accessor for #{accessor}" do
+      Koala::Facebook::APIError.instance_methods.map(&:to_sym).should include(accessor)
+      Koala::Facebook::APIError.instance_methods.map(&:to_sym).should include(:"#{accessor}=")
+    end
   end
 
   it "sets raw_response to the provided error details" do
     error_response = {"type" => "foo", "other_details" => "bar"}
     Koala::Facebook::APIError.new(error_response).raw_response.should == error_response
   end
-  
-  it "sets fb_error_type to details['type']" do
-    type = "foo"
-    Koala::Facebook::APIError.new("type" => type).fb_error_type.should == type
+
+  {
+    :fb_error_type => 'type',
+    :fb_error_message => 'message',
+    :fb_error_code => 'code'
+  }.each_pair do |accessor, key|
+    it "sets #{accessor} to details['#{key}']" do
+      value = "foo"
+      Koala::Facebook::APIError.new(key => value).send(accessor).should == value
+    end
   end
 
   it "sets the error message details['type']: details['message']" do

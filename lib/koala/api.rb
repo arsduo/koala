@@ -12,12 +12,12 @@ module Koala
       def initialize(access_token = nil)
         @access_token = access_token
       end
-      
+
       attr_reader :access_token
 
       include GraphAPIMethods
       include RestAPIMethods
-      
+
       # Makes a request to the appropriate Facebook API.
       # @note You'll rarely need to call this method directly.
       #
@@ -27,17 +27,17 @@ module Koala
       # @param path the server path for this request (leading / is prepended if not present)
       # @param args arguments to be sent to Facebook
       # @param verb the HTTP method to use
-      # @param options request-related options for Koala and Faraday. 
+      # @param options request-related options for Koala and Faraday.
       #                See https://github.com/arsduo/koala/wiki/HTTP-Services for additional options.
       # @option options [Symbol] :http_component which part of the response (headers, body, or status) to return
       # @option options [Boolean] :beta use Facebook's beta tier
-      # @option options [Boolean] :use_ssl force SSL for this request, even if it's tokenless.  
+      # @option options [Boolean] :use_ssl force SSL for this request, even if it's tokenless.
       #                                    (All API requests with access tokens use SSL.)
-      # @param error_checking_block a block to evaluate the response status for additional JSON-encoded errors 
+      # @param error_checking_block a block to evaluate the response status for additional JSON-encoded errors
       #
       # @yield The response body for evaluation
       #
-      # @raise [Koala::Facebook::APIError] if Facebook returns an error (response status >= 500)      
+      # @raise [Koala::Facebook::APIError] if Facebook returns an error (response status >= 500)
       #
       # @return the body of the response from Facebook (unless another http_component is requested)
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
@@ -69,11 +69,11 @@ module Koala
         end
       end
     end
-    
-    class APIError < StandardError
-      attr_accessor :fb_error_type, :raw_response
 
-      # Creates a new APIError. 
+    class APIError < StandardError
+      attr_accessor :fb_error_type, :fb_error_code, :fb_error_message, :raw_response
+
+      # Creates a new APIError.
       #
       # Assigns the error type (as reported by Facebook) to #fb_error_type
       # and the raw error response available to #raw_response.
@@ -82,6 +82,8 @@ module Koala
       def initialize(details = {})
         self.raw_response = details
         self.fb_error_type = details["type"]
+        self.fb_error_code = details["code"]
+        self.fb_error_message = details["message"]
         super("#{fb_error_type}: #{details["message"]}")
       end
     end

@@ -42,11 +42,11 @@ graph_api:
 
   # OAuth error response
   oauth_error: &oauth_error
-    no_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
+    no_token: '{"error": {"code"=>2500, "type": "OAuthException", "message": "Error validating verification code."}}'
 
   # Subscription error response
   verification_error: &verification_error
-    with_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
+    with_token: '{"error": {"code"=>2500, "type": "OAuthException", "message": "Error validating verification code."}}'
 
   test_user_uninstalled: &test_user_uninstalled
     post:

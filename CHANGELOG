@@ -1,6 +1,7 @@
 v1.5
 New methods:
 -- Added Koala::Utils.logger to enable debugging (thanks, KentonWhite!)
+-- Expose fb_error_message and fb_error_code directly in APIError
 Updated methods:
 -- GraphCollection.parse_page_url now uses the URI library and can parse any address (thanks, bnorton!)
 Internal improvements:
