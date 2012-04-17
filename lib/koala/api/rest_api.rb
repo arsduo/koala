@@ -22,7 +22,7 @@ module Koala
       # @return true if successful, false if not.  (This call currently doesn't give useful feedback on failure.)
       def set_app_properties(properties, args = {}, options = {})
         raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "setAppProperties requires an access token"}) unless @access_token
-        rest_call("admin.setAppProperties", args.merge(:properties => MultiJson.encode(properties)), options, "post")
+        rest_call("admin.setAppProperties", args.merge(:properties => MultiJson.dump(properties)), options, "post")
       end
 
       # Make a call to the REST API. 

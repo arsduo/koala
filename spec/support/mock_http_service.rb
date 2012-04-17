@@ -6,7 +6,7 @@ module Koala
     include Koala::HTTPService
 
     # fix our specs to use ok_json, so we always get the same results from to_json
-    MultiJson.engine = :ok_json
+    MultiJson.use :ok_json
 
     # Mocks all HTTP requests for with koala_spec_with_mocks.rb
     # Mocked values to be included in TEST_DATA used in specs
