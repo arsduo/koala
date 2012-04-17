@@ -158,7 +158,7 @@ shared_examples_for "Koala GraphAPI" do
     it "passes a queries argument" do
       queries = stub('query string')
       queries_json = "some JSON"
-      MultiJson.stub(:encode).with(queries).and_return(queries_json)
+      MultiJson.stub(:dump).with(queries).and_return(queries_json)
 
       @api.should_receive(:get_object).with(anything, hash_including(:q => queries_json), anything)
       @api.fql_multiquery(queries)
@@ -426,7 +426,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
 
     it "JSON-encodes the restrictions" do
-      @app_api.should_receive(:graph_call).with(anything, hash_including(:restrictions => MultiJson.encode(@restrictions)), anything, anything)
+      @app_api.should_receive(:graph_call).with(anything, hash_including(:restrictions => MultiJson.dump(@restrictions)), anything, anything)
       @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions)
     end
 

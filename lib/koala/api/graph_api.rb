@@ -318,7 +318,7 @@ module Koala
       #
       # @return a hash of FQL results keyed to the appropriate query
       def fql_multiquery(queries = {}, args = {}, options = {})
-        if results = get_object("fql", args.merge(:q => MultiJson.encode(queries)), options)
+        if results = get_object("fql", args.merge(:q => MultiJson.dump(queries)), options)
           # simplify the multiquery result format
           results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
         end
@@ -353,7 +353,7 @@ module Koala
       end
 
       def set_app_restrictions(app_id, restrictions_hash, args = {}, options = {})
-        graph_call(app_id, args.merge(:restrictions => MultiJson.encode(restrictions_hash)), "post", options)
+        graph_call(app_id, args.merge(:restrictions => MultiJson.dump(restrictions_hash)), "post", options)
       end
 
       # Certain calls such as {#get_connections} return an array of results which you can page through

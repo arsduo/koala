@@ -57,8 +57,8 @@ module Koala
 
         # parse the body as JSON and run it through the error checker (if provided)
         # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
-        # and cause MultiJson.decode to fail -- so we account for that by wrapping the result in []
-        body = MultiJson.decode("[#{result.body.to_s}]")[0]
+        # and cause MultiJson.load to fail -- so we account for that by wrapping the result in []
+        body = MultiJson.load("[#{result.body.to_s}]")[0]
         yield body if error_checking_block
 
         # if we want a component other than the body (e.g. redirect header for images), return that

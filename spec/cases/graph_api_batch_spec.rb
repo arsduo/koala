@@ -304,7 +304,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           Koala::Facebook::GraphBatchAPI::BatchOperation.stub(:new).and_return(op)
 
           # two requests should generate two batch operations
-          expected = MultiJson.encode([op.to_batch_params(access_token), op.to_batch_params(access_token)])
+          expected = MultiJson.dump([op.to_batch_params(access_token), op.to_batch_params(access_token)])
           Koala.should_receive(:make_request).with(anything, hash_including("batch" => expected), anything, anything).and_return(@fake_response)
           Koala::Facebook::API.new(access_token).batch do |batch_api|
             batch_api.get_object('me')
