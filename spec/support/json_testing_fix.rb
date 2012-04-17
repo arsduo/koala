@@ -2,25 +2,25 @@
 # which is a problem because our mock testing service ultimately matches strings to see if requests are mocked
 # this fix solves that problem by ensuring all hashes are created with a consistent key order every time
 module MultiJson
-  self.engine = :ok_json
+  self.use :ok_json
 
   class << self
-    def encode_with_ordering(object)
+    def dump_with_ordering(object)
       # if it's a hash, recreate it with k/v pairs inserted in sorted-by-key order
       # (for some reason, REE fails if we don't assign the ternary result as a local variable
       # separately from calling encode_original)
-      encode_original(sort_object(object))
+      dump_original(sort_object(object))
     end
 
-    alias_method :encode_original, :encode
-    alias_method :encode, :encode_with_ordering
+    alias_method :dump_original, :dump
+    alias_method :dump, :dump_with_ordering
   
-    def decode_with_ordering(string)
-      sort_object(decode_original(string))
+    def load_with_ordering(string)
+      sort_object(load_original(string))
     end
 
-    alias_method :decode_original, :decode
-    alias_method :decode, :decode_with_ordering
+    alias_method :load_original, :load
+    alias_method :load, :load_with_ordering
     
     private 
   

@@ -229,7 +229,7 @@ module Koala
         raise 'SignedRequest: Invalid (incomplete) signature data' unless encoded_sig && encoded_envelope
 
         signature = base64_url_decode(encoded_sig).unpack("H*").first
-        envelope = MultiJson.decode(base64_url_decode(encoded_envelope))
+        envelope = MultiJson.load(base64_url_decode(encoded_envelope))
 
         raise "SignedRequest: Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
 
@@ -260,7 +260,7 @@ module Koala
           })
         end
 
-        MultiJson.decode(response)
+        MultiJson.load(response)
       end
 
       # @deprecated (see #get_token_info_from_session_keys)
@@ -285,7 +285,7 @@ module Koala
         result = fetch_token_string(args, post, "access_token", options)
 
         # if we have an error, parse the error JSON and raise an error
-        raise APIError.new((MultiJson.decode(result)["error"] rescue nil) || {}) if result =~ /error/
+        raise APIError.new((MultiJson.load(result)["error"] rescue nil) || {}) if result =~ /error/
 
         # otherwise, parse the access token
         parse_access_token(result)
