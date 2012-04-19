@@ -50,7 +50,7 @@ describe "Koala::Facebook::API" do
   it "returns the entire response if http_component => :response" do
     http_component = :response
     response = mock('Mock KoalaResponse', :body => '', :status => 200)
-    Koala.stub(:make_request).and_return(response)    
+    Koala.stub(:make_request).and_return(response)
     @service.api('anything', {}, 'get', :http_component => http_component).should == response
   end
 
@@ -59,7 +59,7 @@ describe "Koala::Facebook::API" do
     Koala.stub(:make_request).and_return(response)
 
     json_body = mock('JSON body')
-    MultiJson.stub(:decode).and_return([json_body])
+    MultiJson.stub(:load).and_return([json_body])
 
     @service.api('anything').should == json_body
   end
@@ -73,7 +73,7 @@ describe "Koala::Facebook::API" do
 
     @service.api('anything', {}, "get") do |arg|
       yield_test.pass
-      arg.should == MultiJson.decode(body)
+      arg.should == MultiJson.load(body)
     end
   end
 

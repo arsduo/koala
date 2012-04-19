@@ -661,7 +661,7 @@ describe "Koala::Facebook::OAuth" do
     # the signed request code is ported directly from Facebook
     # so we only need to test at a high level that it works
     it "throws an error if the algorithm is unsupported" do
-      MultiJson.stub(:decode).and_return("algorithm" => "my fun algorithm")
+      MultiJson.stub(:load).and_return("algorithm" => "my fun algorithm")
       lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
     end
 

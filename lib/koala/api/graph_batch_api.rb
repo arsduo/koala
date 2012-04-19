@@ -41,7 +41,7 @@ module Koala
       end
 
       # redefine the graph_call and check_response methods
-      # so we can use this API inside the batch block just like any regular Graph API  
+      # so we can use this API inside the batch block just like any regular Graph API
       alias_method :graph_call_outside_batch, :graph_call
       alias_method :graph_call, :graph_call_in_batch
 
@@ -53,7 +53,7 @@ module Koala
         return [] unless batch_calls.length > 0
         # Turn the call args collected into what facebook expects
         args = {}
-        args["batch"] = MultiJson.encode(batch_calls.map { |batch_op|
+        args["batch"] = MultiJson.dump(batch_calls.map { |batch_op|
           args.merge!(batch_op.files) if batch_op.files
           batch_op.to_batch_params(access_token)
         })
@@ -68,7 +68,7 @@ module Koala
 
             if call_result
               # (see note in regular api method about JSON parsing)
-              body = MultiJson.decode("[#{call_result['body'].to_s}]")[0]
+              body = MultiJson.load("[#{call_result['body'].to_s}]")[0]
 
               unless call_result["code"].to_i >= 500 || error = check_response(body)
                 # Get the HTTP component they want
@@ -92,7 +92,7 @@ module Koala
             end
           end
         end
-        
+
         # turn any results that are pageable into GraphCollections
         batch_result.inject([]) {|processed_results, raw| processed_results << GraphCollection.evaluate(raw, @original_api)}
       end

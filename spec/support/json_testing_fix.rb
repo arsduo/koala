@@ -2,7 +2,7 @@
 # which is a problem because our mock testing service ultimately matches strings to see if requests are mocked
 # this fix solves that problem by ensuring all hashes are created with a consistent key order every time
 module MultiJson
-  self.engine = :ok_json
+  self.use :ok_json
 
   class << self
     def encode_with_ordering(object)
@@ -14,16 +14,16 @@ module MultiJson
 
     alias_method :encode_original, :encode
     alias_method :encode, :encode_with_ordering
-  
+
     def decode_with_ordering(string)
       sort_object(decode_original(string))
     end
 
     alias_method :decode_original, :decode
     alias_method :decode, :decode_with_ordering
-    
-    private 
-  
+
+    private
+
     def sort_object(object)
       if object.is_a?(Hash)
         sort_hash(object)
@@ -33,7 +33,7 @@ module MultiJson
         object
       end
     end
-  
+
     def sort_hash(unsorted_hash)
       sorted_hash = KoalaTest::OrderedHash.new(sorted_hash)
       unsorted_hash.keys.sort {|a, b| a.to_s <=> b.to_s}.inject(sorted_hash) {|hash, k| hash[k] = unsorted_hash[k]; hash}
