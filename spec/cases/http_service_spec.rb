@@ -192,6 +192,17 @@ describe "Koala::HTTPService" do
         Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get", options)
       end
 
+      it "defaults verify to true if use_ssl is true" do
+        Faraday.should_receive(:new).with(anything, hash_including(:ssl => {:verify => true})).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get")
+      end
+
+      it "allows you to set other verify modes if you really want" do
+        options = {:ssl => {:verify => :foo}}
+        Faraday.should_receive(:new).with(anything, hash_including(options)).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get", options)
+      end
+
       it "calls server with the composite options" do
         options = {:a => 2, :c => "3"}
         http_options = {:a => :a}

@@ -66,7 +66,10 @@ module Koala
       # figure out our options for this request
       request_options = {:params => (verb == "get" ? params : {})}.merge(http_options || {}).merge(process_options(options))
       request_options[:use_ssl] = true if args["access_token"] # require https if there's a token
-      (request_options[:ssl] ||= {})[:verify] = true if request_options[:use_ssl]
+      if request_options[:use_ssl]
+        ssl = (request_options[:ssl] ||= {})
+        ssl[:verify] = true unless ssl.has_key?(:verify)
+      end
 
       # set up our Faraday connection
       # we have to manually assign params to the URL or the
