@@ -188,7 +188,7 @@ describe "Koala::HTTPService" do
       it "forces use_ssl to true if an access token is present" do
         options = {:use_ssl => false}
         Koala::HTTPService.stub(:http_options).and_return(:use_ssl => false)
-        Faraday.should_receive(:new).with(anything, hash_including(:use_ssl => true)).and_return(@mock_connection)
+        Faraday.should_receive(:new).with(anything, hash_including(:use_ssl => true, :ssl => {:verify => true})).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get", options)
       end
 
