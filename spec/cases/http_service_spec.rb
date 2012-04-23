@@ -37,10 +37,8 @@ describe "Koala::HTTPService" do
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
     end
 
-    it "uses the default adapter" do
-      adapter = :testing_now
-      Faraday.stub(:default_adapter).and_return(adapter)
-      @builder.should_receive(:adapter).with(adapter)
+    it "uses the net_http_persistent adapter" do
+      @builder.should_receive(:adapter).with(:net_http_persistent)
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
     end
   end

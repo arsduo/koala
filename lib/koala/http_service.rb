@@ -20,7 +20,7 @@ module Koala
     DEFAULT_MIDDLEWARE = Proc.new do |builder|
       builder.use Koala::HTTPService::MultipartRequest
       builder.request :url_encoded
-      builder.adapter Faraday.default_adapter
+      builder.adapter :net_http_persistent
     end
 
     # The address of the appropriate Facebook server.
