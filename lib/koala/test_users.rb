@@ -55,7 +55,7 @@ module Koala
       # @param options (see Koala::Facebook::API#api)
       #
       # @return a hash of information for the new user (id, access token, login URL, etc.)
-      def create(installed, permissions = nil, args = {}, options = {})
+      def create(installed, permissions = '', args = {}, options = {})
         # Creates and returns a test user
         args['installed'] = installed
         args['permissions'] = (permissions.is_a?(Array) ? permissions.join(",") : permissions) if installed
