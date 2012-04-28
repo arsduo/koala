@@ -6,8 +6,12 @@ Updated methods:
 -- GraphCollection.parse_page_url now uses the URI library and can parse any address (thanks, bnorton!)
 Internal improvements:
 -- Update MultiJson dependency to support the Oj library (thanks, zinenko!)
+-- Loosened Faraday dependency (thanks, rewritten and romanbsd!)
 -- Fixed typos (thanks, nathanbertram!)
 -- Cleaned up gemspec
+Documentation:
+-- Added HTTP Services description for Faraday 0.8/persistent connections (thanks, romanbsd!)
+-- Remove documentation of the old pre-1.2 HTTP Service options
 
 v.1.4.1
 -- Update MultiJson to 1.3 and change syntax to silence warnings (thanks, eckz and masterkain!)
