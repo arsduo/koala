@@ -381,6 +381,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             }.to raise_exception(Koala::Facebook::APIError)
           end
 
+          it "raises an APIError if the body is empty" do
+            Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, "", {}))
+            expect {
+              Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
+            }.to raise_exception(Koala::Facebook::APIError)
+          end
+
           context "with the old style" do
             before :each do
               Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, '{"error":190,"error_description":"Error validating access token."}', {}))

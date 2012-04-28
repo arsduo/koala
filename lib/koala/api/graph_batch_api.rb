@@ -41,7 +41,7 @@ module Koala
       end
 
       # redefine the graph_call and check_response methods
-      # so we can use this API inside the batch block just like any regular Graph API  
+      # so we can use this API inside the batch block just like any regular Graph API
       alias_method :graph_call_outside_batch, :graph_call
       alias_method :graph_call, :graph_call_in_batch
 
@@ -59,6 +59,12 @@ module Koala
         })
 
         batch_result = graph_call_outside_batch('/', args, 'post', http_options) do |response|
+          unless response
+            # Facebook sometimes reportedly returns an empty body at times
+            # see https://github.com/arsduo/koala/issues/184
+            raise APIError.new({"type" => "BadFacebookResponse", "message" => "Facebook returned invalid batch response: #{response.inspect}"})
+          end
+
           # map the results with post-processing included
           index = 0 # keep compat with ruby 1.8 - no with_index for map
           response.map do |call_result|
@@ -92,7 +98,7 @@ module Koala
             end
           end
         end
-        
+
         # turn any results that are pageable into GraphCollections
         batch_result.inject([]) {|processed_results, raw| processed_results << GraphCollection.evaluate(raw, @original_api)}
       end
