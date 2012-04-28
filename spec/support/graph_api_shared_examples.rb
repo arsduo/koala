@@ -592,10 +592,13 @@ shared_examples_for "Koala GraphAPI without an access token" do
   end
 
   it "can't put an object" do
+    lambda { @result = @api.put_connections(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
+    # legacy put_object syntax
     lambda { @result = @api.put_object(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
   end
 
-  # these are not strictly necessary as the other put methods resolve to put_object, but are here for completeness
+  # these are not strictly necessary as the other put methods resolve to put_connections,
+  # but are here for completeness
   it "can't post to a feed" do
     (lambda do
       attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
