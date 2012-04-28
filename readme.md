@@ -23,17 +23,17 @@ Or in Bundler:
 Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
-  
+
     @graph = Koala::Facebook::API.new(oauth_access_token)
     # in 1.1 or earlier, use GraphAPI instead of API
-    
+
     profile = @graph.get_object("me")
     friends = @graph.get_connections("me", "friends")
-    @graph.put_object("me", "feed", :message => "I am writing on my wall!")
-   
+    @graph.put_connections("me", "feed", :message => "I am writing on my wall!")
+
     # three-part queries are easy too!
     @graph.get_connections("me", "mutualfriends/#{friend_id}")
-    
+
     # you can even use the new Timeline API
     # see https://developers.facebook.com/docs/beta/opengraph/tutorial/
     @graph.put_connections("me", "namespace:action", :object => object_url)
@@ -70,7 +70,7 @@ Fortunately, Koala supports the REST API using the very same interface; to use t
 
     @rest = Koala::Facebook::API.new(oauth_access_token)
     # in 1.1 or earlier, use RestAPI instead of API
-  	
+
   	@rest.fql_query(my_fql_query) # convenience method
   	@rest.fql_multiquery(fql_query_hash) # convenience method
   	@rest.rest_call("stream.publish", arguments_hash) # generic version
@@ -79,11 +79,11 @@ Of course, you can use the Graph API methods on the same object -- the power of 
 
     @api = Koala::Facebook::API.new(oauth_access_token)
     # in 1.1 or earlier, use GraphAndRestAPI instead of API
-    
+
     @api = Koala::Facebook::API.new(oauth_access_token)
     fql = @api.fql_query(my_fql_query)
     @api.put_wall_post(process_result(fql))
-    
+
 
 OAuth
 -----
@@ -166,7 +166,7 @@ Koala uses Faraday to make HTTP requests, which means you have complete control 
     }
     # or on a per-request basis
     @api.get_object(id, args_hash, { :timeout => 10 })
-  
+
 The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services wiki page</a> has more information on what options are available, as well as on how to configure your own Faraday middleware stack (for instance, to implement request logging).
 
 See examples, ask questions
