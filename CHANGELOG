@@ -8,6 +8,7 @@ Internal improvements:
 -- Update MultiJson dependency to support the Oj library (thanks, zinenko!)
 -- Loosened Faraday dependency (thanks, rewritten and romanbsd!)
 -- Fixed typos (thanks, nathanbertram!)
+-- Switched uses of put_object to the more semantically accurate put_connections
 -- Cleaned up gemspec
 Documentation:
 -- Added HTTP Services description for Faraday 0.8/persistent connections (thanks, romanbsd!)

@@ -72,8 +72,7 @@ module Koala
       #       Please use put_connections; in a future version of Koala (2.0?),
       #       put_object will issue a POST directly to an individual object, not to a connection.
       def put_object(parent_object, connection_name, args = {}, options = {})
-        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
-        graph_call("#{parent_object}/#{connection_name}", args, "post", options)
+        put_connections(parent_object, connection_name, args, options)
       end
 
       # Delete an object from the Graph if you have appropriate permissions.
@@ -115,7 +114,7 @@ module Koala
       # @note (see #get_connection)
       #
       # @example
-      #         graph.put_object("me", "feed", :message => "Hello, world")
+      #         graph.put_connections("me", "feed", :message => "Hello, world")
       #         => writes "Hello, world" to the active user's wall
       #
       # Most write operations require extended permissions. For example,
@@ -192,7 +191,7 @@ module Koala
       #
       # @return (see #put_connections)
       def put_picture(*picture_args)
-        put_object(*parse_media_args(picture_args, "photos"))
+        put_connections(*parse_media_args(picture_args, "photos"))
       end
 
       # Upload a video.  Functions exactly the same as put_picture.
@@ -200,11 +199,11 @@ module Koala
       def put_video(*video_args)
         args = parse_media_args(video_args, "videos")
         args.last[:video] = true
-        put_object(*args)
+        put_connections(*args)
       end
 
       # Write directly to the user's wall.
-      # Convenience method equivalent to put_object(id, "feed").
+      # Convenience method equivalent to put_connections(id, "feed").
       #
       # To get wall posts, use get_connections(user, "feed")
       # To delete a wall post, use delete_object(post_id)
@@ -227,7 +226,7 @@ module Koala
       # @see #put_connections
       # @return (see #put_connections)
       def put_wall_post(message, attachment = {}, target_id = "me", options = {})
-        self.put_object(target_id, "feed", attachment.merge({:message => message}), options)
+        put_connections(target_id, "feed", attachment.merge({:message => message}), options)
       end
 
       # Comment on a given object.
@@ -243,7 +242,7 @@ module Koala
       # @return (see #put_connections)
       def put_comment(id, message, options = {})
         # Writes the given comment on the given post.
-        self.put_object(id, "comments", {:message => message}, options)
+        put_connections(id, "comments", {:message => message}, options)
       end
 
       # Like a given object.
@@ -257,7 +256,7 @@ module Koala
       # @return (see #put_connections)
       def put_like(id, options = {})
         # Likes the given post.
-        self.put_object(id, "likes", {}, options)
+        put_connections(id, "likes", {}, options)
       end
 
       # Unlike a given object.
@@ -447,7 +446,7 @@ module Koala
 
       def parse_media_args(media_args, method)
         # photo and video uploads can accept different types of arguments (see above)
-        # so here, we parse the arguments into a form directly usable in put_object
+        # so here, we parse the arguments into a form directly usable in put_connections
         raise KoalaError.new("Wrong number of arguments for put_#{method == "photos" ? "picture" : "video"}") unless media_args.size.between?(1, 5)
 
         args_offset = media_args[1].kind_of?(Hash) || media_args.size == 1 ? 0 : 1
