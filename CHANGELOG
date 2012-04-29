@@ -5,7 +5,7 @@ New methods:
 Updated methods:
 -- GraphCollection.parse_page_url now uses the URI library and can parse any address (thanks, bnorton!)
 Internal improvements:
--- Update MultiJson dependency to support the Oj library (thanks, zinenko!)
+-- Update MultiJson dependency to support the Oj library (thanks, eckz and zinenko!)
 -- Loosened Faraday dependency (thanks, rewritten and romanbsd!)
 -- Fixed typos (thanks, nathanbertram!)
 -- Switched uses of put_object to the more semantically accurate put_connections
