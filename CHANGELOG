@@ -10,6 +10,7 @@ Internal improvements:
 -- Fixed typos (thanks, nathanbertram!)
 -- Switched uses of put_object to the more semantically accurate put_connections
 -- Cleaned up gemspec
+-- Handle invalid batch API responses better
 Documentation:
 -- Added HTTP Services description for Faraday 0.8/persistent connections (thanks, romanbsd!)
 -- Remove documentation of the old pre-1.2 HTTP Service options
