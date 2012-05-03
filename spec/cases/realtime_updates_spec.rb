@@ -129,33 +129,19 @@ describe "Koala::Facebook::RealtimeUpdates" do
       expect { @updates.subscribe("user", "name", @subscription_path) }.to raise_exception
     end
     
-    it "requests the status component" do
-      @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(:http_component => :status))
-      @updates.subscribe("user", "name", @subscription_path, @verify_token)
-    end
-    
     it "accepts an options hash" do
       options = {:a => 2, :b => "c"}
       @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(options))
       @updates.subscribe("user", "name", @subscription_path, @verify_token, options)
     end
-    
-    it "overrides any provided http_component" do
-      # since we test against status, we need to ensure that we get that
-      options = {:http_component => :body}
-      @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(:http_component => :status))
-      @updates.subscribe("user", "name", @subscription_path, @verify_token, options)
-    end
 
     describe "in practice" do
       it "sends a subscription request" do
-        result = @updates.subscribe("user", "name", @subscription_path, @verify_token)
-        result.should be_true
+        expect { @updates.subscribe("user", "name", @subscription_path, @verify_token) }.to_not raise_error
       end
     
       pending "sends a subscription request without a verify token" do
-        result = @updates.subscribe("user", "name", @subscription_path)
-        result.should be_true
+        expect { @updates.subscribe("user", "name", @subscription_path) }.to_not raise_error
       end
   
       it "fails if you try to hit an invalid path on your valid server" do
@@ -179,11 +165,6 @@ describe "Koala::Facebook::RealtimeUpdates" do
       @updates.api.should_receive(:graph_call).with(anything, hash_including(:object => obj), anything, anything)
       @updates.unsubscribe(obj)
     end
-    
-    it "requests the status component" do
-      @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(:http_component => :status))
-      @updates.unsubscribe("user")
-    end
         
     it "accepts an options hash" do
       options = {:a => 2, :b => "C"}
@@ -191,20 +172,13 @@ describe "Koala::Facebook::RealtimeUpdates" do
       @updates.unsubscribe("user", options)
     end
     
-    it "overrides any provided http_component" do
-      # since we test against status, we need to ensure that we get that
-      options = {:http_component => :body}
-      @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(:http_component => :status))
-      @updates.unsubscribe("user", options)
-    end
-    
     describe "in practice" do
       it "unsubscribes a valid individual object successfully" do 
-        @updates.unsubscribe("user").should be_true
+        expect { @updates.unsubscribe("user") }.to_not raise_error
       end
 
       it "unsubscribes all subscriptions successfully" do 
-        @updates.unsubscribe.should be_true
+        expect { @updates.unsubscribe }.to_not raise_error
       end
 
       it "fails when an invalid object is provided to unsubscribe" do 

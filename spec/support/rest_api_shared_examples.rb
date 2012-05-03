@@ -111,8 +111,8 @@ shared_examples_for "Koala RestAPI" do
       @api.rest_call('anything', {}, {}, method)
     end
 
-    it "throws an APIError if the result hash has an error key" do
-      Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, {"error_code" => "An error occurred!"}, {}))
+    it "throws an APIError if the status code >= 400" do
+      Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, '{"error_code": "An error occurred!"}', {}))
       lambda { @api.rest_call(KoalaTest.user1, {}) }.should raise_exception(Koala::Facebook::APIError)
     end
   end
@@ -164,6 +164,6 @@ end
 
 shared_examples_for "Koala RestAPI without an access token" do
   it "can't use set_app_properties" do
-    lambda { @api.set_app_properties(:desktop => 0) }.should raise_error(Koala::Facebook::APIError)
+    lambda { @api.set_app_properties(:desktop => 0) }.should raise_error(Koala::Facebook::AuthenticationError)
   end
 end

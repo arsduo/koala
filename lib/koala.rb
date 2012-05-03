@@ -3,6 +3,7 @@ require 'digest/md5'
 require 'multi_json'
 
 # include koala modules
+require 'koala/errors'
 require 'koala/api'
 require 'koala/oauth'
 require 'koala/realtime_updates'
@@ -20,8 +21,6 @@ module Koala
   # See http://github.com/arsduo/koala/wiki for a general introduction to Koala
   # and the Graph API.
   
-  class KoalaError < StandardError; end
-
   # Making HTTP requests
   class << self
     # Control which HTTP service framework Koala uses. 

@@ -21,7 +21,7 @@ module Koala
       #
       # @return true if successful, false if not.  (This call currently doesn't give useful feedback on failure.)
       def set_app_properties(properties, args = {}, options = {})
-        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "setAppProperties requires an access token"}) unless @access_token
+        raise AuthenticationError.new(nil, nil, "setAppProperties requires an access token") unless @access_token
         rest_call("admin.setAppProperties", args.merge(:properties => MultiJson.dump(properties)), options, "post")
       end
 
@@ -44,8 +44,24 @@ module Koala
 
         api("method/#{fb_method}", args.merge('format' => 'json'), verb, options) do |response|
           # check for REST API-specific errors
-          if response.is_a?(Hash) && response["error_code"]
-            raise APIError.new("type" => response["error_code"], "message" => response["error_msg"])
+          if response.status >= 400
+            begin
+              response_hash = MultiJson.load(response.body)
+            rescue MultiJson::DecodeError
+              response_hash = {}
+            end
+
+            error_info = {
+              'code' => response_hash['error_code'],
+              'error_subcode' => response_hash['error_subcode'],
+              'message' => response_hash['error_msg']
+            }
+
+            if response.status >= 500
+              raise ServerError.new(response.status, response.body, error_info)
+            else
+              raise ClientError.new(response.status, response.body, error_info)
+            end
           end
         end
       end
