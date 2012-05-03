@@ -65,15 +65,15 @@ describe "Koala::Facebook::API" do
   end
 
   it "executes an error checking block if provided" do
-    body = '{}'
-    Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, body, {}))
+    response = Koala::HTTPService::Response.new(200, '{}', {})
+    Koala.stub(:make_request).and_return(response)
 
     yield_test = mock('Yield Tester')
     yield_test.should_receive(:pass)
 
     @service.api('anything', {}, "get") do |arg|
       yield_test.pass
-      arg.should == MultiJson.load(body)
+      arg.should == response
     end
   end
 

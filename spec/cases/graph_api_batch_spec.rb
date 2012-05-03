@@ -381,58 +381,56 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             }.to raise_exception(Koala::Facebook::APIError)
           end
 
-          it "raises an APIError if the body is empty" do
+          it "raises a BadFacebookResponse if the body is empty" do
             Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, "", {}))
             expect {
               Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
-            }.to raise_exception(Koala::Facebook::APIError)
+            }.to raise_exception(Koala::Facebook::BadFacebookResponse)
           end
 
           context "with the old style" do
             before :each do
-              Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, '{"error":190,"error_description":"Error validating access token."}', {}))
+              Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(400, '{"error_code":190,"error_description":"Error validating access token."}', {}))
             end
 
-            it "throws an error if the response is an old Batch API-style error" do
+            it "throws an error" do
               expect {
                 Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
               }.to raise_exception(Koala::Facebook::APIError)
             end
 
-            it "provides a type for the error if the response is an old Batch API-style error" do
+            it "passes all the error details" do
               begin
                 Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
               rescue Koala::Facebook::APIError => err
+                err.fb_error_code.should == 190
+                err.fb_error_message.should == "Error validating access token."
+                err.http_status == 400
+                err.response_body == '{"error_code":190,"error_description":"Error validating access token."}'
               end
-              err.fb_error_type.should
-            end
-
-            it "passes all the error details if an old Batch API-style error is raised" do
-              begin
-                Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
-              rescue Koala::Facebook::APIError => err
-              end
-              err.raw_response["error"].should == 190
             end
           end
 
           context "with the new style" do
             before :each do
-              Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, '{"error":{"message":"Request 0 cannot depend on an  unresolved request with  name f. Requests can only depend on preceding requests","type":"GraphBatchException"}}', {}))
+              Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(400, '{"error":{"message":"Request 0 cannot depend on an  unresolved request with  name f. Requests can only depend on preceding requests","type":"GraphBatchException"}}', {}))
             end
 
-            it "throws an error if the response is a new Graph API-style error" do
+            it "throws an error" do
               expect {
                 Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
               }.to raise_exception(Koala::Facebook::APIError)
             end
 
-            it "passes all the error details if an old Batch API-style error is raised" do
+            it "passes all the error details" do
               begin
                 Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
               rescue Koala::Facebook::APIError => err
+                err.fb_error_type.should == "GraphBatchException"
+                err.fb_error_message.should == "Request 0 cannot depend on an  unresolved request with  name f. Requests can only depend on preceding requests"
+                err.http_status == 400
+                err.response_body == '{"error":{"message":"Request 0 cannot depend on an  unresolved request with  name f. Requests can only depend on preceding requests","type":"GraphBatchException"}}'
               end
-              err.raw_response["message"].should
             end
           end
         end
@@ -526,7 +524,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         batch_api.get_connection("2", "invalidconnection")
         batch_api.get_object(KoalaTest.user1, {}, {"access_token" => @app_api.access_token})
       end
-      failed_call.should be_a(Koala::Facebook::APIError)
+      failed_call.should be_a(Koala::Facebook::ClientError)
       koppel["id"].should_not be_nil
     end
 
@@ -614,7 +612,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getdata"})
         end
 
-        failed_call.should be_a(Koala::Facebook::APIError)
+        failed_call.should be_a(Koala::Facebook::ClientError)
         koppel.should be_nil
       end
 
@@ -624,7 +622,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             batch_api.get_connections("me", "friends", {:limit => 5})
             batch_api.get_objects("{result=i-dont-exist:$.data.*.id}")
           end
-        }.to raise_exception(Koala::Facebook::APIError)
+        }.to raise_exception(Koala::Facebook::ClientError)
       end
     end
   end

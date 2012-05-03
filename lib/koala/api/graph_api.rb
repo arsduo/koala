@@ -83,7 +83,7 @@ module Koala
       # @return true if successful, false (or an APIError) if not
       def delete_object(id, options = {})
         # Deletes the object with the given ID from the graph.
-        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Delete requires an access token"}) unless @access_token
+        raise AuthenticationError.new(nil, nil, "Delete requires an access token") unless @access_token
         graph_call(id, {}, "delete", options)
       end
 
@@ -130,7 +130,7 @@ module Koala
       # @return a hash containing the new object's id
       def put_connections(id, connection_name, args = {}, options = {})
         # Posts a certain connection
-        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Write operations require an access token"}) unless @access_token
+        raise AuthenticationError.new(nil, nil, "Write operations require an access token") unless @access_token
         graph_call("#{id}/#{connection_name}", args, "post", options)
       end
 
@@ -146,7 +146,7 @@ module Koala
       # @return (see #delete_object)
       def delete_connections(id, connection_name, args = {}, options = {})
         # Deletes a given connection
-        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Delete requires an access token"}) unless @access_token
+        raise AuthenticationError.new(nil, nil, "Delete requires an access token") unless @access_token
         graph_call("#{id}/#{connection_name}", args, "delete", options)
       end
 
@@ -268,7 +268,7 @@ module Koala
       # @return (see #delete_object)
       def delete_like(id, options = {})
         # Unlikes a given object for the logged-in user
-        raise APIError.new({"type" => "KoalaMissingAccessToken", "message" => "Unliking requires an access token"}) unless @access_token
+        raise AuthenticationError.new(nil, nil, "Unliking requires an access token") unless @access_token
         graph_call("#{id}/likes", {}, "delete", options)
       end
 
@@ -422,7 +422,7 @@ module Koala
       # @return the result from Facebook
       def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
         result = api(path, args, verb, options) do |response|
-          error = check_response(response)
+          error = check_response(response.status, response.body)
           raise error if error
         end
 
@@ -435,12 +435,38 @@ module Koala
 
       private
 
-      def check_response(response)
-        # check for Graph API-specific errors
-        # this returns an error, which is immediately raised (non-batch)
-        # or added to the list of batch results (batch)
-        if response.is_a?(Hash) && error_details = response["error"]
-          APIError.new(error_details)
+      def check_response(http_status, response_body)
+        # Check for Graph API-specific errors. This returns an error of the appropriate type 
+        # which is immediately raised (non-batch) or added to the list of batch results (batch)
+        http_status = http_status.to_i
+
+        if http_status >= 400
+          begin
+            response_hash = MultiJson.load(response_body)
+          rescue MultiJson::DecodeError
+            response_hash = {}
+          end
+
+          if response_hash['error_code']
+            # Old batch api error format. This can be removed on July 5, 2012.
+            # See https://developers.facebook.com/roadmap/#graph-batch-api-exception-format
+            error_info = {
+              'code' => response_hash['error_code'],
+              'message' => response_hash['error_description']
+            }
+          else
+            error_info = response_hash['error'] || {}
+          end
+
+          if error_info['type'] == 'OAuthException' && 
+             ( !error_info['code'] || [102, 190, 450, 452, 2500].include?(error_info['code'].to_i))
+
+            # See: https://developers.facebook.com/docs/authentication/access-token-expiration/
+            #      https://developers.facebook.com/bugs/319643234746794?browse=search_4fa075c0bd9117b20604672
+            AuthenticationError.new(http_status, response_body, error_info)
+          else
+            ClientError.new(http_status, response_body, error_info)
+          end
         end
       end
 
