@@ -91,7 +91,7 @@ module Koala
                 # process it if we are given a block to process with
                 batch_op.post_processing ? batch_op.post_processing.call(data) : data
               else
-                error || APIError.new({"type" => "HTTP #{call_result["code"].to_s}", "message" => "Response body: #{body}"})
+                raise error || APIError.new({"type" => "HTTP #{call_result["code"].to_s}", "message" => "Response body: #{body}"})
               end
             else
               nil
