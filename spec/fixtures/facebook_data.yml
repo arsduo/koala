@@ -9,7 +9,8 @@
 # Of course, you can change this to work with your own app.
 # Check out http://oauth.twoalex.com/ to easily generate tokens, cookies, etc.
 
-# Your OAuth token should have the read_stream, publish_stream, user_photos, user_videos, and read_insights permissions.
+# Your OAuth token should have the read_stream, publish_stream, user_photos and user_videos permissions. It should NOT have the 
+# read_insights permission.
 oauth_token:
 
 # for testing the OAuth class
