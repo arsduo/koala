@@ -15,7 +15,7 @@ group :development, :test do
   if RUBY_PLATFORM =~ /darwin/
     # OS X integration
     gem "ruby_gntp"
-    gem "rb-fsevent", "~> 0.4.3.1"
+    gem "rb-fsevent", :git => 'git://github.com/ttilley/rb-fsevent.git', :branch => 'pre-compiled-gem-one-off'
   end
 end
 
