@@ -18,7 +18,7 @@ module Koala
       # @param http_status [Integer] The HTTP status code of the response
       # @param response_body [String] The response body
       # @param error_info One of the following:
-      #                   [Hash] The error information extracted from the request 
+      #                   [Hash] The error information extracted from the request
       #                          ("type", "code", "error_subcode", "message")
       #                   [String] The error description
       #                   If error_info is nil or not provided, the method will attempt to extract
@@ -75,12 +75,14 @@ module Koala
     # Any error with a 5xx HTTP status code
     class ServerError < APIError; end
 
-    # Any error with a 4xx HTTP status code 
+    # Any error with a 4xx HTTP status code
     class ClientError < APIError; end
 
-    # All graph API authentication failures.
+    # Expired, invalid, or deauthorized access token
     class AuthenticationError < ClientError; end
 
+    # The user has either not granted or revoked the permissions needed to perform this action
+    class InsufficientPermissions < ClientError; end
   end
 
 end

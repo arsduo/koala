@@ -436,7 +436,7 @@ module Koala
       private
 
       def check_response(http_status, response_body)
-        # Check for Graph API-specific errors. This returns an error of the appropriate type 
+        # Check for Graph API-specific errors. This returns an error of the appropriate type
         # which is immediately raised (non-batch) or added to the list of batch results (batch)
         http_status = http_status.to_i
 
@@ -458,12 +458,14 @@ module Koala
             error_info = response_hash['error'] || {}
           end
 
-          if error_info['type'] == 'OAuthException' && 
+          if error_info['type'] == 'OAuthException' &&
              ( !error_info['code'] || [102, 190, 450, 452, 2500].include?(error_info['code'].to_i))
 
             # See: https://developers.facebook.com/docs/authentication/access-token-expiration/
             #      https://developers.facebook.com/bugs/319643234746794?browse=search_4fa075c0bd9117b20604672
             AuthenticationError.new(http_status, response_body, error_info)
+          elsif error_info['type'] == 'OAuthException' && error_info['code'] == 200
+            InsufficientPermissions.new(http_status, response_body, error_info)
           else
             ClientError.new(http_status, response_body, error_info)
           end
