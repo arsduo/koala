@@ -99,7 +99,10 @@ If your application uses Koala and the Facebook [JavaScript SDK](http://github.c
 And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
 
 	  # generate authenticating URL
-	  @oauth.url_for_oauth_code
+	  @oauth.url_for_oauth_code 
+	  # optionally with permissions 
+	  @oauth.url_for_oauth_code(:permissions => "email,read_stream,publish_stream,offline_access")
+	  ...
 	  # fetch the access token once you have the code
 	  @oauth.get_access_token(code)
 
