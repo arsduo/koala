@@ -139,7 +139,7 @@ module Koala
       # @param code (see #url_for_access_token)
       # @param options any additional parameters to send to Facebook when redeeming the token
       #
-      # @raise Koala::Facebook::APIError if Facebook returns an error response
+      # @raise Koala::Facebook::OAuthTokenRequestError if Facebook returns an error response
       #
       # @return a hash of the access token info returned by Facebook (token, expiration, etc.)
       def get_access_token_info(code, options = {})
@@ -221,21 +221,21 @@ module Koala
       #
       # @param input the signed request from Facebook
       #
-      # @raise RuntimeError if the signature is incomplete, invalid, or using an unsupported algorithm
+      # @raise OAuthSignatureError if the signature is incomplete, invalid, or using an unsupported algorithm
       #
       # @return a hash of the validated request information
       def parse_signed_request(input)
         encoded_sig, encoded_envelope = input.split('.', 2)
-        raise 'SignedRequest: Invalid (incomplete) signature data' unless encoded_sig && encoded_envelope
+        raise OAuthSignatureError, 'Invalid (incomplete) signature data' unless encoded_sig && encoded_envelope
 
         signature = base64_url_decode(encoded_sig).unpack("H*").first
         envelope = MultiJson.load(base64_url_decode(encoded_envelope))
 
-        raise "SignedRequest: Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
+        raise OAuthSignatureError, "Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
 
         # now see if the signature is valid (digest, key, data)
         hmac = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, @app_secret, encoded_envelope)
-        raise 'SignedRequest: Invalid signature' if (signature != hmac)
+        raise OAuthSignatureError, 'Invalid signature' if (signature != hmac)
 
         envelope
       end
@@ -254,10 +254,7 @@ module Koala
 
         # Facebook returns an empty body in certain error conditions
         if response == ""
-          raise APIError.new({
-            "type" => "ArgumentError",
-            "message" => "get_token_from_session_key received an error (empty response body) for sessions #{sessions.inspect}!"
-          })
+          raise BadFacebookResponse.new(200, '', "get_token_from_session_key received an error (empty response body) for sessions #{sessions.inspect}!")
         end
 
         MultiJson.load(response)
@@ -282,13 +279,8 @@ module Koala
 
       def get_token_from_server(args, post = false, options = {})
         # fetch the result from Facebook's servers
-        result = fetch_token_string(args, post, "access_token", options)
-
-        # if we have an error, parse the error JSON and raise an error
-        raise APIError.new((MultiJson.load(result)["error"] rescue nil) || {}) if result =~ /error/
-
-        # otherwise, parse the access token
-        parse_access_token(result)
+        response = fetch_token_string(args, post, "access_token", options)
+        parse_access_token(response)
       end
 
       def parse_access_token(response_text)
@@ -318,9 +310,12 @@ module Koala
         if code = components["code"]
           begin
             token_info = get_access_token_info(code, :redirect_uri => '')
-          rescue Koala::Facebook::APIError => err
-            return nil if err.message =~ /Code was invalid or expired/
-            raise
+          rescue Koala::Facebook::OAuthTokenRequestError => err
+            if err.fb_error_type == 'OAuthException' && err.fb_error_message =~ /Code was invalid or expired/
+              return nil
+            else
+              raise
+            end
           end
 
           components.merge(token_info) if token_info
@@ -331,10 +326,15 @@ module Koala
       end
 
       def fetch_token_string(args, post = false, endpoint = "access_token", options = {})
-        Koala.make_request("/oauth/#{endpoint}", {
+        response = Koala.make_request("/oauth/#{endpoint}", {
           :client_id => @app_id,
           :client_secret => @app_secret
-        }.merge!(args), post ? "post" : "get", {:use_ssl => true}.merge!(options)).body
+        }.merge!(args), post ? "post" : "get", {:use_ssl => true}.merge!(options))
+
+        raise ServerError.new(response.status, response.body) if response.status >= 500
+        raise OAuthTokenRequestError.new(response.status, response.body) if response.status >= 400
+
+        response.body
       end
 
       # base 64

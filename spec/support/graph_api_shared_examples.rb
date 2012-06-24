@@ -22,7 +22,7 @@ shared_examples_for "Koala GraphAPI" do
     end
 
     it "throws an APIError if the result hash has an error key" do
-      Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, {"error" => "An error occurred!"}, {}))
+      Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(500, '{"error": "An error occurred!"}', {}))
       lambda { @api.graph_call(KoalaTest.user1, {}) }.should raise_exception(Koala::Facebook::APIError)
     end
 
@@ -584,17 +584,17 @@ shared_examples_for "Koala GraphAPI without an access token" do
   end
 
   it "can't get data about 'me'" do
-    lambda { @api.get_object("me") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @api.get_object("me") }.should raise_error(Koala::Facebook::ClientError)
   end
 
   it "can't access connections from users" do
-    lambda { @api.get_connections(KoalaTest.user2, "friends") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @api.get_connections(KoalaTest.user2, "friends") }.should raise_error(Koala::Facebook::ClientError)
   end
 
   it "can't put an object" do
-    lambda { @result = @api.put_connections(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @result = @api.put_connections(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::AuthenticationError)
     # legacy put_object syntax
-    lambda { @result = @api.put_object(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @result = @api.put_object(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::AuthenticationError)
   end
 
   # these are not strictly necessary as the other put methods resolve to put_connections,
@@ -603,26 +603,26 @@ shared_examples_for "Koala GraphAPI without an access token" do
     (lambda do
       attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
       @result = @api.put_wall_post("Hello, world", attachment, "contextoptional")
-    end).should raise_error(Koala::Facebook::APIError)
+    end).should raise_error(Koala::Facebook::AuthenticationError)
   end
 
   it "can't comment on an object" do
     # random public post on the ContextOptional wall
-    lambda { @result = @api.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @result = @api.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::AuthenticationError)
   end
 
   it "can't like an object" do
-    lambda { @api.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @api.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::AuthenticationError)
   end
 
   # DELETE
   it "can't delete posts" do
     # test post on the Ruby SDK Test application
-    lambda { @result = @api.delete_object("115349521819193_113815981982767") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @result = @api.delete_object("115349521819193_113815981982767") }.should raise_error(Koala::Facebook::AuthenticationError)
   end
 
   it "can't delete a like" do
-    lambda { @api.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::APIError)
+    lambda { @api.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::AuthenticationError)
   end
 
   # FQL_QUERY

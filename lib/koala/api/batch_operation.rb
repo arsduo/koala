@@ -25,7 +25,7 @@ module Koala
 
           process_binary_args
 
-          raise Koala::KoalaError, "Batch operations require an access token, none provided." unless @access_token
+          raise AuthenticationError.new(nil, nil, "Batch operations require an access token, none provided.") unless @access_token
         end
 
         def to_batch_params(main_access_token)

@@ -52,7 +52,7 @@ module Koala
       #                     (see the docs for more information)
       # @param options (see Koala::HTTPService.make_request)
       #
-      # @return true if successful, false (or an APIError) otherwise.
+      # @raise A subclass of Koala::Facebook::APIError if the subscription request failed.
       def subscribe(object, fields, callback_url, verify_token, options = {})
         args = {
           :object => object,
@@ -60,7 +60,7 @@ module Koala
           :callback_url => callback_url,
         }.merge(verify_token ? {:verify_token => verify_token} : {})
         # a subscription is a success if Facebook returns a 200 (after hitting your server for verification)
-        @api.graph_call(subscription_path, args, 'post', options.merge(:http_component => :status)) == 200
+        @api.graph_call(subscription_path, args, 'post', options)
       end
 
       # Unsubscribe from updates for a particular object or from updates. 
@@ -69,9 +69,9 @@ module Koala
       #               If no object is provided, all subscriptions will be removed.
       # @param options (see Koala::HTTPService.make_request)
       #
-      # @return true if the unsubscription is successful, false (or an APIError) otherwise.
+      # @raise A subclass of Koala::Facebook::APIError if the subscription request failed.
       def unsubscribe(object = nil, options = {})
-        @api.graph_call(subscription_path, object ? {:object => object} : {}, "delete", options.merge(:http_component => :status)) == 200
+        @api.graph_call(subscription_path, object ? {:object => object} : {}, "delete", options)
       end
 
       # List all active subscriptions for this application.
