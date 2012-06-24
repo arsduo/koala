@@ -13,52 +13,57 @@ Installation
 ---
 
 Easy:
-
-    [sudo|rvm] gem install koala
+```bash
+[sudo|rvm] gem install koala
+```
 
 Or in Bundler:
-
-    gem "koala"
+```ruby
+gem "koala"
+```
 
 Graph API
 ----
 The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
+```ruby
+@graph = Koala::Facebook::API.new(oauth_access_token)
+# in 1.1 or earlier, use GraphAPI instead of API
 
-    @graph = Koala::Facebook::API.new(oauth_access_token)
-    # in 1.1 or earlier, use GraphAPI instead of API
+profile = @graph.get_object("me")
+friends = @graph.get_connections("me", "friends")
+@graph.put_connections("me", "feed", :message => "I am writing on my wall!")
 
-    profile = @graph.get_object("me")
-    friends = @graph.get_connections("me", "friends")
-    @graph.put_connections("me", "feed", :message => "I am writing on my wall!")
+# three-part queries are easy too!
+@graph.get_connections("me", "mutualfriends/#{friend_id}")
 
-    # three-part queries are easy too!
-    @graph.get_connections("me", "mutualfriends/#{friend_id}")
-
-    # you can even use the new Timeline API
-    # see https://developers.facebook.com/docs/beta/opengraph/tutorial/
-    @graph.put_connections("me", "namespace:action", :object => object_url)
+# you can even use the new Timeline API
+# see https://developers.facebook.com/docs/beta/opengraph/tutorial/
+@graph.put_connections("me", "namespace:action", :object => object_url)
+```
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
 When retrieving data that returns an array of results (for example, when calling API#get_connections or API#search) a GraphCollection object will be returned, which makes it easy to page through the results:
+```ruby
+# Returns the feed items for the currently logged-in user as a GraphCollection
+feed = @graph.get_connections("me", "feed")
+feed.each {|f| do_something_with_item(f) } # it's a subclass of Array
+next_feed = feed.next_page
 
-    # Returns the feed items for the currently logged-in user as a GraphCollection
-    feed = @graph.get_connections("me", "feed")
-    feed.each {|f| do_something_with_item(f) } # it's a subclass of Array
-    next_feed = feed.next_page
-
-    # You can also get an array describing the URL for the next page: [path, arguments]
-    # This is useful for storing page state across multiple browser requests
-    next_page_params = feed.next_page_params
-    page = @graph.get_page(next_page_params)
+# You can also get an array describing the URL for the next page: [path, arguments]
+# This is useful for storing page state across multiple browser requests
+next_page_params = feed.next_page_params
+page = @graph.get_page(next_page_params)
+```
 
 You can also make multiple calls at once using Facebook's batch API:
-
-    # Returns an array of results as if they were called non-batch
-    @graph.batch do |batch_api|
-      batch_api.get_object('me')
-      batch_api.put_wall_post('Making a post in a batch.')
-    end
+```ruby
+# Returns an array of results as if they were called non-batch
+@graph.batch do |batch_api|
+  batch_api.get_object('me')
+  batch_api.put_wall_post('Making a post in a batch.')
+end
+```
 
 Check out the wiki for more details and examples.
 
@@ -67,58 +72,58 @@ The REST API
 Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.
 
 Fortunately, Koala supports the REST API using the very same interface; to use this, instantiate an API:
+```ruby
+@rest = Koala::Facebook::API.new(oauth_access_token)
+# in 1.1 or earlier, use RestAPI instead of API
 
-    @rest = Koala::Facebook::API.new(oauth_access_token)
-    # in 1.1 or earlier, use RestAPI instead of API
-
-  	@rest.fql_query(my_fql_query) # convenience method
-  	@rest.fql_multiquery(fql_query_hash) # convenience method
-  	@rest.rest_call("stream.publish", arguments_hash) # generic version
+@rest.fql_query(my_fql_query) # convenience method
+@rest.fql_multiquery(fql_query_hash) # convenience method
+@rest.rest_call("stream.publish", arguments_hash) # generic version
+```
 
 Of course, you can use the Graph API methods on the same object -- the power of two APIs right in the palm of your hand.
+```ruby
+@api = Koala::Facebook::API.new(oauth_access_token)
+# in 1.1 or earlier, use GraphAndRestAPI instead of API
 
-    @api = Koala::Facebook::API.new(oauth_access_token)
-    # in 1.1 or earlier, use GraphAndRestAPI instead of API
-
-    @api = Koala::Facebook::API.new(oauth_access_token)
-    fql = @api.fql_query(my_fql_query)
-    @api.put_wall_post(process_result(fql))
-
+@api = Koala::Facebook::API.new(oauth_access_token)
+fql = @api.fql_query(my_fql_query)
+@api.put_wall_post(process_result(fql))
+```
 
 OAuth
 -----
 You can use the Graph and REST APIs without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
-
-    @oauth = Koala::Facebook::OAuth.new(app_id, app_secret, callback_url)
+```ruby
+@oauth = Koala::Facebook::OAuth.new(app_id, app_secret, callback_url)
+```
 
 If your application uses Koala and the Facebook [JavaScript SDK](http://github.com/facebook/facebook-js-sdk) (formerly Facebook Connect), you can use the OAuth class to parse the cookies:
-
-    @oauth.get_user_from_cookies(cookies) # gets the user's ID
-	  @oauth.get_user_info_from_cookies(cookies) # parses and returns the entire hash
-
+```ruby
+@oauth.get_user_from_cookies(cookies) # gets the user's ID
+@oauth.get_user_info_from_cookies(cookies) # parses and returns the entire hash
+```
 And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
-
-	  # generate authenticating URL
-	  @oauth.url_for_oauth_code 
-	  # optionally with permissions 
-	  @oauth.url_for_oauth_code(:permissions => "email,read_stream,publish_stream,offline_access")
-	  ...
-	  # fetch the access token once you have the code
-	  @oauth.get_access_token(code)
+```ruby
+# generate authenticating URL
+@oauth.url_for_oauth_code
+# fetch the access token once you have the code
+@oauth.get_access_token(code)
+```
 
 You can also get your application's own access token, which can be used without a user session for subscriptions and certain other requests:
-
-    @oauth.get_app_access_token
-
+```ruby
+@oauth.get_app_access_token
+```
 For those building apps on Facebook, parsing signed requests is simple:
-
-    @oauth.parse_signed_request(signed_request_string)
-
+```ruby
+@oauth.parse_signed_request(signed_request_string)
+```
 Or, if for some horrible reason, you're still using session keys, despair not!  It's easy to turn them into shiny, modern OAuth tokens:
-
-    @oauth.get_token_from_session_key(session_key)
-    @oauth.get_tokens_from_session_keys(array_of_session_keys)
-
+```ruby
+@oauth.get_token_from_session_key(session_key)
+@oauth.get_tokens_from_session_keys(array_of_session_keys)
+```
 That's it!  It's pretty simple once you get the hang of it.  If you're new to OAuth, though, check out the wiki and the OAuth Playground example site (see below).
 
 Real-time Updates
@@ -126,50 +131,50 @@ Real-time Updates
 Sometimes, reaching out to Facebook is a pain -- let it reach out to you instead.  The Graph API allows your application to subscribe to real-time updates for certain objects in the graph; check the [official Facebook documentation](http://developers.facebook.com/docs/api/realtime) for more details on what objects you can subscribe to and what limitations may apply.
 
 Koala makes it easy to interact with your applications using the RealtimeUpdates class:
-
-    @updates = Koala::Facebook::RealtimeUpdates.new(:app_id => app_id, :secret => secret)
-
+```ruby
+@updates = Koala::Facebook::RealtimeUpdates.new(:app_id => app_id, :secret => secret)
+```
 You can do just about anything with your real-time update subscriptions using the RealtimeUpdates class:
+```ruby
+# Add/modify a subscription to updates for when the first_name or last_name fields of any of your users is changed
+@updates.subscribe("user", "first_name, last_name", callback_url, verify_token)
 
-    # Add/modify a subscription to updates for when the first_name or last_name fields of any of your users is changed
-    @updates.subscribe("user", "first_name, last_name", callback_url, verify_token)
+# Get an array of your current subscriptions (one hash for each object you've subscribed to)
+@updates.list_subscriptions
 
-    # Get an array of your current subscriptions (one hash for each object you've subscribed to)
-    @updates.list_subscriptions
-
-    # Unsubscribe from updates for an object
-    @updates.unsubscribe("user")
-
+# Unsubscribe from updates for an object
+@updates.unsubscribe("user")
+```
 And to top it all off, RealtimeUpdates provides a static method to respond to Facebook servers' verification of your callback URLs:
-
-    # Returns the hub.challenge parameter in params if the verify token in params matches verify_token
-    Koala::Facebook::RealtimeUpdates.meet_challenge(params, your_verify_token)
-
+```ruby
+# Returns the hub.challenge parameter in params if the verify token in params matches verify_token
+Koala::Facebook::RealtimeUpdates.meet_challenge(params, your_verify_token)
+```
 For more information about meet_challenge and the RealtimeUpdates class, check out the Real-Time Updates page on the wiki.
 
 Test Users
 -----
 
 We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph or REST API:
-
-    @test_users = Koala::Facebook::TestUsers.new(:app_id => id, :secret => secret)
-    user = @test_users.create(is_app_installed, desired_permissions)
-    user_graph_api = Koala::Facebook::API.new(user["access_token"])
-    # or, if you want to make a whole community:
-    @test_users.create_network(network_size, is_app_installed, common_permissions)
-
+```ruby
+@test_users = Koala::Facebook::TestUsers.new(:app_id => id, :secret => secret)
+user = @test_users.create(is_app_installed, desired_permissions)
+user_graph_api = Koala::Facebook::API.new(user["access_token"])
+# or, if you want to make a whole community:
+@test_users.create_network(network_size, is_app_installed, common_permissions)
+```
 Talking to Facebook
 -----
 
 Koala uses Faraday to make HTTP requests, which means you have complete control over how your app makes HTTP requests to Facebook.  You can set Faraday options globally or pass them in on a per-request (or both):
-
-    # Set an SSL certificate to avoid Net::HTTP errors
-    Koala.http_service.http_options = {
-      :ssl => { :ca_path => "/etc/ssl/certs" }
-    }
-    # or on a per-request basis
-    @api.get_object(id, args_hash, { :timeout => 10 })
-
+```ruby
+# Set an SSL certificate to avoid Net::HTTP errors
+Koala.http_service.http_options = {
+  :ssl => { :ca_path => "/etc/ssl/certs" }
+}
+# or on a per-request basis
+@api.get_object(id, args_hash, { :timeout => 10 })
+```
 The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services wiki page</a> has more information on what options are available, as well as on how to configure your own Faraday middleware stack (for instance, to implement request logging).
 
 See examples, ask questions
@@ -187,16 +192,16 @@ Testing
 -----
 
 Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box:
-
-    # From anywhere in the project directory:
-    bundle exec rake spec
-
+```bash
+# From anywhere in the project directory:
+bundle exec rake spec
+```
 
 You can also run live tests against Facebook's servers:
-
-    # Again from anywhere in the project directory:
-    LIVE=true bundle exec rake spec
-    # you can also test against Facebook's beta tier
-    LIVE=true BETA=true bundle exec rake spec
-
+```bash
+# Again from anywhere in the project directory:
+LIVE=true bundle exec rake spec
+# you can also test against Facebook's beta tier
+LIVE=true BETA=true bundle exec rake spec
+```
 By default, the live tests are run against test users, so you can run them as frequently as you want.  If you want to run them against a real user, however, you can fill in the OAuth token, code, and access\_token values in spec/fixtures/facebook_data.yml.  See the wiki for more details.
