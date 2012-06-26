@@ -33,7 +33,9 @@ graph_api:
 
   # Error responses for when a token is required, but not given
   token_required_responses: &token_required
-    no_token: '{"error":{"type":"OAuthAccessTokenException", "message":"An access token is required to request this resource."}}'
+    no_token:
+      code: 400
+      body: '{"error":{"type":"OAuthAccessTokenException", "message":"An access token is required to request this resource."}}'
 
   # Common mock item responses
   item_deleted: &item_deleted
@@ -42,11 +44,15 @@ graph_api:
 
   # OAuth error response
   oauth_error: &oauth_error
-    no_token: '{"error": {"code"=>2500, "type": "OAuthException", "message": "Error validating verification code."}}'
+    no_token: 
+      code: 400
+      body: '{"error": {"code"=>2500, "type": "OAuthException", "message": "Error validating verification code."}}'
 
   # Subscription error response
   verification_error: &verification_error
-    with_token: '{"error": {"code"=>2500, "type": "OAuthException", "message": "Error validating verification code."}}'
+    with_token:
+      code: 400
+      body: '{"error": {"code"=>2500, "type": "OAuthException", "message": "Error validating verification code."}}'
 
   test_user_uninstalled: &test_user_uninstalled
     post:
@@ -70,53 +76,55 @@ graph_api:
     # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}]) %>:
       post:
-        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"id\":\"456\"}"}]'
+        with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"id\":\"456\"}"}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/picture"}]) %>:
       post:
-        with_token: '[{"headers":[{"name":"Location","value":"http://google.com"}]}]'
+        with_token: '[{"code": 200, "headers":[{"name":"Location","value":"http://google.com"}]}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
-        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[],\"paging\":{}}"}]'
+        with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"data\":[],\"paging\":{}}"}]'
     batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
-        with_token: '[{"body":"{\"id\":\"123\"}"}, {"body":"{\"data\":[],\"paging\":{}}"}]'
+        with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"data\":[],\"paging\":{}}"}]'
     batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"2/invalidconnection"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
-        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"body":"{\"id\":\"123\"}"}]'
+        with_token: '[{"code": 400, "body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"code": 200, "body":"{\"id\":\"123\"}"}]'
     batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"FEED_ITEM_BATCH/likes"}, {"method"=>"delete", "relative_url"=> "FEED_ITEM_BATCH"}]) %>:
       post:
-        with_token: '[{"body": "{\"id\": \"MOCK_LIKE\"}"},{"body":true}]'
+        with_token: '[{"code": 200, "body": "{\"id\": \"MOCK_LIKE\"}"},{"code": 200, "body":true}]'
     batch=<%= MultiJson.dump([{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+first_name+from+user+where+uid%3D2905623"}]) %>:
       post:
-        with_token: '[{"body":"[{\"first_name\":\"Alex\"}]"}]'
+        with_token: '[{"code": 200, "body":"[{\"first_name\":\"Alex\"}]"}]'
 
     # dependencies
     batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}]) %>:
       post:
-        with_token: '[null,{"body":"{\"id\":\"123\"}"}]'
+        with_token: '[null,{"code": 200, "body":"{\"id\":\"123\"}"}]'
     batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"2/invalidconnection", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}]) %>:
       post:
-        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+        with_token: '[{"code": 400, "body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:
       post:
-        with_token: '[null,{"body":"{}"}]'
+        with_token: '[null,{"code": 200, "body":"{}"}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends", "omit_response_on_success" => false}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:
       post:
-        with_token: '[{"body":"{\"data\":[],\"paging\":{}}"},{"body":"{}"}]'
+        with_token: '[{"code": 200, "body":"{\"data\":[],\"paging\":{}}"},{"code": 200, "body":"{}"}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}]) %>:
       post:
-        with_token: '{"error":190,"error_description":"Error validating access token."}'
+        with_token:
+          code: 400
+          body: '{"error_code":190,"error_description":"Error validating access token."}'
 
     # attached files tests
     batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
       post:
-        with_token: '[{"body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
+        with_token: '[{"code": 400, body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
     batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
       post:
-        with_token: '[{"body":"{\"id\": \"MOCK_PHOTO\"}"}]'
+        with_token: '[{"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}]'
     batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}, {"method"=>"post", "relative_url"=>"koppel/photos", "attached_files" => "op2_file0"}]) %>&op1_file0=[FILE]&op2_file0=[FILE]:
       post:
-        with_token: '[{"body":"{\"id\": \"MOCK_PHOTO\"}"}, {"body":"{\"id\": \"MOCK_PHOTO\"}"}]'
+        with_token: '[{"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}, {"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}]'
 
 
 
@@ -247,12 +255,12 @@ graph_api:
         no_token: '{"http://developers.facebook.com/blog/post/490": [], "http://developers.facebook.com/blog/post/472": []}'
     ids=:
       get:
-        body: '{"error": {"type": "OAuthException","message": "Cannot specify an empty identifier"}}'
         code: 400
+        body: '{"error": {"type": "OAuthException","message": "Cannot specify an empty identifier"}}'
     no_args:
       get:
-        body: '{"error": {"type": "Exception","message": "No node specified"}}'
         code: 500
+        body: '{"error": {"type": "Exception","message": "No node specified"}}'
 
   /search:
     q=facebook:
@@ -348,17 +356,23 @@ graph_api:
           code: 200
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
       post:
-        with_token: '{"error":{"type":"Exception","message":"(#2200) subscription validation failed"}}'
+        with_token:
+          code: 400
+          body: '{"error":{"type":"Exception","message":"(#2200) subscription validation failed"}}'
     callback_url=foo&fields=name&object=user&verify_token=<%= SUBSCRIPTION_DATA["verify_token"] %>:
       post:
-        with_token: '{"error":{"type":"Exception","message":"(#100) callback_url URL is not properly formatted"}}'
+        with_token:
+          code: 400
+          body: '{"error":{"type":"Exception","message":"(#100) callback_url URL is not properly formatted"}}'
     object=user:
       delete:
         with_token:
           code: 200
     object=kittens:
       delete:
-        with_token: '{"error":{"type":"Exception","message":"(#100) Invalid parameter"}}'
+        with_token:
+          code: 400
+          body: '{"error":{"type":"Exception","message":"(#100) Invalid parameter"}}'
     no_args:
       delete:
         with_token:
@@ -456,7 +470,9 @@ graph_api:
   /9999999991:
     no_args:
       delete:
-        with_token: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
+        with_token:
+          code: 400
+          body: '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
 
   /888888888:
     no_args:

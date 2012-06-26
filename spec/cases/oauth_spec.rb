@@ -117,19 +117,16 @@ describe "Koala::Facebook::OAuth" do
           end
 
           it "returns nil if the call to FB returns an expired code error" do
-            @oauth.stub(:get_access_token_info).and_raise(Koala::Facebook::APIError.new(
-              "type" => "OAuthException",
-              "message" => "Code was invalid or expired. Session has expired at unix time 1324044000. The current unix time is 1324300957."
+            @oauth.stub(:get_access_token_info).and_raise(Koala::Facebook::OAuthTokenRequestError.new(400, 
+              '{ "error": { "type": "OAuthException", "message": "Code was invalid or expired. Session has expired at unix time 1324044000. The current unix time is 1324300957." } }'
             ))
             @oauth.get_user_info_from_cookies(@cookie).should be_nil
           end
 
           it "raises the error if the call to FB returns a different error" do
-            @oauth.stub(:get_access_token_info).and_raise(Koala::Facebook::APIError.new(
-              "type" => "OtherError",
-              "message" => "A Facebook Error"
-            ))
-            expect { @oauth.get_user_info_from_cookies(@cookie) }.to raise_exception(Koala::Facebook::APIError)
+            @oauth.stub(:get_access_token_info).and_raise(Koala::Facebook::OAuthTokenRequestError.new(400,
+              '{ "error": { "type": "OtherError", "message": "A Facebook Error" } }'))
+            expect { @oauth.get_user_info_from_cookies(@cookie) }.to raise_exception(Koala::Facebook::OAuthTokenRequestError)
           end
         end
 
@@ -399,7 +396,7 @@ describe "Koala::Facebook::OAuth" do
         end
 
         it "raises an error when get_access_token is called with a bad code" do
-          lambda { @oauth.get_access_token_info("foo") }.should raise_error(Koala::Facebook::APIError)
+          lambda { @oauth.get_access_token_info("foo") }.should raise_error(Koala::Facebook::OAuthTokenRequestError)
         end
       end
     end
@@ -425,7 +422,7 @@ describe "Koala::Facebook::OAuth" do
         end
 
         it "raises an error when get_access_token is called with a bad code" do
-          lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::APIError)
+          lambda { @oauth.get_access_token("foo") }.should raise_error(Koala::Facebook::OAuthTokenRequestError)
         end
       end
     end
@@ -493,7 +490,7 @@ describe "Koala::Facebook::OAuth" do
       end
 
       it "raises an error when exchange_access_token_info is called with a bad code" do
-        lambda { @oauth.exchange_access_token_info("foo") }.should raise_error(Koala::Facebook::APIError)
+        lambda { @oauth.exchange_access_token_info("foo") }.should raise_error(Koala::Facebook::OAuthTokenRequestError)
       end
     end
 
@@ -579,9 +576,9 @@ describe "Koala::Facebook::OAuth" do
           result.each_with_index {|r, index| index > 0 ? r.should(be_a(Hash)) : r.should(be_nil)}
         end
 
-        it "throws an APIError if Facebook returns an empty body (as happens for instance when the API breaks)" do
+        it "throws a BadFacebookResponse if Facebook returns an empty body (as happens for instance when the API breaks)" do
           @oauth.should_receive(:fetch_token_string).and_return("")
-          lambda { @oauth.get_token_info_from_session_keys(@multiple_session_keys) }.should raise_error(Koala::Facebook::APIError)
+          lambda { @oauth.get_token_info_from_session_keys(@multiple_session_keys) }.should raise_error(Koala::Facebook::BadFacebookResponse)
         end
 
         it "passes on any options provided to make_request" do
