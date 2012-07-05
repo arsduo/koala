@@ -24,7 +24,10 @@ gem "koala"
 
 Graph API
 ----
-The Graph API is the simple, slick new interface to Facebook's data.  Using it with Koala is quite straightforward:
+The Graph API is the simple, slick new interface to Facebook's data.  To obtain an access token to explore with,
+visit the [Graph API Explorer](https://developers.facebook.com/tools/explorer) and click on 'Get Access Token'.
+Using it with Koala is quite straightforward:
+
 ```ruby
 @graph = Koala::Facebook::API.new(oauth_access_token)
 # in 1.1 or earlier, use GraphAPI instead of API
