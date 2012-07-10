@@ -1,3 +1,5 @@
+require 'addressable/uri'
+
 module Koala
   module Facebook
     class API
@@ -87,7 +89,7 @@ module Koala
         #
         # @return an array of parameters that can be provided via graph_call(*parsed_params)
         def self.parse_page_url(url)
-          uri = URI.parse(url)
+          uri = Addressable::URI.parse(url)
 
           base = uri.path.sub(/^\//, '')
           params = CGI.parse(uri.query)
