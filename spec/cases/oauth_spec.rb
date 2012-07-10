@@ -295,13 +295,13 @@ describe "Koala::Facebook::OAuth" do
 
       it "generates a properly formatted OAuth token URL when provided a code" do
         url = @oauth.url_for_access_token(@code)
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}").should be_true
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth token URL when provided a callback" do
         callback = "foo.com"
         url = @oauth.url_for_access_token(@code, :callback => callback)
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape callback}").should be_true
+        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape callback}")
       end
 
       it "includes any additional options as URL parameters, appropriately escaped" do

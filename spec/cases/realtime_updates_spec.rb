@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Koala::Facebook::RealtimeUpdates" do
-  before :all do
+  before :each do
     # get oauth data
     @app_id = KoalaTest.app_id
     @secret = KoalaTest.secret
