@@ -46,7 +46,9 @@ friends = @graph.get_connections("me", "friends")
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
-When retrieving data that returns an array of results (for example, when calling API#get_connections or API#search) a GraphCollection object will be returned, which makes it easy to page through the results:
+When retrieving data that returns an array of results (for example, when calling `API#get_connections` or `API#search`)
+a GraphCollection object will be returned, which makes it easy to page through the results:
+
 ```ruby
 # Returns the feed items for the currently logged-in user as a GraphCollection
 feed = @graph.get_connections("me", "feed")
@@ -67,6 +69,22 @@ You can also make multiple calls at once using Facebook's batch API:
   batch_api.put_wall_post('Making a post in a batch.')
 end
 ```
+
+You can pass a "post-processing" block to each of Koala's Graph API methods. This is handy for two reasons:
+
+1. You can modify the result returned by the Graph API method:
+
+        education = @graph.get_object("me") { |data| data['education'] }
+        # returned value only contains the "education" portion of the profile
+
+2. You can consume the data in place which is particularly useful in the batch case, so you don't have to pull
+the results apart from a long list of array entries:
+
+        @graph.batch do |batch_api|
+          # Assuming you have database fields "about_me" and "photos"
+          batch_api.get_object('me')                {|me|     self.about_me = me }
+          batch_api.get_connections('me', 'photos') {|photos| self.photos   = photos }
+        end
 
 Check out the wiki for more details and examples.
 

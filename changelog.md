@@ -8,6 +8,8 @@ Documentation:
 * Code highlighting in readme (thanks, sfate!)
 * Added Graph API explorer link in readme (thanks, jch!)
 * Added permissions example for OAuth (thanks, sebastiandeutsch!)
+* Every graph API method now accepts a post processing block. This is particularly
+useful for batch operations to separate concerns, see Readme for examles. (thanks, wolframarnold!)
 
 v1.5
 New methods:

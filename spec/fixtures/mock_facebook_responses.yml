@@ -82,7 +82,7 @@ graph_api:
         with_token: '[{"code": 200, "headers":[{"name":"Location","value":"http://google.com"}]}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
-        with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"data\":[],\"paging\":{}}"}]'
+        with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"data\":[{\"id\":\"456\"}],\"paging\":{}}"}]'
     batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"data\":[],\"paging\":{}}"}]'
