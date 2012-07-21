@@ -24,13 +24,13 @@ gem "koala"
 
 Graph API
 ----
-The Graph API is the simple, slick new interface to Facebook's data.  To obtain an access token to explore with,
-visit the [Graph API Explorer](https://developers.facebook.com/tools/explorer) and click on 'Get Access Token'.
-Using it with Koala is quite straightforward:
+The Graph API is the simple, slick new interface to Facebook's data.  
+Using it with Koala is quite straightforward.  First, you'll need an access token, which you can get through 
+Facebook's [Graph API Explorer](https://developers.facebook.com/tools/explorer) (click on 'Get Access Token').  
+Then, go exploring:
 
 ```ruby
 @graph = Koala::Facebook::API.new(oauth_access_token)
-# in 1.1 or earlier, use GraphAPI instead of API
 
 profile = @graph.get_object("me")
 friends = @graph.get_connections("me", "friends")
@@ -77,7 +77,6 @@ Where the Graph API and the old REST API overlap, you should choose the Graph AP
 Fortunately, Koala supports the REST API using the very same interface; to use this, instantiate an API:
 ```ruby
 @rest = Koala::Facebook::API.new(oauth_access_token)
-# in 1.1 or earlier, use RestAPI instead of API
 
 @rest.fql_query(my_fql_query) # convenience method
 @rest.fql_multiquery(fql_query_hash) # convenience method
@@ -87,7 +86,6 @@ Fortunately, Koala supports the REST API using the very same interface; to use t
 Of course, you can use the Graph API methods on the same object -- the power of two APIs right in the palm of your hand.
 ```ruby
 @api = Koala::Facebook::API.new(oauth_access_token)
-# in 1.1 or earlier, use GraphAndRestAPI instead of API
 
 @api = Koala::Facebook::API.new(oauth_access_token)
 fql = @api.fql_query(my_fql_query)
