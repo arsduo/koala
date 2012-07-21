@@ -104,6 +104,12 @@ describe Koala::Facebook::GraphCollection do
         args_hash = {"one" => "val_one", "two" => "val_two"}
         Koala::Facebook::GraphCollection.parse_page_url("http://facebook.com/#{base}?#{args_hash.map {|k,v| "#{k}=#{v}" }.join("&")}").should == [base, args_hash]
       end
+
+      it "works with addresses with irregular characters" do
+        access_token = "appid123a|fdcba"
+        base, args_hash = Koala::Facebook::GraphCollection.parse_page_url("http://facebook.com/foo?token=#{access_token}")
+        args_hash["token"].should == access_token
+      end
     end
   end
 
