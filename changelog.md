@@ -2,6 +2,12 @@ v1.6
 _Internal improvements:_
 * Switched URL parsing to addressable, which can handle unusual FB URLs
 (thanks, bnorton!)
+* Bump Faraday requirement to 0.8 (thanks, jarthod!)
+Documentation:
+* Changelog is now markdown
+* Code highlighting in readme (thanks, sfate!)
+* Added Graph API explorer link in readme (thanks, jch!)
+* Added permissions example for OAuth (thanks, sebastiandeutsch!)
 
 v1.5
 New methods:
