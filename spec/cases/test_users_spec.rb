@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Koala::Facebook::TestUsers" do
-  before :all do
+  before :each do
     # get oauth data
     @app_id = KoalaTest.app_id
     @secret = KoalaTest.secret
@@ -12,13 +12,6 @@ describe "Koala::Facebook::TestUsers" do
     # check OAuth data
     unless @app_id && @secret && @app_access_token
       raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!"
-    end
-  end
-  
-  after :each do
-    # clean up any test users
-    ((@network || []) + [@user1, @user2]).each do |u|
-      puts "Unable to delete test user #{u.inspect}" if u && !(@test_users.delete(u) rescue false)
     end
   end
 
