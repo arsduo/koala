@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'base64'
 
 describe "Koala::Facebook::RealtimeUpdates" do
   before :all do
@@ -210,6 +211,30 @@ describe "Koala::Facebook::RealtimeUpdates" do
     it "returns the app_id/subscriptions" do
       @updates.subscription_path.should == "#{@app_id}/subscriptions"
     end
+  end
+
+  describe ".validate_update" do
+    it "returns false if there is no X-Hub-Signature header" do
+      @updates.validate_update("", {}).should be_false
+    end
+
+    it "returns false if the signature doesn't match the body" do
+      @updates.validate_update("", {"X-Hub-Signature" => "sha1=badsha1"}).should be_false
+    end
+
+    it "results true if the signature matches the body with the secret" do
+      body = "BODY"
+      puts "#{@secret}, #{body}"
+      signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body).chomp
+      @updates.validate_update(body, {"X-Hub-Signature" => "sha1=#{signature}"}).should be_true
+    end
+
+    it "results true with alternate HTTP_X_HUB_SIGNATURE header" do
+      body = "BODY"
+      signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body).chomp
+      @updates.validate_update(body, {"HTTP_X_HUB_SIGNATURE" => "sha1=#{signature}"}).should be_true
+    end
+
   end
   
   describe ".meet_challenge" do

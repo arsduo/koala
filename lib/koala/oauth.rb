@@ -326,10 +326,13 @@ module Koala
       end
 
       def fetch_token_string(args, post = false, endpoint = "access_token", options = {})
+        puts ">>>#{@app_id}"
         response = Koala.make_request("/oauth/#{endpoint}", {
           :client_id => @app_id,
           :client_secret => @app_secret
         }.merge!(args), post ? "post" : "get", {:use_ssl => true}.merge!(options))
+
+        puts response.body
 
         raise ServerError.new(response.status, response.body) if response.status >= 500
         raise OAuthTokenRequestError.new(response.status, response.body) if response.status >= 400
