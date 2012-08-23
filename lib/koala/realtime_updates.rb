@@ -111,6 +111,20 @@ module Koala
           false
         end
       end
+
+      # As a security measure, all updates from facebook are signed using
+      # X-Hub-Signature: sha1=XXXX where XXX is the sha1 of the json payload
+      # using your application secret as the key
+      def validate_update(body, headers)
+        request_signature = headers['X-Hub-Signature'] || headers['HTTP_X_HUB_SIGNATURE']
+        return false unless request_signature
+        signature_parts = request_signature.split("sha1=")
+        return false unless signature_parts.size == 2
+        request_signature = signature_parts[1]
+        calculated_signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body)
+        return calculated_signature == request_signature
+      end
+
       
       # The Facebook subscription management URL for your application.
       def subscription_path
