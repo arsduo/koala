@@ -1,6 +1,6 @@
 v1.6
 New methods:
-* RealtimeUpdates#validate_update to validate the signature of a Facebook call
+* RealtimeUpdates#validate_update to validate the signature of a Facebook call (thanks, gaffo!)
 _Internal improvements:_
 * Switched URL parsing to addressable, which can handle unusual FB URLs
 (thanks, bnorton!)
