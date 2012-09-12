@@ -507,7 +507,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       pictures = @api.batch do |batch_api|
         batch_api.get_picture('me')
       end
-      pictures.first.should_not be_empty
+      puts pictures.inspect
+      pictures.first.should == "http://google.com" # the value in the yml
     end
 
     it "handles requests for two different tokens" do
