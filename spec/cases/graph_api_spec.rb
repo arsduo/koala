@@ -16,24 +16,27 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     # and the other methods which do some post-processing locally
     context '#get_object' do
       it 'is called' do
-        post_processing.should_receive(:call).with("id" => 1, "name" => 1, "updated_time" => 1)
         @api.get_object('koppel', &post_processing)
       end
 
       it 'returns result of block' do
-        post_processing.should_receive(:call).and_return('new result')
+        post_processing.should_receive(:call).
+          with("id" => 1, "name" => 1, "updated_time" => 1).
+          and_return('new result')
         @api.get_object('koppel', &post_processing).should == 'new result'
       end
     end
 
     context '#get_picture' do
       it 'is called with picture url' do
-        post_processing.should_receive(:call).with('http://facebook.com/')
+        post_processing.should_receive(:call)
         @api.get_picture('lukeshepard', &post_processing)
       end
 
       it 'returns result of block' do
-        post_processing.should_receive(:call).and_return('new result')
+        post_processing.should_receive(:call).
+          with('http://facebook.com/').
+          and_return('new result')
         @api.get_picture('lukeshepard', &post_processing).should == 'new result'
       end
     end
@@ -41,7 +44,10 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     context '#fql_multiquery' do
       before do
         MultiJson.stub(:dump)
-        @api.should_receive(:get_object).and_return([{"name" => "query1", "fql_result_set" => [{"id" => 123}]},{"name" => "query2", "fql_result_set" => ["id" => 456]}])
+        @api.should_receive(:get_object).and_return([
+          {"name" => "query1", "fql_result_set" => [{"id" => 123}]},
+          {"name" => "query2", "fql_result_set" => ["id" => 456]}
+        ])
       end
 
       it 'is called with resolved response' do
