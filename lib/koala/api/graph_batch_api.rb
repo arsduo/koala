@@ -81,7 +81,8 @@ module Koala
               end
             end
 
-            # turn any results that are pageable into GraphCollections and pass to post-processing callback if given
+            # turn any results that are pageable into GraphCollections
+            # and pass to post-processing callback if given
             result = GraphCollection.evaluate(raw_result, @original_api)
             if batch_op.post_processing
               batch_op.post_processing.call(result)
