@@ -5,12 +5,14 @@ _Internal improvements:_
 * Switched URL parsing to addressable, which can handle unusual FB URLs
 (thanks, bnorton!)
 * Bump Faraday requirement to 0.8 (thanks, jarthod!)
+Testing improvements:
+* Cleaned up some test suites (thanks, bnorton!)
 Documentation:
 * Changelog is now markdown
 * Code highlighting in readme (thanks, sfate!)
 * Added Graph API explorer link in readme (thanks, jch!)
 * Added permissions example for OAuth (thanks, sebastiandeutsch!)
-
+/
 v1.5
 New methods:
 * Added Koala::Utils.logger to enable debugging (thanks, KentonWhite!)
