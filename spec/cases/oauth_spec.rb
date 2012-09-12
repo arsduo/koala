@@ -24,7 +24,9 @@ describe "Koala::Facebook::OAuth" do
     @multiple_session_keys = [KoalaTest.session_key, KoalaTest.session_key] if KoalaTest.session_key
 
     @oauth = Koala::Facebook::OAuth.new(@app_id, @secret, @callback_url)
+  end
 
+  before :each do
     @time = Time.now
     Time.stub!(:now).and_return(@time)
     @time.stub!(:to_i).and_return(1273363199)
@@ -146,6 +148,7 @@ describe "Koala::Facebook::OAuth" do
 
         it "returns all the cookie components from valid cookie string" do
           cookie_data = KoalaTest.oauth_test_data["valid_cookies"]
+          puts cookie_data.inspect
           parsing_results = @oauth.get_user_info_from_cookies(cookie_data)
           number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
           parsing_results.length.should == number_of_components
