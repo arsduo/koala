@@ -7,19 +7,19 @@ module Koala
       # @note: to subscribe to real-time updates, you must have an application access token
       #        or provide the app secret when initializing your RealtimeUpdates object.
 
-      # The application API interface used to communicate with Facebook. 
-      # @return [Koala::Facebook::API] 
+      # The application API interface used to communicate with Facebook.
+      # @return [Koala::Facebook::API]
       attr_reader :api
       attr_reader :app_id, :app_access_token, :secret
 
-      # Create a new RealtimeUpdates instance.  
-      # If you don't have your app's access token, provide the app's secret and 
+      # Create a new RealtimeUpdates instance.
+      # If you don't have your app's access token, provide the app's secret and
       # Koala will make a request to Facebook for the appropriate token.
-      # 
+      #
       # @param options initialization options.
       # @option options :app_id the application's ID.
       # @option options :app_access_token an application access token, if known.
-      # @option options :secret the application's secret.  
+      # @option options :secret the application's secret.
       #
       # @raise ArgumentError if the application ID and one of the app access token or the secret are not provided.
       def initialize(options = {})
@@ -39,7 +39,7 @@ module Koala
         @api = API.new(@app_access_token)
       end
 
-      # Subscribe to realtime updates for certain fields on a given object (user, page, etc.).  
+      # Subscribe to realtime updates for certain fields on a given object (user, page, etc.).
       # See {http://developers.facebook.com/docs/reference/api/realtime the realtime updates documentation}
       # for more information on what objects and fields you can register for.
       #
@@ -48,7 +48,7 @@ module Koala
       # @param object a Facebook ID (name or number)
       # @param fields the fields you want your app to be updated about
       # @param callback_url the URL Facebook should ping when an update is available
-      # @param verify_token a token included in the verification request, allowing you to ensure the call is genuine 
+      # @param verify_token a token included in the verification request, allowing you to ensure the call is genuine
       #                     (see the docs for more information)
       # @param options (see Koala::HTTPService.make_request)
       #
@@ -63,9 +63,9 @@ module Koala
         @api.graph_call(subscription_path, args, 'post', options)
       end
 
-      # Unsubscribe from updates for a particular object or from updates. 
+      # Unsubscribe from updates for a particular object or from updates.
       #
-      # @param object the object whose subscriptions to delete. 
+      # @param object the object whose subscriptions to delete.
       #               If no object is provided, all subscriptions will be removed.
       # @param options (see Koala::HTTPService.make_request)
       #
@@ -75,8 +75,8 @@ module Koala
       end
 
       # List all active subscriptions for this application.
-      # 
-      # @param options (see Koala::HTTPService.make_request) 
+      #
+      # @param options (see Koala::HTTPService.make_request)
       #
       # @return [Array] a list of active subscriptions
       def list_subscriptions(options = {})
@@ -89,12 +89,12 @@ module Koala
       #
       # @param params the request parameters sent by Facebook.  (You can pass in a Rails params hash.)
       # @param verify_token the verify token sent in the {#subscribe subscription request}, if you provided one
-      # 
+      #
       # @yield verify_token if you need to compute the verification token
       #                     (for instance, if your callback URL includes a record ID, which you look up
-      #                     and use to calculate a hash), you can pass meet_challenge a block, which 
+      #                     and use to calculate a hash), you can pass meet_challenge a block, which
       #                     will receive the verify_token received back from Facebook.
-      # 
+      #
       # @return the challenge string to be sent back to Facebook, or false if the request is invalid.
       def self.meet_challenge(params, verify_token = nil, &verification_block)
         if params["hub.mode"] == "subscribe" &&
@@ -112,25 +112,32 @@ module Koala
         end
       end
 
-      # As a security measure, all updates from facebook are signed using
+      # Public: As a security measure, all updates from facebook are signed using
       # X-Hub-Signature: sha1=XXXX where XXX is the sha1 of the json payload
-      # using your application secret as the key
+      # using your application secret as the key.
+      #
+      # Example:
+      #   # in Rails controller
+      #   # @oauth being a previously defined Koala::Facebook::OAuth instance
+      #   def receive_update
+      #     if @oauth.validate_update(request.body, headers)
+      #       ...
+      #     end
+      #   end
       def validate_update(body, headers)
-        request_signature = headers['X-Hub-Signature'] || headers['HTTP_X_HUB_SIGNATURE']
-        return false unless request_signature
-        signature_parts = request_signature.split("sha1=")
-        return false unless signature_parts.size == 2
-        request_signature = signature_parts[1]
-        calculated_signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body)
-        return calculated_signature == request_signature
+        if request_signature = headers['X-Hub-Signature'] || headers['HTTP_X_HUB_SIGNATURE'] and
+           signature_parts = request_signature.split("sha1=")
+          request_signature = signature_parts[1]
+          calculated_signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body)
+          calculated_signature == request_signature
+        end
       end
 
-      
       # The Facebook subscription management URL for your application.
       def subscription_path
         @subscription_path ||= "#{@app_id}/subscriptions"
       end
-      
+
       # @private
       def graph_api
         Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
