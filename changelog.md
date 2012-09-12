@@ -1,4 +1,6 @@
 v1.6
+New methods:
+* Added several new, specific error classes to allow finer exception handling (thanks, archfear!)
 _Internal improvements:_
 * Switched URL parsing to addressable, which can handle unusual FB URLs
 (thanks, bnorton!)

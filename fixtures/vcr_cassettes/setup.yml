@@ -1,0 +1,54 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://graph.facebook.com/oauth/access_token
+    body:
+      encoding: US-ASCII
+      string: client_id=119908831367602&client_secret=e45e55a333eec232d4206d2703de1307&type=client_cred
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+  response:
+    status:
+      code: 200
+      message: 
+    headers:
+      !binary "QWNjZXNzLUNvbnRyb2wtQWxsb3ctT3JpZ2lu":
+      - !binary |-
+        Kg==
+      !binary "Q2FjaGUtQ29udHJvbA==":
+      - !binary |-
+        cHJpdmF0ZSwgbm8tY2FjaGUsIG5vLXN0b3JlLCBtdXN0LXJldmFsaWRhdGU=
+      Content-Type:
+      - !binary |-
+        dGV4dC9wbGFpbjsgY2hhcnNldD1VVEYtOA==
+      !binary "RXhwaXJlcw==":
+      - !binary |-
+        U2F0LCAwMSBKYW4gMjAwMCAwMDowMDowMCBHTVQ=
+      !binary "UHJhZ21h":
+      - !binary |-
+        bm8tY2FjaGU=
+      !binary "WC1GQi1SZXY=":
+      - !binary |-
+        NTk5MDUz
+      !binary "WC1GQi1EZWJ1Zw==":
+      - !binary |-
+        OEZ3Z1JkMzFUMktiYjEyNk5ubEd5dVNOdzhOUld4Z1k0azJHcUlXMDUrOD0=
+      !binary "RGF0ZQ==":
+      - !binary |-
+        RnJpLCAyNyBKdWwgMjAxMiAxMjozNTowNiBHTVQ=
+      !binary "Q29ubmVjdGlvbg==":
+      - !binary |-
+        a2VlcC1hbGl2ZQ==
+      !binary "Q29udGVudC1MZW5ndGg=":
+      - !binary |-
+        NTY=
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        YWNjZXNzX3Rva2VuPTExOTkwODgzMTM2NzYwMnxvM3dzd1dRODhMWWpFQzkt
+        dWtSX2dqUklPTXc=
+    http_version: 
+  recorded_at: Fri, 27 Jul 2012 12:35:06 GMT
+recorded_with: VCR 2.2.4
