@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'base64'
 
 describe "Koala::Facebook::RealtimeUpdates" do
-  before :each do
+  before :all do
     # get oauth data
     @app_id = KoalaTest.app_id
     @secret = KoalaTest.secret

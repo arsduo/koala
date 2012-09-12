@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Koala::Facebook::OAuth" do
-  before :each do
+  before :all do
     # make the relevant test data easily accessible
     @app_id = KoalaTest.app_id
     @secret = KoalaTest.secret

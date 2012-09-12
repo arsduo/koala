@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Koala::Facebook::TestUsers" do
-  before :each do
+  before :all do
     # get oauth data
     @app_id = KoalaTest.app_id
     @secret = KoalaTest.secret
@@ -12,6 +12,16 @@ describe "Koala::Facebook::TestUsers" do
     # check OAuth data
     unless @app_id && @secret && @app_access_token
       raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!"
+    end
+  end
+
+  after :each do
+    # clean up any test users
+    # Facebook only allows us 500 test users per app, so we have to clean up
+    # This would be a good place to clean up and accumulate all of them for
+    # later deletion.
+    ((@network || []) + [@user1, @user2]).each do |u|
+      puts "Unable to delete test user #{u.inspect}" if u && !(@test_users.delete(u) rescue false)
     end
   end
 
@@ -121,7 +131,7 @@ describe "Koala::Facebook::TestUsers" do
         @test_users.create(true, nil, {}, options)
       end
     end
-    
+
     describe "#list" do
       before :each do
         @user1 = @test_users.create(true, "read_stream")
@@ -135,9 +145,9 @@ describe "Koala::Facebook::TestUsers" do
         (first_user["id"] && first_user["access_token"] && first_user["login_url"]).should
         (second_user["id"] && second_user["access_token"] && second_user["login_url"]).should
       end
-      
+
       it "accepts http options" do
-        options = {:some_http_option => true}          
+        options = {:some_http_option => true}
         @test_users.api.should_receive(:graph_call).with(anything, anything, anything, options)
         @test_users.list(options)
       end
@@ -162,13 +172,13 @@ describe "Koala::Facebook::TestUsers" do
       it "does not delete users when provided a false ID" do
         lambda { @test_users.delete("#{@user1['id']}1") }.should raise_exception(Koala::Facebook::APIError)
       end
-      
+
       it "lets you specify http options that get passed through to the graph call" do
         options = {:some_http_option => true}
         # technically this goes through delete_object, but this makes it less brittle
         @test_users.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
         @test_users.delete("user", options)
-      end        
+      end
     end
 
     describe "#delete_all" do
@@ -180,20 +190,20 @@ describe "Koala::Facebook::TestUsers" do
         array.each {|item| batch_api.should_receive(:delete_object).with(item["id"]) }
         @test_users.delete_all
       end
-      
+
       it "accepts http options that get passed to both list and the batch call" do
         options = {:some_http_option => true}
         @test_users.should_receive(:list).with(options).and_return([{"id" => rand}], [])
         @test_users.api.should_receive(:batch).with(options)
         @test_users.delete_all(options)
-      end  
-      
+      end
+
       it "breaks if Facebook sends back the same list twice" do
         list = [{"id" => rand}]
         @test_users.should_receive(:list).any_number_of_times.and_return(list)
         @test_users.api.should_receive(:batch).once
         @test_users.delete_all
-      end        
+      end
     end
 
     describe "#update" do
@@ -214,9 +224,9 @@ describe "Koala::Facebook::TestUsers" do
         @test_users2.graph_api.should_receive(:graph_call).with(@user1["id"], @updates, anything, anything)
         @test_users2.update(@user1, @updates)
       end
-      
+
       it "accepts an options hash" do
-        options = {:some_http_option => true}          
+        options = {:some_http_option => true}
         @test_users2.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
         @test_users2.update("foo", @updates, options)
       end
@@ -228,13 +238,13 @@ describe "Koala::Facebook::TestUsers" do
         user_info["name"].should == @updates[:name]
       end
     end
-    
+
     describe "#befriend" do
       before :each do
         @user1 = @test_users.create(true, "read_stream")
         @user2 = @test_users.create(true, "read_stream,user_interests")
       end
-      
+
       it "makes two users into friends with string hashes" do
         result = @test_users.befriend(@user1, @user2)
         result.should be_true
@@ -253,13 +263,13 @@ describe "Koala::Facebook::TestUsers" do
       it "does not accept user IDs anymore" do
         lambda { @test_users.befriend(@user1["id"], @user2["id"]) }.should raise_exception
       end
-      
+
       it "accepts http options passed to both calls" do
-        options = {:some_http_option => true}  
+        options = {:some_http_option => true}
         # should come twice, once for each user
         Koala.http_service.should_receive(:make_request).with(anything, anything, anything, options).twice.and_return(Koala::HTTPService::Response.new(200, "{}", {}))
         @test_users.befriend(@user1, @user2, options)
-      end        
+      end
     end
   end # when used without network
 
@@ -311,7 +321,7 @@ describe "Koala::Facebook::TestUsers" do
 
     it "accepts http options that are passed to both the create and befriend calls" do
       count = 25
-      options = {:some_http_option => true}  
+      options = {:some_http_option => true}
       @test_users.should_receive(:create).exactly(count).times.with(anything, anything, options).and_return({})
       # there are more befriends than creates, but we don't need to do the extra work to calculate out the exact #
       @test_users.should_receive(:befriend).at_least(count).times.with(anything, anything, options)
