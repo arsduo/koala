@@ -62,7 +62,7 @@ module Koala
 
             raw_result = nil
             if call_result
-              if ( error = check_response(call_result['code'], call_result['body'].to_s) ) 
+              if ( error = check_response(call_result['code'], call_result['body'].to_s) )
                 raw_result = error
               else
                 # (see note in regular api method about JSON parsing)
@@ -82,8 +82,11 @@ module Koala
             end
 
             # turn any results that are pageable into GraphCollections and pass to post-processing callback if given
-            GraphCollection.evaluate(raw_result, @original_api).tap do |processed|
-              batch_op.post_processing.call(processed) if batch_op.post_processing
+            result = GraphCollection.evaluate(raw_result, @original_api)
+            if batch_op.post_processing
+              batch_op.post_processing.call(result)
+            else
+              result
             end
           end
         end

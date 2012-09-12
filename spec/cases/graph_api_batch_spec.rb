@@ -549,26 +549,19 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     end
 
     describe 'with post-processing callback' do
-      let(:me_callback) { lambda {} }
-      let(:friends_callback) { lambda {} }
+      let(:me_result) { stub("me result") }
+      let(:friends_result) { stub("friends result") }
 
-      it 'passes data to callback' do
-        me_callback.should_receive(:call)
-        friends_callback.should_receive(:call)
-        @api.batch do |batch_api|
-          batch_api.get_object('me', &me_callback)
-          batch_api.get_connections('me', 'friends', &friends_callback)
-        end
-      end
+      let(:me_callback) { lambda {|data| me_result } }
+      let(:friends_callback) { lambda {|data| friends_result } }
 
-      it 'passes only the data each batched call expects' do
+      it 'calls the callback with the appropriate data' do
         me_callback.should_receive(:call).with('id'=>'123')
         friends_callback.should_receive(:call).with(['id'=>'456'])
         @api.batch do |batch_api|
           batch_api.get_object('me', &me_callback)
           batch_api.get_connections('me', 'friends', &friends_callback)
         end
-
       end
 
       it 'passes GraphCollections, not raw data' do
@@ -577,6 +570,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           batch_api.get_object('me')
           batch_api.get_connections('me', 'friends', &friends_callback)
         end
+      end
+
+      it "returns the result of the callback" do
+        @api.batch do |batch_api|
+          batch_api.get_object('me', &me_callback)
+          batch_api.get_connections('me', 'friends', &friends_callback)
+        end.should == [me_result, friends_result]
       end
     end
 

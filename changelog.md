@@ -4,8 +4,8 @@ New methods:
 Updated methods:
 * Graph API methods now accepts a post processing block, see readme for examples (thanks, wolframarnold!)
 _Internal improvements:_
-* Switched URL parsing to addressable, which can handle unusual FB URLs
-(thanks, bnorton!)
+* Switched URL parsing to addressable, which can handle unusual FB URLs (thanks, bnorton!)
+* Fixed Batch API bug that seems to have broken calls requiring post-processing
 * Bump Faraday requirement to 0.8 (thanks, jarthod!)
 Testing improvements:
 * Cleaned up some test suites (thanks, bnorton!)

@@ -27,7 +27,7 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     end
 
     context '#get_picture' do
-      it ' is called with picture url' do
+      it 'is called with picture url' do
         post_processing.should_receive(:call).with('http://facebook.com/')
         @api.get_picture('lukeshepard', &post_processing)
       end
