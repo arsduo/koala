@@ -1,6 +1,8 @@
 v1.6
 New methods:
 * RealtimeUpdates#validate_update to validate the signature of a Facebook call (thanks, gaffo!)
+Updated methods:
+* Graph API methods now accepts a post processing block, see readme for examples (thanks, wolframarnold!)
 _Internal improvements:_
 * Switched URL parsing to addressable, which can handle unusual FB URLs
 (thanks, bnorton!)
@@ -12,7 +14,7 @@ Documentation:
 * Code highlighting in readme (thanks, sfate!)
 * Added Graph API explorer link in readme (thanks, jch!)
 * Added permissions example for OAuth (thanks, sebastiandeutsch!)
-/
+
 v1.5
 New methods:
 * Added Koala::Utils.logger to enable debugging (thanks, KentonWhite!)

@@ -548,6 +548,38 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       fql_result[0]["first_name"].should == "Alex"
     end
 
+    describe 'with post-processing callback' do
+      let(:me_callback) { lambda {} }
+      let(:friends_callback) { lambda {} }
+
+      it 'passes data to callback' do
+        me_callback.should_receive(:call)
+        friends_callback.should_receive(:call)
+        @api.batch do |batch_api|
+          batch_api.get_object('me', &me_callback)
+          batch_api.get_connections('me', 'friends', &friends_callback)
+        end
+      end
+
+      it 'passes only the data each batched call expects' do
+        me_callback.should_receive(:call).with('id'=>'123')
+        friends_callback.should_receive(:call).with(['id'=>'456'])
+        @api.batch do |batch_api|
+          batch_api.get_object('me', &me_callback)
+          batch_api.get_connections('me', 'friends', &friends_callback)
+        end
+
+      end
+
+      it 'passes GraphCollections, not raw data' do
+        friends_callback.should_receive(:call).with(kind_of(Koala::Facebook::API::GraphCollection))
+        @api.batch do |batch_api|
+          batch_api.get_object('me')
+          batch_api.get_connections('me', 'friends', &friends_callback)
+        end
+      end
+    end
+
     describe "binary files" do
       it "posts binary files" do
         file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
