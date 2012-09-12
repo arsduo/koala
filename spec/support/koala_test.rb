@@ -6,19 +6,19 @@ module KoalaTest
     attr_accessor :oauth_test_data, :subscription_test_data, :search_time
     attr_accessor :test_user_api
   end
-    
+
   # Test setup
-  
+
   def self.setup_test_environment!
     setup_rspec
-    
+
     unless ENV['LIVE']
       # By default the Koala specs are run using stubs for HTTP requests,
       # so they won't fail due to Facebook-imposed rate limits or server timeouts.
       #
       # However as a result they are more brittle since
       # we are not testing the latest responses from the Facebook servers.
-      # To be certain all specs pass with the current Facebook services, 
+      # To be certain all specs pass with the current Facebook services,
       # run LIVE=true bundle exec rake spec.
       Koala.http_service = Koala::MockHTTPService
       KoalaTest.setup_test_data(Koala::MockHTTPService::TEST_DATA)
@@ -36,7 +36,7 @@ module KoalaTest
       rescue LoadError
         puts "Unable to load adapter #{adapter}, using Net::HTTP."
       end
-      
+
       Koala.http_service.http_options[:beta] = true if ENV["beta"] || ENV["BETA"]
 
       # use a test user unless the developer wants to test against a real profile
@@ -47,7 +47,7 @@ module KoalaTest
       end
     end
   end
-  
+
   def self.setup_rspec
     # set up a global before block to set the token for tests
     # set the token up for
@@ -85,7 +85,7 @@ module KoalaTest
     self.secret = data["oauth_test_data"]["secret"]
     self.code = data["oauth_test_data"]["code"]
     self.session_key = data["oauth_test_data"]["session_key"]
-    
+
     # fix the search time so it can be used in the mock responses
     self.search_time = data["search_time"] || (Time.now - 3600).to_s
   end
@@ -93,7 +93,7 @@ module KoalaTest
   def self.testing_permissions
     "read_stream, publish_stream, user_photos, user_videos, read_insights"
   end
-  
+
   def self.setup_test_users
     print "Setting up test users..."
     @test_user_api = Koala::Facebook::TestUsers.new(:app_id => self.app_id, :secret => self.secret)
@@ -103,7 +103,7 @@ module KoalaTest
         # before each test module, create two test users with specific names and befriend them
         KoalaTest.create_test_users
       end
-      
+
       config.after :suite do
         # after each test module, delete the test users to avoid cluttering up the application
         KoalaTest.destroy_test_users
@@ -122,9 +122,9 @@ module KoalaTest
     rescue Exception => e
       Kernel.warn("Problem creating test users! #{e.message}")
       raise
-    end    
+    end
   end
-  
+
   def self.destroy_test_users
     [@live_testing_user, @live_testing_friend].each do |u|
       puts "Unable to delete test user #{u.inspect}" if u && !(@test_user_api.delete(u) rescue false)
@@ -144,7 +144,7 @@ module KoalaTest
     end
     puts "done!"
   end
-  
+
   # Info about the testing environment
   def self.real_user?
     !(mock_interface? || @test_user_api)
@@ -189,7 +189,7 @@ module KoalaTest
   end
 
   def self.page
-    "contextoptional"
+    "facebook"
   end
 
   def self.app_properties

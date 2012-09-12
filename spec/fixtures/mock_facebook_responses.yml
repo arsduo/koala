@@ -44,7 +44,7 @@ graph_api:
 
   # OAuth error response
   oauth_error: &oauth_error
-    no_token: 
+    no_token:
       code: 400
       body: '{"error": {"code"=>2500, "type": "OAuthException", "message": "Error validating verification code."}}'
 
@@ -68,10 +68,10 @@ graph_api:
 
 # -- Stubbed Responses --
   root:
-    ids=contextoptional,koppel:
+    ids=facebook,koppel:
       get:
-        with_token: '{"contextoptional":"{}","koppel":"{}"}'
-        no_token: '{"contextoptional":"{}","koppel":"{}"}'
+        with_token: '{"facebook":"{}","koppel":"{}"}'
+        no_token: '{"facebook":"{}","koppel":"{}"}'
 
     # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}]) %>:
@@ -204,13 +204,13 @@ graph_api:
         with_token: '{"id": 1, "name": 1, "updated_time": 1}'
         no_token: '{"id": 1, "name": 1}'
 
-  /contextoptional:
+  /facebook:
     no_args:
       get:
         with_token: '{"id": 1, "name": 1}'
         no_token: '{"id": 1, "name": 1}'
 
-  /contextoptional/photos:
+  /facebook/photos:
     no_args:
       get:
         with_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'

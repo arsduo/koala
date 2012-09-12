@@ -81,7 +81,7 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   it "gets multiple objects if they're a string" do
-    results = @api.get_objects("contextoptional,#{KoalaTest.user1}")
+    results = @api.get_objects("facebook,#{KoalaTest.user1}")
     results.should have(2).items
   end
 
@@ -602,12 +602,12 @@ shared_examples_for "Koala GraphAPI without an access token" do
   it "can't post to a feed" do
     (lambda do
       attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
-      @result = @api.put_wall_post("Hello, world", attachment, "contextoptional")
+      @result = @api.put_wall_post("Hello, world", attachment, "facebook")
     end).should raise_error(Koala::Facebook::AuthenticationError)
   end
 
   it "can't comment on an object" do
-    # random public post on the ContextOptional wall
+    # random public post on the facebook wall
     lambda { @result = @api.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::AuthenticationError)
   end
 
