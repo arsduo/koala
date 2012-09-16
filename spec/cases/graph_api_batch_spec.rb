@@ -508,7 +508,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         batch_api.get_picture('me')
       end
       puts pictures.inspect
-      pictures.first.should == "http://google.com" # the value in the yml
+      pictures.first.should =~ /http\:\/\// # works both live & stubbed
     end
 
     it "handles requests for two different tokens" do
@@ -557,8 +557,12 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       let(:friends_callback) { lambda {|data| friends_result } }
 
       it 'calls the callback with the appropriate data' do
-        me_callback.should_receive(:call).with('id'=>'123')
-        friends_callback.should_receive(:call).with(['id'=>'456'])
+        me_callback.should_receive(:call).with(hash_including(
+          'id' => KoalaTest.user1
+        ))
+        friends_callback.should_receive(:call).with([
+          hash_including('id' => KoalaTest.user2)
+        ])
         @api.batch do |batch_api|
           batch_api.get_object('me', &me_callback)
           batch_api.get_connections('me', 'friends', &friends_callback)

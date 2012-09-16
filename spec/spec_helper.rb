@@ -5,16 +5,16 @@ rescue LoadError
 end
 
 # In Ruby 1.9.2 versions before patchlevel 290, the default Psych
-# parser has an issue with YAML merge keys, which 
+# parser has an issue with YAML merge keys, which
 # fixtures/mock_facebook_responses.yml relies heavily on.
-# 
+#
 # Anyone using an earlier version will see missing mock response
 # errors when running the test suite similar to this:
-# 
+#
 # RuntimeError:
 #   Missing a mock response for graph_api: /me/videos: source=[FILE]: post: with_token
 #   API PATH: /me/videos?source=[FILE]&format=json&access_token=*
-# 
+#
 # For now, it seems the best fix is to just downgrade to the old syck YAML parser
 # for these troubled versions.
 #
@@ -29,8 +29,8 @@ require 'koala'
 
 # ensure consistent to_json behavior
 # this must be required first so mock_http_service loads the YAML as expected
-require 'support/ordered_hash' 
-require 'support/json_testing_fix' 
+require 'support/ordered_hash'
+require 'support/json_testing_fix'
 
 # set up our testing environment
 require 'support/mock_http_service'
