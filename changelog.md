@@ -7,6 +7,7 @@ _Internal improvements:_
 * Switched URL parsing to addressable, which can handle unusual FB URLs (thanks, bnorton!)
 * Fixed Batch API bug that seems to have broken calls requiring post-processing
 * Bump Faraday requirement to 0.8 (thanks, jarthod!)
+* Picture and video URLs now support unicode characters (thanks, jayeff!)
 Testing improvements:
 * Cleaned up some test suites (thanks, bnorton!)
 Documentation:
