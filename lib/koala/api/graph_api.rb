@@ -1,3 +1,5 @@
+require 'addressable/uri'
+
 require 'koala/api/graph_collection'
 require 'koala/http_service/uploadable_io'
 
@@ -536,9 +538,9 @@ module Koala
       def url?(data)
         return false unless data.is_a? String
         begin
-          uri = URI.parse(data)
+          uri = Addressable::URI.parse(data)
           %w( http https ).include?(uri.scheme)
-        rescue URI::BadURIError
+        rescue Addressable::URI::InvalidURIError
           false
         end
       end
