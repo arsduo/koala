@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.executables    = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
 
-  gem.extra_rdoc_files = ["readme.md", "CHANGELOG"]
+  gem.extra_rdoc_files = ["readme.md", "changelog.md"]
   gem.rdoc_options     = ["--line-numbers", "--inline-source", "--title", "Koala"]
 
   gem.add_runtime_dependency(%q<multi_json>,    ["~> 1.3"])
