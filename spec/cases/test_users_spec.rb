@@ -20,8 +20,10 @@ describe "Koala::Facebook::TestUsers" do
     # Facebook only allows us 500 test users per app, so we have to clean up
     # This would be a good place to clean up and accumulate all of them for
     # later deletion.
-    ((@network || []) + [@user1, @user2]).each do |u|
-      puts "Unable to delete test user #{u.inspect}" if u && !(@test_users.delete(u) rescue false)
+    unless KoalaTest.mock_interface?
+      ((@network || []) + [@user1, @user2]).each do |u|
+        puts "Unable to delete test user #{u.inspect}" if u && !(@test_users.delete(u) rescue false)
+      end
     end
   end
 
