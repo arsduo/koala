@@ -127,18 +127,6 @@ module Koala
     end
 
     # @private
-    def self.timeout
-      Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.http_options[:timeout]; .timeout will be removed in a future version.")
-      http_options[:timeout]
-    end
-
-    # @private
-    def self.timeout=(value)
-      Koala::Utils.deprecate("HTTPService.timeout is now HTTPService.http_options[:timeout]; .timeout will be removed in a future version.")
-      http_options[:timeout] = value
-    end
-
-    # @private
     def self.proxy
       Koala::Utils.deprecate("HTTPService.proxy is now HTTPService.http_options[:proxy]; .proxy will be removed in a future version.")
       http_options[:proxy]
