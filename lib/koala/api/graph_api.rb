@@ -368,6 +368,19 @@ module Koala
         block ? block.call(access_token) : access_token
       end
 
+      # Get an access token information
+      # See https://developers.facebook.com/docs/howtos/login/debugging-access-tokens/#step1
+      #
+      # @param input_token the access token you want to inspect
+      # @param block (see Koala::Facebook::API#api)
+      #
+      # @return a JSON array containing data and a map of fields
+      def debug_token(input_token, &block)
+        access_token_info = graph_call("debug_token", {:input_token => input_token})
+
+        block ? block.call(access_token_info) : access_token_info
+      end
+
       # Fetches the comments from fb:comments widgets for a given set of URLs (array or comma-separated string).
       # See https://developers.facebook.com/blog/post/490.
       #
