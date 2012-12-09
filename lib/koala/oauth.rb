@@ -23,9 +23,12 @@ module Koala
 
       # Parses the cookie set Facebook's JavaScript SDK.
       #
-      # @note in parsing Facebook's new signed cookie format this method has to make a request to Facebook.
-      #       We recommend storing authenticated user info in your Rails session (or equivalent) and only
-      #       calling this when needed.
+      # @note this method can only be called once per session, as the OAuth code
+      #       Facebook supplies can only be redeemed once.  Your application
+      #       must handle cross-request storage of this information; you can no
+      #       longer call this method multiple times.  (This works out, as the
+      #       method has to make a call to FB's servers anyway, which you don't
+      #       want on every call.)
       #
       # @param cookie_hash a set of cookies that includes the Facebook cookie.
       #                     You can pass Rack/Rails/Sinatra's cookie hash directly to this method.
