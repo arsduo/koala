@@ -23,9 +23,12 @@ module Koala
 
       # Parses the cookie set Facebook's JavaScript SDK.
       #
-      # @note in parsing Facebook's new signed cookie format this method has to make a request to Facebook.
-      #       We recommend storing authenticated user info in your Rails session (or equivalent) and only
-      #       calling this when needed.
+      # @note this method can only be called once per session, as the OAuth code
+      #       Facebook supplies can only be redeemed once.  Your application
+      #       must handle cross-request storage of this information; you can no
+      #       longer call this method multiple times.  (This works out, as the
+      #       method has to make a call to FB's servers anyway, which you don't
+      #       want on every call.)
       #
       # @param cookie_hash a set of cookies that includes the Facebook cookie.
       #                     You can pass Rack/Rails/Sinatra's cookie hash directly to this method.
@@ -48,6 +51,7 @@ module Koala
       #
       # @return the authenticated user's Facebook ID, or nil.
       def get_user_from_cookies(cookies)
+        Koala::Utils.deprecate("Due to Facebook changes, you can only redeem an OAuth code once; it is therefore recommended not to use this method, as it will consume the code without providing you the access token. See https://developers.facebook.com/roadmap/completed-changes/#december-2012.")
         if signed_cookie = cookies["fbsr_#{@app_id}"]
           if components = parse_signed_request(signed_cookie)
             components["user_id"]
