@@ -1,5 +1,10 @@
 [![Build Status](https://secure.travis-ci.org/arsduo/koala.png)](http://travis-ci.org/arsduo/koala)
 
+**Note**: a recent Facebook change will cause apps that parse the cookies every
+request to fail with the error "OAuthException: This authorization code has
+been used."  If you're seeing this, please read the note in the [OAuth
+wiki](https://github.com/arsduo/koala/wiki/OAuth) for more information.
+
 Koala
 ====
 [Koala](http://github.com/arsduo/koala) is a Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), the REST API, realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
