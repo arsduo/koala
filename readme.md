@@ -24,9 +24,9 @@ gem "koala"
 
 Graph API
 ----
-The Graph API is the simple, slick new interface to Facebook's data.  
-Using it with Koala is quite straightforward.  First, you'll need an access token, which you can get through 
-Facebook's [Graph API Explorer](https://developers.facebook.com/tools/explorer) (click on 'Get Access Token').  
+The Graph API is the simple, slick new interface to Facebook's data.
+Using it with Koala is quite straightforward.  First, you'll need an access token, which you can get through
+Facebook's [Graph API Explorer](https://developers.facebook.com/tools/explorer) (click on 'Get Access Token').
 Then, go exploring:
 
 ```ruby
@@ -119,10 +119,15 @@ You can use the Graph and REST APIs without an OAuth access token, but the real 
 
 If your application uses Koala and the Facebook [JavaScript SDK](http://github.com/facebook/facebook-js-sdk) (formerly Facebook Connect), you can use the OAuth class to parse the cookies:
 ```ruby
-@oauth.get_user_from_cookies(cookies) # gets the user's ID
-@oauth.get_user_info_from_cookies(cookies) # parses and returns the entire hash
+# parses and returns a hash including the token and the user id
+# NOTE: this method can only be called once per session, as the OAuth code
+# Facebook supplies can only be redeemed once.  Your application must handle
+# cross-request storage of this information; you can no longer call this method
+# multiple times.
+@oauth.get_user_info_from_cookies(cookies)
 ```
 And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
+
 ```ruby
 # generate authenticating URL
 @oauth.url_for_oauth_code
