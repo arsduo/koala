@@ -51,6 +51,7 @@ module Koala
       #
       # @return the authenticated user's Facebook ID, or nil.
       def get_user_from_cookies(cookies)
+        Koala::Utils.deprecate("Due to Facebook changes, you can only redeem an OAuth code once; it is therefore recommended not to use this method, as it will consume the code without providing you the access token. See https://developers.facebook.com/roadmap/completed-changes/#december-2012.")
         if signed_cookie = cookies["fbsr_#{@app_id}"]
           if components = parse_signed_request(signed_cookie)
             components["user_id"]
