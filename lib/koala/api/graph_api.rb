@@ -369,6 +369,8 @@ module Koala
       end
 
       # Get an access token information
+      # The access token used to instantiate the API object needs to be
+      # the app access token or a valid User Access Token from a developer of the app.
       # See https://developers.facebook.com/docs/howtos/login/debugging-access-tokens/#step1
       #
       # @param input_token the access token you want to inspect
