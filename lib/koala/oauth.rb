@@ -175,7 +175,7 @@ module Koala
       # @return the application access token and other information (expiration, etc.)
       def get_app_access_token_info(options = {})
         # convenience method to get a the application's sessionless access token
-        get_token_from_server({:type => 'client_cred'}, true, options)
+        get_token_from_server({:grant_type => 'client_credentials'}, true, options)
       end
 
       # Fetches the application's access token (ignoring expiration and other info).
