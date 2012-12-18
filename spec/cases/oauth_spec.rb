@@ -205,6 +205,11 @@ describe "Koala::Facebook::OAuth" do
           result = @oauth.get_user_from_cookies(bad_cookie_hash)
           result.should be_nil
         end
+
+        it "is deprecated" do
+          Koala::Utils.should_receive(:deprecate)
+          @oauth.get_user_from_cookies({})
+        end
       end
 
       describe "for unsigned cookies" do
