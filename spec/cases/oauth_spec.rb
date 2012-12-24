@@ -190,7 +190,7 @@ describe "Koala::Facebook::OAuth" do
         end
 
         it "does not uses get_user_info_from_cookies to parse the cookies" do
-          @oauth.should_not_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
+          @oauth.should_not_receive(:get_user_info_from_cookies).with(@cookie)
           @oauth.get_user_from_cookies(@cookie)
         end
 
