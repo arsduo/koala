@@ -113,8 +113,6 @@ describe "Koala::Facebook::API" do
     it_should_behave_like "Koala RestAPI"
     it_should_behave_like "Koala RestAPI with an access token"
 
-    it_should_behave_like "Koala GraphAPI"
-    it_should_behave_like "Koala GraphAPI with an access token"
     it_should_behave_like "Koala GraphAPI with GraphCollection"
   end
 
@@ -126,8 +124,6 @@ describe "Koala::Facebook::API" do
     it_should_behave_like "Koala RestAPI"
     it_should_behave_like "Koala RestAPI without an access token"
 
-    it_should_behave_like "Koala GraphAPI"
-    it_should_behave_like "Koala GraphAPI without an access token"
     it_should_behave_like "Koala GraphAPI with GraphCollection"
   end
 end
