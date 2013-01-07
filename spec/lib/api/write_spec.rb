@@ -16,9 +16,9 @@ module Koala
         describe "#put_connections" do
           context "without an access token" do
             it "can't put an object" do
-              lambda { @result = @api.put_connections(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::AuthenticationError)
+              lambda { @result = @api_without_token.put_connections(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::AuthenticationError)
               # legacy put_object syntax
-              lambda { @result = @api.put_object(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::AuthenticationError)
+              lambda { @result = @api_without_token.put_object(KoalaTest.user2, "feed", :message => "Hello, world") }.should raise_error(Koala::Facebook::AuthenticationError)
             end
           end
         end
@@ -30,27 +30,27 @@ module Koala
             it "can't post to a feed" do
               (lambda do
                 attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
-                @result = @api.put_wall_post("Hello, world", attachment, "facebook")
+                @result = @api_without_token.put_wall_post("Hello, world", attachment, "facebook")
               end).should raise_error(Koala::Facebook::AuthenticationError)
             end
           end
 
           context "with an access token" do
             it "writes a message to the wall" do
-              result = @api.put_wall_post("Hello, world, from the test suite!")
+              message = "Hello, world, from the test suite!"
               put_result = @api.put_wall_post(message)
               @temporary_object_id = put_result["id"]
-              get_result = @api.get_object(@temporary_object_id)
-
-              # make sure the message we sent is the message that got posted
-              get_result["message"].should == message
             end
 
             it "posts a message with an attachment to a feed" do
-              result = @api.put_wall_post("Hello, world, from the test suite again!", {
-                :name => "OAuth Playground", 
-                :link => "http://oauth.twoalex.com/"
-              })
+              attachment = {
+                "name" => "OAuth Playground",
+                "link" => "http://oauth.twoalex.com/"
+              }
+              result = @api.put_wall_post(
+                "Hello, world, from the test suite again!",
+                attachment
+              )
               @temporary_object_id = result["id"]
               @temporary_object_id.should_not be_nil
 
@@ -58,8 +58,9 @@ module Koala
               get_result = @api.get_object(@temporary_object_id)
 
               # make sure the result we fetch includes all the parameters we sent
-              it_matches = attachment.inject(true) {|valid, param| valid && (get_result[param[0]] == attachment[param[0]])}
-              it_matches.should == true
+              attachment.each_pair do |key, value|
+                expect(get_result[key]).to eq(value)
+              end
             end
 
             it "can post a message whose attachment has a properties dictionary" do
@@ -85,7 +86,7 @@ module Koala
         describe "#put_picture" do
           it "can post photos to the user's wall with an open file object" do
             content_type = "image/jpg"
-            file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+            file = File.open(File.join(File.dirname(__FILE__), "../../fixtures", "beach.jpg"))
 
             result = @api.put_picture(file, content_type)
             @temporary_object_id = result["id"]
@@ -137,7 +138,7 @@ module Koala
 
         describe "#put_video" do
           before :each do
-            @cat_movie = File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v")
+            @cat_movie = File.join(File.dirname(__FILE__), "../..//fixtures", "cat.m4v")
             @content_type = "video/mpeg4"
           end
 
@@ -171,6 +172,13 @@ module Koala
 
         describe "#put_comment" do
           context "without an access token" do
+            it "can't comment on an object" do
+              # random public post on the facebook wall
+              lambda { @result = @api_without_token.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::AuthenticationError)
+            end
+          end
+
+          context "with an access token" do
             it "posts a comment to another object" do
               message_text = "Hello, world, from the test suite, testing comments again!"
               result = @api.put_wall_post(message_text)
@@ -185,13 +193,6 @@ module Koala
               get_result["message"].should == comment_text
             end
           end
-
-          context "with an access token" do
-            it "can't comment on an object" do
-              # random public post on the facebook wall
-              lambda { @result = @api.put_comment("7204941866_119776748033392", "The hackathon was great!") }.should raise_error(Koala::Facebook::AuthenticationError)
-            end
-          end
         end
 
         describe "#put_like" do
@@ -201,9 +202,10 @@ module Koala
             like_result = @api.put_like(@temporary_object_id)
             like_result.should be_true
           end
+
           context "without an access token" do
             it "can't like an object" do
-              lambda { @api.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::AuthenticationError)
+              lambda { @api_without_token.put_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::AuthenticationError)
             end
           end
         end

@@ -40,7 +40,6 @@ KoalaTest.setup_test_environment!
 
 # load supporting files for our tests
 require 'support/rest_api_shared_examples'
-require 'support/graph_api_shared_examples'
 require 'support/uploadable_io_shared_examples'
 
 BEACH_BALL_PATH = File.join(File.dirname(__FILE__), "fixtures", "beach.jpg")

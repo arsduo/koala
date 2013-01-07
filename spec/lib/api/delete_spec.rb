@@ -17,7 +17,7 @@ module Koala
           context "without an access token" do
             it "can't delete posts" do
               # test post on the Ruby SDK Test application
-              lambda { @result = @api.delete_object("115349521819193_113815981982767") }.should raise_error(Koala::Facebook::AuthenticationError)
+              lambda { @result = @api_without_token.delete_object("115349521819193_113815981982767") }.should raise_error(Koala::Facebook::AuthenticationError)
             end
           end
 
@@ -34,7 +34,7 @@ module Koala
         describe "#delete_like" do
           context "without an access token" do
             it "can't delete a like" do
-              lambda { @api.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::AuthenticationError)
+              lambda { @api_without_token.delete_like("7204941866_119776748033392") }.should raise_error(Koala::Facebook::AuthenticationError)
             end
           end
 

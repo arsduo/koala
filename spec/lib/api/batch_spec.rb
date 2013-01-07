@@ -1,15 +1,15 @@
 require "spec_helper"
 
-module koala
-  module facebook
-    describe api do
+module Koala
+  module Facebook
+    describe API do
       before :each do
-        @api = koala::facebook::api.new(@token)
-        @api_without_token = koala::facebook::api.new
+        @api = Koala::Facebook::API.new(@token)
+        @api_without_token = Koala::Facebook::API.new
         # app api
-        @app_id = koalatest.app_id
-        @app_access_token = koalatest.app_access_token
-        @app_api = koala::facebook::api.new(@app_access_token)
+        @app_id = KoalaTest.app_id
+        @app_access_token = KoalaTest.app_access_token
+        @app_api = Koala::Facebook::API.new(@app_access_token)
       end
 
       describe "the Batch API" do
@@ -490,11 +490,11 @@ module koala
           end
 
           it 'makes mixed calls inside of a batch' do
-            me, friends = @api.batch do |batch_api|
+            results = @api.batch do |batch_api|
               batch_api.get_object('me')
               batch_api.get_connections('me', 'friends')
             end
-            friends.should be_a(Koala::Facebook::GraphCollection)
+            results.last.should be_a(Koala::Facebook::GraphCollection)
           end
 
           it 'turns pageable results into GraphCollections' do
@@ -536,7 +536,7 @@ module koala
             result = @api.put_wall_post("Hello, world, from the test suite batch API!")
             wall_post = result["id"]
 
-            wall_post, koppel = @api.batch do |batch_api|
+            @api.batch do |batch_api|
               batch_api.put_like(wall_post)
               batch_api.delete_object(wall_post)
             end
@@ -590,7 +590,7 @@ module koala
 
           describe "binary files" do
             it "posts binary files" do
-              file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+              file = File.open(File.join(File.dirname(__FILE__), "../../fixtures", "beach.jpg"))
 
               Koala::Facebook::GraphBatchAPI::BatchOperation.instance_variable_set(:@identifier, 0)
               result = @api.batch do |batch_api|
@@ -602,8 +602,8 @@ module koala
             end
 
             it "posts binary files with multiple requests" do
-              file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
-              file2 = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+              file = File.open(File.join(File.dirname(__FILE__), "../../fixtures", "beach.jpg"))
+              file2 = File.open(File.join(File.dirname(__FILE__), "../../fixtures", "beach.jpg"))
 
               Koala::Facebook::GraphBatchAPI::BatchOperation.instance_variable_set(:@identifier, 0)
               results = @api.batch do |batch_api|

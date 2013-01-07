@@ -16,25 +16,25 @@ module Koala
         describe "#get_object" do
           context "without an access token" do
             it "gets public data about a user" do
-              result = @api.get_object(KoalaTest.user1)
+              result = @api_without_token.get_object(KoalaTest.user1)
               # the results should have an ID and a name, among other things
               (result["id"] && result["name"]).should_not be_nil
             end
 
             it "gets public data about a Page" do
-              result = @api.get_object(KoalaTest.page)
+              result = @api_without_token.get_object(KoalaTest.page)
               # the results should have an ID and a name, among other things
               (result["id"] && result["name"]).should
             end
 
             it "can't get private data about a user" do
-              result = @api.get_object(KoalaTest.user1)
+              result = @api_without_token.get_object(KoalaTest.user1)
               # updated_time should be a pretty fixed test case
               result["updated_time"].should be_nil
             end
 
             it "can't get data about 'me'" do
-              lambda { @api.get_object("me") }.should raise_error(Koala::Facebook::ClientError)
+              lambda { @api_without_token.get_object("me") }.should raise_error(Koala::Facebook::ClientError)
             end
           end
 
@@ -93,12 +93,12 @@ module Koala
 
           context "without an access token" do
             it "can access connections from public Pages" do
-              result = @api.get_connections(KoalaTest.page, "photos")
+              result = @api_without_token.get_connections(KoalaTest.page, "photos")
               result.should be_a(Array)
             end
 
             it "can't access connections from users" do
-              lambda { @api.get_connections(KoalaTest.user2, "friends") }.should raise_error(Koala::Facebook::ClientError)
+              lambda { @api_without_token.get_connections(KoalaTest.user2, "friends") }.should raise_error(Koala::Facebook::ClientError)
             end
           end
 
@@ -165,10 +165,10 @@ module Koala
               end
 
               it "can't access protected information via FQL" do
-                lambda { @api.fql_query("select read_stream from permissions where uid = #{KoalaTest.user2_id}") }.should raise_error(Koala::Facebook::APIError)
+                lambda { @api_without_token.fql_query("select read_stream from permissions where uid = #{KoalaTest.user2_id}") }.should raise_error(Koala::Facebook::APIError)
               end
             end
-            
+
             context "with an access token" do
               it "can access protected information via FQL" do
                 # Tests agains the permissions fql table
@@ -239,7 +239,7 @@ module Koala
 
               it "can't access protected information via FQL.multiquery" do
                 lambda {
-                  @api.fql_multiquery(
+                  @api_without_token.fql_multiquery(
                     :query1 => "select post_id from stream where source_id = me()",
                     :query2 => "select fromid from comment where post_id in (select post_id from #query1)",
                     :query3 => "select uid, name from user where uid in (select fromid from #query2)"

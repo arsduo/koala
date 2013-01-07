@@ -127,8 +127,6 @@ graph_api:
         with_token: '[{"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}, {"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}]'
 
 
-
-
   /me:
     no_args:
       get:
@@ -405,7 +403,7 @@ graph_api:
     no_args:
       <<: *item_deleted
       get:
-        with_token: '{"link":"http://oauth.twoalex.com/", "name": "OAuth Playground"}'
+        with_token: '{"link":"http://oauth.twoalex.com/", "message": "Hello, world, from the test suite again!", "name": "OAuth Playground"}'
 
   /FEED_ITEM_CATS:
     no_args:
