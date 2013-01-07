@@ -1,3 +1,10 @@
+v1.7
+====
+
+Internal improvements:
+* CHANGED: Gem version restrictions have been removed, and versions updated.
+* CHANGED: How support files are loaded in spec_helper has been improved.
+
 v1.6
 ====
 
