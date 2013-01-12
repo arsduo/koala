@@ -38,7 +38,4 @@ require 'support/koala_test'
 # load testing data and (if needed) create test users or validate real users
 KoalaTest.setup_test_environment!
 
-# load supporting files for our tests
-require 'support/rest_api_shared_examples'
-
 BEACH_BALL_PATH = File.join(File.dirname(__FILE__), "fixtures", "beach.jpg")

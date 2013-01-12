@@ -148,7 +148,6 @@ describe "Koala::Facebook::OAuth" do
 
         it "returns all the cookie components from valid cookie string" do
           cookie_data = KoalaTest.oauth_test_data["valid_cookies"]
-          puts cookie_data.inspect
           parsing_results = @oauth.get_user_info_from_cookies(cookie_data)
           number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
           parsing_results.length.should == number_of_components
@@ -176,62 +175,6 @@ describe "Koala::Facebook::OAuth" do
           # make an invalid string by replacing some values
           bad_cookie_hash = KoalaTest.oauth_test_data["valid_cookies"].inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
           result = @oauth.get_user_info_from_cookies(bad_cookie_hash)
-          result.should be_nil
-        end
-      end
-    end
-
-    describe "get_user_from_cookies" do
-      describe "for signed cookies" do
-        before :each do
-          # we don't actually want to make requests to Facebook to redeem the code
-          @cookie = KoalaTest.oauth_test_data["valid_signed_cookies"]
-          @oauth.stub(:get_access_token_info).and_return("access_token" => "my token")
-        end
-
-        it "does not uses get_user_info_from_cookies to parse the cookies" do
-          @oauth.should_not_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
-          @oauth.get_user_from_cookies(@cookie)
-        end
-
-        it "uses return the facebook user id string if the cookies are valid" do
-          result = @oauth.get_user_from_cookies(@cookie)
-          result.should == "2905623" # the user who generated the original test cookie
-        end
-
-        it "returns nil if the cookies are invalid" do
-          # make an invalid string by replacing some values
-          bad_cookie_hash = @cookie.inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
-          result = @oauth.get_user_from_cookies(bad_cookie_hash)
-          result.should be_nil
-        end
-
-        it "is deprecated" do
-          Koala::Utils.should_receive(:deprecate)
-          @oauth.get_user_from_cookies({})
-        end
-      end
-
-      describe "for unsigned cookies" do
-        before :each do
-          # we don't actually want to make requests to Facebook to redeem the code
-          @cookie = KoalaTest.oauth_test_data["valid_cookies"]
-        end
-
-        it "uses get_user_info_from_cookies to parse the cookies" do
-          @oauth.should_receive(:get_user_info_from_cookies).with(@cookie).and_return({})
-          @oauth.get_user_from_cookies(@cookie)
-        end
-
-        it "uses return a string if the cookies are valid" do
-          result = @oauth.get_user_from_cookies(@cookie)
-          result.should == "2905623" # the user who generated the original test cookie
-        end
-
-        it "returns nil if the cookies are invalid" do
-          # make an invalid string by replacing some values
-          bad_cookie_hash = @cookie.inject({}) { |hash, value| hash[value[0]] = value[1].gsub(/[0-9]/, "3") }
-          result = @oauth.get_user_from_cookies(bad_cookie_hash)
           result.should be_nil
         end
       end
@@ -549,116 +492,6 @@ describe "Koala::Facebook::OAuth" do
         result = @oauth.send(:fetch_token_string, {:type => 'client_cred'}, true)
         result.should =~ /^access_token/
       end
-    end
-  end
-
-  describe "for exchanging session keys" do
-    if KoalaTest.session_key
-      describe "with get_token_info_from_session_keys" do
-        it "gets an array of session keys from Facebook when passed a single key" do
-          result = @oauth.get_tokens_from_session_keys([KoalaTest.session_key])
-          result.should be_an(Array)
-          result.length.should == 1
-        end
-
-        it "gets an array of session keys from Facebook when passed multiple keys" do
-          result = @oauth.get_tokens_from_session_keys(@multiple_session_keys)
-          result.should be_an(Array)
-          result.length.should == 2
-        end
-
-        it "returns the original hashes" do
-          result = @oauth.get_token_info_from_session_keys(@multiple_session_keys)
-          result[0].should be_a(Hash)
-        end
-
-        it "properly handles invalid session keys" do
-          result = @oauth.get_token_info_from_session_keys(["foo", "bar"])
-          #it should return nil for each of the invalid ones
-          result.each {|r| r.should be_nil}
-        end
-
-        it "properly handles a mix of valid and invalid session keys" do
-          result = @oauth.get_token_info_from_session_keys(["foo"].concat(@multiple_session_keys))
-          # it should return nil for each of the invalid ones
-          result.each_with_index {|r, index| index > 0 ? r.should(be_a(Hash)) : r.should(be_nil)}
-        end
-
-        it "throws a BadFacebookResponse if Facebook returns an empty body (as happens for instance when the API breaks)" do
-          @oauth.should_receive(:fetch_token_string).and_return("")
-          lambda { @oauth.get_token_info_from_session_keys(@multiple_session_keys) }.should raise_error(Koala::Facebook::BadFacebookResponse)
-        end
-
-        it "passes on any options provided to make_request" do
-          options = {:a => 2}
-          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "[{}]", {}))
-          @oauth.get_token_info_from_session_keys([], options)
-        end
-      end
-
-      describe "with get_tokens_from_session_keys" do
-        it "calls get_token_info_from_session_keys" do
-          args = @multiple_session_keys
-          @oauth.should_receive(:get_token_info_from_session_keys).with(args, anything).and_return([])
-          @oauth.get_tokens_from_session_keys(args)
-        end
-
-        it "returns an array of strings" do
-          args = @multiple_session_keys
-          result = @oauth.get_tokens_from_session_keys(args)
-          result.each {|r| r.should be_a(String) }
-        end
-
-        it "properly handles invalid session keys" do
-          result = @oauth.get_tokens_from_session_keys(["foo", "bar"])
-          # it should return nil for each of the invalid ones
-          result.each {|r| r.should be_nil}
-        end
-
-        it "properly handles a mix of valid and invalid session keys" do
-          result = @oauth.get_tokens_from_session_keys(["foo"].concat(@multiple_session_keys))
-          # it should return nil for each of the invalid ones
-          result.each_with_index {|r, index| index > 0 ? r.should(be_a(String)) : r.should(be_nil)}
-        end
-
-        it "passes on any options provided to make_request" do
-          options = {:a => 2}
-          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "[{}]", {}))
-          @oauth.get_tokens_from_session_keys([], options)
-        end
-      end
-
-      describe "get_token_from_session_key" do
-        it "calls get_tokens_from_session_keys when the get_token_from_session_key is called" do
-          key = KoalaTest.session_key
-          @oauth.should_receive(:get_tokens_from_session_keys).with([key], anything).and_return([])
-          @oauth.get_token_from_session_key(key)
-        end
-
-        it "gets back the access token string from get_token_from_session_key" do
-          result = @oauth.get_token_from_session_key(KoalaTest.session_key)
-          result.should be_a(String)
-        end
-
-        it "returns the first value in the array" do
-          result = @oauth.get_token_from_session_key(KoalaTest.session_key)
-          array = @oauth.get_tokens_from_session_keys([KoalaTest.session_key])
-          result.should == array[0]
-        end
-
-        it "properly handles an invalid session key" do
-          result = @oauth.get_token_from_session_key("foo")
-          result.should be_nil
-        end
-
-        it "passes on any options provided to make_request" do
-          options = {:a => 2}
-          Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "[{}]", {}))
-          @oauth.get_token_from_session_key("", options)
-        end
-      end
-    else
-      it "Session key exchange tests will not be run since the session key in facebook_data.yml is blank."
     end
   end
 

@@ -61,18 +61,6 @@ describe "Koala::Facebook::RealtimeUpdates" do
       Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:api=)
     end
 
-    # old graph_api accessor
-    it "returns the api object when graph_api is called" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      updates.graph_api.should == updates.api
-    end
-
-    it "fire a deprecation warning when graph_api is called" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      Koala::Utils.should_receive(:deprecate)
-      updates.graph_api
-    end
-
     # init with secret / fetching the token
     it "initializes properly with an app_id and a secret" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
@@ -97,7 +85,6 @@ describe "Koala::Facebook::RealtimeUpdates" do
       updates.api.should be_a(Koala::Facebook::API)
       updates.api.access_token.should == @app_access_token
     end
-
   end
 
   describe "#subscribe" do
@@ -233,7 +220,6 @@ describe "Koala::Facebook::RealtimeUpdates" do
       signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body).chomp
       @updates.validate_update(body, {"HTTP_X_HUB_SIGNATURE" => "sha1=#{signature}"}).should be_true
     end
-
   end
 
   describe ".meet_challenge" do

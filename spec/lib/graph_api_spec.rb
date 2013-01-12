@@ -12,17 +12,6 @@ describe Koala::Facebook::GraphAPIMethods do
 
   # Read, write, and delete behavior are tested in the appropriate api/* files
   describe "core behavior" do
-    it "never uses the rest api server" do
-      Koala.should_receive(:make_request).with(
-        anything,
-        anything,
-        anything,
-        hash_not_including(:rest_api => true)
-      ).and_return(Koala::HTTPService::Response.new(200, "", {}))
-
-      @api.api("anything")
-    end
-
     it "can use the beta tier" do
       result = @api.get_object(KoalaTest.user1, {}, :beta => true)
       # the results should have an ID and a name, among other things
@@ -133,7 +122,7 @@ describe Koala::Facebook::GraphAPIMethods do
         end
       end
     end
-    
+
     # test all methods to make sure they pass data through to the API
     # we run the tests here (rather than in the common shared example group)
     # since some require access tokens

@@ -59,7 +59,7 @@ module Koala
                 @uploadable_io = stub("UploadableIO 1")
 
                 @batch_queue = []
-                Koala::Facebook::GraphAPI.stub(:batch_calls).and_return(@batch_queue)
+                Koala::Facebook::API.stub(:batch_calls).and_return(@batch_queue)
 
                 Koala::UploadableIO.stub(:new).with(@binary).and_return(@uploadable_io)
                 Koala::UploadableIO.stub(:binary_content?).and_return(false)
@@ -248,7 +248,7 @@ module Koala
                 @uploadable_io.stub(:is_a?).with(Koala::UploadableIO).and_return(true)
 
                 @batch_queue = []
-                Koala::Facebook::GraphAPI.stub(:batch_calls).and_return(@batch_queue)
+                Koala::Facebook::API.stub(:batch_calls).and_return(@batch_queue)
 
                 @args[:method] = "post" # files are always post
               end
@@ -265,7 +265,7 @@ module Koala
 
         end
 
-        describe "GraphAPI batch interface" do
+        describe "API batch interface" do
           it "returns nothing for a batch operation" do
             Koala.stub(:make_request).and_return(Koala::HTTPService::Response.new(200, "[]", {}))
             @api.batch do |batch_api|
@@ -510,7 +510,6 @@ module Koala
             pictures = @api.batch do |batch_api|
               batch_api.get_picture('me')
             end
-            puts pictures.inspect
             pictures.first.should =~ /http\:\/\// # works both live & stubbed
           end
 

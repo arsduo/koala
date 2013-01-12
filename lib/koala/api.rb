@@ -1,6 +1,5 @@
-# graph_batch_api and legacy are required at the bottom, since they depend on API being defined
+# graph_batch_api is required at the bottom, since it depends on API being defined
 require 'koala/api/graph_api'
-require 'koala/api/rest_api'
 
 module Koala
   module Facebook
@@ -16,13 +15,11 @@ module Koala
       attr_reader :access_token
 
       include GraphAPIMethods
-      include RestAPIMethods
 
       # Makes a request to the appropriate Facebook API.
       # @note You'll rarely need to call this method directly.
       #
       # @see GraphAPIMethods#graph_call
-      # @see RestAPIMethods#rest_call
       #
       # @param path the server path for this request (leading / is prepended if not present)
       # @param args arguments to be sent to Facebook
@@ -53,7 +50,7 @@ module Koala
         if result.status.to_i >= 500
           raise Koala::Facebook::ServerError.new(result.status.to_i, result.body)
         end
-      
+
         yield result if error_checking_block
 
         # if we want a component other than the body (e.g. redirect header for images), return that
@@ -71,5 +68,3 @@ module Koala
 end
 
 require 'koala/api/graph_batch_api'
-# legacy support for old pre-1.2 API interfaces
-require 'koala/api/legacy'
