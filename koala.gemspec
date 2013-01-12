@@ -20,9 +20,9 @@ Gem::Specification.new do |gem|
   gem.extra_rdoc_files = ["readme.md", "changelog.md"]
   gem.rdoc_options     = ["--line-numbers", "--inline-source", "--title", "Koala"]
 
-  gem.add_runtime_dependency(%q<multi_json>,    ["~> 1.3"])
-  gem.add_runtime_dependency(%q<faraday>,       ["~> 0.8"])
-  gem.add_runtime_dependency(%q<addressable>,   ["~> 2.2"])
-  gem.add_development_dependency(%q<rspec>,     ["~> 2.8"])
-  gem.add_development_dependency(%q<rake>,      ["~> 0.8"])
+  gem.add_runtime_dependency("multi_json")
+  gem.add_runtime_dependency("faraday")
+  gem.add_runtime_dependency("addressable")
+  gem.add_development_dependency("rspec")
+  gem.add_development_dependency("rake")
 end
