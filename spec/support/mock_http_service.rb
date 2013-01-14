@@ -137,7 +137,7 @@ module Koala
     # all the time -- different Rubies may create a strings with equivalent
     # content but different order.  We want to compare the objects.
     def self.should_json_decode?(v)
-      ["[", "{"].include?(v[0])
+      v.match(/^[\[\{]/)
     end
   end
 end
