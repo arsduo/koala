@@ -148,7 +148,6 @@ describe "Koala::Facebook::OAuth" do
 
         it "returns all the cookie components from valid cookie string" do
           cookie_data = KoalaTest.oauth_test_data["valid_cookies"]
-          puts cookie_data.inspect
           parsing_results = @oauth.get_user_info_from_cookies(cookie_data)
           number_of_components = cookie_data["fbs_#{@app_id.to_s}"].scan(/\=/).length
           parsing_results.length.should == number_of_components

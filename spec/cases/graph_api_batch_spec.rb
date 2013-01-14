@@ -507,7 +507,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       pictures = @api.batch do |batch_api|
         batch_api.get_picture('me')
       end
-      puts pictures.inspect
       pictures.first.should =~ /http\:\/\// # works both live & stubbed
     end
 
