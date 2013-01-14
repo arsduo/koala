@@ -44,7 +44,7 @@ describe 'Koala::Facebook::GraphAPIMethods' do
         }
         response = @api.fql_multiquery({}, &post_processing)
         response["args"].should == resolved_result
-	response["result"].should == result	
+        response["result"].should == result
       end
     end
 
@@ -53,8 +53,8 @@ describe 'Koala::Facebook::GraphAPIMethods' do
         token = Koala::MockHTTPService::APP_ACCESS_TOKEN
         @api.stub(:api).and_return("access_token" => token)
         response = @api.get_page_access_token('facebook', &post_processing)
-        response["args"].should == token 
-	response["result"].should == result	
+        response["args"].should == token
+        response["result"].should == result
       end
     end
   end

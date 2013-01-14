@@ -551,7 +551,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     describe 'with post-processing callback' do
       let(:me_result) { stub("me result") }
       let(:friends_result) { stub("friends result") }
-      
+
       let(:me_callback) { lambda {|arg| {"result" => me_result, "args" => arg} } }
       let(:friends_callback) { lambda {|arg| {"result" => friends_result, "args" => arg} } }
 
@@ -560,8 +560,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           batch_api.get_object('me', &me_callback)
           batch_api.get_connections('me', 'friends', &friends_callback)
         end
-	me["args"].should include("id" => KoalaTest.user1)
-	friends["args"].should include("id" => KoalaTest.user2)
+        me["args"].should include("id" => KoalaTest.user1)
+        friends["args"].should include("id" => KoalaTest.user2)
       end
 
       it 'passes GraphCollections, not raw data' do
