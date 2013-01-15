@@ -507,7 +507,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       pictures = @api.batch do |batch_api|
         batch_api.get_picture('me')
       end
-      puts pictures.inspect
       pictures.first.should =~ /http\:\/\// # works both live & stubbed
     end
 
@@ -553,35 +552,31 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       let(:me_result) { stub("me result") }
       let(:friends_result) { stub("friends result") }
 
-      let(:me_callback) { lambda {|data| me_result } }
-      let(:friends_callback) { lambda {|data| friends_result } }
+      let(:me_callback) { lambda {|arg| {"result" => me_result, "args" => arg} } }
+      let(:friends_callback) { lambda {|arg| {"result" => friends_result, "args" => arg} } }
 
       it 'calls the callback with the appropriate data' do
-        me_callback.should_receive(:call).with(hash_including(
-          'id' => KoalaTest.user1
-        ))
-        friends_callback.should_receive(:call).with([
-          hash_including('id' => KoalaTest.user2)
-        ])
-        @api.batch do |batch_api|
+        me, friends = @api.batch do |batch_api|
           batch_api.get_object('me', &me_callback)
           batch_api.get_connections('me', 'friends', &friends_callback)
         end
+        me["args"].should include("id" => KoalaTest.user1)
+        friends["args"].should include("id" => KoalaTest.user2)
       end
 
       it 'passes GraphCollections, not raw data' do
-        friends_callback.should_receive(:call).with(kind_of(Koala::Facebook::API::GraphCollection))
-        @api.batch do |batch_api|
+        me, friends = @api.batch do |batch_api|
           batch_api.get_object('me')
           batch_api.get_connections('me', 'friends', &friends_callback)
         end
+        friends["args"].should be_a(Koala::Facebook::API::GraphCollection)
       end
 
       it "returns the result of the callback" do
         @api.batch do |batch_api|
           batch_api.get_object('me', &me_callback)
           batch_api.get_connections('me', 'friends', &friends_callback)
-        end.should == [me_result, friends_result]
+        end.map {|r| r["result"]}.should == [me_result, friends_result]
       end
     end
 
