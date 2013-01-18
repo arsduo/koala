@@ -1,4 +1,5 @@
 require 'faraday'
+require 'typhoeus/adapters/faraday'
 require 'koala/http_service/multipart_request'
 require 'koala/http_service/uploadable_io'
 require 'koala/http_service/response'
