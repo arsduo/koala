@@ -19,10 +19,6 @@ YAML::ENGINE.yamler = 'syck' if RUBY_VERSION == '1.9.2' && RUBY_PATCHLEVEL < 290
 require 'koala'
 
 # Support files
-# we have to first ensure consistent to_json behavior across versions
-# otherwise mock_http_service may parse the YAML improperly
-require 'support/ordered_hash'
-require 'support/json_testing_fix'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 # set up our testing environment
