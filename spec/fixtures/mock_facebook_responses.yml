@@ -308,7 +308,7 @@ graph_api:
   /debug_token:
     input_token=<%= APP_ACCESS_TOKEN %>:
       get:
-        with_token: '{ "data": { "app_id": 138483919580948, "application": "Social Cafe", "expires_at": 1352419328, "is_valid": true, "issued_at": 1347235328, "metadata": { "sso": "iphone-safari" }, "scopes": [ "email", "publish_actions" ], "user_id": 1207059 } }'
+        with_token: '{ "data": { "app_id": <%= APP_ID %>, "application": "Social Cafe", "expires_at": 1352419328, "is_valid": true, "issued_at": 1347235328, "metadata": { "sso": "iphone-safari" }, "scopes": [ "email", "publish_actions" ], "user_id": 1207059 } }'
 
   # -- OAuth responses --
   /oauth/access_token:

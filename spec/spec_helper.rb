@@ -21,9 +21,6 @@ end
 require 'koala'
 
 # Support files
-# we have to first ensure consistent to_json behavior across versions
-# otherwise mock_http_service may parse the YAML improperly
-require 'support/ordered_hash'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 # set up our testing environment
