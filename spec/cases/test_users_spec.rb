@@ -20,7 +20,7 @@ describe "Koala::Facebook::TestUsers" do
     # Facebook only allows us 500 test users per app, so we have to clean up
     # This would be a good place to clean up and accumulate all of them for
     # later deletion.
-    unless KoalaTest.mock_interface?
+    unless KoalaTest.mock_interface? || @stubbed
       ((@network || []) + [@user1, @user2]).each do |u|
         puts "Unable to delete test user #{u.inspect}" if u && !(@test_users.delete(u) rescue false)
       end
@@ -149,6 +149,7 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       it "accepts http options" do
+        @stubbed = true
         options = {:some_http_option => true}
         @test_users.api.should_receive(:graph_call).with(anything, anything, anything, options)
         @test_users.list(options)
@@ -178,6 +179,7 @@ describe "Koala::Facebook::TestUsers" do
       it "lets you specify http options that get passed through to the graph call" do
         options = {:some_http_option => true}
         # technically this goes through delete_object, but this makes it less brittle
+        @stubbed = true
         @test_users.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
         @test_users.delete("user", options)
       end
@@ -229,6 +231,7 @@ describe "Koala::Facebook::TestUsers" do
 
       it "accepts an options hash" do
         options = {:some_http_option => true}
+        @stubbed = true
         @test_users2.graph_api.should_receive(:graph_call).with(anything, anything, anything, options)
         @test_users2.update("foo", @updates, options)
       end
@@ -269,6 +272,7 @@ describe "Koala::Facebook::TestUsers" do
       it "accepts http options passed to both calls" do
         options = {:some_http_option => true}
         # should come twice, once for each user
+        @stubbed = true
         Koala.http_service.should_receive(:make_request).with(anything, anything, anything, options).twice.and_return(Koala::HTTPService::Response.new(200, "{}", {}))
         @test_users.befriend(@user1, @user2, options)
       end
