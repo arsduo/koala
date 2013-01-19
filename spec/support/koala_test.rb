@@ -32,6 +32,7 @@ module KoalaTest
       adapter = ENV['ADAPTER'] || "typhoeus" # use Typhoeus by default if available
       begin
         require adapter
+        require 'typhoeus/adapters/faraday' if adapter.to_s == "typhoeus"
         Faraday.default_adapter = adapter.to_sym
       rescue LoadError
         puts "Unable to load adapter #{adapter}, using Net::HTTP."

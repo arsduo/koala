@@ -343,7 +343,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @temporary_object_id.should_not be_nil
     end
 
-
     it "can post videos to the user's wall without an open file object" do
       result = @api.put_video(@cat_movie, @content_type)
       @temporary_object_id = result["id"]
