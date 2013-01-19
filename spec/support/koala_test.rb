@@ -32,6 +32,7 @@ module KoalaTest
       adapter = ENV['ADAPTER'] || "typhoeus" # use Typhoeus by default if available
       begin
         require adapter
+        require 'typhoeus/adapters/faraday' if adapter.to_s == "typhoeus"
         Faraday.default_adapter = adapter.to_sym
       rescue LoadError
         puts "Unable to load adapter #{adapter}, using Net::HTTP."
@@ -80,7 +81,7 @@ module KoalaTest
     self.oauth_test_data = data["oauth_test_data"]
     self.subscription_test_data = data["subscription_test_data"]
     self.oauth_token = data["oauth_token"]
-    self.app_id = data["oauth_test_data"]["app_id"]
+    self.app_id = data["oauth_test_data"]["app_id"].to_s
     self.app_access_token = data["oauth_test_data"]["app_access_token"]
     self.secret = data["oauth_test_data"]["secret"]
     self.code = data["oauth_test_data"]["code"]

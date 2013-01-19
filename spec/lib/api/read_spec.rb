@@ -137,6 +137,16 @@ module Koala
           end
         end
 
+        describe "#debug_token" do
+          it "can get information about an access token" do
+            result = @api.debug_token(KoalaTest.app_access_token)
+            result.should be_kind_of(Hash)
+            result["data"].should be_kind_of(Hash)
+            result["data"]["app_id"].to_s.should == KoalaTest.app_id.to_s
+            result["data"]["application"].should_not be_nil
+          end
+        end
+
         describe "FQL" do
           describe "#fql_query" do
             it "makes a request to /fql" do
