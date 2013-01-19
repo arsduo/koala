@@ -81,7 +81,7 @@ module KoalaTest
     self.oauth_test_data = data["oauth_test_data"]
     self.subscription_test_data = data["subscription_test_data"]
     self.oauth_token = data["oauth_token"]
-    self.app_id = data["oauth_test_data"]["app_id"]
+    self.app_id = data["oauth_test_data"]["app_id"].to_s
     self.app_access_token = data["oauth_test_data"]["app_access_token"]
     self.secret = data["oauth_test_data"]["secret"]
     self.code = data["oauth_test_data"]["code"]

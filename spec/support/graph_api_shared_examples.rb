@@ -251,22 +251,21 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
   it "can post a message whose attachment has a properties dictionary" do
     url = KoalaTest.oauth_test_data["callback_url"]
-    options = {
-    "picture" => "#{KoalaTest.oauth_test_data["callback_url"]}/images/logo.png",
-    "name" => "It's a big question",
-    "type" => "link",
-    "link" => KoalaTest.oauth_test_data["callback_url"],
-    "properties" => [
+    args = {
+      "picture" => "#{KoalaTest.oauth_test_data["callback_url"]}/images/logo.png",
+      "name" => "It's a big question",
+      "type" => "link",
+      "link" => KoalaTest.oauth_test_data["callback_url"],
+      "properties" => [
         {"name" => "Link1'", "text" => "Left", "href" => url},
         {"name" => "other", "text" => "Straight ahead"}
       ]
     }
 
-    result = @api.put_wall_post("body", options)
+    result = @api.put_wall_post("body", args)
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
   end
-
 
   describe "#put_picture" do
     it "can post photos to the user's wall with an open file object" do

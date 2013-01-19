@@ -36,41 +36,22 @@ module Koala
     RESPONSES = YAML.load(ERB.new(IO.read(mock_response_file_path)).result(binding))
 
     def self.make_request(path, args, verb, options = {})
-      path = 'root' if path == '' || path == '/'
-      verb ||= 'get'
-      server = options[:rest_api] ? 'rest_api' : 'graph_api'
-      token = args.delete('access_token')
-      with_token = (token == ACCESS_TOKEN || token == APP_ACCESS_TOKEN) ? 'with_token' : 'no_token'
-
-      # Assume format is always JSON
-      args.delete('format')
-
-      # Create a hash key for the arguments
-      args = create_params_key(args)
-
-      begin
-        response = RESPONSES[server][path][args][verb][with_token]
-
-        # Raises an error of with_token/no_token key is missing
-        raise NoMethodError unless response
-
+      if response = match_response(path, args, verb, options)
         # create response class object
         response_object = if response.is_a? String
-            Koala::HTTPService::Response.new(200, response, {})
-          else
-            Koala::HTTPService::Response.new(response["code"] || 200, response["body"] || "", response["headers"] || {})
-          end
-
-      rescue NoMethodError
+          Koala::HTTPService::Response.new(200, response, {})
+        else
+          Koala::HTTPService::Response.new(response["code"] || 200, response["body"] || "", response["headers"] || {})
+        end
+      else
         # Raises an error message with the place in the data YML
         # to place a mock as well as a URL to request from
         # Facebook's servers for the actual data
         # (Don't forget to replace ACCESS_TOKEN with a real access token)
-        data_trace = [server, path, args, verb, with_token] * ': '
+        data_trace = [path, args, verb, options] * ': '
 
         args = args == 'no_args' ? '' : "#{args}&"
         args += 'format=json'
-        args += "&access_token=#{ACCESS_TOKEN}" if with_token
 
         raise "Missing a mock response for #{data_trace}\nAPI PATH: #{[path, args].join('?')}"
       end
@@ -85,15 +66,78 @@ module Koala
 
     protected
 
-    def self.create_params_key(params_hash)
-      if params_hash.empty?
-        'no_args'
-      else
-        params_hash.sort{ |a,b| a[0].to_s <=> b[0].to_s}.map do |arr|
-          arr[1] = '[FILE]' if arr[1].kind_of?(Koala::UploadableIO)
-          arr.join('=')
-        end.join('&')
+    # For a given query, see if our mock responses YAML has a resopnse for it.
+    def self.match_response(path, args, verb, options = {})
+      server = options[:rest_api] ? 'rest_api' : 'graph_api'
+      path = 'root' if path == '' || path == '/'
+      verb = (verb || 'get').to_s
+      token = args.delete('access_token')
+      with_token = (token == ACCESS_TOKEN || token == APP_ACCESS_TOKEN) ? 'with_token' : 'no_token'
+
+      if endpoint = RESPONSES[server][path]
+        # see if we have a match for the arguments
+        if arg_match = endpoint.find {|query, v| decode_query(query) == massage_args(args)}
+          # we have a match for the server/path/arguments
+          # so if it's the right verb and authentication, we're good
+          # arg_match will be [query, hash_response]
+          arg_match.last[verb][with_token]
+        end
       end
+    end
+
+    # Since we're comparing the arguments with data in a yaml file, we need to
+    # massage them slightly to get to the format we expect.
+    def self.massage_args(arguments)
+      args = arguments.inject({}) do |hash, (k, v)|
+        # ensure our args are all stringified
+        value = if v.is_a?(String)
+          should_json_decode?(v) ? MultiJson.load(v) : v
+        elsif v.is_a?(Koala::UploadableIO)
+          # obviously there are no files in the yaml
+          "[FILE]"
+        else
+          v
+        end
+        # make sure all keys are strings
+        hash.merge(k.to_s => value)
+      end
+
+      # Assume format is always JSON
+      args.delete('format')
+
+      # if there are no args, return the special keyword no_args
+      args.empty? ? "no_args" : args
+    end
+
+    # Facebook sometimes requires us to encode JSON values in an HTTP query
+    # param. This complicates test matches, since we get into JSON-encoding
+    # issues (what order keys are written into).  To avoid string comparisons
+    # and the hacks required to make it work, we decode the query into a
+    # Ruby object.
+    def self.decode_query(string)
+      if string == "no_args"
+        string
+      else
+        # we can't use Faraday's decode_query because that CGI-unencodes, which
+        # will remove +'s in restriction strings
+        string.split("&").reduce({}) do |hash, component|
+          k, v = component.split("=", 2) # we only care about the first =
+          value = should_json_decode?(v) ? MultiJson.decode(v) : v.to_s rescue v.to_s
+          # some special-casing, unfortunate but acceptable in this testing
+          # environment
+          value = nil if value.empty?
+          value = true if value == "true"
+          value = false if value == "false"
+          hash.merge(k => value)
+        end
+      end
+    end
+
+    # We want to decode JSON because it may not be encoded in the same order
+    # all the time -- different Rubies may create a strings with equivalent
+    # content but different order.  We want to compare the objects.
+    def self.should_json_decode?(v)
+      v.match(/^[\[\{]/)
     end
   end
 end
