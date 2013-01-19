@@ -126,7 +126,6 @@ graph_api:
       post:
         with_token: '[{"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}, {"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}]'
 
-
   /me:
     no_args:
       get:
@@ -164,7 +163,7 @@ graph_api:
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
-    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= {"name"=>"Link1'", "text"=>"Left", "href"=>"http://oauth.twoalex.com/"}.to_s %>=<%= {"name"=>"other", "text"=>"Straight ahead"}.to_s %>&type=link:
+    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= MultiJson.encode([{"name"=>"Link1'", "text"=>"Left", "href"=>"http://oauth.twoalex.com/"}, {"name"=>"other", "text"=>"Straight ahead"}]) %>&type=link:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
 
@@ -305,6 +304,11 @@ graph_api:
     restrictions=<%= MultiJson.dump({"age_distr" => "13+"}) %>:
       post:
         with_token: "true"
+
+  /debug_token:
+    input_token=<%= APP_ACCESS_TOKEN %>:
+      get:
+        with_token: '{ "data": { "app_id": <%= APP_ID %>, "application": "Social Cafe", "expires_at": 1352419328, "is_valid": true, "issued_at": 1347235328, "metadata": { "sso": "iphone-safari" }, "scopes": [ "email", "publish_actions" ], "user_id": 1207059 } }'
 
   # -- OAuth responses --
   /oauth/access_token:
