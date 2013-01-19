@@ -545,7 +545,7 @@ describe "Koala::Facebook::OAuth" do
       end
 
       it "fetches a proper token string from Facebook when asked for the app token" do
-        result = @oauth.send(:fetch_token_string, {:type => 'client_cred'}, true)
+        result = @oauth.send(:fetch_token_string, {:grant_type => 'client_credentials'}, true)
         result.should =~ /^access_token/
       end
     end
