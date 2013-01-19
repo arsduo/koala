@@ -412,6 +412,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
   end
 
+  it "can get information about an access token" do
+    result = @api.debug_token(KoalaTest.app_access_token)
+    result.should be_kind_of(Hash)
+    result["data"].should be_kind_of(Hash)
+    result["data"]["app_id"].should == 138483919580948
+    result["data"]["application"].should == "Social Cafe"
+  end
+
   describe "#set_app_restrictions" do
     before :all do
       oauth = Koala::Facebook::OAuth.new(KoalaTest.app_id, KoalaTest.secret)
