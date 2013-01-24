@@ -411,7 +411,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "can get information about an access token" do
-    result = @api.debug_token(KoalaTest.app_access_token)
+    result = @app_api.debug_token(@api.access_token)
     result.should be_kind_of(Hash)
     result["data"].should be_kind_of(Hash)
     result["data"]["app_id"].to_s.should == KoalaTest.app_id.to_s
