@@ -85,12 +85,19 @@ shared_examples_for "Koala GraphAPI" do
     results.should have(2).items
   end
 
-  it "can access a user's picture" do
-    @api.get_picture(KoalaTest.user2).should =~ /http[s]*\:\/\//
-  end
+  describe "#get_picture" do
+    it "can access a user's picture" do
+      @api.get_picture(KoalaTest.user2).should =~ /http[s]*\:\/\//
+    end
 
-  it "can access a user's picture, given a picture type"  do
-    @api.get_picture(KoalaTest.user2, {:type => 'large'}).should =~ /^http[s]*\:\/\//
+    it "can access a user's picture, given a picture type"  do
+      @api.get_picture(KoalaTest.user2, {:type => 'large'}).should =~ /^http[s]*\:\/\//
+    end
+
+    it "works even if Facebook returns nil" do
+      @api.stub(:graph_call).and_return(nil)
+      @api.get_picture(KoalaTest.user2, {:type => 'large'}).should be_nil
+    end
   end
 
   it "can access connections from public Pages" do
