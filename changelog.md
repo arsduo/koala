@@ -1,12 +1,20 @@
 v1.7
 ====
 
+New methods:
+* API#debug_token allows you to examine user tokens (thanks, Cyril-sf!)
+
 Internal improvements:
 * CHANGED: Gem version restrictions have been removed, and versions updated.
 * CHANGED: How support files are loaded in spec_helper has been improved.
+* FIXED: API#get_picture returns nil if FB returns no result, rather than error (thanks, mtparet!)
+* FIXED: Koala now uses the right grant_type value for fetching app access tokens (thanks, miv!)
 
 Testing improvements:
 * FIXED: MockHTTPService compares Ruby objects rather than strings.
+* FIXED: Removed deprecated usage of should_not_receive.and_return (thanks, Cyril-sf!)
+* FIXED: Test suite now supports Typhoeus 0.5 (thanks, Cyril-sf!)
+*
 
 v1.6
 ====
