@@ -1,3 +1,17 @@
+v2.0
+====
+
+Removed deprecated methods and classes:
+* OAuth#get_user_from_cookies (no longer useful since codes can't be used > 1x)
+* GraphAPI, RestAPI, and GraphAndRestAPI classes
+* All RestAPI methods (use equivalent Graph API calls)
+* NetHTTPService and TyphoeusHTTPService
+* Old HTTPService options (timeout/=, etc.)
+
+Testing improvements:
+* Restructured test suite -- all spec files now in spec/lib
+* Separated read/write/delete/batch specs (for clarity)
+
 v1.7
 ====
 
