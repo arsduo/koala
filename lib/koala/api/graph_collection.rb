@@ -6,22 +6,22 @@ module Koala
       # A light wrapper for collections returned from the Graph API.
       # It extends Array to allow you to page backward and forward through
       # result sets, and providing easy access to paging information.
-      class GraphCollection < Array        
-        
+      class GraphCollection < Array
+
         # The raw paging information from Facebook (next/previous URLs).
         attr_reader :paging
         # @return [Koala::Facebook::GraphAPI] the api used to make requests.
         attr_reader :api
         # The entire raw response from Facebook.
         attr_reader :raw_response
-    
+
         # Initialize the array of results and store various additional paging-related information.
-        # 
+        #
         # @param response the response from Facebook (a hash whose "data" key is an array)
         # @param api the Graph {Koala::Facebook::API API} instance to use to make calls
         #            (usually the API that made the original call).
         #
-        # @return [Koala::Facebook::GraphCollection] an initialized GraphCollection 
+        # @return [Koala::Facebook::GraphCollection] an initialized GraphCollection
         #         whose paging, raw_response, and api attributes are populated.
         def initialize(response, api)
           super response["data"]
@@ -31,32 +31,32 @@ module Koala
         end
 
         # @private
-        # Turn the response into a GraphCollection if they're pageable; 
+        # Turn the response into a GraphCollection if they're pageable;
         # if not, return the original response.
         # The Ads API (uniquely so far) returns a hash rather than an array when queried
-        # with get_connections. 
+        # with get_connections.
         def self.evaluate(response, api)
           response.is_a?(Hash) && response["data"].is_a?(Array) ? self.new(response, api) : response
         end
-        
+
         # Retrieve the next page of results.
-        # 
+        #
         # @return a GraphCollection array of additional results (an empty array if there are no more results)
         def next_page
           base, args = next_page_params
           base ? @api.get_page([base, args]) : nil
         end
-        
+
         # Retrieve the previous page of results.
-        # 
+        #
         # @return a GraphCollection array of additional results (an empty array if there are no earlier results)
         def previous_page
           base, args = previous_page_params
           base ? @api.get_page([base, args]) : nil
         end
-        
-        # Arguments that can be sent to {Koala::Facebook::API#graph_call} to retrieve the next page of results. 
-        # 
+
+        # Arguments that can be sent to {Koala::Facebook::API#graph_call} to retrieve the next page of results.
+        #
         # @example
         #           @api.graph_call(*collection.next_page_params)
         #
@@ -64,9 +64,9 @@ module Koala
         def next_page_params
           @paging && @paging["next"] ? parse_page_url(@paging["next"]) : nil
         end
-        
-        # Arguments that can be sent to {Koala::Facebook::API#graph_call} to retrieve the previous page of results. 
-        # 
+
+        # Arguments that can be sent to {Koala::Facebook::API#graph_call} to retrieve the previous page of results.
+        #
         # @example
         #           @api.graph_call(*collection.previous_page_params)
         #
@@ -74,7 +74,7 @@ module Koala
         def previous_page_params
           @paging && @paging["previous"] ? parse_page_url(@paging["previous"]) : nil
         end
-        
+
         # @private
         def parse_page_url(url)
           GraphCollection.parse_page_url(url)
@@ -102,9 +102,9 @@ module Koala
         end
       end
     end
-    
+
     # @private
-    # legacy support for when GraphCollection lived directly under Koala::Facebook    
+    # legacy support for when GraphCollection lived directly under Koala::Facebook
     GraphCollection = API::GraphCollection
   end
 end
