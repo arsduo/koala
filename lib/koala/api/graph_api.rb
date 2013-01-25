@@ -178,7 +178,7 @@ module Koala
       def get_picture(object, args = {}, options = {}, &block)
         # Gets a picture object, returning the URL (which Facebook sends as a header)
         resolved_result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
-          result["Location"]
+          result ? result["Location"] : nil
         end
         block ? block.call(resolved_result) : resolved_result
       end
