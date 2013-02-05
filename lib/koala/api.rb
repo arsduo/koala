@@ -42,6 +42,7 @@ module Koala
       # @return the body of the response from Facebook (unless another http_component is requested)
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
         # Fetches the given path in the Graph API.
+        args = sanitize_request_parameters(args)
         args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
 
         # add a leading /
@@ -64,6 +65,16 @@ module Koala
           # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
           # and cause MultiJson.load to fail -- so we account for that by wrapping the result in []
           MultiJson.load("[#{result.body.to_s}]")[0]
+        end
+      end
+
+      private
+
+      def sanitize_request_parameters(parameters)
+        parameters.reduce({}) do |result, (key, value)|
+          value = value.join(",") if value && value.is_a?(Array) && value.none?{|entry| entry.is_a?(Enumerable)}
+          result[key] = value
+          result
         end
       end
     end
