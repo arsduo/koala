@@ -350,7 +350,7 @@ module Koala
 
       def build_url(base, require_redirect_uri = false, url_options = {})
         if require_redirect_uri && !(url_options[:redirect_uri] ||= url_options.delete(:callback) || @oauth_callback_url)
-          raise ArgumentError, "url_for_dialog must get a callback either from the OAuth object or in the parameters!"
+          raise ArgumentError, "build_url must get a callback either from the OAuth object or in the parameters!"
         end
 
         "#{base}?#{Koala::HTTPService.encode_params(url_options)}"
