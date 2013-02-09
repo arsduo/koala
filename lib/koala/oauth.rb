@@ -90,7 +90,7 @@ module Koala
         url_options = {:client_id => @app_id}.merge(options)
 
         # Creates the URL for oauth authorization for a given callback and optional set of permissions
-        build_url("https://#{GRAPH_SERVER}/oauth/authorize", true, url_options)
+        build_url("https://#{DIALOG_HOST}/dialog/oauth", true, url_options)
       end
 
       # Once you receive an OAuth code, you need to redeem it from Facebook using an appropriate URL.
