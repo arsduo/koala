@@ -241,37 +241,37 @@ describe "Koala::Facebook::OAuth" do
     describe "#url_for_oauth_code" do
       it "generates a properly formatted OAuth code URL with the default values" do
         url = @oauth.url_for_oauth_code
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
+        url.should match_url("https://#{Koala::Facebook::DIALOG_HOST}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when a callback is given" do
         callback = "foo.com"
         url = @oauth.url_for_oauth_code(:callback => callback)
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&redirect_uri=#{callback}")
+        url.should match_url("https://#{Koala::Facebook::DIALOG_HOST}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{callback}")
       end
 
       it "generates a properly formatted OAuth code URL when permissions are requested as a string" do
         permissions = "publish_stream,read_stream"
         url = @oauth.url_for_oauth_code(:permissions => permissions)
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape @callback_url}")
+        url.should match_url("https://#{Koala::Facebook::DIALOG_HOST}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when permissions are requested as a string" do
         permissions = ["publish_stream", "read_stream"]
         url = @oauth.url_for_oauth_code(:permissions => permissions)
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions.join(",")}&redirect_uri=#{CGI.escape @callback_url}")
+        url.should match_url("https://#{Koala::Facebook::DIALOG_HOST}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions.join(",")}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when both permissions and callback are provided" do
         permissions = "publish_stream,read_stream"
         callback = "foo.com"
         url = @oauth.url_for_oauth_code(:callback => callback, :permissions => permissions)
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape callback}")
+        url.should match_url("https://#{Koala::Facebook::DIALOG_HOST}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape callback}")
       end
 
       it "generates a properly formatted OAuth code URL when a display is given as a string" do
         url = @oauth.url_for_oauth_code(:display => "page")
-        url.should match_url("https://#{Koala::Facebook::GRAPH_SERVER}/oauth/authorize?client_id=#{@app_id}&display=page&redirect_uri=#{CGI.escape @callback_url}")
+        url.should match_url("https://#{Koala::Facebook::DIALOG_HOST}/dialog/oauth?client_id=#{@app_id}&display=page&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "raises an exception if no callback is given in initialization or the call" do
