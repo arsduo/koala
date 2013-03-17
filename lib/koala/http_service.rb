@@ -33,9 +33,9 @@ module Koala
     #
     # @return a complete server address with protocol
     def self.server(options = {})
-      server = "#{options[:rest_api] ? Facebook::REST_SERVER : Facebook::GRAPH_SERVER}"
-      server.gsub!(/\.facebook/, "-video.facebook") if options[:video]
-      server.gsub!(/\.facebook/, ".beta.facebook") if options[:beta]
+      server = "#{options[:rest_api] ? Koala.config.rest_server : Koala.config.graph_server}"
+      server.gsub!(Koala.config.host_path_matcher, Koala.config.video_replace) if options[:video]
+      server.gsub!(Koala.config.host_path_matcher, Koala.config.beta_replace) if options[:beta]
       "#{options[:use_ssl] ? "https" : "http"}://#{server}"
     end
 

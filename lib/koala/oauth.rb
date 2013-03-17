@@ -4,9 +4,6 @@ require 'base64'
 
 module Koala
   module Facebook
-
-    DIALOG_HOST = "www.facebook.com"
-
     class OAuth
       attr_reader :app_id, :app_secret, :oauth_callback_url
 
@@ -90,7 +87,7 @@ module Koala
         url_options = {:client_id => @app_id}.merge(options)
 
         # Creates the URL for oauth authorization for a given callback and optional set of permissions
-        build_url("https://#{DIALOG_HOST}/dialog/oauth", true, url_options)
+        build_url("https://#{Koala.config.dialog_host}/dialog/oauth", true, url_options)
       end
 
       # Once you receive an OAuth code, you need to redeem it from Facebook using an appropriate URL.
@@ -114,7 +111,7 @@ module Koala
           :code => code,
           :client_secret => @app_secret
         }.merge(options)
-        build_url("https://#{GRAPH_SERVER}/oauth/access_token", true, url_options)
+        build_url("https://#{Koala.config.graph_server}/oauth/access_token", true, url_options)
       end
 
       # Builds a URL for a given dialog (feed, friends, OAuth, pay, send, etc.)
@@ -129,7 +126,7 @@ module Koala
       def url_for_dialog(dialog_type, options = {})
         # some endpoints require app_id, some client_id, supply both doesn't seem to hurt
         url_options = {:app_id => @app_id, :client_id => @app_id}.merge(options)
-        build_url("http://#{DIALOG_HOST}/dialog/#{dialog_type}", true, url_options)
+        build_url("http://#{Koala.config.dialog_host}/dialog/#{dialog_type}", true, url_options)
       end
 
       # access tokens

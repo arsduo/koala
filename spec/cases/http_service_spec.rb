@@ -48,12 +48,12 @@ describe "Koala::HTTPService" do
   describe "server" do
     describe "with no options" do
       it "returns the REST server if options[:rest_api]" do
-        Koala::HTTPService.server(:rest_api => true).should =~ Regexp.new(Koala::Facebook::REST_SERVER)
+        Koala::HTTPService.server(:rest_api => true).should =~ Regexp.new(Koala.config.rest_server)
       end
 
       it "returns the graph server if !options[:rest_api]" do
-        Koala::HTTPService.server(:rest_api => false).should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER)
-        Koala::HTTPService.server({}).should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER)
+        Koala::HTTPService.server(:rest_api => false).should =~ Regexp.new(Koala.config.graph_server)
+        Koala::HTTPService.server({}).should =~ Regexp.new(Koala.config.graph_server)
       end
     end
 
@@ -64,12 +64,12 @@ describe "Koala::HTTPService" do
 
       it "returns the beta REST server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
-        server.should =~ Regexp.new(Koala::Facebook::REST_SERVER.gsub(/\.facebook/, ".beta.facebook"))
+        server.should =~ Regexp.new(Koala.config.rest_server.gsub(/\.facebook/, ".beta.facebook"))
       end
 
       it "returns the beta rest server if !options[:rest_api]" do
         server = Koala::HTTPService.server(@options)
-        server.should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER.gsub(/\.facebook/, ".beta.facebook"))
+        server.should =~ Regexp.new(Koala.config.graph_server.gsub(/\.facebook/, ".beta.facebook"))
       end
     end
 
@@ -80,12 +80,12 @@ describe "Koala::HTTPService" do
 
       it "returns the REST video server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
-        server.should =~ Regexp.new(Koala::Facebook::REST_SERVER.gsub(/\.facebook/, "-video.facebook"))
+        server.should =~ Regexp.new(Koala.config.rest_server.gsub(/\.facebook/, "-video.facebook"))
       end
 
       it "returns the graph video server if !options[:rest_api]" do
         server = Koala::HTTPService.server(@options)
-        server.should =~ Regexp.new(Koala::Facebook::GRAPH_SERVER.gsub(/\.facebook/, "-video.facebook"))
+        server.should =~ Regexp.new(Koala.config.graph_server.gsub(/\.facebook/, "-video.facebook"))
       end
     end
   end

@@ -5,8 +5,6 @@ require 'koala/http_service/uploadable_io'
 
 module Koala
   module Facebook
-    GRAPH_SERVER = "graph.facebook.com"
-
     # Methods used to interact with the Facebook Graph API.
     #
     # See https://github.com/arsduo/koala/wiki/Graph-API for a general introduction to Koala

@@ -115,6 +115,22 @@ fql = @api.fql_query(my_fql_query)
 @api.put_wall_post(process_result(fql))
 ```
 
+Configuration
+----
+You can change the host that koala makes requests to (point to a mock server, apigee, runscope etc..)
+```ruby
+# config/initializers/koala.rb
+require 'koala'
+
+Koala.configure do |config|
+  config.graph_server = 'my-graph-mock.mysite.com'
+  # also available are the `rest_server` and `dialog_host`
+end
+```
+
+Of course the defaults are the facebook endpoints and you can additionally configure the beta
+tier and video upload matching and replacement strings.
+
 OAuth
 -----
 You can use the Graph and REST APIs without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
