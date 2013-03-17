@@ -20,11 +20,12 @@ module Koala
     end
 
     def method_missing(method, *args)
-      case method
-        when /(.+)=$/
-          self[$1] = args.pop
-        else
-          self[method.to_s]
+      match = method.to_s.match(/(.+)(=)$/)
+
+      if match && match[2]
+        self[match[1]] = args.pop
+      else
+        self[method.to_s]
       end
     end
   end
