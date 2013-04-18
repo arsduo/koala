@@ -519,6 +519,35 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       insights.should be_an(Array)
     end
 
+    it "handles batch operation-specific token when paging" do
+
+      # Provide an alternate token for a batch operation
+      @args = { 'access_token' => @app_api.access_token }
+
+      me, insights = @api.batch do |batch_api|
+        batch_api.get_object('me')
+        batch_api.get_connections(@app_id, 'insights', {}, @args)
+      end
+
+      insights.should be_a(Koala::Facebook::GraphCollection)
+
+      # The alternate token is returned with the next page parameters
+      # The GraphCollection should receive a request for the next_page_params during paging
+      insights.should_receive(:next_page_params).and_return([stub("base"), @args.dup])
+
+      # Koala should receive a request during paging using the alternate token
+      Koala.should_receive(:make_request).with(
+          anything,
+          hash_including(@args.dup),
+          anything,
+          anything
+      ).and_return(Koala::HTTPService::Response.new(200, "", ""))
+
+      # Page the collection
+      insights.next_page
+
+    end
+
     it "inserts errors in the appropriate place, without breaking other results" do
       failed_call, koppel = @api.batch do |batch_api|
         batch_api.get_connection("2", "invalidconnection")
