@@ -10,7 +10,7 @@ module Koala
 
         # The raw paging information from Facebook (next/previous URLs).
         attr_reader :paging
-        # @return [Koala::Facebook::GraphAPI] the api used to make requests.
+        # @return [Koala::Facebook::API] the api used to make requests.
         attr_reader :api
         # The entire raw response from Facebook.
         attr_reader :raw_response

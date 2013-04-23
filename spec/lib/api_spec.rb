@@ -50,7 +50,7 @@ describe "Koala::Facebook::API" do
   it "returns the entire response if http_component => :response" do
     http_component = :response
     response = mock('Mock KoalaResponse', :body => '', :status => 200)
-    Koala.stub(:make_request).and_return(response)    
+    Koala.stub(:make_request).and_return(response)
     @service.api('anything', {}, 'get', :http_component => http_component).should == response
   end
 
@@ -103,23 +103,5 @@ describe "Koala::Facebook::API" do
       Koala.should_receive(:make_request).with(path, anything, anything, anything).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
       @service.api(path)
     end
-  end
-
-  describe "with an access token" do
-    before(:each) do
-      @api = Koala::Facebook::API.new(@token)
-    end
-
-    it_should_behave_like "Koala RestAPI"
-    it_should_behave_like "Koala RestAPI with an access token"
-  end
-
-  describe "without an access token" do
-    before(:each) do
-      @api = Koala::Facebook::API.new
-    end
-
-    it_should_behave_like "Koala RestAPI"
-    it_should_behave_like "Koala RestAPI without an access token"
   end
 end
