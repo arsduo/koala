@@ -41,9 +41,13 @@ module Koala
       #
       # @return the body of the response from Facebook (unless another http_component is requested)
       def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
-        # Fetches the given path in the Graph API.
+        # If a access token is explicitly provided, use that
+        # This is explicitly needed in batch requests so GraphCollection
+        # results preserve any specific access tokens provided
+        args["access_token"] ||= @access_token || @app_access_token if @access_token || @app_access_token
+
+        # Translate any arrays in the params into comma-separated strings
         args = sanitize_request_parameters(args)
-        args["access_token"] = @access_token || @app_access_token if @access_token || @app_access_token
 
         # add a leading /
         path = "/#{path}" unless path =~ /^\//
