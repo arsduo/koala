@@ -212,8 +212,10 @@ describe "Koala::HTTPService" do
       end
 
       it "uses the default builder block if HTTPService.faraday_middleware block is not defined" do
+        block = Proc.new {}
+        stub_const("Koala::HTTPService::DEFAULT_MIDDLEWARE", block)
         Koala::HTTPService.stub(:faraday_middleware).and_return(nil)
-        Faraday.should_receive(:new).with(anything, anything, &Koala::HTTPService::DEFAULT_MIDDLEWARE).and_return(@mock_connection)
+        Faraday.should_receive(:new).with(anything, anything, &block).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get")
       end
 
