@@ -74,11 +74,16 @@ module Koala
       #
       # @param parameters a hash of parameters.
       #
-      # Returns a hash in which values that are arrays of Strings, Symbols,
-      #         Numbers, etc. are turned into comma-separated strings.
+      # Returns a hash in which values that are arrays of non-enumerable values
+      #         (Strings, Symbols, Numbers, etc.) are turned into comma-separated strings.
       def sanitize_request_parameters(parameters)
         parameters.reduce({}) do |result, (key, value)|
-          value = value.join(",") if value.is_a?(Array) && value.none?{|entry| entry.is_a?(Enumerable)}
+          # if the parameter is an array that contains non-enumerable values,
+          # turn it into a comma-separated list
+          # in Ruby 1.8.7, strings are enumerable, but we don't care
+          if value.is_a?(Array) && value.none? {|entry| entry.is_a?(Enumerable) && !entry.is_a?(String)}
+            value = value.join(",")
+          end
           result.merge(key => value)
         end
       end
