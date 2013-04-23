@@ -6,6 +6,7 @@ New methods:
 
 Internal improvements:
 * CHANGED: Parameters can now be Arrays of non-enumerable values, which get comma-separated (thanks, csaunders!)
+* CHANGED: GraphCollections returned by batch API calls retain individual access tokens (thanks, billvieux!)
 * CHANGED: Gem version restrictions have been removed, and versions updated.
 * CHANGED: How support files are loaded in spec_helper has been improved.
 * FIXED: API#get_picture returns nil if FB returns no result, rather than error (thanks, mtparet!)
