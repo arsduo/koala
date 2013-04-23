@@ -54,6 +54,14 @@ describe "Koala::Facebook::API" do
     @service.api('anything', {}, 'get', :http_component => http_component).should == response
   end
 
+  it "should extract arrays into comma-separated arguments" do
+      args = [12345, {:foo => [1, 2, 3, 4]}]
+      expected = ["/12345", {:foo => "1,2,3,4"}, "get", {}]
+      response = mock('Mock KoalaResponse', :body => '', :status => 200)
+      Koala.should_receive(:make_request).with(*expected).and_return(response)
+      @service.api(*args)
+    end
+
   it "returns the body of the request as JSON if no http_component is given" do
     response = stub('response', :body => 'body', :status => 200)
     Koala.stub(:make_request).and_return(response)
