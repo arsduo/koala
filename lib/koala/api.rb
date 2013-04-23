@@ -54,7 +54,7 @@ module Koala
         if result.status.to_i >= 500
           raise Koala::Facebook::ServerError.new(result.status.to_i, result.body)
         end
-      
+
         yield result if error_checking_block
 
         # if we want a component other than the body (e.g. redirect header for images), return that
@@ -70,11 +70,16 @@ module Koala
 
       private
 
+      # Sanitizes Ruby objects into Facebook-compatible string values.
+      #
+      # @param parameters a hash of parameters.
+      #
+      # Returns a hash in which values that are arrays of Strings, Symbols,
+      #         Numbers, etc. are turned into comma-separated strings.
       def sanitize_request_parameters(parameters)
         parameters.reduce({}) do |result, (key, value)|
-          value = value.join(",") if value && value.is_a?(Array) && value.none?{|entry| entry.is_a?(Enumerable)}
-          result[key] = value
-          result
+          value = value.join(",") if value.is_a?(Array) && value.none?{|entry| entry.is_a?(Enumerable)}
+          result.merge(key => value)
         end
       end
     end

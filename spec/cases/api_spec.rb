@@ -50,17 +50,29 @@ describe "Koala::Facebook::API" do
   it "returns the entire response if http_component => :response" do
     http_component = :response
     response = mock('Mock KoalaResponse', :body => '', :status => 200)
-    Koala.stub(:make_request).and_return(response)    
+    Koala.stub(:make_request).and_return(response)
     @service.api('anything', {}, 'get', :http_component => http_component).should == response
   end
 
-  it "should extract arrays into comma-separated arguments" do
-      args = [12345, {:foo => [1, 2, 3, 4]}]
-      expected = ["/12345", {:foo => "1,2,3,4"}, "get", {}]
-      response = mock('Mock KoalaResponse', :body => '', :status => 200)
-      Koala.should_receive(:make_request).with(*expected).and_return(response)
-      @service.api(*args)
-    end
+  it "turns arrays of non-enumerables into comma-separated arguments" do
+    args = [12345, {:foo => [1, 2, "3", :four]}]
+    expected = ["/12345", {:foo => "1,2,3,four"}, "get", {}]
+    response = mock('Mock KoalaResponse', :body => '', :status => 200)
+    Koala.should_receive(:make_request).with(*expected).and_return(response)
+    @service.api(*args)
+  end
+
+  it "doesn't turn arrays containing enumerables into comma-separated strings" do
+    params = {:foo => [1, 2, ["3"], :four]}
+    args = [12345, params]
+    # we leave this as is -- the HTTP layer can either handle it appropriately
+    # (if appropriate behavior is defined)
+    # or raise an exception
+    expected = ["/12345", params, "get", {}]
+    response = mock('Mock KoalaResponse', :body => '', :status => 200)
+    Koala.should_receive(:make_request).with(*expected).and_return(response)
+    @service.api(*args)
+  end
 
   it "returns the body of the request as JSON if no http_component is given" do
     response = stub('response', :body => 'body', :status => 200)
