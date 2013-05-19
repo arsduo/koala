@@ -11,7 +11,7 @@ Koala
 
 * Lightweight: Koala should be as light and simple as Facebook’s own libraries, providing API accessors and returning simple JSON.
 * Fast: Koala should, out of the box, be quick. Out of the box, we use Facebook's faster read-only servers when possible and if available, the Typhoeus gem to make snappy Facebook requests.  Of course, that brings us to our next topic:
-* Flexible: Koala should be useful to everyone, regardless of their current configuration.  We support JRuby, Rubinius, and REE as well as vanilla Ruby (1.8.7, 1.9.2, and 1.9.3), and use the Faraday library to provide complete flexibility over how HTTP requests are made.
+* Flexible: Koala should be useful to everyone, regardless of their current configuration.  We support JRuby, Rubinius, and REE as well as vanilla Ruby (1.8.7, 1.9.2, 1.9.3, and 2.0.0), and use the Faraday library to provide complete flexibility over how HTTP requests are made.
 * Tested: Koala should have complete test coverage, so you can rely on it.  Our test coverage is complete and can be run against either mocked responses or the live Facebook servers; we're also on [Travis CI](http://travis-ci.org/arsduo/koala/).
 
 Installation
