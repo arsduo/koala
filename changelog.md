@@ -13,6 +13,7 @@ Internal improvements:
 * CHANGED: How support files are loaded in spec_helper has been improved.
 * FIXED: API#get_picture returns nil if FB returns no result, rather than error (thanks, mtparet!)
 * FIXED: Koala now uses the right grant_type value for fetching app access tokens (thanks, miv!)
+* FIXED: Koala now uses the modern OAuth endpoint for generating codes (thanks, jayeff!)
 
 Testing improvements:
 * FIXED: MockHTTPService compares Ruby objects rather than strings.
