@@ -12,20 +12,6 @@ describe Koala do
     it "has a version" do
       Koala.const_defined?("VERSION").should be_true
     end
-
-    describe Koala::Facebook do      
-      it "defines GRAPH_SERVER" do
-        Koala::Facebook::GRAPH_SERVER.should == "graph.facebook.com"
-      end
-
-      it "defines REST_SERVER" do
-        Koala::Facebook::REST_SERVER.should == "api.facebook.com"
-      end
-      
-      it "defines DIALOG_HOST" do
-        Koala::Facebook::DIALOG_HOST.should == "www.facebook.com"
-      end
-    end
   end
   
   context "for deprecated services" do
@@ -66,6 +52,35 @@ describe Koala do
       
       Koala.http_service.should_receive(:make_request).with(path, args, verb, options)
       Koala.make_request(path, args, verb, options)
+    end
+  end
+
+  describe ".configure" do
+    it "should yield a config object" do
+      config = nil
+      Koala.configure {|c| config = c}
+
+      config.class.should == Koala::Config
+    end
+
+    it "should cache the config (singleton)" do
+      configs = []
+      2.times { Koala.configure {|c| configs << c } }
+
+      configs.should have(2).items
+      configs.map(&:object_id).uniq.should == [Koala.config.object_id]
+    end
+  end
+
+  describe ".config" do
+    before do
+      Koala.configure do |config|
+        config.graph_server = "some-new.graph_server.com"
+      end
+    end
+
+    it "should expose the values configured" do
+      Koala.config.graph_server.should == "some-new.graph_server.com"
     end
   end
 

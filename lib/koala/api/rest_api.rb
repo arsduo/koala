@@ -1,8 +1,6 @@
 module Koala
   module Facebook
-    REST_SERVER = "api.facebook.com"
-
-    # Methods used to interact with Facebook's legacy REST API.  
+    # Methods used to interact with Facebook's legacy REST API.
     # Where possible, you should use the newer, faster Graph API to interact with Facebook;
     # in the future, the REST API will be deprecated.
     # For now, though, there are a few methods that can't be done through the Graph API.

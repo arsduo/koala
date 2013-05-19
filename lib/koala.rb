@@ -13,6 +13,7 @@ require 'koala/test_users'
 require 'koala/http_service'
 
 # miscellaneous
+require 'koala/config'
 require 'koala/utils'
 require 'koala/version'
 
@@ -29,6 +30,14 @@ module Koala
     # In theory, you could write your own HTTPService module if you need different functionality,
     # but since the switch to {https://github.com/arsduo/koala/wiki/HTTP-Services Faraday} almost all such goals can be accomplished with middleware.
     attr_accessor :http_service
+
+    def configure
+      yield config
+    end
+
+    def config
+      @config ||= Config.new
+    end
   end
 
   # @private
