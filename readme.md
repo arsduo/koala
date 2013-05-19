@@ -19,12 +19,12 @@ Installation
 
 Easy:
 ```bash
-[sudo|rvm] gem install koala
+[sudo|rvm] gem install koala --pre
 ```
 
 Or in Bundler:
 ```ruby
-gem "koala"
+gem "koala", "~> 1.7.0rc1"
 ```
 
 Graph API
