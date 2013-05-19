@@ -163,9 +163,9 @@ graph_api:
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
-    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= MultiJson.encode([{"name"=>"Link1'", "text"=>"Left", "href"=>"http://oauth.twoalex.com/"}, {"name"=>"other", "text"=>"Straight ahead"}]) %>&type=link:
+    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= MultiJson.encode({"Link1"=>{"text"=>"Left", "href"=>"http://oauth.twoalex.com/"}, "other" => {"text"=>"Straight ahead", "href"=>"http://oauth.twoalex.com/?"}}) %>&type=link:
       post:
-        with_token: '{"id": "FEED_ITEM_CONTEXT"}'
+        with_token: '{"id": "FEED_ITEM_DICTIONARY"}'
 
   /me/photos:
     source=[FILE]:
@@ -408,6 +408,12 @@ graph_api:
       <<: *item_deleted
       get:
         with_token: '{"link":"http://oauth.twoalex.com/", "name": "OAuth Playground"}'
+
+  /FEED_ITEM_DICTIONARY:
+    no_args:
+      <<: *item_deleted
+      get:
+        with_token: '{"link":"http://oauth.twoalex.com/", "name": "OAuth Playground", "properties": {}}'
 
   /FEED_ITEM_CATS:
     no_args:

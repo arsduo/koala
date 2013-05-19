@@ -247,11 +247,9 @@ module Koala
       # @return (see #put_connections)
       def put_wall_post(message, attachment = {}, target_id = "me", options = {}, &block)
         if properties = attachment.delete(:properties) || attachment.delete("properties")
-          puts "Got properties!"
           properties = MultiJson.dump(properties) if properties.is_a?(Hash) || properties.is_a?(Array)
           attachment["properties"] = properties
         end
-        puts attachment
         put_connections(target_id, "feed", attachment.merge({:message => message}), options, &block)
       end
 

@@ -263,16 +263,19 @@ shared_examples_for "Koala GraphAPI with an access token" do
       "name" => "It's a big question",
       "type" => "link",
       "link" => KoalaTest.oauth_test_data["callback_url"],
-      "properties" => [
-        {"name" => "Link1'", "text" => "Left", "href" => url},
-        {"name" => "other", "text" => "Straight ahead"}
-      ]
+      "properties" => {
+        "Link1" => {"text" => "Left", "href" => url},
+        "other" => {"text" => "Straight ahead", "href" => url + "?"}
+      }
     }
 
     result = @api.put_wall_post("body", args)
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
-    puts @api.get_object(@temporary_object_id)
+
+    # ensure the properties dictionary is there
+    api_data = @api.get_object(@temporary_object_id)
+    api_data["properties"].should_not be_nil
   end
 
   describe "#put_picture" do
