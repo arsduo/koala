@@ -16,6 +16,7 @@ Testing improvements:
 * FIXED: MockHTTPService compares Ruby objects rather than strings.
 * FIXED: Removed deprecated usage of should_not_receive.and_return (thanks, Cyril-sf!)
 * FIXED: Test suite now supports Typhoeus 0.5 (thanks, Cyril-sf!)
+* CHANGED: Koala now tests against Ruby 2.0 on Travis (thanks, sanemat!)
 
 v1.6
 ====
