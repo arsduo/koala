@@ -3,6 +3,7 @@ v1.7
 
 New methods:
 * API#debug_token allows you to examine user tokens (thanks, Cyril-sf!)
+* Koala.config allows you to set Facebook servers (to use proxies, etc.) (thanks, bnorton!)
 
 Internal improvements:
 * CHANGED: Parameters can now be Arrays of non-enumerable values, which get comma-separated (thanks, csaunders!)

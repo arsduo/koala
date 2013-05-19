@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Koala::HTTPService" do
+describe Koala::HTTPService do
   it "has a faraday_middleware accessor" do
     Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_middleware)
     Koala::HTTPService.methods.map(&:to_sym).should include(:faraday_middleware=)
@@ -42,6 +42,34 @@ describe "Koala::HTTPService" do
       Faraday.stub(:default_adapter).and_return(adapter)
       @builder.should_receive(:adapter).with(adapter)
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
+    end
+  end
+
+  describe Koala::HTTPService::DEFAULT_SERVERS do
+    let(:defaults) { Koala::HTTPService::DEFAULT_SERVERS }
+
+    it "defines the graph server" do
+      defaults[:graph_server].should == "graph.facebook.com"
+    end
+
+    it "defines the rest server" do
+      defaults[:rest_server].should == "api.facebook.com"
+    end
+
+    it "defines the dialog host" do
+      defaults[:dialog_host].should == "www.facebook.com"
+    end
+
+    it "defines the path replacement regular expression" do
+      defaults[:host_path_matcher].should == /\.facebook/
+    end
+
+    it "defines the video server replacement for uploads" do
+      defaults[:video_replace].should == "-video.facebook"
+    end
+
+    it "defines the beta tier replacement" do
+      defaults[:beta_replace].should == ".beta.facebook"
     end
   end
 

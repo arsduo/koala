@@ -13,18 +13,18 @@ require 'koala/test_users'
 require 'koala/http_service'
 
 # miscellaneous
-require 'koala/config'
 require 'koala/utils'
 require 'koala/version'
+require 'ostruct'
 
 module Koala
   # A Ruby client library for the Facebook Platform.
   # See http://github.com/arsduo/koala/wiki for a general introduction to Koala
   # and the Graph API.
-  
+
   # Making HTTP requests
   class << self
-    # Control which HTTP service framework Koala uses. 
+    # Control which HTTP service framework Koala uses.
     # Primarily used to switch between the mock-request framework used in testing
     # and the live framework used in real life (and live testing).
     # In theory, you could write your own HTTPService module if you need different functionality,
@@ -36,7 +36,7 @@ module Koala
     end
 
     def config
-      @config ||= Config.new
+      @config ||= OpenStruct.new(HTTPService::DEFAULT_SERVERS)
     end
   end
 
@@ -48,14 +48,14 @@ module Koala
       # if this is a deprecated module, support the old interface
       # by changing the default adapter so the right library is used
       # we continue to use the single HTTPService module for everything
-      service.deprecated_interface 
+      service.deprecated_interface
     else
       # if it's a real http_service, use it
       @http_service = service
     end
   end
 
-  # An convenenient alias to Koala.http_service.make_request. 
+  # An convenenient alias to Koala.http_service.make_request.
   def self.make_request(path, args, verb, options = {})
     http_service.make_request(path, args, verb, options)
   end

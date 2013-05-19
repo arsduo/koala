@@ -59,6 +59,13 @@ module KoalaTest
       end
 
       config.after :each do
+        # Clean up Koala config
+        Koala.configure do |config|
+          Koala::HTTPService::DEFAULT_SERVERS.each_pair do |k, v|
+            config.send("#{k}=", v)
+          end
+        end
+
         # if we're working with a real user, clean up any objects posted to Facebook
         # no need to do so for test users, since they get deleted at the end
         if @temporary_object_id && KoalaTest.real_user?
@@ -72,6 +79,7 @@ module KoalaTest
           # if we errored out or Facebook returned false, track that
           puts "Unable to delete #{@temporary_object_id}: #{result} (probably a photo or video, which can't be deleted through the API)" unless result
         end
+
       end
     end
   end

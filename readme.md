@@ -124,7 +124,8 @@ require 'koala'
 
 Koala.configure do |config|
   config.graph_server = 'my-graph-mock.mysite.com'
-  # also available are the `rest_server` and `dialog_host`
+  # other common options are `rest_server` and `dialog_host`
+  # see lib/koala/http_service.rb
 end
 ```
 
