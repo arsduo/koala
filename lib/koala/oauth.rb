@@ -75,6 +75,9 @@ module Koala
       #
       # @param options any query values to add to the URL, as well as any special/required values listed below.
       # @option options permissions an array or comma-separated string of desired permissions
+      # @option options state a unique string to serve as a CSRF (cross-site request
+      #                 forgery) token -- highly recommended for security. See
+      #                 https://developers.facebook.com/docs/howtos/login/server-side-login/
       #
       # @raise ArgumentError if no OAuth callback was specified in OAuth#new or in options as :redirect_uri
       #
