@@ -17,14 +17,14 @@ Koala
 Installation
 ---
 
-Easy:
-```bash
-[sudo|rvm] gem install koala --pre
-```
-
-Or in Bundler:
+In Bundler:
 ```ruby
 gem "koala", "~> 1.7.0rc1"
+```
+
+Otherwise:
+```bash
+[sudo|rvm] gem install koala --pre
 ```
 
 Graph API
