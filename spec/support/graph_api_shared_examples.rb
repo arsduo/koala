@@ -272,6 +272,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result = @api.put_wall_post("body", args)
     @temporary_object_id = result["id"]
     @temporary_object_id.should_not be_nil
+    puts @api.get_object(@temporary_object_id)
   end
 
   describe "#put_picture" do

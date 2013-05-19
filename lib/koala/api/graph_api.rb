@@ -142,6 +142,7 @@ module Koala
       def put_connections(id, connection_name, args = {}, options = {}, &block)
         # Posts a certain connection
         raise AuthenticationError.new(nil, nil, "Write operations require an access token") unless @access_token
+
         graph_call("#{id}/#{connection_name}", args, "post", options, &block)
       end
 
@@ -226,6 +227,9 @@ module Koala
       # @param message the message to write for the wall
       # @param attachment a hash describing the wall post
       #         (see the {https://developers.facebook.com/docs/guides/attachments/ stream attachments} documentation.)
+      #         If attachment contains a properties key, this will be turned to
+      #         JSON (if it's a hash) since Facebook's API, oddly, requires
+      #         this.
       # @param target_id the target wall
       # @param options (see #get_object)
       # @param block (see Koala::Facebook::API#api)
@@ -242,6 +246,12 @@ module Koala
       # @see #put_connections
       # @return (see #put_connections)
       def put_wall_post(message, attachment = {}, target_id = "me", options = {}, &block)
+        if properties = attachment.delete(:properties) || attachment.delete("properties")
+          puts "Got properties!"
+          properties = MultiJson.dump(properties) if properties.is_a?(Hash) || properties.is_a?(Array)
+          attachment["properties"] = properties
+        end
+        puts attachment
         put_connections(target_id, "feed", attachment.merge({:message => message}), options, &block)
       end
 
@@ -396,6 +406,15 @@ module Koala
         get_object("comments", args, options, &block)
       end
 
+      # App restrictions require you to JSON-encode the restriction value. This
+      # is neither obvious nor intuitive, so this convenience method is
+      # provided.
+      #
+      # @params app_id the application to apply the restrictions to
+      # @params restrictions_hash the restrictions to apply
+      # @param args (see #get_object)
+      # @param options (see #get_object)
+      # @param block (see Koala::Facebook::API#api)
       def set_app_restrictions(app_id, restrictions_hash, args = {}, options = {}, &block)
         graph_call(app_id, args.merge(:restrictions => MultiJson.dump(restrictions_hash)), "post", options, &block)
       end
