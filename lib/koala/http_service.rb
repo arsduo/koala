@@ -90,7 +90,7 @@ module Koala
 
       # set up our Faraday connection
       # we have to manually assign params to the URL or the
-      conn = Faraday.new(server(request_options), request_options, &(faraday_middleware || DEFAULT_MIDDLEWARE))
+      conn = Faraday.new(server(request_options), faraday_options(request_options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
       response = conn.send(verb, path, (verb == "post" ? params : {}))
 
@@ -215,6 +215,11 @@ module Koala
       end
 
       options
+    end
+
+    def self.faraday_options(options)
+      valid_options = [:request, :proxy, :ssl, :builder, :url, :parallel_manager, :params, :headers, :builder_class]
+      options.select { |key,value| valid_options.include?(key) }
     end
   end
 
