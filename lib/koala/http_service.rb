@@ -219,7 +219,7 @@ module Koala
 
     def self.faraday_options(options)
       valid_options = [:request, :proxy, :ssl, :builder, :url, :parallel_manager, :params, :headers, :builder_class]
-      options.select { |key,value| valid_options.include?(key) }
+      Hash[ options.select { |key,value| valid_options.include?(key) } ]
     end
   end
 
