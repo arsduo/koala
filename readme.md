@@ -109,8 +109,6 @@ Fortunately, Koala supports the REST API using the very same interface; to use t
 Of course, you can use the Graph API methods on the same object -- the power of two APIs right in the palm of your hand.
 ```ruby
 @api = Koala::Facebook::API.new(oauth_access_token)
-
-@api = Koala::Facebook::API.new(oauth_access_token)
 fql = @api.fql_query(my_fql_query)
 @api.put_wall_post(process_result(fql))
 ```
