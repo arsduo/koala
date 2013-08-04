@@ -7,6 +7,9 @@ module Koala
     # The OAuth signature is incomplete, invalid, or using an unsupported algorithm
     class OAuthSignatureError < ::Koala::KoalaError; end
 
+    # Required for realtime updates validation
+    class AppSecretNotDefinedError < ::Koala::KoalaError; end
+
     # Facebook responded with an error to an API request. If the exception contains a nil
     # http_status, then the error was detected before making a call to Facebook. (e.g. missing access token)
     class APIError < ::Koala::KoalaError
