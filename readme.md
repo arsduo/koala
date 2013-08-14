@@ -130,15 +130,15 @@ end
 Of course the defaults are the facebook endpoints and you can additionally configure the beta
 tier and video upload matching and replacement strings.
 
-You can also set the [appsecret_proof](https://developers.facebook.com/docs/reference/api/securing-graph-api/) parameter to tie your access tokens to your app secret:
+You can also set your appsecret in order to pass the [appsecret_proof](https://developers.facebook.com/docs/reference/api/securing-graph-api/) parameter to tie your access tokens to your app secret:
 ```ruby
-require 'gibberish'
+# config/initializers/koala.rb
+require 'koala'
 
 app_secret = '...'
-access_token = '...'
 
 Koala.configure do |config|
-  config.appsecret_proof = Gibberish::HMAC(app_secret, access_token, :digest => :sha256)
+  config.appsecret = app_secret
   # see lib/koala/api/graph_api.rb
 end
 ```
