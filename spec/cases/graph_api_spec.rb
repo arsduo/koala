@@ -60,10 +60,6 @@ describe 'Koala::Facebook::GraphAPIMethods' do
   end
 
   describe "the appsecret_proof argument" do
-    after do
-      Koala.instance_variable_set(:@config, nil)
-    end
-
     let(:path) { 'path' }
 
     it "should be passed to #api if a value is provided" do

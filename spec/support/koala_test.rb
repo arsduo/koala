@@ -60,11 +60,7 @@ module KoalaTest
 
       config.after :each do
         # Clean up Koala config
-        Koala.configure do |config|
-          Koala::HTTPService::DEFAULT_SERVERS.each_pair do |k, v|
-            config.send("#{k}=", v)
-          end
-        end
+        Koala.instance_variable_set(:@config, nil)
 
         # if we're working with a real user, clean up any objects posted to Facebook
         # no need to do so for test users, since they get deleted at the end
