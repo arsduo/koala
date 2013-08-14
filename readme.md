@@ -130,6 +130,21 @@ end
 Of course the defaults are the facebook endpoints and you can additionally configure the beta
 tier and video upload matching and replacement strings.
 
+You can also set the [appsecret_proof](https://developers.facebook.com/docs/reference/api/securing-graph-api/) parameter to tie your access tokens to your app secret:
+```ruby
+require 'gibberish'
+
+app_secret = '...'
+access_token = '...'
+
+Koala.configure do |config|
+  config.appsecret_proof = Gibberish::HMAC(app_secret, access_token, :digest => :sha256)
+  # see lib/koala/api/graph_api.rb
+end
+```
+
+You'll probably want to turn on 'Require proof on all calls' in the advanced section of your app's settings if you do this.
+
 OAuth
 -----
 You can use the Graph and REST APIs without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
