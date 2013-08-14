@@ -16,8 +16,9 @@ shared_examples_for "Koala GraphAPI" do
   # GRAPH CALL
   describe "graph_call" do
     it "passes all arguments to the api method" do
-      args = [KoalaTest.user1, {}, "get", {:a => :b}]
-      @api.should_receive(:api).with(*args)
+      opts = {:a => :b}
+      args = [KoalaTest.user1, {}, "get", opts]
+      @api.should_receive(:api).with(*args[0..-2], opts.merge(:appsecret_proof => true))
       @api.graph_call(*args)
     end
 

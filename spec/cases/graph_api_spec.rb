@@ -59,34 +59,15 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     end
   end
 
-  describe "the appsecret_proof argument" do
-    let(:path) { 'path' }
+  context '#graph_call' do
+    describe "the appsecret_proof option" do
+      let(:path) { '/path' }
 
-    it "should be passed to #api if a value is provided" do
-      appsecret_proof = 'appsecret_proof'
-      Koala.configure do |config|
-        config.appsecret_proof = appsecret_proof
+      it "should be passed to #api" do
+        @api.should_receive(:api).with(path, {}, 'get', :appsecret_proof => true)
+
+        @api.graph_call(path)
       end
-
-      @api.should_receive(:api).with(path, { 'appsecret_proof' => appsecret_proof }, 'get', {})
-
-      @api.graph_call(path)
-    end
-
-    it "should not be passed to #api unless a value is provided" do
-      @api.should_receive(:api).with(path, {}, 'get', {})
-
-      @api.graph_call(path)
-    end
-
-    it "should not be passed to #api if a value of nil is provided" do
-      Koala.configure do |config|
-        config.appsecret_proof = nil
-      end
-
-      @api.should_receive(:api).with(path, {}, 'get', {})
-
-      @api.graph_call(path)
     end
   end
 end

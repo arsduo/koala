@@ -1,6 +1,7 @@
 # graph_batch_api and legacy are required at the bottom, since they depend on API being defined
 require 'koala/api/graph_api'
 require 'koala/api/rest_api'
+require 'openssl'
 
 module Koala
   module Facebook
@@ -45,6 +46,8 @@ module Koala
         # This is explicitly needed in batch requests so GraphCollection
         # results preserve any specific access tokens provided
         args["access_token"] ||= @access_token || @app_access_token if @access_token || @app_access_token
+        args['appsecret_proof'] = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), Koala.config.appsecret, args['access_token']) if options[:appsecret_proof] && args['access_token'] && Koala.config.appsecret
+        options = options.reject { |k| k == :appsecret_proof }
 
         # Translate any arrays in the params into comma-separated strings
         args = sanitize_request_parameters(args)
