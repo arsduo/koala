@@ -47,7 +47,7 @@ module Koala
         # results preserve any specific access tokens provided
         args["access_token"] ||= @access_token || @app_access_token if @access_token || @app_access_token
         args['appsecret_proof'] = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), Koala.config.appsecret, args['access_token']) if options[:appsecret_proof] && args['access_token'] && Koala.config.appsecret
-        options = options.reject { |k| k == :appsecret_proof }
+        options = options.reject { |k,v| k == :appsecret_proof }
 
         # Translate any arrays in the params into comma-separated strings
         args = sanitize_request_parameters(args)
