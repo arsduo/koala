@@ -10,13 +10,13 @@ end
 
 describe "Koala::UploadableIO" do
   def rails_3_mocks
-    tempfile = stub('Tempfile', :path => "foo")
-    uploaded_file = stub('ActionDispatch::Http::UploadedFile',
+    tempfile = double('Tempfile', :path => "foo")
+    uploaded_file = double('ActionDispatch::Http::UploadedFile',
       :content_type => true,
       :tempfile => tempfile,
       :original_filename => "bar"
     )
-    tempfile.stub!(:respond_to?).with(:path).and_return(true)
+    tempfile.stub(:respond_to?).with(:path).and_return(true)
 
     [tempfile, uploaded_file]
   end
@@ -34,7 +34,7 @@ describe "Koala::UploadableIO" do
 
       describe "and a content type" do
         before :each do
-          @stub_type = stub("image/jpg")
+          @stub_type = double("image/jpg")
           @koala_io_params.concat([@stub_type])
         end
 
@@ -72,7 +72,7 @@ describe "Koala::UploadableIO" do
         end
 
         it "returns an UploadableIO with the same content_type" do
-          content_stub = @koala_io_params[1] = stub('Content Type')
+          content_stub = @koala_io_params[1] = double('Content Type')
           Koala::UploadableIO.new(*@koala_io_params).content_type.should == content_stub
         end
 
@@ -102,7 +102,7 @@ describe "Koala::UploadableIO" do
         end
 
         it "returns an UploadableIO with the same content_type" do
-          content_stub = @koala_io_params[1] = stub('Content Type')
+          content_stub = @koala_io_params[1] = double('Content Type')
           Koala::UploadableIO.new(*@koala_io_params).content_type.should == content_stub
         end
       end
@@ -120,13 +120,13 @@ describe "Koala::UploadableIO" do
       end
 
       it "gets the path from the tempfile associated with the UploadedFile" do
-        expected_path = stub('Tempfile')
+        expected_path = double('Tempfile')
         @tempfile.should_receive(:path).and_return(expected_path)
         Koala::UploadableIO.new(@uploaded_file).io_or_path.should == expected_path
       end
 
       it "gets the content type via the content_type method" do
-        expected_content_type = stub('Content Type')
+        expected_content_type = double('Content Type')
         @uploaded_file.should_receive(:content_type).and_return(expected_content_type)
         Koala::UploadableIO.new(@uploaded_file).content_type.should == expected_content_type
       end
@@ -142,7 +142,7 @@ describe "Koala::UploadableIO" do
       end
 
       it "gets the io_or_path from the :tempfile key" do
-        expected_file = stub('File')
+        expected_file = double('File')
         @file_hash[:tempfile] = expected_file
 
         uploadable = Koala::UploadableIO.new(@file_hash)
@@ -150,7 +150,7 @@ describe "Koala::UploadableIO" do
       end
 
       it "gets the content type from the :type key" do
-        expected_content_type = stub('Content Type')
+        expected_content_type = double('Content Type')
         @file_hash[:type] = expected_content_type
 
         uploadable = Koala::UploadableIO.new(@file_hash)
@@ -179,8 +179,8 @@ describe "Koala::UploadableIO" do
 
   describe "getting an UploadableIO" do
     before(:each) do
-      @upload_io = stub("UploadIO")
-      UploadIO.stub!(:new).with(anything, anything, anything).and_return(@upload_io)
+      @upload_io = double("UploadIO")
+      UploadIO.stub(:new).with(anything, anything, anything).and_return(@upload_io)
     end
 
     context "if no filename was provided" do
@@ -206,7 +206,7 @@ describe "Koala::UploadableIO" do
     end
 
     it "should open up and return a file corresponding to the path if io_or_path is a path" do
-      result = stub("File")
+      result = double("File")
       File.should_receive(:open).with(BEACH_BALL_PATH).and_return(result)
       Koala::UploadableIO.new(BEACH_BALL_PATH).to_file.should == result
     end

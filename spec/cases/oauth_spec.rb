@@ -28,8 +28,8 @@ describe "Koala::Facebook::OAuth" do
 
   before :each do
     @time = Time.now
-    Time.stub!(:now).and_return(@time)
-    @time.stub!(:to_i).and_return(1273363199)
+    Time.stub(:now).and_return(@time)
+    @time.stub(:to_i).and_return(1273363199)
   end
 
   describe ".new" do
@@ -670,7 +670,7 @@ describe "Koala::Facebook::OAuth" do
     end
 
     it "throws an error if the signature is invalid" do
-      OpenSSL::HMAC.stub!(:hexdigest).and_return("i'm an invalid signature")
+      OpenSSL::HMAC.stub(:hexdigest).and_return("i'm an invalid signature")
       lambda { @oauth.parse_signed_request(@signed_request) }.should raise_error
     end
 
