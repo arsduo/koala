@@ -167,12 +167,12 @@ describe "Koala::UploadableIO" do
       # what that means is tested below
       it "should accept a file object alone" do
         params = [BEACH_BALL_PATH]
-        lambda { Koala::UploadableIO.new(*params) }.should_not raise_exception(Koala::KoalaError)
+        lambda { Koala::UploadableIO.new(*params) }.should_not raise_exception
       end
 
       it "should accept a file path alone" do
         params = [BEACH_BALL_PATH]
-        lambda { Koala::UploadableIO.new(*params) }.should_not raise_exception(Koala::KoalaError)
+        lambda { Koala::UploadableIO.new(*params) }.should_not raise_exception
       end
     end
   end
