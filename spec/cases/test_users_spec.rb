@@ -190,7 +190,7 @@ describe "Koala::Facebook::TestUsers" do
         array = 200.times.collect { {"id" => rand}}
         @test_users.should_receive(:list).and_return(array, [])
         batch_api = stub("batch API")
-        @test_users.api.should_receive(:batch).and_yield(batch_api).any_number_of_times
+        allow(@test_users.api).to receive(:batch).and_yield(batch_api)
         array.each {|item| batch_api.should_receive(:delete_object).with(item["id"]) }
         @test_users.delete_all
       end
@@ -204,7 +204,7 @@ describe "Koala::Facebook::TestUsers" do
 
       it "breaks if Facebook sends back the same list twice" do
         list = [{"id" => rand}]
-        @test_users.should_receive(:list).any_number_of_times.and_return(list)
+        allow(@test_users).to receive(:list).and_return(list)
         @test_users.api.should_receive(:batch).once
         @test_users.delete_all
       end
