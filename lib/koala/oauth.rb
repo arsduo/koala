@@ -132,6 +132,34 @@ module Koala
         build_url("http://#{Koala.config.dialog_host}/dialog/#{dialog_type}", true, url_options)
       end
 
+      # Generates a 'client code' from a server side long-lived access token. With the generated
+      # code, it can be sent to a client application which can then use it to get a long-lived
+      # access token from Facebook. After which the clients can use that access token to make
+      # requests to Facebook without having to use the server token, yet the server access token
+      # remains valid.
+      # See https://developers.facebook.com/docs/facebook-login/access-tokens/#long-via-code
+      #
+      # @param access_token a user's long lived (server) access token
+      #
+      # @raise Koala::Facebook::ServerError if Facebook returns a server error (status >= 500)
+      # @raise Koala::Facebook::OAuthTokenRequestError if Facebook returns an error response (status >= 400)
+      # @raise Koala::Facebook::BadFacebookResponse if Facebook returns a blank response
+      # @raise Koala::KoalaError if response does not contain 'code' hash key
+      #
+      # @return a string of the generated 'code'
+      def generate_client_code(access_token)
+        response = fetch_token_string({redirect_uri: @oauth_callback_url, access_token: access_token}, false, 'client_code')
+
+        # Facebook returns an empty body in certain error conditions
+        if response == ''
+          raise BadFacebookResponse.new(200, '', 'generate_client_code received an error: empty response body')
+        else
+          result = MultiJson.load(response)
+        end
+
+        result.has_key?('code') ? result['code'] : raise(Koala::KoalaError.new("Facebook returned a valid response without the expected 'code' in the body (response = #{response})"))
+      end
+
       # access tokens
 
       # Fetches an access token, token expiration, and other info from Facebook.

@@ -373,6 +373,46 @@ describe "Koala::Facebook::OAuth" do
     end
   end
 
+  describe 'for generating a client code' do
+    describe '#generate_client_code' do
+      if KoalaTest.mock_interface? || KoalaTest.oauth_token
+        it 'makes a request using the correct endpoint' do
+          Koala.should_receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"code": "fake_client_code"}', {}))
+          @oauth.generate_client_code(KoalaTest.oauth_token)
+        end
+
+        it 'gets a valid client code returned' do
+          Koala.should_receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"code": "fake_client_code"}', {}))
+          result = @oauth.generate_client_code(KoalaTest.oauth_token)
+          result.should be_a(String)
+          result.should eq('fake_client_code')
+        end
+
+        it 'raises a BadFacebookResponse error when empty response body is returned' do
+          Koala.should_receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '', {}))
+          lambda { @oauth.generate_client_code(KoalaTest.oauth_token) }.should raise_error(Koala::Facebook::BadFacebookResponse)
+        end
+
+        it 'raises an OAuthTokenRequestError when empty response body is returned' do
+          Koala.should_receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(400, '', {}))
+          lambda { @oauth.generate_client_code(KoalaTest.oauth_token) }.should raise_error(Koala::Facebook::OAuthTokenRequestError)
+        end
+
+        it 'raises a ServerError when empty response body is returned' do
+          Koala.should_receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(500, '', {}))
+          lambda { @oauth.generate_client_code(KoalaTest.oauth_token) }.should raise_error(Koala::Facebook::ServerError)
+        end
+
+        it 'raises a KoalaError when empty response body is returned' do
+          Koala.should_receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"client_code":"should_not_be_returned"}', {}))
+          lambda { @oauth.generate_client_code(KoalaTest.oauth_token) }.should raise_error(Koala::KoalaError)
+        end
+      else
+        pending "Some OAuth token exchange tests will not be run since the access token field in facebook_data.yml is blank."
+      end
+    end
+  end
+
   describe "for fetching access tokens" do
     describe "#get_access_token_info" do
       it "uses options[:redirect_uri] if provided" do
