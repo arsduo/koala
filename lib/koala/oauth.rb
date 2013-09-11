@@ -148,7 +148,7 @@ module Koala
       #
       # @return a string of the generated 'code'
       def generate_client_code(access_token)
-        response = fetch_token_string({redirect_uri: @oauth_callback_url, access_token: access_token}, false, 'client_code')
+        response = fetch_token_string({:redirect_uri => @oauth_callback_url, :access_token => access_token}, false, 'client_code')
 
         # Facebook returns an empty body in certain error conditions
         if response == ''
