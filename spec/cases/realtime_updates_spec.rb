@@ -213,7 +213,14 @@ describe "Koala::Facebook::RealtimeUpdates" do
     end
   end
 
-  describe ".validate_update" do
+  describe "#validate_update" do
+    it "raises an error if no secret is defined" do
+      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => "foo")
+      expect {
+        updates.validate_update("", {})
+      }.to raise_exception(Koala::Facebook::AppSecretNotDefinedError)
+    end
+
     it "returns false if there is no X-Hub-Signature header" do
       @updates.validate_update("", {}).should be_false
     end
