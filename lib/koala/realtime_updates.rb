@@ -125,7 +125,7 @@ module Koala
       #     end
       #   end
       def validate_update(body, headers)
-        if @secret == nil
+        unless @secret
           raise AppSecretNotDefinedError, "You must init RealtimeUpdates with your app secret in order to validate updates"
         end
 
