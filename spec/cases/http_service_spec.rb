@@ -192,21 +192,28 @@ describe Koala::HTTPService do
       end
 
       it "merges Koala::HTTPService.http_options into the request params" do
-        http_options = {:a => 2, :c => "3"}
+        http_options = {:proxy => "http://user:password@example.org/", :request => { :timeout => 3 }}
         Koala::HTTPService.http_options = http_options
         Faraday.should_receive(:new).with(anything, hash_including(http_options)).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get")
       end
 
+      it "does not merge invalid Faraday options from Koala::HTTPService.http_options into the request params" do
+        http_options = {:invalid => "fake param"}
+        Koala::HTTPService.http_options = http_options
+        Faraday.should_receive(:new).with(anything, hash_not_including(http_options)).and_return(@mock_connection)
+        Koala::HTTPService.make_request("anything", {}, "get")
+      end
+
       it "merges any provided options into the request params" do
-        options = {:a => 2, :c => "3"}
+        options = {:proxy => "http://user:password@example.org/", :request => { :timeout => 3 }}
         Faraday.should_receive(:new).with(anything, hash_including(options)).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get", options)
       end
 
       it "overrides Koala::HTTPService.http_options with any provided options for the request params" do
-        options = {:a => 2, :c => "3"}
-        http_options = {:a => :a}
+        options = {:proxy => "http://user:password@proxy.org/", :request => { :timeout => 10 }}
+        http_options = {:proxy => "http://user:password@example.org/", :request => { :timeout => 3 }}
         Koala::HTTPService.stub(:http_options).and_return(http_options)
 
         Faraday.should_receive(:new).with(anything, hash_including(http_options.merge(options))).and_return(@mock_connection)
@@ -216,7 +223,7 @@ describe Koala::HTTPService do
       it "forces use_ssl to true if an access token is present" do
         options = {:use_ssl => false}
         Koala::HTTPService.stub(:http_options).and_return(:use_ssl => false)
-        Faraday.should_receive(:new).with(anything, hash_including(:use_ssl => true, :ssl => {:verify => true})).and_return(@mock_connection)
+        Faraday.should_receive(:new).with(anything, hash_including(:ssl => {:verify => true})).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get", options)
       end
 
@@ -445,13 +452,13 @@ describe Koala::HTTPService do
 
       describe ":typhoeus_options" do
         it "merges any typhoeus_options into options" do
-          typhoeus_options = {:a => 2}
+          typhoeus_options = {:proxy => "http://user:password@example.org/" }
           Faraday.should_receive(:new).with(anything, hash_including(typhoeus_options)).and_return(@mock_connection)
           Koala::HTTPService.make_request("anything", {}, "get", :typhoeus_options => typhoeus_options)
         end
 
         it "deletes the typhoeus_options key" do
-          typhoeus_options = {:a => 2}
+          typhoeus_options = {:proxy => "http://user:password@example.org/" }
           Faraday.should_receive(:new).with(anything, hash_not_including(:typhoeus_options => typhoeus_options)).and_return(@mock_connection)
           Koala::HTTPService.make_request("anything", {}, "get", :typhoeus_options => typhoeus_options)
         end
