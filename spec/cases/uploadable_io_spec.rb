@@ -86,6 +86,38 @@ describe "Koala::UploadableIO" do
       end
     end
 
+
+    describe "when given a Tempfile object" do
+      before(:each) do
+        @file = Tempfile.new('coucou')
+        @koala_io_params = [@file]
+      end
+
+      describe "and a content type" do
+        before :each do
+          @koala_io_params.concat(["image/jpg"])
+        end
+
+        it "returns an UploadIO with the same io" do
+          #Problem comparing Tempfile in Ruby 1.8, REE and Rubinius mode 1.8
+          Koala::UploadableIO.new(*@koala_io_params).io_or_path.path.should == @koala_io_params[0].path
+        end
+
+        it "returns an UploadableIO with the same content_type" do
+          content_stub = @koala_io_params[1] = stub('Content Type')
+          Koala::UploadableIO.new(*@koala_io_params).content_type.should == content_stub
+        end
+
+        it "returns an UploadableIO with the right filename" do
+          Koala::UploadableIO.new(*@koala_io_params).filename.should == File.basename(@file.path)
+        end
+      end
+
+      describe "and no content type" do
+        it_should_behave_like "determining a mime type"
+      end
+    end
+
     describe "when given an IO object" do
       before(:each) do
         @io = StringIO.open("abcdefgh")
