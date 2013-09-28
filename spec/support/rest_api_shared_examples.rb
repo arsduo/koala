@@ -2,7 +2,7 @@ shared_examples_for "Koala RestAPI" do
   # REST_CALL
   describe "when making a rest request" do
     it "uses the proper path" do
-      method = stub('methodName')
+      method = double('methodName')
       @api.should_receive(:api).with(
         "method/#{method}",
         anything,
@@ -146,7 +146,7 @@ shared_examples_for "Koala RestAPI with an access token" do
       @api.should_receive(:rest_call).with(anything, anything, opts, anything)
       @api.set_app_properties({}, {}, opts)
     end
-    
+
     it "makes a POST" do
       @api.should_receive(:rest_call).with(anything, anything, anything, "post")
       @api.set_app_properties({})

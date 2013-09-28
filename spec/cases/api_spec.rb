@@ -39,8 +39,8 @@ describe "Koala::Facebook::API" do
   it "gets the attribute of a Koala::HTTPService::Response given by the http_component parameter" do
     http_component = :method_name
 
-    response = mock('Mock KoalaResponse', :body => '', :status => 200)
-    result = stub("result")
+    response = double('Mock KoalaResponse', :body => '', :status => 200)
+    result = double("result")
     response.stub(http_component).and_return(result)
     Koala.stub(:make_request).and_return(response)
 
@@ -49,7 +49,7 @@ describe "Koala::Facebook::API" do
 
   it "returns the entire response if http_component => :response" do
     http_component = :response
-    response = mock('Mock KoalaResponse', :body => '', :status => 200)
+    response = double('Mock KoalaResponse', :body => '', :status => 200)
     Koala.stub(:make_request).and_return(response)
     @service.api('anything', {}, 'get', :http_component => http_component).should == response
   end
@@ -57,7 +57,7 @@ describe "Koala::Facebook::API" do
   it "turns arrays of non-enumerables into comma-separated arguments" do
     args = [12345, {:foo => [1, 2, "3", :four]}]
     expected = ["/12345", {:foo => "1,2,3,four"}, "get", {}]
-    response = mock('Mock KoalaResponse', :body => '', :status => 200)
+    response = double('Mock KoalaResponse', :body => '', :status => 200)
     Koala.should_receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
   end
@@ -69,16 +69,16 @@ describe "Koala::Facebook::API" do
     # (if appropriate behavior is defined)
     # or raise an exception
     expected = ["/12345", params, "get", {}]
-    response = mock('Mock KoalaResponse', :body => '', :status => 200)
+    response = double('Mock KoalaResponse', :body => '', :status => 200)
     Koala.should_receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
   end
 
   it "returns the body of the request as JSON if no http_component is given" do
-    response = stub('response', :body => 'body', :status => 200)
+    response = double('response', :body => 'body', :status => 200)
     Koala.stub(:make_request).and_return(response)
 
-    json_body = mock('JSON body')
+    json_body = double('JSON body')
     MultiJson.stub(:load).and_return([json_body])
 
     @service.api('anything').should == json_body
@@ -88,7 +88,7 @@ describe "Koala::Facebook::API" do
     response = Koala::HTTPService::Response.new(200, '{}', {})
     Koala.stub(:make_request).and_return(response)
 
-    yield_test = mock('Yield Tester')
+    yield_test = double('Yield Tester')
     yield_test.should_receive(:pass)
 
     @service.api('anything', {}, "get") do |arg|
