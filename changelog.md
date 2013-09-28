@@ -1,3 +1,17 @@
+v1.8
+====
+
+New methods:
+* OAuth#generate_client_code lets you get long-lived user tokens for client apps (thanks, binarygeek!)
+
+Internal Improvements:
+* CHANGED: Koala now properly uploads Tempfiles like Files, detecting mime type (thanks, ys!)
+* CHANGED: Koala now only passes valid Faraday options, improving compatibility with 0.9 (thanks, lsimoneau!)
+* FIXED: RealtimeUpdates#validate_update now raise a proper error if secret is missing (thanks, theosp!)
+
+Testing improvements:
+* Fixed RSpec deprecations (thanks, sanemat!)
+
 v1.7
 ====
 
