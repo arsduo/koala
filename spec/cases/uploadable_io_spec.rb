@@ -104,7 +104,7 @@ describe "Koala::UploadableIO" do
         end
 
         it "returns an UploadableIO with the same content_type" do
-          content_stub = @koala_io_params[1] = stub('Content Type')
+          content_stub = @koala_io_params[1] = double('Content Type')
           Koala::UploadableIO.new(*@koala_io_params).content_type.should == content_stub
         end
 
