@@ -125,6 +125,10 @@ module Koala
       #     end
       #   end
       def validate_update(body, headers)
+        if @secret == nil
+          raise AppSecretNotDefinedError, "You must init RealtimeUpdates with your app secret in order to validate updates"
+        end
+
         if request_signature = headers['X-Hub-Signature'] || headers['HTTP_X_HUB_SIGNATURE'] and
            signature_parts = request_signature.split("sha1=")
           request_signature = signature_parts[1]
