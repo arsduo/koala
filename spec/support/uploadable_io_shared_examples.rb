@@ -8,7 +8,7 @@ shared_examples_for "MIME::Types can't return results" do
     it "should properly get content types for #{extension} using basic analysis" do
       path = "filename.#{extension}"
       if @koala_io_params[0].is_a?(File)
-        @koala_io_params[0].stub!(:path).and_return(path)
+        @koala_io_params[0].stub(:path).and_return(path)
       else
         @koala_io_params[0] = path
       end
@@ -18,7 +18,7 @@ shared_examples_for "MIME::Types can't return results" do
     it "should get content types for #{extension} using basic analysis with file names with more than one dot" do
       path = "file.name.#{extension}"
       if @koala_io_params[0].is_a?(File)
-        @koala_io_params[0].stub!(:path).and_return(path)
+        @koala_io_params[0].stub(:path).and_return(path)
       else
         @koala_io_params[0] = path
       end
@@ -30,7 +30,7 @@ shared_examples_for "MIME::Types can't return results" do
     before :each do
       path = "badfile.badextension"
       if @koala_io_params[0].is_a?(File)
-        @koala_io_params[0].stub!(:path).and_return(path)
+        @koala_io_params[0].stub(:path).and_return(path)
       else
         @koala_io_params[0] = path
       end

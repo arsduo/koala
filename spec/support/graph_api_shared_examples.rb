@@ -140,11 +140,11 @@ shared_examples_for "Koala GraphAPI" do
   describe "#fql_query" do
     it "makes a request to /fql" do
       @api.should_receive(:get_object).with("fql", anything, anything)
-      @api.fql_query stub('query string')
+      @api.fql_query double('query string')
     end
 
     it "passes a query argument" do
-      query = stub('query string')
+      query = double('query string')
       @api.should_receive(:get_object).with(anything, hash_including(:q => query), anything)
       @api.fql_query(query)
     end
@@ -163,7 +163,7 @@ shared_examples_for "Koala GraphAPI" do
     end
 
     it "passes a queries argument" do
-      queries = stub('query string')
+      queries = double('query string')
       queries_json = "some JSON"
       MultiJson.stub(:dump).with(queries).and_return(queries_json)
 
@@ -338,7 +338,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
 
     it "sets options[:video] to true" do
-      source = stub("UploadIO")
+      source = double("UploadIO")
       Koala::UploadableIO.stub(:new).and_return(source)
       source.stub(:requires_base_http_service).and_return(false)
       Koala.should_receive(:make_request).with(anything, anything, anything, hash_including(:video => true)).and_return(Koala::HTTPService::Response.new(200, "[]", {}))

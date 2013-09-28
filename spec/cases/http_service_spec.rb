@@ -17,7 +17,7 @@ describe Koala::HTTPService do
 
   describe "DEFAULT_MIDDLEWARE" do
     before :each do
-      @builder = stub("Faraday connection builder")
+      @builder = double("Faraday connection builder")
       @builder.stub(:request)
       @builder.stub(:adapter)
       @builder.stub(:use)
@@ -173,11 +173,11 @@ describe Koala::HTTPService do
   describe ".make_request" do
     before :each do
       # Setup stubs for make_request to execute without exceptions
-      @mock_body = stub('Typhoeus response body')
-      @mock_headers_hash = stub({:value => "headers hash"})
-      @mock_http_response = stub("Faraday Response", :status => 200, :headers => @mock_headers_hash, :body => @mock_body)
+      @mock_body = double('Typhoeus response body')
+      @mock_headers_hash = double({:value => "headers hash"})
+      @mock_http_response = double("Faraday Response", :status => 200, :headers => @mock_headers_hash, :body => @mock_body)
 
-      @mock_connection = stub("Faraday connection")
+      @mock_connection = double("Faraday connection")
       @mock_connection.stub(:get).and_return(@mock_http_response)
       @mock_connection.stub(:post).and_return(@mock_http_response)
       Faraday.stub(:new).and_return(@mock_connection)
@@ -319,7 +319,7 @@ describe Koala::HTTPService do
 
       it "turns any UploadableIOs to UploadIOs" do
         # technically this is done for all requests, but you don't send GET requests with files
-        upload_io = stub("UploadIO")
+        upload_io = double("UploadIO")
         u = Koala::UploadableIO.new("/path/to/stuff", "img/jpg")
         u.stub(:to_upload_io).and_return(upload_io)
         @mock_connection.should_receive(:post).with(anything, hash_including("source" => upload_io)).and_return(@mock_http_response)
@@ -440,11 +440,11 @@ describe Koala::HTTPService do
     describe "per-request options" do
       before :each do
         # Setup stubs for make_request to execute without exceptions
-        @mock_body = stub('Typhoeus response body')
-        @mock_headers_hash = stub({:value => "headers hash"})
-        @mock_http_response = stub("Faraday Response", :status => 200, :headers => @mock_headers_hash, :body => @mock_body)
+        @mock_body = double('Typhoeus response body')
+        @mock_headers_hash = double({:value => "headers hash"})
+        @mock_http_response = double("Faraday Response", :status => 200, :headers => @mock_headers_hash, :body => @mock_body)
 
-        @mock_connection = stub("Faraday connection")
+        @mock_connection = double("Faraday connection")
         @mock_connection.stub(:get).and_return(@mock_http_response)
         @mock_connection.stub(:post).and_return(@mock_http_response)
         Faraday.stub(:new).and_return(@mock_connection)

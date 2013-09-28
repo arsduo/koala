@@ -22,20 +22,20 @@ describe Koala do
     end
 
     it "invokes deprecated_interface if present" do
-      mock_service = stub("http service")
+      mock_service = double("http service")
       mock_service.should_receive(:deprecated_interface)
       Koala.http_service = mock_service
     end
 
     it "does not set the service if it's deprecated" do
-      mock_service = stub("http service")
+      mock_service = double("http service")
       mock_service.stub(:deprecated_interface)
       Koala.http_service = mock_service
       Koala.http_service.should == @service
     end
 
     it "sets the service if it's not deprecated" do
-      mock_service = stub("http service")
+      mock_service = double("http service")
       Koala.http_service = mock_service
       Koala.http_service.should == mock_service
     end

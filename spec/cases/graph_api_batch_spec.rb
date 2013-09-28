@@ -52,8 +52,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       describe "when supplied binary files" do
         before :each do
-          @binary = stub("Binary file")
-          @uploadable_io = stub("UploadableIO 1")
+          @binary = double("Binary file")
+          @uploadable_io = double("UploadableIO 1")
 
           @batch_queue = []
           Koala::Facebook::GraphAPI.stub(:batch_calls).and_return(@batch_queue)
@@ -237,10 +237,10 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       describe "with binary files" do
         before :each do
-          @binary = stub("Binary file")
+          @binary = double("Binary file")
           Koala::UploadableIO.stub(:binary_content?).and_return(false)
           Koala::UploadableIO.stub(:binary_content?).with(@binary).and_return(true)
-          @uploadable_io = stub("UploadableIO")
+          @uploadable_io = double("UploadableIO")
           Koala::UploadableIO.stub(:new).with(@binary).and_return(@uploadable_io)
           @uploadable_io.stub(:is_a?).with(Koala::UploadableIO).and_return(true)
 
@@ -317,8 +317,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           # we test above to ensure that files are properly assimilated into the BatchOperation instance
           # right now, we want to make sure that batch_api handles them properly
           @key = "file0_0"
-          @uploadable_io = stub("UploadableIO")
-          batch_op = stub("Koala Batch Operation", :files => {@key => @uploadable_io}, :to_batch_params => {}, :access_token => "foo")
+          @uploadable_io = double("UploadableIO")
+          batch_op = double("Koala Batch Operation", :files => {@key => @uploadable_io}, :to_batch_params => {}, :access_token => "foo")
           Koala::Facebook::GraphBatchAPI::BatchOperation.stub(:new).and_return(batch_op)
 
           Koala.should_receive(:make_request).with(anything, hash_including(@key => @uploadable_io), anything, anything).and_return(@fake_response)
@@ -531,7 +531,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
       # The alternate token is returned with the next page parameters
       # The GraphCollection should receive a request for the next_page_params during paging
-      insights.should_receive(:next_page_params).and_return([stub("base"), @other_access_token_args.dup])
+      insights.should_receive(:next_page_params).and_return([double("base"), @other_access_token_args.dup])
 
       # The alternate access token should pass through to making the request
       # Koala should receive a request during paging using the alternate token
@@ -576,8 +576,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     end
 
     describe 'with post-processing callback' do
-      let(:me_result) { stub("me result") }
-      let(:friends_result) { [stub("friends result")] }
+      let(:me_result) { double("me result") }
+      let(:friends_result) { [double("friends result")] }
 
       let(:me_callback) { lambda {|arg| {"result" => me_result, "args" => arg} } }
       let(:friends_callback) { lambda {|arg| {"result" => friends_result, "args" => arg} } }

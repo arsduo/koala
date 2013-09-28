@@ -189,8 +189,8 @@ describe "Koala::Facebook::TestUsers" do
       it "deletes the batch API to deleten all users found by the list commnand" do
         array = 200.times.collect { {"id" => rand}}
         @test_users.should_receive(:list).and_return(array, [])
-        batch_api = stub("batch API")
-        @test_users.api.should_receive(:batch).and_yield(batch_api).any_number_of_times
+        batch_api = double("batch API")
+        allow(@test_users.api).to receive(:batch).and_yield(batch_api)
         array.each {|item| batch_api.should_receive(:delete_object).with(item["id"]) }
         @test_users.delete_all
       end
@@ -204,7 +204,7 @@ describe "Koala::Facebook::TestUsers" do
 
       it "breaks if Facebook sends back the same list twice" do
         list = [{"id" => rand}]
-        @test_users.should_receive(:list).any_number_of_times.and_return(list)
+        allow(@test_users).to receive(:list).and_return(list)
         @test_users.api.should_receive(:batch).once
         @test_users.delete_all
       end
@@ -291,12 +291,12 @@ describe "Koala::Facebook::TestUsers" do
 
       if KoalaTest.mock_interface?
         id_counter = 999999900
-        @test_users.stub!(:create).and_return do
+        @test_users.stub(:create).and_return do
           id_counter += 1
           {"id" => id_counter, "access_token" => @token, "login_url" => "https://www.facebook.com/platform/test_account.."}
         end
-        @test_users.stub!(:befriend).and_return(true)
-        @test_users.stub!(:delete).and_return(true)
+        @test_users.stub(:befriend).and_return(true)
+        @test_users.stub(:delete).and_return(true)
       end
     end
 
@@ -312,7 +312,7 @@ describe "Koala::Facebook::TestUsers" do
     it "has no built-in network size limit" do
       times = 100
       @test_users.should_receive(:create).exactly(times).times
-      @test_users.stub!(:befriend)
+      @test_users.stub(:befriend)
       @test_users.create_network(times)
     end
 
@@ -321,7 +321,7 @@ describe "Koala::Facebook::TestUsers" do
       installed = false
       count = 25
       @test_users.should_receive(:create).exactly(count).times.with(installed, perms, anything)
-      @test_users.stub!(:befriend)
+      @test_users.stub(:befriend)
       @test_users.create_network(count, installed, perms)
     end
 
