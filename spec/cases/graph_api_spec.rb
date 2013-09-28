@@ -10,21 +10,21 @@ describe 'Koala::Facebook::GraphAPIMethods' do
   end
 
   describe 'post-processing for' do
-    let(:result) { stub("result") }
+    let(:result) { double("result") }
     let(:post_processing) { lambda {|arg| {"result" => result, "args" => arg} } }
 
     # Most API methods have the same signature, we test get_object representatively
     # and the other methods which do some post-processing locally
     context '#get_object' do
       it 'returns result of block' do
-        @api.stub(:api).and_return(stub("other results"))
+        @api.stub(:api).and_return(double("other results"))
         @api.get_object('koppel', &post_processing)["result"].should == result
       end
     end
 
     context '#get_picture' do
       it 'returns result of block' do
-        @api.stub(:api).and_return("Location" => stub("other result"))
+        @api.stub(:api).and_return("Location" => double("other result"))
         @api.get_picture('lukeshepard', &post_processing)["result"].should == result
       end
     end

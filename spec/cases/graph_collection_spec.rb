@@ -45,9 +45,9 @@ describe Koala::Facebook::GraphCollection do
         "data" => [:second, :page, :data],
         "paging" => {}
       }
-      @base = stub("base")
-      @args = stub("args")
-      @page_of_results = stub("page of results")
+      @base = double("base")
+      @args = double("args")
+      @page_of_results = double("page of results")
     end
 
     it "should return the previous page of results" do
@@ -76,15 +76,15 @@ describe Koala::Facebook::GraphCollection do
   describe "when parsing page paramters" do
     describe "#parse_page_url" do
       it "should pass the url to the class method" do
-        url = stub("url")
+        url = double("url")
         Koala::Facebook::GraphCollection.should_receive(:parse_page_url).with(url)
         @collection.parse_page_url(url)
       end
 
       it "should return the result of the class method" do
-        parsed_content = stub("parsed_content")
+        parsed_content = double("parsed_content")
         Koala::Facebook::GraphCollection.stub(:parse_page_url).and_return(parsed_content)
-        @collection.parse_page_url(stub("url")).should == parsed_content
+        @collection.parse_page_url(double("url")).should == parsed_content
       end
     end
 
