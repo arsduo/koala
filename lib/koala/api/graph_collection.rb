@@ -45,7 +45,7 @@ module Koala
         #
         # @example With optional extra params
         #    wall = api.get_connections("me", "feed", since: 1379593891)
-        #    wall.next_page(sice: 1379593891)
+        #    wall.next_page(since: 1379593891)
         #
         # @return a GraphCollection array of additional results (an empty array if there are no more results)
         def next_page extra_params = {}
