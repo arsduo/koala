@@ -41,18 +41,26 @@ module Koala
 
         # Retrieve the next page of results.
         #
+        # @param [Hash] extra_params Some optional extra parameters for paging. For supported parameters see https://developers.facebook.com/docs/reference/api/pagination/
+        #
+        # @example With optional extra params
+        #    wall = api.get_connections("me", "feed", since: 1379593891)
+        #    wall.next_page(sice: 1379593891)
+        #
         # @return a GraphCollection array of additional results (an empty array if there are no more results)
-        def next_page
+        def next_page extra_params = {}
           base, args = next_page_params
-          base ? @api.get_page([base, args]) : nil
+          base ? @api.get_page([base, args.merge(extra_params)]) : nil
         end
 
         # Retrieve the previous page of results.
         #
+        # @param [Hash] extra_params Some optional extra parameters for paging. For supported parameters see https://developers.facebook.com/docs/reference/api/pagination/
+        #
         # @return a GraphCollection array of additional results (an empty array if there are no earlier results)
-        def previous_page
+        def previous_page extra_params = {}
           base, args = previous_page_params
-          base ? @api.get_page([base, args]) : nil
+          base ? @api.get_page([base, args.merge(extra_params)]) : nil
         end
 
         # Arguments that can be sent to {Koala::Facebook::API#graph_call} to retrieve the next page of results.
