@@ -38,6 +38,11 @@ module Koala
     def config
       @config ||= OpenStruct.new(HTTPService::DEFAULT_SERVERS)
     end
+
+    # Used for testing.
+    def reset_config
+      @config = nil
+    end
   end
 
   # @private
