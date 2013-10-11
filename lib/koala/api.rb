@@ -8,10 +8,12 @@ module Koala
     class API
       # Creates a new API client.
       # @param [String] access_token access token
+      # @param [String] app_secret app secret, for tying your access tokens to your app secret
       # @note If no access token is provided, you can only access some public information.
       # @return [Koala::Facebook::API] the API client
-      def initialize(access_token = nil)
+      def initialize(access_token = nil, app_secret = nil)
         @access_token = access_token
+        @app_secret = app_secret
       end
 
       attr_reader :access_token
@@ -46,8 +48,9 @@ module Koala
         # This is explicitly needed in batch requests so GraphCollection
         # results preserve any specific access tokens provided
         args["access_token"] ||= @access_token || @app_access_token if @access_token || @app_access_token
-        args['appsecret_proof'] = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), Koala.config.appsecret, args['access_token']) if options[:appsecret_proof] && args['access_token'] && Koala.config.appsecret
-        options = options.reject { |k,v| k == :appsecret_proof }
+        if options.delete(:appsecret_proof) && args["access_token"] && @app_secret
+          args["appsecret_proof"] = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @app_secret, args["access_token"])
+        end
 
         # Translate any arrays in the params into comma-separated strings
         args = sanitize_request_parameters(args)

@@ -152,90 +152,107 @@ describe "Koala::Facebook::API" do
   end
 
   context '#api' do
-    describe "with the :appsecret_proof option" do
-      let(:access_token) { 'access_token' }
-      let(:api) { Koala::Facebook::API.new(access_token) }
-      let(:path) { '/path' }
-      let(:appsecret) { 'appsecret' }
-      let(:token_args) { { 'access_token' => access_token } }
-      let(:appsecret_proof_args) { { 'appsecret_proof' => OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), appsecret, access_token) } }
-      let(:verb) { 'get' }
-      let(:response) { Koala::HTTPService::Response.new(200, '', '') }
+    let(:access_token) { 'access_token' }
+    let(:api) { Koala::Facebook::API.new(access_token) }
+    let(:path) { '/path' }
+    let(:appsecret) { 'appsecret' }
+    let(:token_args) { { 'access_token' => access_token } }
+    let(:appsecret_proof_args) { { 'appsecret_proof' => OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), appsecret, access_token) } }
+    let(:verb) { 'get' }
+    let(:response) { Koala::HTTPService::Response.new(200, '', '') }
 
-      it "set and with an access token present and an appsecret set, it should send the appsecret_proof argument" do
-        Koala.configure do |config|
-          config.appsecret = appsecret
+    describe "with the :appsecret_proof option set" do
+
+      describe "and with an access token present" do
+        describe "and with an appsecret present" do
+          let(:api) { Koala::Facebook::API.new(access_token, appsecret) }
+
+          it "should send the appsecret_proof argument" do
+            Koala.should_receive(:make_request).with(path, token_args.merge(appsecret_proof_args), verb, {}).and_return(response)
+
+            api.api(path, {}, verb, :appsecret_proof => true)
+          end
         end
 
-        Koala.should_receive(:make_request).with(path, token_args.merge(appsecret_proof_args), verb, {}).and_return(response)
+        describe "but without an appsecret present" do
+          it "should not send the appsecret_proof argument" do
+            Koala.should_receive(:make_request).with(path, token_args, verb, {}).and_return(response)
 
-        api.api(path, {}, verb, :appsecret_proof => true)
+            api.api(path, {}, verb, :appsecret_proof => true)
+          end
+        end
       end
 
-      it "set and with an access token present but no appsecret set, it should not send the appsecret_proof argument" do
-        Koala.should_receive(:make_request).with(path, token_args, verb, {}).and_return(response)
+      describe "but without an access token present" do
+        describe "and with an appsecret present" do
+          let(:api) { Koala::Facebook::API.new(nil, appsecret) }
 
-        api.api(path, {}, verb, :appsecret_proof => true)
-      end
+          it "should not send the appsecret_proof argument" do
+            Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
 
-      it "set and with no access token present but an appsecret set, it should not send the appsecret_proof argument" do
-        api = Koala::Facebook::API.new
-
-        Koala.configure do |config|
-          config.appsecret = appsecret
+            api.api(path, {}, verb, :appsecret_proof => true)
+          end
         end
 
-        Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
+        describe "but without an appsecret present" do
+          let(:api) { Koala::Facebook::API.new }
 
-        api.api(path, {}, verb, :appsecret_proof => true)
+          it "should not sent the appsecret_proof argument" do
+            Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
+
+            api.api(path, {}, verb, :appsecret_proof => true)
+          end
+        end
       end
 
-      it "set to true and with no access token present and no appsecret set, it should not send the appsecret_proof argument" do
-        api = Koala::Facebook::API.new
+    end
 
-        Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
+    describe "without the appsecret_proof option set" do
 
-        api.api(path, {}, verb, :appsecret_proof => true)
-      end
+      describe "and with an access token present" do
+        describe "and with an appsecret present" do
+          let(:api) { Koala::Facebook::API.new(access_token, appsecret) }
 
-      it "unset and with an access token present and an appsecret set, it should not send the appsecret_proof argument" do
-        Koala.configure do |config|
-          config.appsecret = appsecret
+          it "should not send the appsecret_proof argument" do
+            Koala.should_receive(:make_request).twice.with(path, token_args, verb, {}).and_return(response)
+
+            api.api(path, {}, verb, :appsecret_proof => false)
+            api.api(path)
+          end
         end
 
-        Koala.should_receive(:make_request).twice.with(path, token_args, verb, {}).and_return(response)
+        describe "but without an appsecret present" do
+           it "should not send the appsecret_proof argument" do
+             Koala.should_receive(:make_request).twice.with(path, token_args, verb, {}).and_return(response)
 
-        api.api(path, {}, verb, :appsecret_proof => false)
-        api.api(path)
+             api.api(path, {}, verb, :appsecret_proof => false)
+             api.api(path)
+           end
+        end
       end
 
-      it "unset and with an access token present and no appsecret set, it should not send the appsecret_proof argument" do
-        Koala.should_receive(:make_request).twice.with(path, token_args, verb, {}).and_return(response)
+      describe "but without an access token present" do
+        describe "and with an appsecret present" do
+          let(:api) { Koala::Facebook::API.new(nil, appsecret) }
 
-        api.api(path, {}, verb, :appsecret_proof => false)
-        api.api(path)
-      end
+          it "should not send the appsecret_proof argument" do
+            Koala.should_receive(:make_request).twice.with(path, {}, verb, {}).and_return(response)
 
-      it "unset and with no access token present but an appsecret set, it should not send the appsecret_proof argument" do
-        api = Koala::Facebook::API.new
-
-        Koala.configure do |config|
-          config.appsecret = appsecret
+            api.api(path, {}, verb, :appsecret_proof => false)
+            api.api(path)
+          end
         end
 
-        Koala.should_receive(:make_request).twice.with(path, {}, verb, {}).and_return(response)
+        describe "but without an appsecret present" do
+          let(:api) { Koala::Facebook::API.new }
 
-        api.api(path, {}, verb, :appsecret_proof => false)
-        api.api(path)
-      end
+          it "should not send the appsecret_proof argument" do
+            Koala.should_receive(:make_request).twice.with(path, {}, verb, {}).and_return(response)
 
-      it "unset and with no access token present and no appsecret set, it should not send the appsecret_proof argument" do
-        api = Koala::Facebook::API.new
-
-        Koala.should_receive(:make_request).twice.with(path, {}, verb, {}).and_return(response)
-
-        api.api(path, {}, verb, :appsecret_proof => false)
-        api.api(path)
+            api.api(path, {}, verb, :appsecret_proof => false)
+            api.api(path)
+          end
+        end
       end
     end
   end
