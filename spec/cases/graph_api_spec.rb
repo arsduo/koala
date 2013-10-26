@@ -58,4 +58,16 @@ describe 'Koala::Facebook::GraphAPIMethods' do
       end
     end
   end
+
+  context '#graph_call' do
+    describe "the appsecret_proof option" do
+      let(:path) { '/path' }
+
+      it "should be passed to #api" do
+        @api.should_receive(:api).with(path, {}, 'get', :appsecret_proof => true)
+
+        @api.graph_call(path)
+      end
+    end
+  end
 end

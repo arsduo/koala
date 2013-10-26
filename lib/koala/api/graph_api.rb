@@ -495,6 +495,7 @@ module Koala
       #
       # @return the result from Facebook
       def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
+        options = options.merge(:appsecret_proof => true)
         result = api(path, args, verb, options) do |response|
           error = check_response(response.status, response.body)
           raise error if error
