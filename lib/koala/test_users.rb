@@ -96,7 +96,7 @@ module Koala
         while (test_user_list = list(options)).length > 0
           # avoid infinite loops if Facebook returns buggy users you can't delete
           # see http://developers.facebook.com/bugs/223629371047398
-          break if test_user_list == previous_list
+          break if (test_user_list.map{|u|u['id']} - (previous_list||[]).map{|u|u['id']}).empty?
 
           test_user_list.each_slice(50) do |users| 
             self.api.batch(options) {|batch_api| users.each {|u| batch_api.delete_object(u["id"]) }}
