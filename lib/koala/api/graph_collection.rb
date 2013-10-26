@@ -48,7 +48,7 @@ module Koala
         #    wall.next_page(since: 1379593891)
         #
         # @return a GraphCollection array of additional results (an empty array if there are no more results)
-        def next_page extra_params = {}
+        def next_page(extra_params = {})
           base, args = next_page_params
           base ? @api.get_page([base, args.merge(extra_params)]) : nil
         end
@@ -58,7 +58,7 @@ module Koala
         # @param [Hash] extra_params Some optional extra parameters for paging. For supported parameters see https://developers.facebook.com/docs/reference/api/pagination/
         #
         # @return a GraphCollection array of additional results (an empty array if there are no earlier results)
-        def previous_page extra_params = {}
+        def previous_page(extra_params = {})
           base, args = previous_page_params
           base ? @api.get_page([base, args.merge(extra_params)]) : nil
         end

@@ -4,6 +4,10 @@ v1.8
 New methods:
 * OAuth#generate_client_code lets you get long-lived user tokens for client apps (thanks, binarygeek!)
 
+Updated methods:
+* GraphCollection#next_page and #previous_page can now take additional
+  parameters ([thanks, gacha!](https://github.com/arsduo/koala/pull/330))
+
 Internal Improvements:
 * CHANGED: Koala now properly uploads Tempfiles like Files, detecting mime type (thanks, ys!)
 * CHANGED: Koala now only passes valid Faraday options, improving compatibility with 0.9 (thanks, lsimoneau!)
