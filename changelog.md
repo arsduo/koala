@@ -1,6 +1,10 @@
 v1.8
 ====
 
+NOTE: Due to updates to underlying gems, new versions of Koala no longer work
+with Ruby 1.8.x and rbx/jruby in 1.8 mode. Earlier versions will, of course,
+continue to work, since the underlying Facebook API remains the same.
+
 New methods:
 * OAuth#generate_client_code lets you get long-lived user tokens for client apps (thanks, binarygeek!)
 
