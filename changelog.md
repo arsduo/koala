@@ -2,13 +2,21 @@ v1.8
 ====
 
 NOTE: Due to updates to underlying gems, new versions of Koala no longer work
-with Ruby 1.8.x and rbx/jruby in 1.8 mode. Earlier versions will, of course,
-continue to work, since the underlying Facebook API remains the same.
+with Ruby 1.8.x, rbx/jruby in 1.8 mode, and Ruby 1.9.2. Earlier versions will,
+of course, continue to work, since the underlying Facebook API remains the
+same.
+
+If you, tragically, find yourself stuck using these old versions, you may be
+able to get Koala to work by adding proper constraints to your Gemfile. Good
+luck.
 
 New methods:
 * OAuth#generate_client_code lets you get long-lived user tokens for client apps (thanks, binarygeek!)
 
 Updated methods:
+* API#new now takes an optional access_token, which will be used to generate
+  the appsecret_proof parameters ([thanks,
+  nchelluri!](https://github.com/arsduo/koala/pull/323))
 * GraphCollection#next_page and #previous_page can now take additional
   parameters ([thanks, gacha!](https://github.com/arsduo/koala/pull/330))
 
