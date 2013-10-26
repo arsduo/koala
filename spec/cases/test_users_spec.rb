@@ -208,6 +208,14 @@ describe "Koala::Facebook::TestUsers" do
         @test_users.api.should_receive(:batch).once
         @test_users.delete_all
       end
+
+      it "breaks if the same list comes back, even if the hashes differ" do
+        list1 = [{"id" => 123}]
+        list2 = [{"id" => 123, "name" => "foo"}]
+        allow(@test_users).to receive(:list).twice.and_return(list1, list2)
+        @test_users.api.should_receive(:batch).once
+        @test_users.delete_all
+      end
     end
 
     describe "#update" do

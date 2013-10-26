@@ -2,11 +2,11 @@ require 'koala'
 
 module Koala
   module Facebook
-    
-    # Create and manage test users for your application.  
-    # A test user is a user account associated with an app created for the purpose 
-    # of testing the functionality of that app. 
-    # You can use test users for manual or automated testing -- 
+
+    # Create and manage test users for your application.
+    # A test user is a user account associated with an app created for the purpose
+    # of testing the functionality of that app.
+    # You can use test users for manual or automated testing --
     # Koala's live test suite uses test users to verify the library works with Facebook.
     #
     # @note the test user API is fairly slow compared to other interfaces
@@ -15,19 +15,19 @@ module Koala
     # See http://developers.facebook.com/docs/test_users/.
     class TestUsers
 
-      # The application API interface used to communicate with Facebook. 
-      # @return [Koala::Facebook::API] 
+      # The application API interface used to communicate with Facebook.
+      # @return [Koala::Facebook::API]
       attr_reader :api
       attr_reader :app_id, :app_access_token, :secret
-      
-      # Create a new TestUsers instance.  
-      # If you don't have your app's access token, provide the app's secret and 
+
+      # Create a new TestUsers instance.
+      # If you don't have your app's access token, provide the app's secret and
       # Koala will make a request to Facebook for the appropriate token.
-      # 
+      #
       # @param options initialization options.
       # @option options :app_id the application's ID.
       # @option options :app_access_token an application access token, if known.
-      # @option options :secret the application's secret.  
+      # @option options :secret the application's secret.
       #
       # @raise ArgumentError if the application ID and one of the app access token or the secret are not provided.
       def initialize(options = {})
@@ -43,11 +43,11 @@ module Koala
           oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
           @app_access_token = oauth.get_app_access_token
         end
-        
+
         @api = API.new(@app_access_token)
       end
 
-      # Create a new test user.  
+      # Create a new test user.
       #
       # @param installed whether the user has installed your app
       # @param permissions a comma-separated string or array of permissions the user has granted (if installed)
@@ -83,11 +83,11 @@ module Koala
       end
 
       # Deletes all test users in batches of 50.
-      # 
+      #
       # @note if you have a lot of test users (> 20), this operation can take a long time.
       #
       # @param options (see Koala::Facebook::API#api)
-      # 
+      #
       # @return a list of the test users that have been deleted
       def delete_all(options = {})
         # ideally we'd save a call by checking next_page_params, but at the time of writing
@@ -96,19 +96,23 @@ module Koala
         while (test_user_list = list(options)).length > 0
           # avoid infinite loops if Facebook returns buggy users you can't delete
           # see http://developers.facebook.com/bugs/223629371047398
-          break if (test_user_list.map{|u|u['id']} - (previous_list||[]).map{|u|u['id']}).empty?
+          # since the hashes may change across calls, even if the IDs don't,
+          # we just compare the IDs.
+          test_user_ids = test_user_list.map {|u| u['id']}
+          previous_user_ids = (previous_list || []).map {|u| u['id']}
+          break if (test_user_ids - previous_user_ids).empty?
 
-          test_user_list.each_slice(50) do |users| 
+          test_user_list.each_slice(50) do |users|
             self.api.batch(options) {|batch_api| users.each {|u| batch_api.delete_object(u["id"]) }}
           end
-          
+
           previous_list = test_user_list
         end
       end
 
       # Updates a test user's attributes.
       #
-      # @note currently, only name and password can be changed; 
+      # @note currently, only name and password can be changed;
       #       see {http://developers.facebook.com/docs/test_users/ the Facebook documentation}.
       #
       # @param test_user the user to update; can be either a Facebook ID or the hash returned by {#create}
@@ -151,7 +155,7 @@ module Koala
 
       # Create a network of test users, all of whom are friends and have the same permissions.
       #
-      # @note this call slows down dramatically the more users you create 
+      # @note this call slows down dramatically the more users you create
       #       (test user calls are slow, and more users => more 1-on-1 connections to be made).
       #       Use carefully.
       #
@@ -174,11 +178,11 @@ module Koala
         end
         return users
       end
-      
+
       # The Facebook test users management URL for your application.
       def test_user_accounts_path
         @test_user_accounts_path ||= "/#{@app_id}/accounts/test-users"
-      end      
+      end
 
       # @private
       # Legacy accessor for before GraphAPI was unified into API
