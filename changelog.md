@@ -1,5 +1,5 @@
-v1.8
-====
+v1.8.0rc1
+=========
 
 NOTE: Due to updates to underlying gems, new versions of Koala no longer work
 with Ruby 1.8.x, rbx/jruby in 1.8 mode, and Ruby 1.9.2. Earlier versions will,
