@@ -1,10 +1,12 @@
 require 'spec_helper'
 
 describe Koala::Facebook::GraphCollection do
+  let(:paging){ {:paging => true} }
+
   before(:each) do
     @result = {
       "data" => [1, 2, :three],
-      "paging" => {:paging => true}
+      "paging" => paging
     }
     @api = Koala::Facebook::API.new("123")
     @collection = Koala::Facebook::GraphCollection.new(@result, @api)
@@ -46,7 +48,7 @@ describe Koala::Facebook::GraphCollection do
         "paging" => {}
       }
       @base = double("base")
-      @args = double("args")
+      @args = {"a" => 1}
       @page_of_results = double("page of results")
     end
 
@@ -139,6 +141,34 @@ describe Koala::Facebook::GraphCollection do
       expected = :foo
       Koala::Facebook::GraphCollection.should_receive(:new).with(result, @api).and_return(expected)
       Koala::Facebook::GraphCollection.evaluate(result, @api).should == expected
+    end
+  end
+
+  describe "#next_page" do
+    let(:paging){ {"next" => "http://example.com/?a=2&b=3"} }
+
+    it "should get next page" do
+      @api.should_receive(:get_page).with(["", {"a" => "2", "b" => "3"}])
+      @collection.next_page
+    end
+
+    it "should get next page with extra parameters" do
+      @api.should_receive(:get_page).with(["", {"a" => "2", "b" => "3", "c" => "4"}])
+      @collection.next_page("c" => "4")
+    end
+  end
+
+  describe "#previous_page" do
+    let(:paging){ {"previous" => "http://example.com/?a=2&b=3"} }
+
+    it "should get previous page" do
+      @api.should_receive(:get_page).with(["", {"a" => "2", "b" => "3"}])
+      @collection.previous_page
+    end
+
+    it "should get previous page with extra parameters" do
+      @api.should_receive(:get_page).with(["", {"a" => "2", "b" => "3", "c" => "4"}])
+      @collection.previous_page("c" => "4")
     end
   end
 end
