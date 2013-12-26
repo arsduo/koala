@@ -86,7 +86,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           @args[:args].merge!("source" => @binary, "source2" => @binary)
           batch_op = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args)
           # if the name wasn't unique, there'd just be one item
-          batch_op.files.should have(2).items
+          batch_op.files.size.should eq(2)
         end
 
         it "assigns each binary parameter unique name across batch requests" do
@@ -97,7 +97,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           batch_op2 = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args)
           @batch_queue << batch_op2
           # if the name wasn't unique, we should have < 4 items since keys would be the same
-          batch_op.files.merge(batch_op2.files).should have(4).items
+          batch_op.files.merge(batch_op2.files).size.should eq(4)
         end
 
         it "removes the value from the arguments" do

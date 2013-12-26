@@ -163,12 +163,12 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       it "deletes a user by id" do
-        @test_users.delete(@user1['id']).should be_true
+        @test_users.delete(@user1['id']).should be true
         @user1 = nil
       end
 
       it "deletes a user by hash" do
-        @test_users.delete(@user2).should be_true
+        @test_users.delete(@user2).should be true
         @user2 = nil
       end
 
@@ -260,7 +260,7 @@ describe "Koala::Facebook::TestUsers" do
 
       it "makes two users into friends with string hashes" do
         result = @test_users.befriend(@user1, @user2)
-        result.should be_true
+        result.should be true
       end
 
       it "makes two users into friends with symbol hashes" do
@@ -270,7 +270,7 @@ describe "Koala::Facebook::TestUsers" do
         @user2.each_pair {|k, v| new_user_2[k.to_sym] = v}
 
         result = @test_users.befriend(new_user_1, new_user_2)
-        result.should be_true
+        result.should be true
       end
 
       it "does not accept user IDs anymore" do

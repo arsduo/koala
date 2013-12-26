@@ -19,27 +19,27 @@ describe Koala::HTTPService::MultipartRequest do
     # no way to test the call to super, unfortunately
     it "returns true if env[:body] is a hash with at least one hash in its values" do
       @env[:body] = {:a => {:c => 2}}
-      @multipart.process_request?(@env).should be_true
+      @multipart.process_request?(@env).should be true
     end
 
     it "returns true if env[:body] is a hash with at least one array in its values" do
       @env[:body] = {:a => [:c, 2]}
-      @multipart.process_request?(@env).should be_true
+      @multipart.process_request?(@env).should be true
     end
 
     it "returns true if env[:body] is a hash with mixed objects in its values" do
       @env[:body] = {:a => [:c, 2], :b => {:e => :f}}
-      @multipart.process_request?(@env).should be_true
+      @multipart.process_request?(@env).should be true
     end
 
     it "returns false if env[:body] is a string" do
       @env[:body] = "my body"
-      @multipart.process_request?(@env).should be_false
+      @multipart.process_request?(@env).should be false
     end
 
     it "returns false if env[:body] is a hash without an array or hash value" do
       @env[:body] = {:a => 3}
-      @multipart.process_request?(@env).should be_false
+      @multipart.process_request?(@env).should be false
     end    
   end
   

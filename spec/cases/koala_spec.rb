@@ -8,7 +8,7 @@ describe Koala do
 
   describe "constants" do
     it "has a version" do
-      Koala.const_defined?("VERSION").should be_true
+      Koala.const_defined?("VERSION").should be true
     end
   end
 
