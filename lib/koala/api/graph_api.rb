@@ -119,7 +119,8 @@ module Koala
 
       # Write an object to the Graph for a specific user.
       # See {http://developers.facebook.com/docs/api#publishing Facebook's documentation}
-      # for all the supported writeable objects.
+      # for all the supported writeable objects. It is important to note that objects 
+      # take the singular form, i.e. "event" when using put_connections.
       #
       # @note (see #get_connection)
       #
