@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Koala do
   it "has an http_service accessor" do
-    Koala.should respond_to(:http_service)
-    Koala.should respond_to(:http_service=)
+    expect(Koala).to respond_to(:http_service)
+    expect(Koala).to respond_to(:http_service=)
   end
 
   describe "constants" do
     it "has a version" do
-      Koala.const_defined?("VERSION").should be_true
+      expect(Koala.const_defined?("VERSION")).to be_truthy
     end
   end
 
@@ -23,21 +23,21 @@ describe Koala do
 
     it "invokes deprecated_interface if present" do
       mock_service = double("http service")
-      mock_service.should_receive(:deprecated_interface)
+      expect(mock_service).to receive(:deprecated_interface)
       Koala.http_service = mock_service
     end
 
     it "does not set the service if it's deprecated" do
       mock_service = double("http service")
-      mock_service.stub(:deprecated_interface)
+      allow(mock_service).to receive(:deprecated_interface)
       Koala.http_service = mock_service
-      Koala.http_service.should == @service
+      expect(Koala.http_service).to eq(@service)
     end
 
     it "sets the service if it's not deprecated" do
       mock_service = double("http service")
       Koala.http_service = mock_service
-      Koala.http_service.should == mock_service
+      expect(Koala.http_service).to eq(mock_service)
     end
   end
 
@@ -48,7 +48,7 @@ describe Koala do
       verb = "get"
       options = {:c => :d}
 
-      Koala.http_service.should_receive(:make_request).with(path, args, verb, options)
+      expect(Koala.http_service).to receive(:make_request).with(path, args, verb, options)
       Koala.make_request(path, args, verb, options)
     end
   end
@@ -77,7 +77,7 @@ describe Koala do
       Koala.configure do |config|
         config.graph_server = "some-new.graph_server.com"
       end
-      Koala.config.graph_server.should == "some-new.graph_server.com"
+      expect(Koala.config.graph_server).to eq("some-new.graph_server.com")
     end
   end
 

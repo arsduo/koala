@@ -7,14 +7,14 @@ RSpec::Matchers.define :match_url do |url|
     original_query_hash = query_to_params(original_query_string)
 
     # the base URLs need to match
-    base.should == original_base
+    expect(base).to eq(original_base)
     
     # the number of parameters should match (avoid one being a subset of the other)
-    query_hash.values.length.should == original_query_hash.values.length
+    expect(query_hash.values.length).to eq(original_query_hash.values.length)
     
     # and ensure all the keys and values match
     query_hash.each_pair do |key, value|
-      original_query_hash[key].should == value
+      expect(original_query_hash[key]).to eq(value)
     end
   end
   
