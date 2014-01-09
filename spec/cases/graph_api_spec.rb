@@ -17,21 +17,21 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     # and the other methods which do some post-processing locally
     context '#get_object' do
       it 'returns result of block' do
-        @api.stub(:api).and_return(double("other results"))
-        @api.get_object('koppel', &post_processing)["result"].should == result
+        allow(@api).to receive(:api).and_return(double("other results"))
+        expect(@api.get_object('koppel', &post_processing)["result"]).to eq(result)
       end
     end
 
     context '#get_picture' do
       it 'returns result of block' do
-        @api.stub(:api).and_return("Location" => double("other result"))
-        @api.get_picture('lukeshepard', &post_processing)["result"].should == result
+        allow(@api).to receive(:api).and_return("Location" => double("other result"))
+        expect(@api.get_picture('lukeshepard', &post_processing)["result"]).to eq(result)
       end
     end
 
     context '#fql_multiquery' do
       before do
-        @api.should_receive(:get_object).and_return([
+        expect(@api).to receive(:get_object).and_return([
           {"name" => "query1", "fql_result_set" => [{"id" => 123}]},
           {"name" => "query2", "fql_result_set" => ["id" => 456]}
         ])
@@ -43,18 +43,18 @@ describe 'Koala::Facebook::GraphAPIMethods' do
           'query2' => [{'id' => 456}]
         }
         response = @api.fql_multiquery({}, &post_processing)
-        response["args"].should == resolved_result
-        response["result"].should == result
+        expect(response["args"]).to eq(resolved_result)
+        expect(response["result"]).to eq(result)
       end
     end
 
     context '#get_page_access_token' do
       it 'returns result of block' do
         token = Koala::MockHTTPService::APP_ACCESS_TOKEN
-        @api.stub(:api).and_return("access_token" => token)
+        allow(@api).to receive(:api).and_return("access_token" => token)
         response = @api.get_page_access_token('facebook', &post_processing)
-        response["args"].should == token
-        response["result"].should == result
+        expect(response["args"]).to eq(token)
+        expect(response["result"]).to eq(result)
       end
     end
   end
