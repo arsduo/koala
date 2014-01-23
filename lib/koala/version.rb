@@ -1,3 +1,3 @@
 module Koala
-  VERSION = "1.8.0rc1"
+  VERSION = "1.8.0"
 end

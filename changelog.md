@@ -1,4 +1,4 @@
-v1.8.0rc1
+v1.8.0
 =========
 
 NOTE: Due to updates to underlying gems, new versions of Koala no longer work
