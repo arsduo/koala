@@ -230,14 +230,20 @@ The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services w
 
 See examples, ask questions
 -----
+
 Some resources to help you as you play with Koala and the Graph API:
 
 * Complete Koala documentation <a href="https://github.com/arsduo/koala/wiki">on the wiki</a>
-* The <a href="http://groups.google.com/group/koala-users">Koala users group</a> on Google Groups, the place for your Koala and API questions
+* Facebook's <a href="http://facebook.stackoverflow.com/">Stack Overflow site</a> is a stupendous place to ask questions, filled with people who will help you figure out what's up with the Facebook API.
 * Facebook's <a href="http://developers.facebook.com/tools/explorer/">Graph API Explorer</a>, where you can play with the Graph API in your browser
 * The Koala-powered <a href="http://oauth.twoalex.com" target="_blank">OAuth Playground</a>, where you can easily generate OAuth access tokens and any other data needed to test out the APIs or OAuth
 * Follow Koala on <a href="http://www.facebook.com/pages/Koala/315368291823667">Facebook</a> and <a href="https://twitter.com/#!/koala_fb">Twitter</a> for SDK updates and occasional news about Facebook API changes.
 
+*Note*: I use the Koala issues tracker on Github to triage and address issues
+with the gem itself; if you need help using the Facebook API, the above
+resources will be far more effective. Depending on how much time I have, Github
+issues filed about how to use the Facebook API may be closed with a reference
+to the Facebook Stack Overflow page.
 
 Testing
 -----
