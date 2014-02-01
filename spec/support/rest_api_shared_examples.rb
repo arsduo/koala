@@ -161,7 +161,6 @@ shared_examples_for "Koala RestAPI with an access token" do
   end
 end
 
-
 shared_examples_for "Koala RestAPI without an access token" do
   it "can't use set_app_properties" do
     expect { @api.set_app_properties(:desktop => 0) }.to raise_error(Koala::Facebook::AuthenticationError)
