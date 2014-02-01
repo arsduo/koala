@@ -7,6 +7,8 @@ Updated Methods:
   nchelluri!](https://github.com/arsduo/koala/pull/323))
 
 Testing Improvements:
+* Add 2.1.0 to travis and remove RSpec 3.0 deprecation warnings (thanks,
+  [petergoldstein](https://github.com/arsduo/koala/pull/348))
 * With 1.9.0+ only support, removed the OrderedHash patch
 
 v1.8.0
