@@ -10,3 +10,4 @@ rvm:
   # jruby
   - jruby-19mode
   - jruby-head
+bundler_args: --without development
