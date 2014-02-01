@@ -23,6 +23,4 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency("multi_json")
   gem.add_runtime_dependency("faraday")
   gem.add_runtime_dependency("addressable")
-  gem.add_development_dependency("rspec", '~> 3.0.0.beta1')
-  gem.add_development_dependency("rake")
 end
