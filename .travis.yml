@@ -2,10 +2,10 @@ rvm:
   # MRI
   - 1.9.3
   - 2.0.0
-  - ruby-head
+  - 2.1.0
   # rbx
   - rbx-2.1.1
   - rbx
   # jruby
   - jruby-19mode
-  - jruby-head
+bundler_args: --without development
