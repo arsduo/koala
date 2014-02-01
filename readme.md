@@ -41,17 +41,19 @@ profile = @graph.get_object("me")
 friends = @graph.get_connections("me", "friends")
 @graph.put_connections("me", "feed", :message => "I am writing on my wall!")
 
-# three-part queries are easy too!
+# Three-part queries are easy too!
 @graph.get_connections("me", "mutualfriends/#{friend_id}")
 
-# you can even use the new Timeline API
-# see https://developers.facebook.com/docs/beta/opengraph/tutorial/
+# You can use the Timeline API:
+# (see https://developers.facebook.com/docs/beta/opengraph/tutorial/)
 @graph.put_connections("me", "namespace:action", :object => object_url)
 
-# you can add your appsecret in order to pass the appsecret_proof parameter, tying your access tokens to your app secret:
-# see https://developers.facebook.com/docs/reference/api/securing-graph-api/
+# For extra security (recommended), you can provide an appsecret parameter,
+# tying your access tokens to your app secret. 
+# (See https://developers.facebook.com/docs/reference/api/securing-graph-api/
+# You'll need to turn on 'Require proof on all calls' in the advanced section
+# of your app's settings when doing this.
 @graph = Koala::Facebook::API.new(oauth_access_token, app_secret)
-# you'll want to turn on 'Require proof on all calls' in the advanced section of your app's settings when doing this.
 ```
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
