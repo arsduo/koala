@@ -1,6 +1,10 @@
 v1.9.0
 ======
 
+Updated Methods:
+* API#new now takes an optional access_token, which will be used to generate
+  the appsecret_proof parameters ([thanks,
+  nchelluri!](https://github.com/arsduo/koala/pull/323))
 
 Testing Improvements:
 * With 1.9.0+ only support, removed the OrderedHash patch
@@ -21,11 +25,12 @@ New methods:
 * OAuth#generate_client_code lets you get long-lived user tokens for client apps (thanks, binarygeek!)
 
 Updated methods:
-* API#new now takes an optional access_token, which will be used to generate
-  the appsecret_proof parameters ([thanks,
-  nchelluri!](https://github.com/arsduo/koala/pull/323))
 * GraphCollection#next_page and #previous_page can now take additional
   parameters ([thanks, gacha!](https://github.com/arsduo/koala/pull/330))
+
+NOTE: the appsecret_proof update from nchelluri was originally listed in the
+changelog for 1.8.0, but didn't make it in. It's now properly in the changelog
+for 1.9.0.
 
 Internal Improvements:
 * FIXED: TestUser#delete_all will avoid infinite loops if the user hashes
