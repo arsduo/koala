@@ -55,7 +55,7 @@ module KoalaTest
     RSpec.configure do |config|
       config.before :each do
         @token = KoalaTest.oauth_token
-        Koala::Utils.stub(:deprecate) # never fire deprecation warnings
+        allow(Koala::Utils).to receive(:deprecate) # never fire deprecation warnings
       end
 
       config.after :each do

@@ -14,9 +14,9 @@ module Koala
       def process_request?(env)
         # if the request values contain any hashes or arrays, multipart it
         super || !!(env[:body].respond_to?(:values) && env[:body].values.find {|v| v.is_a?(Hash) || v.is_a?(Array)})
-      end   
+      end
     
-    
+
       def process_params(params, prefix = nil, pieces = nil, &block)
         params.inject(pieces || []) do |all, (key, value)|
           key = "#{prefix}%5B#{key}%5D" if prefix
