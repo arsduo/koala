@@ -7,9 +7,14 @@ Updated Methods:
   nchelluri!](https://github.com/arsduo/koala/pull/323))
 
 Testing Improvements:
-* Add 2.1.0 to travis and remove RSpec 3.0 deprecation warnings (thanks,
-  [petergoldstein](https://github.com/arsduo/koala/pull/348))
+* Add 2.1.0 to travis.yml and update specs to pass w/o deprecation on RSpec 3.0
+  ([thanks](https://github.com/arsduo/koala/pull/350),
+  [petergoldstein](https://github.com/arsduo/koala/pull/348)!)
 * With 1.9.0+ only support, removed the OrderedHash patch
+
+Documentation Improvements:
+* Make it clear that connections take a singlar form in API#put_connection
+(thanks, [josephdburdick](https://github.com/arsduo/koala/pull/349)!)
 
 v1.8.0
 =========
