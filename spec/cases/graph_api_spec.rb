@@ -63,9 +63,20 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     describe "the appsecret_proof option" do
       let(:path) { '/path' }
 
-      it "should be passed to #api" do
-        @api.should_receive(:api).with(path, {}, 'get', :appsecret_proof => true)
+      it "is enabled by default if an app secret is present" do
+        api = Koala::Facebook::API.new(@token, "mysecret")
+        expect(api).to receive(:api).with(path, {}, 'get', :appsecret_proof => true)
+        api.graph_call(path)
+      end
 
+      it "can be disabled manually" do
+        api = Koala::Facebook::API.new(@token, "mysecret")
+        expect(api).to receive(:api).with(path, {}, 'get', hash_not_including(appsecret_proof: true))
+        api.graph_call(path, {}, "get", appsecret_proof: false)
+      end
+
+      it "isn't included if no app secret is present" do
+        expect(@api).to receive(:api).with(path, {}, 'get', {})
         @api.graph_call(path)
       end
     end

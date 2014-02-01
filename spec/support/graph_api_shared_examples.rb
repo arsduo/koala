@@ -20,7 +20,7 @@ shared_examples_for "Koala GraphAPI" do
       args = {}
       verb = 'get'
       opts = {:a => :b}
-      expect(@api).to receive(:api).with(user, args, verb, opts.merge(:appsecret_proof => true))
+      expect(@api).to receive(:api).with(user, args, verb, opts)
       @api.graph_call(user, args, verb, opts)
     end
 

@@ -36,6 +36,12 @@ describe "Koala::Facebook::API" do
     expect(service.access_token).to eq(token)
   end
 
+  it "has an attr_reader for app_secret" do
+    secret = double
+    service = Koala::Facebook::API.new(@token, secret)
+    expect(service.app_secret).to eq(secret)
+  end
+
   it "gets the attribute of a Koala::HTTPService::Response given by the http_component parameter" do
     http_component = :method_name
 
@@ -161,96 +167,41 @@ describe "Koala::Facebook::API" do
     let(:verb) { 'get' }
     let(:response) { Koala::HTTPService::Response.new(200, '', '') }
 
-    describe "with the :appsecret_proof option set" do
-
-      describe "and with an access token present" do
-        describe "and with an appsecret present" do
+    describe "the appsecret_proof arguments" do
+      describe "with an API access token present" do
+        describe "and with an appsecret included on API initialization " do
           let(:api) { Koala::Facebook::API.new(access_token, appsecret) }
 
-          it "should send the appsecret_proof argument" do
+          it "will be included by default" do
             Koala.should_receive(:make_request).with(path, token_args.merge(appsecret_proof_args), verb, {}).and_return(response)
-
             api.api(path, {}, verb, :appsecret_proof => true)
           end
         end
 
-        describe "but without an appsecret present" do
-          it "should not send the appsecret_proof argument" do
+        describe "but without an appsecret included on API initialization" do
+          it "will not be included" do
             Koala.should_receive(:make_request).with(path, token_args, verb, {}).and_return(response)
-
             api.api(path, {}, verb, :appsecret_proof => true)
           end
         end
       end
 
-      describe "but without an access token present" do
-        describe "and with an appsecret present" do
+      describe "but without an API access token present" do
+        describe "and with an appsecret included on API initialization " do
           let(:api) { Koala::Facebook::API.new(nil, appsecret) }
 
-          it "should not send the appsecret_proof argument" do
+          it "will not be included" do
             Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
-
             api.api(path, {}, verb, :appsecret_proof => true)
           end
         end
 
-        describe "but without an appsecret present" do
+        describe "but without an appsecret included on API initialization" do
           let(:api) { Koala::Facebook::API.new }
 
-          it "should not sent the appsecret_proof argument" do
+          it "will not be included" do
             Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
-
             api.api(path, {}, verb, :appsecret_proof => true)
-          end
-        end
-      end
-
-    end
-
-    describe "without the appsecret_proof option set" do
-
-      describe "and with an access token present" do
-        describe "and with an appsecret present" do
-          let(:api) { Koala::Facebook::API.new(access_token, appsecret) }
-
-          it "should not send the appsecret_proof argument" do
-            Koala.should_receive(:make_request).twice.with(path, token_args, verb, {}).and_return(response)
-
-            api.api(path, {}, verb, :appsecret_proof => false)
-            api.api(path)
-          end
-        end
-
-        describe "but without an appsecret present" do
-           it "should not send the appsecret_proof argument" do
-             Koala.should_receive(:make_request).twice.with(path, token_args, verb, {}).and_return(response)
-
-             api.api(path, {}, verb, :appsecret_proof => false)
-             api.api(path)
-           end
-        end
-      end
-
-      describe "but without an access token present" do
-        describe "and with an appsecret present" do
-          let(:api) { Koala::Facebook::API.new(nil, appsecret) }
-
-          it "should not send the appsecret_proof argument" do
-            Koala.should_receive(:make_request).twice.with(path, {}, verb, {}).and_return(response)
-
-            api.api(path, {}, verb, :appsecret_proof => false)
-            api.api(path)
-          end
-        end
-
-        describe "but without an appsecret present" do
-          let(:api) { Koala::Facebook::API.new }
-
-          it "should not send the appsecret_proof argument" do
-            Koala.should_receive(:make_request).twice.with(path, {}, verb, {}).and_return(response)
-
-            api.api(path, {}, verb, :appsecret_proof => false)
-            api.api(path)
           end
         end
       end

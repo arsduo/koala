@@ -9,6 +9,10 @@ module Koala
       # Creates a new API client.
       # @param [String] access_token access token
       # @param [String] app_secret app secret, for tying your access tokens to your app secret
+      #                 If you provide an app secret, your requests will be
+      #                 signed by default, unless you pass appsecret_proof:
+      #                 false as an option to the API call. (See
+      #                 https://developers.facebook.com/docs/graph-api/securing-requests/)
       # @note If no access token is provided, you can only access some public information.
       # @return [Koala::Facebook::API] the API client
       def initialize(access_token = nil, app_secret = nil)
@@ -16,7 +20,7 @@ module Koala
         @app_secret = app_secret
       end
 
-      attr_reader :access_token
+      attr_reader :access_token, :app_secret
 
       include GraphAPIMethods
       include RestAPIMethods
