@@ -33,83 +33,83 @@ describe "Koala::Facebook::RealtimeUpdates" do
     # basic initialization
     it "initializes properly with an app_id and an app_access_token" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
-      updates.should be_a(Koala::Facebook::RealtimeUpdates)
+      expect(updates).to be_a(Koala::Facebook::RealtimeUpdates)
     end
 
     # attributes
     it "allows read access to app_id" do
       # in Ruby 1.9, .method returns symbols
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:app_id)
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:app_id=)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).to include(:app_id)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).not_to include(:app_id=)
     end
 
     it "allows read access to app_access_token" do
       # in Ruby 1.9, .method returns symbols
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:app_access_token)
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:app_access_token=)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).to include(:app_access_token)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).not_to include(:app_access_token=)
     end
 
     it "allows read access to secret" do
       # in Ruby 1.9, .method returns symbols
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:secret)
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:secret=)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).to include(:secret)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).not_to include(:secret=)
     end
 
     it "allows read access to api" do
       # in Ruby 1.9, .method returns symbols
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should include(:api)
-      Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym).should_not include(:api=)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).to include(:api)
+      expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).not_to include(:api=)
     end
 
     # old graph_api accessor
     it "returns the api object when graph_api is called" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      updates.graph_api.should == updates.api
+      expect(updates.graph_api).to eq(updates.api)
     end
 
     it "fire a deprecation warning when graph_api is called" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      Koala::Utils.should_receive(:deprecate)
+      expect(Koala::Utils).to receive(:deprecate)
       updates.graph_api
     end
 
     # init with secret / fetching the token
     it "initializes properly with an app_id and a secret" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      updates.should be_a(Koala::Facebook::RealtimeUpdates)
+      expect(updates).to be_a(Koala::Facebook::RealtimeUpdates)
     end
 
     it "fetches an app_token from Facebook when provided an app_id and a secret" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      updates.app_access_token.should_not be_nil
+      expect(updates.app_access_token).not_to be_nil
     end
 
     it "uses the OAuth class to fetch a token when provided an app_id and a secret" do
       oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
       token = oauth.get_app_access_token
-      oauth.should_receive(:get_app_access_token).and_return(token)
-      Koala::Facebook::OAuth.should_receive(:new).with(@app_id, @secret).and_return(oauth)
+      expect(oauth).to receive(:get_app_access_token).and_return(token)
+      expect(Koala::Facebook::OAuth).to receive(:new).with(@app_id, @secret).and_return(oauth)
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
     end
 
     it "sets up the with the app acces token" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
-      updates.api.should be_a(Koala::Facebook::API)
-      updates.api.access_token.should == @app_access_token
+      expect(updates.api).to be_a(Koala::Facebook::API)
+      expect(updates.api.access_token).to eq(@app_access_token)
     end
 
   end
 
   describe "#subscribe" do
     it "makes a POST to the subscription path" do
-      @updates.api.should_receive(:graph_call).with(@updates.subscription_path, anything, "post", anything)
+      expect(@updates.api).to receive(:graph_call).with(@updates.subscription_path, anything, "post", anything)
       @updates.subscribe("user", "name", @subscription_path, @verify_token)
     end
 
     it "properly formats the subscription request" do
       obj = "user"
       fields = "name"
-      @updates.api.should_receive(:graph_call).with(anything, hash_including(
+      expect(@updates.api).to receive(:graph_call).with(anything, hash_including(
         :object => obj,
         :fields => fields,
         :callback_url => @subscription_path,
@@ -122,7 +122,7 @@ describe "Koala::Facebook::RealtimeUpdates" do
       # see https://github.com/arsduo/koala/issues/150
       obj = "user"
       fields = "name"
-      @updates.api.should_not_receive(:graph_call).with(anything, hash_including(:verify_token => anything), anything, anything)
+      expect(@updates.api).not_to receive(:graph_call).with(anything, hash_including(:verify_token => anything), anything, anything)
       @updates.subscribe("user", "name", @subscription_path)
     end
 
@@ -132,7 +132,7 @@ describe "Koala::Facebook::RealtimeUpdates" do
 
     it "accepts an options hash" do
       options = {:a => 2, :b => "c"}
-      @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(options))
+      expect(@updates.api).to receive(:graph_call).with(anything, anything, anything, hash_including(options))
       @updates.subscribe("user", "name", @subscription_path, @verify_token, options)
     end
 
@@ -157,19 +157,19 @@ describe "Koala::Facebook::RealtimeUpdates" do
 
   describe "#unsubscribe" do
     it "makes a DELETE to the subscription path" do
-      @updates.api.should_receive(:graph_call).with(@updates.subscription_path, anything, "delete", anything)
+      expect(@updates.api).to receive(:graph_call).with(@updates.subscription_path, anything, "delete", anything)
       @updates.unsubscribe("user")
     end
 
     it "includes the object if provided" do
       obj = "user"
-      @updates.api.should_receive(:graph_call).with(anything, hash_including(:object => obj), anything, anything)
+      expect(@updates.api).to receive(:graph_call).with(anything, hash_including(:object => obj), anything, anything)
       @updates.unsubscribe(obj)
     end
 
     it "accepts an options hash" do
       options = {:a => 2, :b => "C"}
-      @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(options))
+      expect(@updates.api).to receive(:graph_call).with(anything, anything, anything, hash_including(options))
       @updates.unsubscribe("user", options)
     end
 
@@ -190,26 +190,26 @@ describe "Koala::Facebook::RealtimeUpdates" do
 
   describe "#list_subscriptions" do
     it "GETs the subscription path" do
-      @updates.api.should_receive(:graph_call).with(@updates.subscription_path, anything, "get", anything)
+      expect(@updates.api).to receive(:graph_call).with(@updates.subscription_path, anything, "get", anything)
       @updates.list_subscriptions
     end
 
     it "accepts options" do
       options = {:a => 3, :b => "D"}
-      @updates.api.should_receive(:graph_call).with(anything, anything, anything, hash_including(options))
+      expect(@updates.api).to receive(:graph_call).with(anything, anything, anything, hash_including(options))
       @updates.list_subscriptions(options)
     end
 
     describe "in practice" do
       it "lists subscriptions properly" do
-        @updates.list_subscriptions.should be_a(Array)
+        expect(@updates.list_subscriptions).to be_a(Array)
       end
     end
   end
 
   describe "#subscription_path" do
     it "returns the app_id/subscriptions" do
-      @updates.subscription_path.should == "#{@app_id}/subscriptions"
+      expect(@updates.subscription_path).to eq("#{@app_id}/subscriptions")
     end
   end
 
@@ -222,23 +222,23 @@ describe "Koala::Facebook::RealtimeUpdates" do
     end
 
     it "returns false if there is no X-Hub-Signature header" do
-      @updates.validate_update("", {}).should be_false
+      expect(@updates.validate_update("", {})).to be_falsey
     end
 
     it "returns false if the signature doesn't match the body" do
-      @updates.validate_update("", {"X-Hub-Signature" => "sha1=badsha1"}).should be_false
+      expect(@updates.validate_update("", {"X-Hub-Signature" => "sha1=badsha1"})).to be_falsey
     end
 
     it "results true if the signature matches the body with the secret" do
       body = "BODY"
       signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body).chomp
-      @updates.validate_update(body, {"X-Hub-Signature" => "sha1=#{signature}"}).should be_true
+      expect(@updates.validate_update(body, {"X-Hub-Signature" => "sha1=#{signature}"})).to be_truthy
     end
 
     it "results true with alternate HTTP_X_HUB_SIGNATURE header" do
       body = "BODY"
       signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body).chomp
-      @updates.validate_update(body, {"HTTP_X_HUB_SIGNATURE" => "sha1=#{signature}"}).should be_true
+      expect(@updates.validate_update(body, {"HTTP_X_HUB_SIGNATURE" => "sha1=#{signature}"})).to be_truthy
     end
 
   end
@@ -246,19 +246,19 @@ describe "Koala::Facebook::RealtimeUpdates" do
   describe ".meet_challenge" do
     it "returns false if hub.mode isn't subscribe" do
       params = {'hub.mode' => 'not subscribe'}
-      Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be_false
+      expect(Koala::Facebook::RealtimeUpdates.meet_challenge(params)).to be_falsey
     end
 
     it "doesn't evaluate the block if hub.mode isn't subscribe" do
       params = {'hub.mode' => 'not subscribe'}
       block_evaluated = false
       Koala::Facebook::RealtimeUpdates.meet_challenge(params){|token| block_evaluated = true}
-      block_evaluated.should be_false
+      expect(block_evaluated).to be_falsey
     end
 
     it "returns false if not given a verify_token or block" do
       params = {'hub.mode' => 'subscribe'}
-      Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be_false
+      expect(Koala::Facebook::RealtimeUpdates.meet_challenge(params)).to be_falsey
     end
 
     describe "and mode is 'subscribe'" do
@@ -273,12 +273,12 @@ describe "Koala::Facebook::RealtimeUpdates" do
         end
 
         it "returns false if the given verify token doesn't match" do
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token + '1').should be_false
+          expect(Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token + '1')).to be_falsey
         end
 
         it "returns the challenge if the given verify token matches" do
           @params['hub.challenge'] = 'challenge val'
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token).should == @params['hub.challenge']
+          expect(Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token)).to eq(@params['hub.challenge'])
         end
       end
 
@@ -289,27 +289,27 @@ describe "Koala::Facebook::RealtimeUpdates" do
 
         it "gives the block the token as a parameter" do
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
-            token.should == @token
+            expect(token).to eq(@token)
           end
         end
 
         it "returns false if the given block return false" do
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
+          expect(Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             false
-          end.should be_false
+          end).to be_falsey
         end
 
         it "returns false if the given block returns nil" do
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
+          expect(Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             nil
-          end.should be_false
+          end).to be_falsey
         end
 
         it "returns the challenge if the given block returns true" do
           @params['hub.challenge'] = 'challenge val'
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
+          expect(Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             true
-          end.should be_true
+          end).to be_truthy
         end
       end
     end

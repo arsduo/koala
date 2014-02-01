@@ -4,29 +4,29 @@ describe Koala::Utils do
   describe ".deprecate" do    
     before :each do
       # unstub deprecate so we can test it
-      Koala::Utils.unstub(:deprecate)
+       allow(Koala::Utils).to receive(:deprecate).and_call_original
     end
     
     it "has a deprecation prefix that includes the words Koala and deprecation" do
-      Koala::Utils::DEPRECATION_PREFIX.should =~ /koala/i
-      Koala::Utils::DEPRECATION_PREFIX.should =~ /deprecation/i      
+      expect(Koala::Utils::DEPRECATION_PREFIX).to match(/koala/i)
+      expect(Koala::Utils::DEPRECATION_PREFIX).to match(/deprecation/i)      
     end
     
     it "prints a warning with Kernel.warn" do
       message = Time.now.to_s + rand.to_s
-      Kernel.should_receive(:warn)
+      expect(Kernel).to receive(:warn)
       Koala::Utils.deprecate(message)
     end
 
     it "prints the deprecation prefix and the warning" do
       message = Time.now.to_s + rand.to_s
-      Kernel.should_receive(:warn).with(Koala::Utils::DEPRECATION_PREFIX + message)
+      expect(Kernel).to receive(:warn).with(Koala::Utils::DEPRECATION_PREFIX + message)
       Koala::Utils.deprecate(message)
     end
     
     it "only prints each unique message once" do
       message = Time.now.to_s + rand.to_s
-      Kernel.should_receive(:warn).once
+      expect(Kernel).to receive(:warn).once
       Koala::Utils.deprecate(message)
       Koala::Utils.deprecate(message)
     end
@@ -34,20 +34,20 @@ describe Koala::Utils do
   
   describe ".logger" do
     it "has an accessor for logger" do
-      Koala::Utils.methods.map(&:to_sym).should include(:logger)
-      Koala::Utils.methods.map(&:to_sym).should include(:logger=)
+      expect(Koala::Utils.methods.map(&:to_sym)).to include(:logger)
+      expect(Koala::Utils.methods.map(&:to_sym)).to include(:logger=)
     end
     
     it "defaults to the standard ruby logger with level set to ERROR" do |variable|
-      Koala::Utils.logger.should be_kind_of(Logger)
-      Koala::Utils.logger.level.should == Logger::ERROR
+      expect(Koala::Utils.logger).to be_kind_of(Logger)
+      expect(Koala::Utils.logger.level).to eq(Logger::ERROR)
     end
     
     logger_methods = [:debug, :info, :warn, :error, :fatal]
     
     logger_methods.each do |logger_method|
       it "should delegate #{logger_method} to the attached logger" do
-        Koala::Utils.logger.should_receive(logger_method)
+        expect(Koala::Utils.logger).to receive(logger_method)
         Koala::Utils.send(logger_method, "Test #{logger_method} message")
       end
     end
