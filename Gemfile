@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 group :development do
+  gem 'debugger'
   gem "yard"
 end
 
