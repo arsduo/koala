@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 group :development do
+  gem 'debugger'
   gem "yard"
 end
 
@@ -16,8 +17,6 @@ group :development, :test do
     gem "ruby_gntp"
     gem "rb-fsevent"
   end
-
-  gem 'debugger'
 end
 
 gem "jruby-openssl" if defined? JRUBY_VERSION
