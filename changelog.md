@@ -1,3 +1,10 @@
+v1.9.0
+======
+
+
+Testing Improvements:
+* With 1.9.0+ only support, removed the OrderedHash patch
+
 v1.8.0
 =========
 

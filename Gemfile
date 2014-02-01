@@ -16,6 +16,8 @@ group :development, :test do
     gem "ruby_gntp"
     gem "rb-fsevent"
   end
+
+  gem 'debugger'
 end
 
 gem "jruby-openssl" if defined? JRUBY_VERSION
