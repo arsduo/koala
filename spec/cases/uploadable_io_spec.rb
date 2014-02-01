@@ -246,21 +246,21 @@ describe "Koala::UploadableIO" do
 
   describe ".binary_content?" do
     it "returns true for Rails 3 file uploads" do
-      Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_true
+      Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_truthy
     end
 
     it "returns true for Sinatra file uploads" do
-      Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_true
+      Koala::UploadableIO.binary_content?(rails_3_mocks.last).should be_truthy
     end
 
     it "returns true for File objects" do
-      Koala::UploadableIO.binary_content?(File.open(BEACH_BALL_PATH)).should be_true
+      Koala::UploadableIO.binary_content?(File.open(BEACH_BALL_PATH)).should be_truthy
     end
 
     it "returns false for everything else" do
-      Koala::UploadableIO.binary_content?(StringIO.new).should be_false
-      Koala::UploadableIO.binary_content?(BEACH_BALL_PATH).should be_false
-      Koala::UploadableIO.binary_content?(nil).should be_false
+      Koala::UploadableIO.binary_content?(StringIO.new).should be_falsy
+      Koala::UploadableIO.binary_content?(BEACH_BALL_PATH).should be_falsy
+      Koala::UploadableIO.binary_content?(nil).should be_falsy
     end
   end
 end  # describe UploadableIO

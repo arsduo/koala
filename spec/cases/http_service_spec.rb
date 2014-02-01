@@ -24,7 +24,7 @@ describe Koala::HTTPService do
     end
 
     it "is defined" do
-      Koala::HTTPService.const_defined?("DEFAULT_MIDDLEWARE").should be_true
+      Koala::HTTPService.const_defined?("DEFAULT_MIDDLEWARE").should be true
     end
 
     it "adds multipart" do
@@ -139,7 +139,7 @@ describe Koala::HTTPService do
       result = Koala::HTTPService.encode_params(args)
       result.split('&').find do |key_and_val|
         key_and_val.match("#{not_a_string}=#{val}")
-      end.should be_true
+      end.should be_truthy
     end
 
     it "escapes all values" do

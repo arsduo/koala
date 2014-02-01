@@ -105,10 +105,10 @@ describe "Koala::Facebook::API" do
 
   it "handles rogue true/false as responses" do
     Koala.should_receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
-    @service.api('anything').should be_true
+    @service.api('anything').should be true
 
     Koala.should_receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'false', {}))
-    @service.api('anything').should be_false
+    @service.api('anything').should be false
   end
 
   describe "with regard to leading slashes" do

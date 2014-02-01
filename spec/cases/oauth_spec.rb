@@ -40,7 +40,7 @@ describe "Koala::Facebook::OAuth" do
     it "properly sets attributes" do
       (@oauth.app_id == @app_id &&
         @oauth.app_secret == @secret &&
-        @oauth.oauth_callback_url == @callback_url).should be_true
+        @oauth.oauth_callback_url == @callback_url).should be true
     end
 
     it "properly initializes without a callback_url" do
@@ -51,7 +51,7 @@ describe "Koala::Facebook::OAuth" do
       @oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
       (@oauth.app_id == @app_id &&
         @oauth.app_secret == @secret &&
-        @oauth.oauth_callback_url == nil).should be_true
+        @oauth.oauth_callback_url == nil).should be true
     end
   end
 

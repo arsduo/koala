@@ -77,12 +77,12 @@ shared_examples_for "Koala GraphAPI" do
 
   it "gets multiple objects" do
     results = @api.get_objects([KoalaTest.page, KoalaTest.user1])
-    results.should have(2).items
+    results.size.should eq(2)
   end
 
   it "gets multiple objects if they're a string" do
     results = @api.get_objects("facebook,#{KoalaTest.user1}")
-    results.should have(2).items
+    results.size.should eq(2)
   end
 
   describe "#get_picture" do
@@ -402,7 +402,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result = @api.put_wall_post("Hello, world, from the test suite, testing liking!")
     @temporary_object_id = result["id"]
     like_result = @api.put_like(@temporary_object_id)
-    like_result.should be_true
+    like_result.should be_truthy
   end
 
   # Page Access Token Support
@@ -454,7 +454,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
 
     it "works" do
-      @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions).should be_true
+      @app_api.set_app_restrictions(KoalaTest.app_id, @restrictions).should be true
     end
   end
 

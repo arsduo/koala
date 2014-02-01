@@ -222,23 +222,23 @@ describe "Koala::Facebook::RealtimeUpdates" do
     end
 
     it "returns false if there is no X-Hub-Signature header" do
-      @updates.validate_update("", {}).should be_false
+      @updates.validate_update("", {}).should be_falsy
     end
 
     it "returns false if the signature doesn't match the body" do
-      @updates.validate_update("", {"X-Hub-Signature" => "sha1=badsha1"}).should be_false
+      @updates.validate_update("", {"X-Hub-Signature" => "sha1=badsha1"}).should be false
     end
 
     it "results true if the signature matches the body with the secret" do
       body = "BODY"
       signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body).chomp
-      @updates.validate_update(body, {"X-Hub-Signature" => "sha1=#{signature}"}).should be_true
+      @updates.validate_update(body, {"X-Hub-Signature" => "sha1=#{signature}"}).should be true
     end
 
     it "results true with alternate HTTP_X_HUB_SIGNATURE header" do
       body = "BODY"
       signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body).chomp
-      @updates.validate_update(body, {"HTTP_X_HUB_SIGNATURE" => "sha1=#{signature}"}).should be_true
+      @updates.validate_update(body, {"HTTP_X_HUB_SIGNATURE" => "sha1=#{signature}"}).should be true
     end
 
   end
@@ -246,19 +246,19 @@ describe "Koala::Facebook::RealtimeUpdates" do
   describe ".meet_challenge" do
     it "returns false if hub.mode isn't subscribe" do
       params = {'hub.mode' => 'not subscribe'}
-      Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be_false
+      Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be false
     end
 
     it "doesn't evaluate the block if hub.mode isn't subscribe" do
       params = {'hub.mode' => 'not subscribe'}
       block_evaluated = false
       Koala::Facebook::RealtimeUpdates.meet_challenge(params){|token| block_evaluated = true}
-      block_evaluated.should be_false
+      block_evaluated.should be false
     end
 
     it "returns false if not given a verify_token or block" do
       params = {'hub.mode' => 'subscribe'}
-      Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be_false
+      Koala::Facebook::RealtimeUpdates.meet_challenge(params).should be false
     end
 
     describe "and mode is 'subscribe'" do
@@ -273,7 +273,7 @@ describe "Koala::Facebook::RealtimeUpdates" do
         end
 
         it "returns false if the given verify token doesn't match" do
-          Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token + '1').should be_false
+          Koala::Facebook::RealtimeUpdates.meet_challenge(@params, @token + '1').should be false
         end
 
         it "returns the challenge if the given verify token matches" do
@@ -296,20 +296,20 @@ describe "Koala::Facebook::RealtimeUpdates" do
         it "returns false if the given block return false" do
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             false
-          end.should be_false
+          end.should be false
         end
 
         it "returns false if the given block returns nil" do
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             nil
-          end.should be_false
+          end.should be false
         end
 
         it "returns the challenge if the given block returns true" do
           @params['hub.challenge'] = 'challenge val'
           Koala::Facebook::RealtimeUpdates.meet_challenge(@params) do |token|
             true
-          end.should be_true
+          end.should be_truthy
         end
       end
     end

@@ -156,7 +156,7 @@ shared_examples_for "Koala RestAPI with an access token" do
       oauth = Koala::Facebook::OAuth.new(KoalaTest.app_id, KoalaTest.secret)
       app_token = oauth.get_app_access_token
       @app_api = Koala::Facebook::API.new(app_token)
-      @app_api.set_app_properties(KoalaTest.app_properties).should be_true
+      @app_api.set_app_properties(KoalaTest.app_properties).should be true
     end
   end
 end
