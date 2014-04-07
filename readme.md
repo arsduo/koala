@@ -19,7 +19,7 @@ Installation
 
 In Bundler:
 ```ruby
-gem "koala", "~> 1.8.0rc1"
+gem "koala", "~> 1.9.0"
 ```
 
 Otherwise:
