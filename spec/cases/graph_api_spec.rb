@@ -20,6 +20,12 @@ describe 'Koala::Facebook::GraphAPIMethods' do
         allow(@api).to receive(:api).and_return(double("other results"))
         expect(@api.get_object('koppel', &post_processing)["result"]).to eq(result)
       end
+
+      it "doesn't add token to received arguments" do
+        args = {}.freeze
+        expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, "", ""))
+        expect(@api.get_object('koppel', args, &post_processing)["result"]).to eq(result)
+      end
     end
 
     context '#get_picture' do
