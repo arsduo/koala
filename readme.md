@@ -1,9 +1,10 @@
 [![Build Status](https://secure.travis-ci.org/arsduo/koala.png)](http://travis-ci.org/arsduo/koala)
 
-**Note**: a recent Facebook change will cause apps that parse the cookies every
-request to fail with the error "OAuthException: This authorization code has
-been used."  If you're seeing this, please read the note in the [OAuth
-wiki](https://github.com/arsduo/koala/wiki/OAuth) for more information.
+f8 2014 and Graph API 2.0!
+==========================
+
+For updates on new features/changes that will be coming very soon, check out [this tracker issue](https://github.com/arsduo/koala/issues/369).
+
 
 Koala
 ====
