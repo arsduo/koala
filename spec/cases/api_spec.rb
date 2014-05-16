@@ -173,14 +173,14 @@ describe "Koala::Facebook::API" do
           let(:api) { Koala::Facebook::API.new(access_token, appsecret) }
 
           it "will be included by default" do
-            Koala.should_receive(:make_request).with(path, token_args.merge(appsecret_proof_args), verb, {}).and_return(response)
+            expect(Koala).to receive(:make_request).with(path, token_args.merge(appsecret_proof_args), verb, {}).and_return(response)
             api.api(path, {}, verb, :appsecret_proof => true)
           end
         end
 
         describe "but without an appsecret included on API initialization" do
           it "will not be included" do
-            Koala.should_receive(:make_request).with(path, token_args, verb, {}).and_return(response)
+            expect(Koala).to receive(:make_request).with(path, token_args, verb, {}).and_return(response)
             api.api(path, {}, verb, :appsecret_proof => true)
           end
         end
@@ -191,7 +191,7 @@ describe "Koala::Facebook::API" do
           let(:api) { Koala::Facebook::API.new(nil, appsecret) }
 
           it "will not be included" do
-            Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
+            expect(Koala).to receive(:make_request).with(path, {}, verb, {}).and_return(response)
             api.api(path, {}, verb, :appsecret_proof => true)
           end
         end
@@ -200,7 +200,7 @@ describe "Koala::Facebook::API" do
           let(:api) { Koala::Facebook::API.new }
 
           it "will not be included" do
-            Koala.should_receive(:make_request).with(path, {}, verb, {}).and_return(response)
+            expect(Koala).to receive(:make_request).with(path, {}, verb, {}).and_return(response)
             api.api(path, {}, verb, :appsecret_proof => true)
           end
         end

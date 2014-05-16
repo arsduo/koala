@@ -299,7 +299,7 @@ describe "Koala::Facebook::TestUsers" do
 
       if KoalaTest.mock_interface?
         id_counter = 999999900
-        allow(@test_users).to receive(:create).and_return do
+        allow(@test_users).to receive(:create) do
           id_counter += 1
           {"id" => id_counter, "access_token" => @token, "login_url" => "https://www.facebook.com/platform/test_account.."}
         end
