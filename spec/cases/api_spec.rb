@@ -132,17 +132,56 @@ describe "Koala::Facebook::API" do
     expect(@service.api('anything')).to be_falsey
   end
 
-  describe "with regard to leading slashes" do
-    it "adds a leading / to the path if not present" do
-      path = "anything"
-      expect(Koala).to receive(:make_request).with("/#{path}", anything, anything, anything).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
-      @service.api(path)
+  describe "path manipulation" do
+    context "leading /" do
+      it "adds a leading / to the path if not present" do
+        path = "anything"
+        expect(Koala).to receive(:make_request).with("/#{path}", anything, anything, anything).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
+        @service.api(path)
+      end
+
+      it "doesn't change the path if a leading / is present" do
+        path = "/anything"
+        expect(Koala).to receive(:make_request).with(path, anything, anything, anything).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
+        @service.api(path)
+      end
     end
 
-    it "doesn't change the path if a leading / is present" do
-      path = "/anything"
-      expect(Koala).to receive(:make_request).with(path, anything, anything, anything).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
-      @service.api(path)
+    context "API versions" do
+      let(:path) { "/anything" }
+
+      it "adds a version if specified by Koala.config" do
+        Koala.config.api_version = "v1000.000"
+        expect(Koala).to receive(:make_request).with(
+          "/#{Koala.config.api_version}#{path}",
+          anything,
+          anything,
+          anything
+        ).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
+        @service.api(path)
+      end
+
+      it "prefers a version set in the options" do
+        Koala.config.api_version = "v1000.000"
+        version = "v2.0"
+        expect(Koala).to receive(:make_request).with(
+          "/#{version}#{path}",
+          anything,
+          anything,
+          anything
+        ).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
+        @service.api(path, {}, "get", api_version: "v2.0")
+      end
+
+      it "doesn't include a version if not specified" do
+        expect(Koala).to receive(:make_request).with(
+          path,
+          anything,
+          anything,
+          anything
+        ).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
+        @service.api(path)
+      end
     end
   end
 
