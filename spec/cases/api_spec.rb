@@ -30,6 +30,21 @@ describe "Koala::Facebook::API" do
     service.api('anything')
   end
 
+  it "doesn't add token to received arguments" do
+    token = 'adfadf'
+    service = Koala::Facebook::API.new token
+
+    expect(Koala).to receive(:make_request).with(
+                       anything,
+                       hash_including('access_token' => token),
+                       anything,
+                       anything
+                     ).and_return(Koala::HTTPService::Response.new(200, "", ""))
+
+    args = {}.freeze
+    service.api('anything', args)
+  end
+
   it "has an attr_reader for access token" do
     token = 'adfadf'
     service = Koala::Facebook::API.new token
