@@ -35,6 +35,13 @@ module Koala
       yield config
     end
 
+    # Allows you to control various Koala configuration options.
+    # Notable options:
+    #   * server endpoints: you can override any or all the server endpoints
+    #   (see HTTPService::DEFAULT_SERVERS) if you want to run requests through
+    #   other servers.
+    #   * api_version: controls which Facebook API version to use (v1.0, v2.0,
+    #   etc)
     def config
       @config ||= OpenStruct.new(HTTPService::DEFAULT_SERVERS)
     end

@@ -63,8 +63,12 @@ module Koala
         # Translate any arrays in the params into comma-separated strings
         args = sanitize_request_parameters(args)
 
-        # add a leading /
+        # add a leading / if needed...
         path = "/#{path}" unless path =~ /^\//
+        # ...and an API version if specified
+        if api_version = options[:api_version] || Koala.config.api_version
+          path = "/#{api_version}#{path}"
+        end
 
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)

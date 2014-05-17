@@ -1,11 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/arsduo/koala.png)](http://travis-ci.org/arsduo/koala)
 
-f8 2014 and Graph API 2.0!
-==========================
-
-For updates on new features/changes that will be coming very soon, check out [this tracker issue](https://github.com/arsduo/koala/issues/369).
-
-
 Koala
 ====
 [Koala](http://github.com/arsduo/koala) is a Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), the REST API, realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
@@ -29,7 +23,8 @@ Otherwise:
 ```
 
 Graph API
-----
+---------
+
 The Graph API is the simple, slick new interface to Facebook's data.
 Using it with Koala is quite straightforward.  First, you'll need an access token, which you can get through
 Facebook's [Graph API Explorer](https://developers.facebook.com/tools/explorer) (click on 'Get Access Token').
@@ -55,6 +50,16 @@ friends = @graph.get_connections("me", "friends")
 # You'll need to turn on 'Require proof on all calls' in the advanced section
 # of your app's settings when doing this.
 @graph = Koala::Facebook::API.new(oauth_access_token, app_secret)
+
+# Facebook is now versioning their API. You can specify version either
+globally:
+Koala.config.api_version = "v2.0"
+# or on a per-request basis
+@graph.get_object("me", {}, api_version: "v2.0")
+# If you don't specify a version, Facebook will default to the oldest version
+# your app is allowed to use. Note that apps created after f8 2014 *cannot* use
+# the v1.0 API. See https://developers.facebook.com/docs/apps/versions for more
+# information.
 ```
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
