@@ -51,15 +51,15 @@ friends = @graph.get_connections("me", "friends")
 # of your app's settings when doing this.
 @graph = Koala::Facebook::API.new(oauth_access_token, app_secret)
 
-# Facebook is now versioning their API. You can specify version either
-globally:
+# Facebook is now versioning their API. # If you don't specify a version, Facebook 
+# will default to the oldest version your app is allowed to use. Note that apps 
+# created after f8 2014 *cannot* use the v1.0 API. See 
+# https://developers.facebook.com/docs/apps/versions for more information.
+#
+# You can specify version either globally:
 Koala.config.api_version = "v2.0"
 # or on a per-request basis
 @graph.get_object("me", {}, api_version: "v2.0")
-# If you don't specify a version, Facebook will default to the oldest version
-# your app is allowed to use. Note that apps created after f8 2014 *cannot* use
-# the v1.0 API. See https://developers.facebook.com/docs/apps/versions for more
-# information.
 ```
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
