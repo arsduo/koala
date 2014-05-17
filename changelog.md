@@ -1,3 +1,20 @@
+v.1.10.0
+========
+
+New features:
+* API versioning is now supported through global and per-options requests
+  (Koala.config.api_version and the :api_version key specified as a per-request
+  options)
+
+Updated features:
+* API calls won't modify argument hashes in place anymore (thanks, MSex!)
+
+Testing improvements:
+* Use the modern RSpec syntax (thanks, loganhasson!)
+
+Documentation improvements:
+* Properly document the timeout option (thanks, bachand!)
+
 v1.9.0
 ======
 
