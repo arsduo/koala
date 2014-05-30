@@ -6,6 +6,7 @@ Gem::Specification.new do |gem|
   gem.name        = "koala"
   gem.summary     = "A lightweight, flexible library for Facebook with support for the Graph API, the REST API, realtime updates, and OAuth authentication."
   gem.description = "Koala is a lightweight, flexible Ruby SDK for Facebook.  It allows read/write access to the social graph via the Graph and REST APIs, as well as support for realtime updates and OAuth and Facebook Connect authentication.  Koala is fully tested and supports Net::HTTP and Typhoeus connections out of the box and can accept custom modules for other services."
+  gem.licenses    = ['MIT']
   gem.homepage    = "http://github.com/arsduo/koala"
   gem.version     = Koala::VERSION
 
