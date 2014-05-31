@@ -8,12 +8,14 @@ New features:
 
 Updated features:
 * API calls won't modify argument hashes in place anymore (thanks, MSex!)
+* OAuth#dialog_url now uses https rather than http
 
 Testing improvements:
 * Use the modern RSpec syntax (thanks, loganhasson!)
 
 Documentation improvements:
 * Properly document the timeout option (thanks, bachand!)
+* The gemspec now includes the license (thanks, coreyhaines!)
 
 v1.9.0
 ======

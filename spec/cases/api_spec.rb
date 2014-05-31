@@ -146,43 +146,6 @@ describe "Koala::Facebook::API" do
         @service.api(path)
       end
     end
-
-    context "API versions" do
-      let(:path) { "/anything" }
-
-      it "adds a version if specified by Koala.config" do
-        Koala.config.api_version = "v1000.000"
-        expect(Koala).to receive(:make_request).with(
-          "/#{Koala.config.api_version}#{path}",
-          anything,
-          anything,
-          anything
-        ).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
-        @service.api(path)
-      end
-
-      it "prefers a version set in the options" do
-        Koala.config.api_version = "v1000.000"
-        version = "v2.0"
-        expect(Koala).to receive(:make_request).with(
-          "/#{version}#{path}",
-          anything,
-          anything,
-          anything
-        ).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
-        @service.api(path, {}, "get", api_version: "v2.0")
-      end
-
-      it "doesn't include a version if not specified" do
-        expect(Koala).to receive(:make_request).with(
-          path,
-          anything,
-          anything,
-          anything
-        ).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
-        @service.api(path)
-      end
-    end
   end
 
   describe "with an access token" do

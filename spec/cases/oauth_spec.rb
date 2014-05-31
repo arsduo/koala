@@ -244,6 +244,12 @@ describe "Koala::Facebook::OAuth" do
         expect(url).to match_url("https://#{Koala.config.dialog_host}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
+      it "includes the api version if specified" do
+        version = Koala.config.api_version = "v.2.2.2.2"
+        url = @oauth.url_for_oauth_code
+        expect(url).to match_url("https://#{Koala.config.dialog_host}/#{version}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
+      end
+
       it "generates a properly formatted OAuth code URL when a callback is given" do
         callback = "foo.com"
         url = @oauth.url_for_oauth_code(:callback => callback)
@@ -302,6 +308,12 @@ describe "Koala::Facebook::OAuth" do
         expect(url).to match_url("https://#{Koala.config.graph_server}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
+      it "includes the api version if specified" do
+        version = Koala.config.api_version = "v.2.2.2.2"
+        url = @oauth.url_for_access_token(@code)
+        expect(url).to match_url("https://#{Koala.config.graph_server}/#{version}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}")
+      end
+
       it "generates a properly formatted OAuth token URL when provided a callback" do
         callback = "foo.com"
         url = @oauth.url_for_access_token(@code, :callback => callback)
@@ -323,7 +335,13 @@ describe "Koala::Facebook::OAuth" do
     describe "#url_for_dialog" do
       it "builds the base properly" do
         dialog_type = "my_dialog_type"
-        expect(@oauth.url_for_dialog(dialog_type)).to match(/^http:\/\/#{Koala.config.dialog_host}\/dialog\/#{dialog_type}/)
+        expect(@oauth.url_for_dialog(dialog_type)).to match(/^https:\/\/#{Koala.config.dialog_host}\/dialog\/#{dialog_type}/)
+      end
+
+      it "includes the api version if specified" do
+        version = Koala.config.api_version = "v.2.2.2.2"
+        dialog_type = "my_dialog_type"
+        expect(@oauth.url_for_dialog(dialog_type)).to match("https:\/\/#{Koala.config.dialog_host}\/#{version}\/dialog\/#{dialog_type}")
       end
 
       it "adds the app_id/client_id to the url" do
@@ -352,22 +370,22 @@ describe "Koala::Facebook::OAuth" do
         # slightly brittle (e.g. if parameter order changes), but still useful
         it "can generate a send dialog" do
           url = @oauth.url_for_dialog("send", :name => "People Argue Just to Win", :link => "http://www.nytimes.com/2011/06/15/arts/people-argue-just-to-win-scholars-assert.html")
-          expect(url).to match_url("http://www.facebook.com/dialog/send?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
+          expect(url).to match_url("https://www.facebook.com/dialog/send?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
         end
 
         it "can generate a feed dialog" do
           url = @oauth.url_for_dialog("feed", :name => "People Argue Just to Win", :link => "http://www.nytimes.com/2011/06/15/arts/people-argue-just-to-win-scholars-assert.html")
-          expect(url).to match_url("http://www.facebook.com/dialog/feed?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
+          expect(url).to match_url("https://www.facebook.com/dialog/feed?app_id=#{@app_id}&client_id=#{@app_id}&link=http%3A%2F%2Fwww.nytimes.com%2F2011%2F06%2F15%2Farts%2Fpeople-argue-just-to-win-scholars-assert.html&name=People+Argue+Just+to+Win&redirect_uri=#{CGI.escape @callback_url}")
         end
 
         it "can generate a oauth dialog" do
           url = @oauth.url_for_dialog("oauth", :scope => "email", :response_type => "token")
-          expect(url).to match_url("http://www.facebook.com/dialog/oauth?app_id=#{@app_id}&client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}&response_type=token&scope=email")
+          expect(url).to match_url("https://www.facebook.com/dialog/oauth?app_id=#{@app_id}&client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}&response_type=token&scope=email")
         end
 
         it "can generate a pay dialog" do
           url = @oauth.url_for_dialog("pay", :order_id => "foo", :credits_purchase => false)
-          expect(url).to match_url("http://www.facebook.com/dialog/pay?app_id=#{@app_id}&client_id=#{@app_id}&order_id=foo&credits_purchase=false&redirect_uri=#{CGI.escape @callback_url}")
+          expect(url).to match_url("https://www.facebook.com/dialog/pay?app_id=#{@app_id}&client_id=#{@app_id}&order_id=foo&credits_purchase=false&redirect_uri=#{CGI.escape @callback_url}")
         end
       end
     end

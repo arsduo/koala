@@ -76,12 +76,26 @@ describe Koala::HTTPService do
   describe "server" do
     describe "with no options" do
       it "returns the REST server if options[:rest_api]" do
-        expect(Koala::HTTPService.server(:rest_api => true)).to match(Regexp.new(Koala.config.rest_server))
+        expect(Koala::HTTPService.server(:rest_api => true)).to eq(
+         "http://#{Koala.config.rest_server}"
+        )
       end
 
       it "returns the graph server if !options[:rest_api]" do
-        expect(Koala::HTTPService.server(:rest_api => false)).to match(Regexp.new(Koala.config.graph_server))
-        expect(Koala::HTTPService.server({})).to match(Regexp.new(Koala.config.graph_server))
+        expect(Koala::HTTPService.server(:rest_api => false)).to eq(
+          "http://#{Koala.config.graph_server}"
+        )
+        expect(Koala::HTTPService.server({})).to eq(
+          "http://#{Koala.config.graph_server}"
+        )
+      end
+
+      context "with use_ssl" do
+        it "includes https" do
+          expect(Koala::HTTPService.server(use_ssl: true)).to eq(
+            "https://#{Koala.config.graph_server}"
+          )
+        end
       end
     end
 
@@ -114,6 +128,23 @@ describe Koala::HTTPService do
       it "returns the graph video server if !options[:rest_api]" do
         server = Koala::HTTPService.server(@options)
         expect(server).to match(Regexp.new(Koala.config.graph_server.gsub(/\.facebook/, "-video.facebook")))
+      end
+    end
+
+    context "with API versions" do
+      it "adds a version if specified by Koala.config" do
+        Koala.config.api_version = "v1000.000"
+        expect(Koala::HTTPService.server).to eq(
+          "http://#{Koala.config.graph_server}/#{Koala.config.api_version}"
+        )
+      end
+
+      it "prefers a version set in the options" do
+        Koala.config.api_version = "v1000.000"
+        version = "v2.0"
+        expect(Koala::HTTPService.server(api_version: version)).to eq(
+          "http://#{Koala.config.graph_server}/#{version}"
+        )
       end
     end
   end

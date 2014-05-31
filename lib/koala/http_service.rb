@@ -47,12 +47,17 @@ module Koala
     # @option options :video use the server designated for video uploads
     # @option options :beta use the beta tier
     # @option options :use_ssl force https, even if not needed
+    # @option options :api_version a version of the Facebook API, e.g. v2.0
     #
     # @return a complete server address with protocol
     def self.server(options = {})
       server = "#{options[:rest_api] ? Koala.config.rest_server : Koala.config.graph_server}"
       server.gsub!(Koala.config.host_path_matcher, Koala.config.video_replace) if options[:video]
       server.gsub!(Koala.config.host_path_matcher, Koala.config.beta_replace) if options[:beta]
+      # ...and an API version if specified
+      if api_version = options[:api_version] || Koala.config.api_version
+        server = "#{server}/#{api_version}"
+      end
       "#{options[:use_ssl] ? "https" : "http"}://#{server}"
     end
 
