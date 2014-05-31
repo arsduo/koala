@@ -90,7 +90,7 @@ module Koala
         url_options = {:client_id => @app_id}.merge(options)
 
         # Creates the URL for oauth authorization for a given callback and optional set of permissions
-        build_url("https://#{Koala.config.dialog_host}/dialog/oauth", true, url_options)
+        build_url(:dialog_host, "/dialog/oauth", true, url_options)
       end
 
       # Once you receive an OAuth code, you need to redeem it from Facebook using an appropriate URL.
@@ -114,7 +114,7 @@ module Koala
           :code => code,
           :client_secret => @app_secret
         }.merge(options)
-        build_url("https://#{Koala.config.graph_server}/oauth/access_token", true, url_options)
+        build_url(:graph_server, "/oauth/access_token", true, url_options)
       end
 
       # Builds a URL for a given dialog (feed, friends, OAuth, pay, send, etc.)
@@ -129,7 +129,7 @@ module Koala
       def url_for_dialog(dialog_type, options = {})
         # some endpoints require app_id, some client_id, supply both doesn't seem to hurt
         url_options = {:app_id => @app_id, :client_id => @app_id}.merge(options)
-        build_url("http://#{Koala.config.dialog_host}/dialog/#{dialog_type}", true, url_options)
+        build_url(:dialog_host, "/dialog/#{dialog_type}", true, url_options)
       end
 
       # Generates a 'client code' from a server side long-lived access token. With the generated
@@ -376,12 +376,21 @@ module Koala
         Base64.decode64(str.tr('-_', '+/'))
       end
 
-      def build_url(base, require_redirect_uri = false, url_options = {})
+      def server_url(type)
+        url = "https://#{Koala.config.send(type)}"
+        if version = Koala.config.api_version
+          "#{url}/#{version}"
+        else
+          url
+        end
+      end
+
+      def build_url(type, path, require_redirect_uri = false, url_options = {})
         if require_redirect_uri && !(url_options[:redirect_uri] ||= url_options.delete(:callback) || @oauth_callback_url)
           raise ArgumentError, "build_url must get a callback either from the OAuth object or in the parameters!"
         end
-
-        "#{base}?#{Koala::HTTPService.encode_params(url_options)}"
+        params = Koala::HTTPService.encode_params(url_options)
+        "#{server_url(type)}#{path}?#{params}"
       end
     end
   end
