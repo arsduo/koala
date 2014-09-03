@@ -1,3 +1,11 @@
+v.1.10.1
+========
+
+Bug fixes:
+
+* Facebook API version now works in all cases (thanks, markprzepiora!)
+* Fixed a typo in an example (thanks, mktakuya!)
+
 v.1.10.0
 ========
 
