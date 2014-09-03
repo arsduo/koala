@@ -130,23 +130,6 @@ describe Koala::HTTPService do
         expect(server).to match(Regexp.new(Koala.config.graph_server.gsub(/\.facebook/, "-video.facebook")))
       end
     end
-
-    context "with API versions" do
-      it "adds a version if specified by Koala.config" do
-        Koala.config.api_version = "v1000.000"
-        expect(Koala::HTTPService.server).to eq(
-          "http://#{Koala.config.graph_server}/#{Koala.config.api_version}"
-        )
-      end
-
-      it "prefers a version set in the options" do
-        Koala.config.api_version = "v1000.000"
-        version = "v2.0"
-        expect(Koala::HTTPService.server(api_version: version)).to eq(
-          "http://#{Koala.config.graph_server}/#{version}"
-        )
-      end
-    end
   end
 
   describe ".encode_params" do
@@ -290,6 +273,28 @@ describe Koala::HTTPService do
         expect(Koala::HTTPService).to receive(:faraday_middleware).and_return(block)
         expect(Faraday).to receive(:new).with(anything, anything, &block).and_return(@mock_connection)
         Koala::HTTPService.make_request("anything", {}, "get")
+      end
+    end
+
+
+    context "with API versions" do
+      it "adds a version if specified by Koala.config" do
+        expect(Koala.config).to receive(:api_version).and_return("v11")
+        expect(@mock_connection).to receive(:get).with("/v11/anything", anything)
+        Koala::HTTPService.make_request("anything", {}, "get")
+      end
+
+      it "prefers a version set in http_options" do
+        allow(Koala.config).to receive(:api_version).and_return("v11")
+        allow(Koala::HTTPService).to receive(:http_options).and_return({ api_version: 'v12' })
+        expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
+        Koala::HTTPService.make_request("anything", {}, "get")
+      end
+
+      it "doesn't add double slashes to the path" do
+        allow(Koala::HTTPService).to receive(:http_options).and_return({ api_version: 'v12' })
+        expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
+        Koala::HTTPService.make_request("/anything", {}, "get")
       end
     end
 
