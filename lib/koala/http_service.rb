@@ -88,8 +88,10 @@ module Koala
         ssl[:verify] = true unless ssl.has_key?(:verify)
       end
 
-      # if an api_version is specified, prepend it to the path
-      if api_version = request_options[:api_version] || Koala.config.api_version
+      # if an api_version is specified and the path does not already contain
+      # one, prepend it to the path
+      api_version = request_options[:api_version] || Koala.config.api_version
+      if api_version && !path_api_version(path)
         begins_with_slash = path[0] == "/"
         divider = begins_with_slash ? "" : "/"
         path = "/#{api_version}#{divider}#{path}"
@@ -121,6 +123,16 @@ module Koala
         key_and_value[1] = MultiJson.dump(key_and_value[1]) unless key_and_value[1].is_a? String
         "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
       end).join("&")
+    end
+
+    # Extracts the api version from an URL path.
+    #
+    # @param path the URL path.
+    #
+    # @return the version present in the path or nil
+    def self.path_api_version(path)
+      match = /^\/?(v\d+(?:\.\d+)?)\//.match(path)
+      match && match[1]
     end
 
     # deprecations

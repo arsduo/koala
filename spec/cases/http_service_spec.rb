@@ -296,6 +296,12 @@ describe Koala::HTTPService do
         expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
         Koala::HTTPService.make_request("/anything", {}, "get")
       end
+
+      it "doesn't add a version if the path already contains one" do
+        expect(Koala.config).to receive(:api_version).and_return("v11")
+        expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
+        Koala::HTTPService.make_request("/v12/anything", {}, "get")
+      end
     end
 
     it "makes a POST request if the verb isn't get" do
@@ -375,6 +381,24 @@ describe Koala::HTTPService do
         end
         Koala::HTTPService.make_request("anything", args, "post")
       end
+    end
+  end
+
+  describe ".path_api_version" do
+    it "works when the path is prefixed by a slash" do
+      expect(Koala::HTTPService.path_api_version('/v2.1/anything')).to eq('v2.1')
+    end
+
+    it "works when the path is not prefixed by a slash" do
+      expect(Koala::HTTPService.path_api_version('v2.1/anything')).to eq('v2.1')
+    end
+
+    it "works with versions without a ." do
+      expect(Koala::HTTPService.path_api_version('v21/anything')).to eq('v21')
+    end
+
+    it "returns nil for paths without a version" do
+      expect(Koala::HTTPService.path_api_version('/anything')).to be_nil
     end
   end
 
