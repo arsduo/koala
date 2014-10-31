@@ -112,6 +112,16 @@ describe Koala::Facebook::GraphCollection do
         base, args_hash = Koala::Facebook::GraphCollection.parse_page_url("http://facebook.com/foo?token=#{access_token}")
         expect(args_hash["token"]).to eq(access_token)
       end
+
+      it 'works with adresses with included API version' do
+        base = 'me/tagged_places'
+        api_version = 'v2.2'
+        args_without_api_hash = {'param' => 'value', 'second_param' => 'value'}
+        get_params = args_without_api_hash.map { |k, v| "#{k}=#{v}" }.join '&'
+        args_hash = { 'api_version' => 'v2.2' }.merge args_without_api_hash
+        path = "https://graph.facebook.com/#{api_version}/#{base}?#{get_params}"
+        expect(Koala::Facebook::GraphCollection.parse_page_url(path)).to eq [base, args_hash]
+      end
     end
   end
 
