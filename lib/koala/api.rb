@@ -61,7 +61,8 @@ module Koala
         end
 
         # Translate any arrays in the params into comma-separated strings
-        args = sanitize_request_parameters(args)
+        # default to use x-www-urlencoded
+        args = sanitize_request_parameters(args) if options[:format] && options[:format].to_s.downcase != "json"
 
         # add a leading / if needed...
         path = "/#{path}" unless path =~ /^\//
