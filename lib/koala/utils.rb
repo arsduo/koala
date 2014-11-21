@@ -29,5 +29,13 @@ module Koala
         @posted_deprecations << message
       end
     end
+
+    # Ensures that a hash uses symbols as opposed to strings
+    # Useful for allowing either syntax for end users
+    def symbolize_hash(hash)
+      return hash unless hash.is_a?(Hash)
+
+      hash.inject({}){ |memo,(key,value)| memo[key.to_sym] = symbolize_hash(value); memo }
+    end
   end
 end
