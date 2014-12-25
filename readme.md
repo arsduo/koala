@@ -15,7 +15,7 @@ Installation
 
 In Bundler:
 ```ruby
-gem "koala", "~> 1.10.0rc"
+gem "koala", "~> 1.10.1"
 ```
 
 Otherwise:
