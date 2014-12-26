@@ -29,15 +29,7 @@ module KoalaTest
       live_data = YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml'))
       KoalaTest.setup_test_data(live_data)
 
-      # allow live tests with different adapters
-      adapter = ENV['ADAPTER'] || "typhoeus" # use Typhoeus by default if available
-      begin
-        require adapter
-        require 'typhoeus/adapters/faraday' if adapter.to_s == "typhoeus"
-        Faraday.default_adapter = adapter.to_sym
-      rescue LoadError
-        puts "Unable to load adapter #{adapter}, using Net::HTTP."
-      end
+      activate_adapter!
 
       Koala.http_service.http_options[:beta] = true if ENV["beta"] || ENV["BETA"]
 
@@ -92,6 +84,7 @@ module KoalaTest
         # an early implementation of the same type of tool
         old_adapter = Koala.http_service
         Koala.http_service = Koala::HTTPService
+        activate_adapter!
         VCR.use_cassette(name) do
           yield
         end
@@ -226,5 +219,21 @@ module KoalaTest
 
   def self.live?
     ENV['LIVE']
+  end
+
+  def self.activate_adapter!
+    unless @adapter_activation_attempted
+      # allow live tests with different adapters
+      adapter = ENV['ADAPTER'] || "typhoeus" # use Typhoeus by default if available
+      begin
+        require adapter
+        require 'typhoeus/adapters/faraday' if adapter.to_s == "typhoeus"
+        Faraday.default_adapter = adapter.to_sym
+      rescue LoadError
+        puts "Unable to load adapter #{adapter}, using Net::HTTP."
+      ensure
+        @adapter_activation_attempted = true
+      end
+    end
   end
 end
