@@ -5,6 +5,7 @@ module KoalaTest
     attr_accessor :oauth_token, :app_id, :secret, :app_access_token, :code, :session_key
     attr_accessor :oauth_test_data, :subscription_test_data, :search_time
     attr_accessor :test_user_api
+    attr_accessor :vcr_oauth_token
   end
 
   # Test setup
@@ -12,7 +13,7 @@ module KoalaTest
   def self.setup_test_environment!
     setup_rspec
 
-    unless ENV['LIVE']
+    unless live?
       # By default the Koala specs are run using stubs for HTTP requests,
       # so they won't fail due to Facebook-imposed rate limits or server timeouts.
       #
@@ -79,6 +80,27 @@ module KoalaTest
     end
   end
 
+  # If we're running live tests against the Facebook API, don't use the VCR
+  # fixtures. (Another alternative would be to rerecord those fixtures, but we
+  # don't necessarily want to do that.
+  def self.with_vcr_unless_live(name)
+    if live?
+      yield
+    else
+      begin
+        # if we're using VCR, we don't want to use the mock service, which was
+        # an early implementation of the same type of tool
+        old_adapter = Koala.http_service
+        Koala.http_service = Koala::HTTPService
+        VCR.use_cassette(name) do
+          yield
+        end
+      ensure
+        Koala.http_service = old_adapter
+      end
+    end
+  end
+
   def self.setup_test_data(data)
     # make data accessible to all our tests
     self.oauth_test_data = data["oauth_test_data"]
@@ -90,12 +112,14 @@ module KoalaTest
     self.code = data["oauth_test_data"]["code"]
     self.session_key = data["oauth_test_data"]["session_key"]
 
+    self.vcr_oauth_token = data["vcr_data"]["oauth_token"]
+
     # fix the search time so it can be used in the mock responses
     self.search_time = data["search_time"] || (Time.now - 3600).to_s
   end
 
   def self.testing_permissions
-    "read_stream, publish_stream, user_photos, user_videos, read_insights"
+    "read_stream, publish_actions, user_photos, user_videos, read_insights"
   end
 
   def self.setup_test_users
@@ -143,7 +167,7 @@ module KoalaTest
     perms.each_pair do |perm, value|
       if value == (perm == "read_insights" ? 1 : 0) # live testing depends on insights calls failing
         puts "failed!\n" # put a new line after the print above
-        raise ArgumentError, "Your access token must have the read_stream, publish_stream, and user_photos permissions, and lack read_insights.  You have: #{perms.inspect}"
+        raise ArgumentError, "Your access token must have #{testing_permissions.join(", ")}, and lack read_insights.  You have: #{perms.inspect}"
       end
     end
     puts "done!"
@@ -198,5 +222,9 @@ module KoalaTest
 
   def self.app_properties
     mock_interface? ? {"desktop" => 0} : {"description" => "A test framework for Koala and its users.  (#{rand(10000).to_i})"}
+  end
+
+  def self.live?
+    ENV['LIVE']
   end
 end

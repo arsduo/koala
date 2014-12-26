@@ -1,5 +1,12 @@
 # load the library
 require 'koala'
+require 'vcr'
+
+VCR.configure do |c|
+  c.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
+  c.hook_into :webmock # or :fakeweb
+end
+
 
 # Support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }

@@ -60,3 +60,6 @@ subscription_test_data:
     "hub.challenge": "1290024882"
     "hub.verify_token": "myverificationtoken|1f54545d5f722733e17faae15377928f"
     "hub.mode": "subscribe"
+
+vcr_data:
+  oauth_token: CAACEdEose0cBAKuiUM40KZBEsq2l0iggaMGZBPI74svGQRMmZCPXb7eZCYPhNUbVXnnYZCjXKFKIc7HgYllr4RDIKrANHm6kKncOx0Y3UpDqLliRGZAnSEUypyFworUnBMOQJBlAuB1wlwYJZB7LIZCobCcnT2q9QwrZBpK3qAZB3u7ZAJaZAdsMZBsyALkAXatoj75leWXhgXfT1QiJHZBGoRlz07Q85z1dZBReK4ZD
