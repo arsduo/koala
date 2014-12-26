@@ -384,21 +384,21 @@ describe Koala::HTTPService do
     end
   end
 
-  describe ".path_api_version" do
+  describe ".path_contains_api_version?" do
     it "works when the path is prefixed by a slash" do
-      expect(Koala::HTTPService.path_api_version('/v2.1/anything')).to eq('v2.1')
+      expect(Koala::HTTPService.path_contains_api_version?('/v2.1/anything')).to be true
     end
 
     it "works when the path is not prefixed by a slash" do
-      expect(Koala::HTTPService.path_api_version('v2.1/anything')).to eq('v2.1')
+      expect(Koala::HTTPService.path_contains_api_version?('v2.1/anything')).to be true
     end
 
     it "works with versions without a ." do
-      expect(Koala::HTTPService.path_api_version('v21/anything')).to eq('v21')
+      expect(Koala::HTTPService.path_contains_api_version?('v21/anything')).to be true
     end
 
     it "returns nil for paths without a version" do
-      expect(Koala::HTTPService.path_api_version('/anything')).to be_nil
+      expect(Koala::HTTPService.path_contains_api_version?('/anything')).to be false
     end
   end
 

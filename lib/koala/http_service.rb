@@ -91,7 +91,7 @@ module Koala
       # if an api_version is specified and the path does not already contain
       # one, prepend it to the path
       api_version = request_options[:api_version] || Koala.config.api_version
-      if api_version && !path_api_version(path)
+      if api_version && !path_contains_api_version?(path)
         begins_with_slash = path[0] == "/"
         divider = begins_with_slash ? "" : "/"
         path = "/#{api_version}#{divider}#{path}"
@@ -125,14 +125,14 @@ module Koala
       end).join("&")
     end
 
-    # Extracts the api version from an URL path.
+    # Determines whether a given path already contains an API version.
     #
     # @param path the URL path.
     #
-    # @return the version present in the path or nil
-    def self.path_api_version(path)
+    # @return true or false accordingly.
+    def self.path_contains_api_version?(path)
       match = /^\/?(v\d+(?:\.\d+)?)\//.match(path)
-      match && match[1]
+      !!(match && match[1])
     end
 
     # deprecations
