@@ -328,7 +328,7 @@ describe "Koala::Facebook::TestUsers" do
       perms = ["read_stream", "offline_access"]
       installed = false
       count = 25
-      expect(@test_users).to receive(:create).exactly(count).times.with(installed, perms, anything)
+      expect(@test_users).to receive(:create).exactly(count).times.with(installed, perms, anything, anything)
       allow(@test_users).to receive(:befriend)
       @test_users.create_network(count, installed, perms)
     end
@@ -336,7 +336,7 @@ describe "Koala::Facebook::TestUsers" do
     it "accepts http options that are passed to both the create and befriend calls" do
       count = 25
       options = {:some_http_option => true}
-      expect(@test_users).to receive(:create).exactly(count).times.with(anything, anything, options).and_return({})
+      expect(@test_users).to receive(:create).exactly(count).times.with(anything, anything, anything, options).and_return({})
       # there are more befriends than creates, but we don't need to do the extra work to calculate out the exact #
       expect(@test_users).to receive(:befriend).at_least(count).times.with(anything, anything, options)
       @test_users.create_network(count, true, "", options)

@@ -166,7 +166,7 @@ module Koala
       #
       # @return the list of users created
       def create_network(network_size, installed = true, permissions = '', options = {})
-        users = (0...network_size).collect { create(installed, permissions, options) }
+        users = (0...network_size).collect { create(installed, permissions, {}, options) }
         friends = users.clone
         users.each do |user|
           # Remove this user from list of friends
