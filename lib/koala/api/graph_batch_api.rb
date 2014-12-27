@@ -19,12 +19,15 @@ module Koala
       end
 
       def graph_call_in_batch(path, args = {}, verb = "get", options = {}, &post_processing)
-        # for batch APIs, we queue up the call details (incl. post-processing)
+        # normalize options for consistency
+        options = Koala::Utils.symbolize_hash(options)
+
+        # for batch APIs, we queue up the call details (incl. post-processing)        
         batch_calls << BatchOperation.new(
           :url => path,
           :args => args,
           :method => verb,
-          :access_token => options['access_token'] || access_token,
+          :access_token => options[:access_token] || access_token,
           :http_options => options,
           :post_processing => post_processing
         )

@@ -519,6 +519,15 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       expect(insights).to be_an(Koala::Facebook::GraphCollection)
     end
 
+    it "handles requests passing the access token option as a symbol instead of a string" do
+      me, insights = @api.batch do |batch_api|
+        batch_api.get_object('me')
+        batch_api.get_connections(@app_id, 'insights', {}, {:access_token => @app_api.access_token})
+      end
+      expect(me['id']).not_to be_nil
+      expect(insights).to be_an(Koala::Facebook::GraphCollection)
+    end
+
     it "preserves batch-op specific access tokens in GraphCollection returned from batch" do
       # Provide an alternate token for a batch operation
       @other_access_token_args = { 'access_token' => @app_api.access_token }
