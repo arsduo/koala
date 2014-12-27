@@ -449,6 +449,34 @@ describe "Koala::Facebook::OAuth" do
         @oauth.get_access_token_info(@code)
       end
 
+      it "properly decodes JSON results" do
+        result =  {
+          "access_token" => "foo",
+          "expires_in" => "baz",
+          "machine_id" => "bar"
+        }
+        allow(Koala).to receive(:make_request).and_return(
+          Koala::HTTPService::Response.new(
+            200,
+            MultiJson.dump(result),
+            {}
+          )
+        )
+        expect(@oauth.get_access_token_info(@code)).to eq(result)
+      end
+
+      it "falls back to URL-style parsing " do
+        result = "access_token=foo&expires_in=baz&machine_id=bar"
+        allow(Koala).to receive(:make_request).and_return(
+          Koala::HTTPService::Response.new(200, result, {})
+        )
+        expect(@oauth.get_access_token_info(@code)).to eq({
+          "access_token" => "foo",
+          "expires_in" => "baz",
+          "machine_id" => "bar"
+        })
+      end
+
       if KoalaTest.code
         it "properly gets and parses an access token token results into a hash" do
           result = @oauth.get_access_token_info(@code)
