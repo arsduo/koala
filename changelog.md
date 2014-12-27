@@ -1,3 +1,19 @@
+v.1.11.0
+========
+
+Updated features:
+* OAuth now supports decoding the new JSON responses from the access token endpoints (thanks, ridiculous!)
+* Batch API now accepts either symbols or strings for the access token (thanks, mattmueller!)
+* Incorporate user message and title into error handling (thanks, richrines and isra17!)
+
+Bug fixes:
+* Fixed bug in GraphCollection URL versioning (thanks, deviousdodo and jankowy!)
+* TestUsers#create_network now properly handles options (thanks, crx!)
+
+Documentation improvements:
+* Updated gem version (thanks, thomasklemm!)
+
+
 v.1.10.1
 ========
 
