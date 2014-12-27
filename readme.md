@@ -15,7 +15,7 @@ Installation
 
 In Bundler:
 ```ruby
-gem "koala", "~> 1.10.1"
+gem "koala", "~> 1.11.0rc"
 ```
 
 Otherwise:
@@ -46,15 +46,15 @@ friends = @graph.get_connections("me", "friends")
 @graph.put_connections("me", "namespace:action", :object => object_url)
 
 # For extra security (recommended), you can provide an appsecret parameter,
-# tying your access tokens to your app secret. 
+# tying your access tokens to your app secret.
 # (See https://developers.facebook.com/docs/reference/api/securing-graph-api/
 # You'll need to turn on 'Require proof on all calls' in the advanced section
 # of your app's settings when doing this.
 @graph = Koala::Facebook::API.new(oauth_access_token, app_secret)
 
-# Facebook is now versioning their API. # If you don't specify a version, Facebook 
-# will default to the oldest version your app is allowed to use. Note that apps 
-# created after f8 2014 *cannot* use the v1.0 API. See 
+# Facebook is now versioning their API. # If you don't specify a version, Facebook
+# will default to the oldest version your app is allowed to use. Note that apps
+# created after f8 2014 *cannot* use the v1.0 API. See
 # https://developers.facebook.com/docs/apps/versions for more information.
 #
 # You can specify version either globally:
