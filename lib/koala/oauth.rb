@@ -316,11 +316,12 @@ module Koala
       end
 
       def parse_access_token(response_text)
-        components = response_text.split("&").inject({}) do |hash, bit|
+        JSON.parse(response_text)
+      rescue JSON::ParserError
+        response_text.split("&").inject({}) do |hash, bit|
           key, value = bit.split("=")
           hash.merge!(key => value)
         end
-        components
       end
 
       def parse_unsigned_cookie(fb_cookie)
