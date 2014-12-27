@@ -13,17 +13,7 @@ module KoalaTest
   def self.setup_test_environment!
     setup_rspec
 
-    unless live?
-      # By default the Koala specs are run using stubs for HTTP requests,
-      # so they won't fail due to Facebook-imposed rate limits or server timeouts.
-      #
-      # However as a result they are more brittle since
-      # we are not testing the latest responses from the Facebook servers.
-      # To be certain all specs pass with the current Facebook services,
-      # run LIVE=true bundle exec rake spec.
-      Koala.http_service = Koala::MockHTTPService
-      KoalaTest.setup_test_data(Koala::MockHTTPService::TEST_DATA)
-    else
+    if live?
       # Runs Koala specs through the Facebook servers
       # using data for a real app
       live_data = YAML.load_file(File.join(File.dirname(__FILE__), '../fixtures/facebook_data.yml'))
@@ -39,6 +29,17 @@ module KoalaTest
       else
         KoalaTest.validate_user_info(token)
       end
+    else
+      # By default the Koala specs are run using stubs for HTTP requests,
+      # so they won't fail due to Facebook-imposed rate limits or server timeouts.
+      #
+      # However as a result they are more brittle since
+      # we are not testing the latest responses from the Facebook servers.
+      # To be certain all specs pass with the current Facebook services,
+      # run LIVE=true bundle exec rake spec.
+      activate_vcr!
+      Koala.http_service = Koala::MockHTTPService
+      KoalaTest.setup_test_data(Koala::MockHTTPService::TEST_DATA)
     end
   end
 
@@ -219,6 +220,15 @@ module KoalaTest
 
   def self.live?
     ENV['LIVE']
+  end
+
+  def self.activate_vcr!
+    require 'vcr'
+
+    VCR.configure do |c|
+      c.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
+      c.hook_into :webmock # or :fakeweb
+    end
   end
 
   def self.activate_adapter!
