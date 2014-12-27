@@ -22,7 +22,7 @@ describe Koala::Facebook::APIError do
   end
 
   context "with an error_info hash" do
-    let(:error) { 
+    let(:error) {
       error_info = {
         'type' => 'type',
         'message' => 'message',
@@ -47,8 +47,8 @@ describe Koala::Facebook::APIError do
       end
     end
 
-    it "sets the error message \"type: error_info['type'], code: error_info['code'], error_subcode: error_info['error_subcode'], message: error_info['message'] [HTTP http_status]\"" do
-      expect(error.message).to eq("type: type, code: 1, error_subcode: subcode, message: message [HTTP 400]")
+    it "sets the error message appropriately" do
+      expect(error.message).to eq("type: type, code: 1, error_subcode: subcode, message: message, error_user_title: error user title, error_user_message: error user message [HTTP 400]")
     end
   end
 

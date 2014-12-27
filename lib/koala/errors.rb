@@ -21,7 +21,7 @@ module Koala
       # @param http_status [Integer] The HTTP status code of the response
       # @param response_body [String] The response body
       # @param error_info One of the following:
-      #                   [Hash] The error information extracted from the request 
+      #                   [Hash] The error information extracted from the request
       #                          ("type", "code", "error_subcode", "message")
       #                   [String] The error description
       #                   If error_info is nil or not provided, the method will attempt to extract
@@ -55,7 +55,7 @@ module Koala
           self.fb_error_user_title = error_info["error_user_title"]
 
           error_array = []
-          %w(type code error_subcode message).each do |key|
+          %w(type code error_subcode message error_user_title error_user_message).each do |key|
             error_array << "#{key}: #{error_info[key]}" if error_info[key]
           end
 
@@ -80,7 +80,7 @@ module Koala
     # Any error with a 5xx HTTP status code
     class ServerError < APIError; end
 
-    # Any error with a 4xx HTTP status code 
+    # Any error with a 4xx HTTP status code
     class ClientError < APIError; end
 
     # All graph API authentication failures.
