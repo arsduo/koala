@@ -297,6 +297,19 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           end
         end
 
+        context 'with appsecret_proof and app_secret' do
+          it "includes the app_secret in the API call" do
+            access_token = "foo"
+            app_secret = "baz"
+            app_secret_digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), app_secret, access_token)
+            expect(Koala).to receive(:make_request).with(anything, hash_including("access_token" => access_token, "appsecret_proof" => app_secret_digest), anything, anything).and_return(@fake_response)
+            Koala::Facebook::API.new(access_token, app_secret).batch do |batch_api|
+              batch_api.get_object('me')
+              batch_api.get_object('me', {}, {'access_token' => 'bar'})
+            end
+          end
+        end
+
         it "sets args['batch'] to a json'd map of all the batch params" do
           access_token = "bar"
           op = Koala::Facebook::GraphBatchAPI::BatchOperation.new(:access_token => access_token, :method => :get, :url => "/")
