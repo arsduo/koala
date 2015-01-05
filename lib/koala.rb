@@ -53,18 +53,10 @@ module Koala
   end
 
   # @private
-  # For current HTTPServices, switch the service as expected.
-  # For deprecated services (Typhoeus and Net::HTTP), print a warning and set the default Faraday adapter appropriately.
+  # Switch the HTTP service -- mostly used for testing.
   def self.http_service=(service)
-    if service.respond_to?(:deprecated_interface)
-      # if this is a deprecated module, support the old interface
-      # by changing the default adapter so the right library is used
-      # we continue to use the single HTTPService module for everything
-      service.deprecated_interface
-    else
-      # if it's a real http_service, use it
-      @http_service = service
-    end
+    # if it's a real http_service, use it
+    @http_service = service
   end
 
   # An convenenient alias to Koala.http_service.make_request.

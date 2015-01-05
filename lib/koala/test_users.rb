@@ -183,13 +183,6 @@ module Koala
       def test_user_accounts_path
         @test_user_accounts_path ||= "/#{@app_id}/accounts/test-users"
       end
-
-      # @private
-      # Legacy accessor for before GraphAPI was unified into API
-      def graph_api
-        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
-        @api
-      end
     end # TestUserMethods
   end # Facebook
 end # Koala

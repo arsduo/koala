@@ -56,7 +56,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           @uploadable_io = double("UploadableIO 1")
 
           @batch_queue = []
-          allow(Koala::Facebook::GraphAPI).to receive(:batch_calls).and_return(@batch_queue)
+          allow(Koala::Facebook::API).to receive(:batch_calls).and_return(@batch_queue)
 
           allow(Koala::UploadableIO).to receive(:new).with(@binary).and_return(@uploadable_io)
           allow(Koala::UploadableIO).to receive(:binary_content?).and_return(false)
@@ -245,7 +245,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           allow(@uploadable_io).to receive(:is_a?).with(Koala::UploadableIO).and_return(true)
 
           @batch_queue = []
-          allow(Koala::Facebook::GraphAPI).to receive(:batch_calls).and_return(@batch_queue)
+          allow(Koala::Facebook::API).to receive(:batch_calls).and_return(@batch_queue)
 
           @args[:method] = "post" # files are always post
         end

@@ -141,12 +141,6 @@ module Koala
       def subscription_path
         @subscription_path ||= "#{@app_id}/subscriptions"
       end
-
-      # @private
-      def graph_api
-        Koala::Utils.deprecate("the TestUsers.graph_api accessor is deprecated and will be removed in a future version; please use .api instead.")
-        @api
-      end
     end
   end
 end

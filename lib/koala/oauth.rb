@@ -40,26 +40,6 @@ module Koala
       end
       alias_method :get_user_info_from_cookie, :get_user_info_from_cookies
 
-      # Parses the cookie set Facebook's JavaScript SDK and returns only the user ID.
-      #
-      # @note (see #get_user_info_from_cookie)
-      #
-      # @param (see #get_user_info_from_cookie)
-      #
-      # @return the authenticated user's Facebook ID, or nil.
-      def get_user_from_cookies(cookies)
-        Koala::Utils.deprecate("Due to Facebook changes, you can only redeem an OAuth code once; it is therefore recommended not to use this method, as it will consume the code without providing you the access token. See https://developers.facebook.com/roadmap/completed-changes/#december-2012.")
-        if signed_cookie = cookies["fbsr_#{@app_id}"]
-          if components = parse_signed_request(signed_cookie)
-            components["user_id"]
-          end
-        elsif info = get_user_info_from_cookies(cookies)
-          # Parsing unsigned cookie
-          info["uid"]
-        end
-      end
-      alias_method :get_user_from_cookie, :get_user_from_cookies
-
       # URLs
 
       # Builds an OAuth URL, where users will be prompted to log in and for any desired permissions.
@@ -180,7 +160,6 @@ module Koala
         get_token_from_server({:code => code, :redirect_uri => options[:redirect_uri] || @oauth_callback_url}, false, options)
       end
 
-
       # Fetches the access token (ignoring expiration and other info) from Facebook.
       # Useful when you've received an OAuth code using the server-side authentication process.
       # @see get_access_token_info
@@ -270,41 +249,6 @@ module Koala
         raise OAuthSignatureError, 'Invalid signature' if (signature != hmac)
 
         envelope
-      end
-
-      # Old session key code
-
-      # @deprecated Facebook no longer provides session keys.
-      def get_token_info_from_session_keys(sessions, options = {})
-        Koala::Utils.deprecate("Facebook no longer provides session keys. The relevant OAuth methods will be removed in the next release.")
-
-        # fetch the OAuth tokens from Facebook
-        response = fetch_token_string({
-          :type => 'client_cred',
-          :sessions => sessions.join(",")
-        }, true, "exchange_sessions", options)
-
-        # Facebook returns an empty body in certain error conditions
-        if response == ""
-          raise BadFacebookResponse.new(200, '', "get_token_from_session_key received an error (empty response body) for sessions #{sessions.inspect}!")
-        end
-
-        MultiJson.load(response)
-      end
-
-      # @deprecated (see #get_token_info_from_session_keys)
-      def get_tokens_from_session_keys(sessions, options = {})
-        # get the original hash results
-        results = get_token_info_from_session_keys(sessions, options)
-        # now recollect them as just the access tokens
-        results.collect { |r| r ? r["access_token"] : nil }
-      end
-
-      # @deprecated (see #get_token_info_from_session_keys)
-      def get_token_from_session_key(session, options = {})
-        # convenience method for a single key
-        # gets the overlaoded strings automatically
-        get_tokens_from_session_keys([session], options)[0]
       end
 
       protected

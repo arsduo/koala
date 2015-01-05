@@ -1,5 +1,22 @@
+v2.0.0
+======
+
+Koala 2.0 is not a major refactor, but rather a set of small, mostly internal
+refactors:
+
+* Remove legacy interfaces (deprecated since 1.2)
+  * API#search (which Facebook doesn't support anymore)
+  * TestUser#graph\_api and RealtimeUpdates#graph\_api (use #api instead)
+  * Various HTTP options (see diff for deprecation warnings/upgrade
+    instructions for each method)
+  * NetHTTPService and TyphoeusHTTPService (see diff for deprecation
+    warnings/upgrade instructions)
+  * OAuth methods for dealing with session tokens (which Facebook stopped
+    providing)
+  * OAuth#get\_user\_from\_cookies (use get\_user\_info\_from\_cookies instead)
+
 v.1.11.1
-=======
+========
 
 Bug fixes:
 * Properly import Facebook error attributes (thanks, isra17!)
@@ -14,7 +31,7 @@ Updated features:
 
 Bug fixes:
 * Fixed bug in GraphCollection URL versioning (thanks, deviousdodo and jankowy!)
-* TestUsers#create_network now properly handles options (thanks, crx!)
+* TestUsers#create\_network now properly handles options (thanks, crx!)
 
 Documentation improvements:
 * Updated gem version (thanks, thomasklemm!)

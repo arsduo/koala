@@ -25,7 +25,7 @@ shared_examples_for "Koala RestAPI" do
     end
 
     it "sets the read_only option to true if the method is listed in the read-only list" do
-      method = Koala::Facebook::RestAPI::READ_ONLY_METHODS.first
+      method = Koala::Facebook::API::READ_ONLY_METHODS.first
 
       expect(@api).to receive(:api).with(
         anything,

@@ -72,18 +72,6 @@ describe "Koala::Facebook::TestUsers" do
       expect(Koala::Facebook::TestUsers.instance_methods.map(&:to_sym)).to include(:api)
       expect(Koala::Facebook::TestUsers.instance_methods.map(&:to_sym)).not_to include(:api=)
     end
-
-    # old graph_api accessor
-    it "returns the api object when graph_api is called" do
-      test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
-      expect(test_users.graph_api).to eq(test_users.api)
-    end
-
-    it "fire a deprecation warning when graph_api is called" do
-      test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
-      expect(Koala::Utils).to receive(:deprecate)
-      test_users.graph_api
-    end
   end
 
   describe "when used without network" do
@@ -105,12 +93,12 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       it "accepts permissions as a string" do
-        expect(@test_users.graph_api).to receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
+        expect(@test_users.api).to receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
         result = @test_users.create(true, "read_stream,publish_stream")
       end
 
       it "accepts permissions as an array" do
-        expect(@test_users.graph_api).to receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
+        expect(@test_users.api).to receive(:graph_call).with(anything, hash_including("permissions" => "read_stream,publish_stream"), anything, anything)
         result = @test_users.create(true, ["read_stream", "publish_stream"])
       end
 
@@ -123,13 +111,13 @@ describe "Koala::Facebook::TestUsers" do
 
       it "lets you specify other graph arguments, like uid and access token" do
         args = {:uid => "some test user ID", :owner_access_token => "some owner access token"}
-        expect(@test_users.graph_api).to receive(:graph_call).with(anything, hash_including(args), anything, anything)
+        expect(@test_users.api).to receive(:graph_call).with(anything, hash_including(args), anything, anything)
         @test_users.create(true, nil, args)
       end
 
       it "lets you specify http options that get passed through to the graph call" do
         options = {:some_http_option => true}
-        expect(@test_users.graph_api).to receive(:graph_call).with(anything, anything, anything, options)
+        expect(@test_users.api).to receive(:graph_call).with(anything, anything, anything, options)
         @test_users.create(true, nil, {}, options)
       end
     end
@@ -180,7 +168,7 @@ describe "Koala::Facebook::TestUsers" do
         options = {:some_http_option => true}
         # technically this goes through delete_object, but this makes it less brittle
         @stubbed = true
-        expect(@test_users.graph_api).to receive(:graph_call).with(anything, anything, anything, options)
+        expect(@test_users.api).to receive(:graph_call).with(anything, anything, anything, options)
         @test_users.delete("user", options)
       end
     end
@@ -227,20 +215,20 @@ describe "Koala::Facebook::TestUsers" do
 
       it "makes a POST with the test user Graph API " do
         @user1 = @test_users2.create(true)
-        expect(@test_users2.graph_api).to receive(:graph_call).with(anything, anything, "post", anything)
+        expect(@test_users2.api).to receive(:graph_call).with(anything, anything, "post", anything)
         @test_users2.update(@user1, @updates)
       end
 
       it "makes a request to the test user with the update params " do
         @user1 = @test_users2.create(true)
-        expect(@test_users2.graph_api).to receive(:graph_call).with(@user1["id"], @updates, anything, anything)
+        expect(@test_users2.api).to receive(:graph_call).with(@user1["id"], @updates, anything, anything)
         @test_users2.update(@user1, @updates)
       end
 
       it "accepts an options hash" do
         options = {:some_http_option => true}
         @stubbed = true
-        expect(@test_users2.graph_api).to receive(:graph_call).with(anything, anything, anything, options)
+        expect(@test_users2.api).to receive(:graph_call).with(anything, anything, anything, options)
         @test_users2.update("foo", @updates, options)
       end
 

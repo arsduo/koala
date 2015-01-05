@@ -110,5 +110,3 @@ module Koala
 end
 
 require 'koala/api/graph_batch_api'
-# legacy support for old pre-1.2 API interfaces
-require 'koala/api/legacy'

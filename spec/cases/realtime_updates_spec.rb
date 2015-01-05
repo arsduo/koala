@@ -61,18 +61,6 @@ describe "Koala::Facebook::RealtimeUpdates" do
       expect(Koala::Facebook::RealtimeUpdates.instance_methods.map(&:to_sym)).not_to include(:api=)
     end
 
-    # old graph_api accessor
-    it "returns the api object when graph_api is called" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      expect(updates.graph_api).to eq(updates.api)
-    end
-
-    it "fire a deprecation warning when graph_api is called" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      expect(Koala::Utils).to receive(:deprecate)
-      updates.graph_api
-    end
-
     # init with secret / fetching the token
     it "initializes properly with an app_id and a secret" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
