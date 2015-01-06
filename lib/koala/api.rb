@@ -60,9 +60,6 @@ module Koala
           args["appsecret_proof"] = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @app_secret, args["access_token"])
         end
 
-        # Translate any arrays in the params into comma-separated strings
-        args = sanitize_request_parameters(args)
-
         # add a leading / if needed...
         path = "/#{path}" unless path =~ /^\//
 
@@ -83,26 +80,6 @@ module Koala
           # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
           # and cause MultiJson.load to fail -- so we account for that by wrapping the result in []
           MultiJson.load("[#{result.body.to_s}]")[0]
-        end
-      end
-
-      private
-
-      # Sanitizes Ruby objects into Facebook-compatible string values.
-      #
-      # @param parameters a hash of parameters.
-      #
-      # Returns a hash in which values that are arrays of non-enumerable values
-      #         (Strings, Symbols, Numbers, etc.) are turned into comma-separated strings.
-      def sanitize_request_parameters(parameters)
-        parameters.reduce({}) do |result, (key, value)|
-          # if the parameter is an array that contains non-enumerable values,
-          # turn it into a comma-separated list
-          # in Ruby 1.8.7, strings are enumerable, but we don't care
-          if value.is_a?(Array) && value.none? {|entry| entry.is_a?(Enumerable) && !entry.is_a?(String)}
-            value = value.join(",")
-          end
-          result.merge(key => value)
         end
       end
     end

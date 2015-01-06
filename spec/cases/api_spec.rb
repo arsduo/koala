@@ -75,26 +75,6 @@ describe "Koala::Facebook::API" do
     expect(@service.api('anything', {}, 'get', :http_component => http_component)).to eq(response)
   end
 
-  it "turns arrays of non-enumerables into comma-separated arguments" do
-    args = [12345, {:foo => [1, 2, "3", :four]}]
-    expected = ["/12345", {:foo => "1,2,3,four"}, "get", {}]
-    response = double('Mock KoalaResponse', :body => '', :status => 200)
-    expect(Koala).to receive(:make_request).with(*expected).and_return(response)
-    @service.api(*args)
-  end
-
-  it "doesn't turn arrays containing enumerables into comma-separated strings" do
-    params = {:foo => [1, 2, ["3"], :four]}
-    args = [12345, params]
-    # we leave this as is -- the HTTP layer can either handle it appropriately
-    # (if appropriate behavior is defined)
-    # or raise an exception
-    expected = ["/12345", params, "get", {}]
-    response = double('Mock KoalaResponse', :body => '', :status => 200)
-    expect(Koala).to receive(:make_request).with(*expected).and_return(response)
-    @service.api(*args)
-  end
-
   it "returns the body of the request as JSON if no http_component is given" do
     response = double('response', :body => 'body', :status => 200)
     allow(Koala).to receive(:make_request).and_return(response)
