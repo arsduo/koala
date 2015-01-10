@@ -618,7 +618,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
     describe "binary files" do
       it "posts binary files" do
-        file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+        file = File.open(File.join(File.dirname(__FILE__), "../../..", "fixtures", "beach.jpg"))
 
         Koala::Facebook::GraphBatchAPI::BatchOperation.instance_variable_set(:@identifier, 0)
         result = @api.batch do |batch_api|
@@ -630,8 +630,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
 
       it "posts binary files with multiple requests" do
-        file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
-        file2 = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+        file = File.open(File.join(File.dirname(__FILE__), "../../..", "fixtures", "beach.jpg"))
+        file2 = File.open(File.join(File.dirname(__FILE__), "../../..", "fixtures", "beach.jpg"))
 
         Koala::Facebook::GraphBatchAPI::BatchOperation.instance_variable_set(:@identifier, 0)
         results = @api.batch do |batch_api|
