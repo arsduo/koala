@@ -45,55 +45,27 @@ describe Koala::HTTPService do
     end
   end
 
-  describe Koala::HTTPService::DEFAULT_SERVERS do
-    let(:defaults) { Koala::HTTPService::DEFAULT_SERVERS }
-
-    it "defines the graph server" do
-      expect(defaults[:graph_server]).to eq("graph.facebook.com")
-    end
-
-    it "defines the rest server" do
-      expect(defaults[:rest_server]).to eq("api.facebook.com")
-    end
-
-    it "defines the dialog host" do
-      expect(defaults[:dialog_host]).to eq("www.facebook.com")
-    end
-
-    it "defines the path replacement regular expression" do
-      expect(defaults[:host_path_matcher]).to eq(/\.facebook/)
-    end
-
-    it "defines the video server replacement for uploads" do
-      expect(defaults[:video_replace]).to eq("-video.facebook")
-    end
-
-    it "defines the beta tier replacement" do
-      expect(defaults[:beta_replace]).to eq(".beta.facebook")
-    end
-  end
-
   describe "server" do
     describe "with no options" do
       it "returns the REST server if options[:rest_api]" do
         expect(Koala::HTTPService.server(:rest_api => true)).to eq(
-         "http://#{Koala.config.rest_server}"
+         "http://#{Koala.configuration.rest_server}"
         )
       end
 
       it "returns the graph server if !options[:rest_api]" do
         expect(Koala::HTTPService.server(:rest_api => false)).to eq(
-          "http://#{Koala.config.graph_server}"
+          "http://#{Koala.configuration.graph_server}"
         )
         expect(Koala::HTTPService.server({})).to eq(
-          "http://#{Koala.config.graph_server}"
+          "http://#{Koala.configuration.graph_server}"
         )
       end
 
       context "with use_ssl" do
         it "includes https" do
           expect(Koala::HTTPService.server(use_ssl: true)).to eq(
-            "https://#{Koala.config.graph_server}"
+            "https://#{Koala.configuration.graph_server}"
           )
         end
       end
@@ -106,12 +78,12 @@ describe Koala::HTTPService do
 
       it "returns the beta REST server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
-        expect(server).to match(Regexp.new(Koala.config.rest_server.gsub(/\.facebook/, ".beta.facebook")))
+        expect(server).to match(Regexp.new(Koala.configuration.rest_server.gsub(/\.facebook/, ".beta.facebook")))
       end
 
       it "returns the beta rest server if !options[:rest_api]" do
         server = Koala::HTTPService.server(@options)
-        expect(server).to match(Regexp.new(Koala.config.graph_server.gsub(/\.facebook/, ".beta.facebook")))
+        expect(server).to match(Regexp.new(Koala.configuration.graph_server.gsub(/\.facebook/, ".beta.facebook")))
       end
     end
 
@@ -122,12 +94,12 @@ describe Koala::HTTPService do
 
       it "returns the REST video server if options[:rest_api]" do
         server = Koala::HTTPService.server(@options.merge(:rest_api => true))
-        expect(server).to match(Regexp.new(Koala.config.rest_server.gsub(/\.facebook/, "-video.facebook")))
+        expect(server).to match(Regexp.new(Koala.configuration.rest_server.gsub(/\.facebook/, "-video.facebook")))
       end
 
       it "returns the graph video server if !options[:rest_api]" do
         server = Koala::HTTPService.server(@options)
-        expect(server).to match(Regexp.new(Koala.config.graph_server.gsub(/\.facebook/, "-video.facebook")))
+        expect(server).to match(Regexp.new(Koala.configuration.graph_server.gsub(/\.facebook/, "-video.facebook")))
       end
     end
   end
@@ -278,14 +250,14 @@ describe Koala::HTTPService do
 
 
     context "with API versions" do
-      it "adds a version if specified by Koala.config" do
-        expect(Koala.config).to receive(:api_version).and_return("v11")
+      it "adds a version if specified by Koala.configuration" do
+        expect(Koala.configuration).to receive(:api_version).and_return("v11")
         expect(@mock_connection).to receive(:get).with("/v11/anything", anything)
         Koala::HTTPService.make_request("anything", {}, "get")
       end
 
       it "prefers a version set in http_options" do
-        allow(Koala.config).to receive(:api_version).and_return("v11")
+        allow(Koala.configuration).to receive(:api_version).and_return("v11")
         allow(Koala::HTTPService).to receive(:http_options).and_return({ api_version: 'v12' })
         expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
         Koala::HTTPService.make_request("anything", {}, "get")
@@ -298,7 +270,7 @@ describe Koala::HTTPService do
       end
 
       it "doesn't add a version if the path already contains one" do
-        expect(Koala.config).to receive(:api_version).and_return("v11")
+        expect(Koala.configuration).to receive(:api_version).and_return("v11")
         expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
         Koala::HTTPService.make_request("/v12/anything", {}, "get")
       end

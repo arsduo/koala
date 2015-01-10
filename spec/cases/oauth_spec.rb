@@ -32,6 +32,10 @@ describe "Koala::Facebook::OAuth" do
     allow(@time).to receive(:to_i).and_return(1273363199)
   end
 
+  after :each do
+    Koala.reset
+  end
+
   describe ".new" do
     it "properly initializes" do
       expect(@oauth).to be_truthy
@@ -241,43 +245,43 @@ describe "Koala::Facebook::OAuth" do
     describe "#url_for_oauth_code" do
       it "generates a properly formatted OAuth code URL with the default values" do
         url = @oauth.url_for_oauth_code
-        expect(url).to match_url("https://#{Koala.config.dialog_host}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
+        expect(url).to match_url("https://#{Koala.configuration.dialog_host}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "includes the api version if specified" do
-        version = Koala.config.api_version = "v.2.2.2.2"
+        version = Koala.configuration.api_version = "v.2.2.2.2"
         url = @oauth.url_for_oauth_code
-        expect(url).to match_url("https://#{Koala.config.dialog_host}/#{version}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
+        expect(url).to match_url("https://#{Koala.configuration.dialog_host}/#{version}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when a callback is given" do
         callback = "foo.com"
         url = @oauth.url_for_oauth_code(:callback => callback)
-        expect(url).to match_url("https://#{Koala.config.dialog_host}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{callback}")
+        expect(url).to match_url("https://#{Koala.configuration.dialog_host}/dialog/oauth?client_id=#{@app_id}&redirect_uri=#{callback}")
       end
 
       it "generates a properly formatted OAuth code URL when permissions are requested as a string" do
         permissions = "publish_stream,read_stream"
         url = @oauth.url_for_oauth_code(:permissions => permissions)
-        expect(url).to match_url("https://#{Koala.config.dialog_host}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape @callback_url}")
+        expect(url).to match_url("https://#{Koala.configuration.dialog_host}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when permissions are requested as a string" do
         permissions = ["publish_stream", "read_stream"]
         url = @oauth.url_for_oauth_code(:permissions => permissions)
-        expect(url).to match_url("https://#{Koala.config.dialog_host}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions.join(",")}&redirect_uri=#{CGI.escape @callback_url}")
+        expect(url).to match_url("https://#{Koala.configuration.dialog_host}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions.join(",")}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth code URL when both permissions and callback are provided" do
         permissions = "publish_stream,read_stream"
         callback = "foo.com"
         url = @oauth.url_for_oauth_code(:callback => callback, :permissions => permissions)
-        expect(url).to match_url("https://#{Koala.config.dialog_host}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape callback}")
+        expect(url).to match_url("https://#{Koala.configuration.dialog_host}/dialog/oauth?client_id=#{@app_id}&scope=#{CGI.escape permissions}&redirect_uri=#{CGI.escape callback}")
       end
 
       it "generates a properly formatted OAuth code URL when a display is given as a string" do
         url = @oauth.url_for_oauth_code(:display => "page")
-        expect(url).to match_url("https://#{Koala.config.dialog_host}/dialog/oauth?client_id=#{@app_id}&display=page&redirect_uri=#{CGI.escape @callback_url}")
+        expect(url).to match_url("https://#{Koala.configuration.dialog_host}/dialog/oauth?client_id=#{@app_id}&display=page&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "raises an exception if no callback is given in initialization or the call" do
@@ -305,19 +309,19 @@ describe "Koala::Facebook::OAuth" do
 
       it "generates a properly formatted OAuth token URL when provided a code" do
         url = @oauth.url_for_access_token(@code)
-        expect(url).to match_url("https://#{Koala.config.graph_server}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}")
+        expect(url).to match_url("https://#{Koala.configuration.graph_server}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "includes the api version if specified" do
-        version = Koala.config.api_version = "v.2.2.2.2"
+        version = Koala.configuration.api_version = "v.2.2.2.2"
         url = @oauth.url_for_access_token(@code)
-        expect(url).to match_url("https://#{Koala.config.graph_server}/#{version}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}")
+        expect(url).to match_url("https://#{Koala.configuration.graph_server}/#{version}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape @callback_url}")
       end
 
       it "generates a properly formatted OAuth token URL when provided a callback" do
         callback = "foo.com"
         url = @oauth.url_for_access_token(@code, :callback => callback)
-        expect(url).to match_url("https://#{Koala.config.graph_server}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape callback}")
+        expect(url).to match_url("https://#{Koala.configuration.graph_server}/oauth/access_token?client_id=#{@app_id}&code=#{@code}&client_secret=#{@secret}&redirect_uri=#{CGI.escape callback}")
       end
 
       it "includes any additional options as URL parameters, appropriately escaped" do
@@ -335,13 +339,13 @@ describe "Koala::Facebook::OAuth" do
     describe "#url_for_dialog" do
       it "builds the base properly" do
         dialog_type = "my_dialog_type"
-        expect(@oauth.url_for_dialog(dialog_type)).to match(/^https:\/\/#{Koala.config.dialog_host}\/dialog\/#{dialog_type}/)
+        expect(@oauth.url_for_dialog(dialog_type)).to match(/^https:\/\/#{Koala.configuration.dialog_host}\/dialog\/#{dialog_type}/)
       end
 
       it "includes the api version if specified" do
-        version = Koala.config.api_version = "v.2.2.2.2"
+        version = Koala.configuration.api_version = "v.2.2.2.2"
         dialog_type = "my_dialog_type"
-        expect(@oauth.url_for_dialog(dialog_type)).to match("https:\/\/#{Koala.config.dialog_host}\/#{version}\/dialog\/#{dialog_type}")
+        expect(@oauth.url_for_dialog(dialog_type)).to match("https:\/\/#{Koala.configuration.dialog_host}\/#{version}\/dialog\/#{dialog_type}")
       end
 
       it "adds the app_id/client_id to the url" do

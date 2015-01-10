@@ -58,7 +58,7 @@ friends = @graph.get_connections("me", "friends")
 # https://developers.facebook.com/docs/apps/versions for more information.
 #
 # You can specify version either globally:
-Koala.config.api_version = "v2.0"
+Koala.configuration.api_version = "v2.0"
 # or on a per-request basis
 @graph.get_object("me", {}, api_version: "v2.0")
 ```

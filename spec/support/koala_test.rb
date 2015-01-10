@@ -50,8 +50,7 @@ module KoalaTest
       config.before :each do
         @token = KoalaTest.oauth_token
         allow(Koala::Utils).to receive(:deprecate) # never fire deprecation warnings
-        # Clean up Koala config
-        Koala.reset_config
+        Koala.reset
       end
 
       config.after :each do

@@ -378,8 +378,8 @@ module Koala
       end
 
       def server_url(type)
-        url = "https://#{Koala.config.send(type)}"
-        if version = Koala.config.api_version
+        url = "https://#{Koala.configuration.send(type)}"
+        if version = Koala.configuration.api_version
           "#{url}/#{version}"
         else
           url

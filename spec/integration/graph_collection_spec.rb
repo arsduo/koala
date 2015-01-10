@@ -6,7 +6,7 @@ module Koala
 
     before :each do
       # use the right version of the API as of the writing of this test
-      Koala.config.api_version = "v2.2"
+      Koala.configuration.api_version = "v2.2"
     end
 
     it "can access the next page of a friend list" do

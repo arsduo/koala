@@ -13,6 +13,7 @@ end
 
 group :test do
   gem "rspec", '~> 3.0.0.beta1'
+  gem 'rspec-its', '~> 1.1.0'
   gem "vcr"
   gem "webmock"
 end
