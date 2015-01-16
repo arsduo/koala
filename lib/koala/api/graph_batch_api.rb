@@ -9,8 +9,8 @@ module Koala
       include GraphAPIMethods
 
       attr_reader :original_api
-      def initialize(access_token, api)
-        super(access_token)
+      def initialize(access_token, app_secret, api)
+        super(access_token, app_secret)
         @original_api = api
       end
 

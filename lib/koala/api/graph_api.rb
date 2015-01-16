@@ -469,7 +469,7 @@ module Koala
       # @return an array of results from your batch calls (as if you'd made them individually),
       #         arranged in the same order they're made.
       def batch(http_options = {}, &block)
-        batch_client = GraphBatchAPI.new(access_token, self)
+        batch_client = GraphBatchAPI.new(access_token, app_secret, self)
         if block
           yield batch_client
           batch_client.execute(http_options)
