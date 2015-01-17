@@ -3,6 +3,7 @@ require 'digest/md5'
 require 'multi_json'
 
 # include koala modules
+require 'koala/configuration'
 require 'koala/errors'
 require 'koala/api'
 require 'koala/oauth'
@@ -24,6 +25,8 @@ module Koala
 
   # Making HTTP requests
   class << self
+    attr_writer :configuration
+
     # Control which HTTP service framework Koala uses.
     # Primarily used to switch between the mock-request framework used in testing
     # and the live framework used in real life (and live testing).
@@ -31,24 +34,18 @@ module Koala
     # but since the switch to {https://github.com/arsduo/koala/wiki/HTTP-Services Faraday} almost all such goals can be accomplished with middleware.
     attr_accessor :http_service
 
+    def configuration
+      @configuration ||= Configuration.new
+    end
+
+    # Allows you to control various Koala configuration options
+    # See Koala::Configuration for full list of configurable options
     def configure
-      yield config
+      yield configuration
     end
 
-    # Allows you to control various Koala configuration options.
-    # Notable options:
-    #   * server endpoints: you can override any or all the server endpoints
-    #   (see HTTPService::DEFAULT_SERVERS) if you want to run requests through
-    #   other servers.
-    #   * api_version: controls which Facebook API version to use (v1.0, v2.0,
-    #   etc)
-    def config
-      @config ||= OpenStruct.new(HTTPService::DEFAULT_SERVERS)
-    end
-
-    # Used for testing.
-    def reset_config
-      @config = nil
+    def reset
+      self.configuration = Configuration.new
     end
   end
 

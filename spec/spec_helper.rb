@@ -1,3 +1,4 @@
+require 'rspec/its'
 # load the library
 require 'koala'
 

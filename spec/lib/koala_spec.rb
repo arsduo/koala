@@ -53,32 +53,35 @@ describe Koala do
     end
   end
 
-  describe ".configure" do
-    it "yields a configurable object" do
-      expect {
-        Koala.configure {|c| c.foo = "bar"}
-      }.not_to raise_exception
+  describe '.configuration' do
+    it 'returns a Configuration instance' do
+      expect(Koala.configuration).to be_a Koala::Configuration
     end
 
-    it "caches the config (singleton)" do
-      c = Koala.config
-      expect(c.object_id).to eq(Koala.config.object_id)
+    it 'memoizes @configuration' do
+      config = Koala.configuration
+      expect(config.object_id).to eq Koala.configuration.object_id
     end
   end
 
-  describe ".config" do
-    it "exposes the basic configuration" do
-      Koala::HTTPService::DEFAULT_SERVERS.each_pair do |k, v|
-        expect(Koala.config.send(k)).to eq(v)
-      end
+  describe '.configure' do
+    it 'yields a Configuration instance' do
+      expect { |b|
+        Koala.configure(&b)
+      }.to yield_with_args(Koala::Configuration)
     end
+  end
 
-    it "exposes the values configured" do
+  describe '.reset' do
+    before do
       Koala.configure do |config|
-        config.graph_server = "some-new.graph_server.com"
+        config.allow_array_parameters = true
       end
-      expect(Koala.config.graph_server).to eq("some-new.graph_server.com")
+    end
+
+    it 'resets the configuration' do
+      Koala.reset
+      expect(Koala.configuration.allow_array_parameters).to eq false
     end
   end
-
 end

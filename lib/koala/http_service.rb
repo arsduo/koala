@@ -23,23 +23,6 @@ module Koala
       builder.adapter Faraday.default_adapter
     end
 
-    # Default servers for Facebook. These are read into the config OpenStruct,
-    # and can be overridden via Koala.config.
-    DEFAULT_SERVERS = {
-      :graph_server => 'graph.facebook.com',
-      :dialog_host => 'www.facebook.com',
-      :rest_server => 'api.facebook.com',
-      # certain Facebook services (beta, video) require you to access different
-      # servers. If you're using your own servers, for instance, for a proxy,
-      # you can change both the matcher and the replacement values.
-      # So for instance, if you're talking to fbproxy.mycompany.com, you could
-      # set up beta.fbproxy.mycompany.com for FB's beta tier, and set the
-      # matcher to /\.fbproxy/ and the beta_replace to '.beta.fbproxy'.
-      :host_path_matcher => /\.facebook/,
-      :video_replace => '-video.facebook',
-      :beta_replace => '.beta.facebook'
-    }
-
     # The address of the appropriate Facebook server.
     #
     # @param options various flags to indicate which server to use.
@@ -50,9 +33,9 @@ module Koala
     #
     # @return a complete server address with protocol
     def self.server(options = {})
-      server = "#{options[:rest_api] ? Koala.config.rest_server : Koala.config.graph_server}"
-      server.gsub!(Koala.config.host_path_matcher, Koala.config.video_replace) if options[:video]
-      server.gsub!(Koala.config.host_path_matcher, Koala.config.beta_replace) if options[:beta]
+      server = "#{options[:rest_api] ? Koala.configuration.rest_server : Koala.configuration.graph_server}"
+      server.gsub!(Koala.configuration.host_path_matcher, Koala.configuration.video_replace) if options[:video]
+      server.gsub!(Koala.configuration.host_path_matcher, Koala.configuration.beta_replace) if options[:beta]
       "#{options[:use_ssl] ? "https" : "http"}://#{server}"
     end
 
@@ -90,7 +73,7 @@ module Koala
 
       # if an api_version is specified and the path does not already contain
       # one, prepend it to the path
-      api_version = request_options[:api_version] || Koala.config.api_version
+      api_version = request_options[:api_version] || Koala.configuration.api_version
       if api_version && !path_contains_api_version?(path)
         begins_with_slash = path[0] == "/"
         divider = begins_with_slash ? "" : "/"

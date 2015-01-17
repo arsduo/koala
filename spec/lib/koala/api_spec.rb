@@ -5,6 +5,10 @@ describe "Koala::Facebook::API" do
     @service = Koala::Facebook::API.new
   end
 
+  after :each do
+    Koala.reset
+  end
+
   it "doesn't include an access token if none was given" do
     expect(Koala).to receive(:make_request).with(
       anything,
@@ -75,9 +79,21 @@ describe "Koala::Facebook::API" do
     expect(@service.api('anything', {}, 'get', :http_component => http_component)).to eq(response)
   end
 
-  it "turns arrays of non-enumerables into comma-separated arguments" do
+  it "by default turns arrays of non-enumerables into comma-separated arguments" do
     args = [12345, {:foo => [1, 2, "3", :four]}]
     expected = ["/12345", {:foo => "1,2,3,four"}, "get", {}]
+    response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(Koala).to receive(:make_request).with(*expected).and_return(response)
+    @service.api(*args)
+  end
+
+  it 'can be configured to leave arrays of non-enumerables as is' do
+    Koala.configure do |config|
+      config.allow_array_parameters = true
+    end
+
+    args = [12345, {:foo => [1, 2, "3", :four]}]
+    expected = ["/12345", {:foo => [1, 2, "3", :four]}, "get", {}]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
