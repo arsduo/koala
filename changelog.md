@@ -1,3 +1,10 @@
+v.1.12.0
+=======
+
+Bug fixes:
+* Properly import Facebook error attributes (thanks, isra17!)
+
+
 v.1.11.0
 ========
 
