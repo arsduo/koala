@@ -4,6 +4,8 @@ v2.0.0
 Koala 2.0 is not a major refactor, but rather a set of small, mostly internal
 refactors:
 
+* BatchAPI now reads both access token and app secret from the original API
+  instance (thanks, lukeasrodgers!)
 * Remove legacy interfaces (deprecated since 1.2)
   * API#search (which Facebook doesn't support anymore)
   * TestUser#graph\_api and RealtimeUpdates#graph\_api (use #api instead)
