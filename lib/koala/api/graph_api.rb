@@ -183,6 +183,17 @@ module Koala
         block ? block.call(resolved_result) : resolved_result
       end
 
+      # Fetches a photo data.
+      #
+      # @param args (see #get_object)
+      # @param options (see Koala::Facebook::API#api)
+      # @param block (see Koala::Facebook::API#api)
+      #
+      # @return a hash of object data
+      def get_user_picture_data(object, args = {}, options = {}, &block)
+        graph_call("#{object}/picture", args.merge(:redirect => false), "get", options, &block)
+      end
+
       # Upload a photo.
       #
       # This can be called in multiple ways:
