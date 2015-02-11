@@ -1,3 +1,7 @@
+# Quantify coverage
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
+
 # load the library
 require 'koala'
 

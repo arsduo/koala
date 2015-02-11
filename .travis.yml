@@ -12,3 +12,6 @@ rvm:
   # jruby
   - jruby-19mode
 bundler_args: --without development
+addons:
+  code_climate:
+    repo_token: 87f08cb4f9c851e1207d04105d809edb4564ea7f2e9b45dd616aa71b55e99c8a
