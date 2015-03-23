@@ -500,7 +500,14 @@ module Koala
         options = {:appsecret_proof => true}.merge(options) if @app_secret
         result = api(path, args, verb, options) do |response|
           error = check_response(response.status, response.body)
-          raise error if error
+          if error
+            raise error
+          elsif response.status.to_i == 304
+            return {
+              "message" => "Etags sent with request match response",
+              "response_code" => "304",
+            }
+          end
         end
 
         # turn this into a GraphCollection if it's pageable
