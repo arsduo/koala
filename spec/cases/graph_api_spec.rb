@@ -26,6 +26,15 @@ describe 'Koala::Facebook::GraphAPIMethods' do
         expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, "", ""))
         expect(@api.get_object('koppel', args, &post_processing)["result"]).to eq(result)
       end
+
+      context "etag headers sent with response match data" do
+        it "returns a 304 and helpful response body" do
+          response_hash = { "message" => "Etags sent with request match response", "response_code" => "304" }
+          expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(304, "", ""))
+
+          expect(@api.get_object("koppel", {})).to eq(response_hash)
+        end
+      end
     end
 
     context '#get_picture' do
