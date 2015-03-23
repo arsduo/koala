@@ -278,23 +278,21 @@ describe Koala::HTTPService do
 
 
     context "with API versions" do
-      it "adds a version if specified by Koala.config" do
+      it "uses an api_version specified in the request params" do
+        expect(Koala.config).not_to receive(:api_version)
+        expect(@mock_connection).to receive(:get).with("/v11/anything", anything)
+        Koala::HTTPService.make_request("anything", { api_version: "v11"}, "get")
+      end
+
+      it "falls back to a version specified via Koala.config" do
         expect(Koala.config).to receive(:api_version).and_return("v11")
         expect(@mock_connection).to receive(:get).with("/v11/anything", anything)
         Koala::HTTPService.make_request("anything", {}, "get")
       end
 
-      it "prefers a version set in http_options" do
-        allow(Koala.config).to receive(:api_version).and_return("v11")
-        allow(Koala::HTTPService).to receive(:http_options).and_return({ api_version: 'v12' })
-        expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
-        Koala::HTTPService.make_request("anything", {}, "get")
-      end
-
       it "doesn't add double slashes to the path" do
-        allow(Koala::HTTPService).to receive(:http_options).and_return({ api_version: 'v12' })
         expect(@mock_connection).to receive(:get).with("/v12/anything", anything)
-        Koala::HTTPService.make_request("/anything", {}, "get")
+        Koala::HTTPService.make_request("/anything", { api_version: "v12" }, "get")
       end
 
       it "doesn't add a version if the path already contains one" do

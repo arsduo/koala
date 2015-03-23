@@ -90,7 +90,7 @@ module Koala
 
       # if an api_version is specified and the path does not already contain
       # one, prepend it to the path
-      api_version = request_options[:api_version] || Koala.config.api_version
+      api_version = args[:api_version] || Koala.config.api_version
       if api_version && !path_contains_api_version?(path)
         begins_with_slash = path[0] == "/"
         divider = begins_with_slash ? "" : "/"
