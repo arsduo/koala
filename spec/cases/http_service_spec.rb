@@ -281,7 +281,7 @@ describe Koala::HTTPService do
       it "uses an api_version specified in the request params" do
         expect(Koala.config).not_to receive(:api_version)
         expect(@mock_connection).to receive(:get).with("/v11/anything", anything)
-        Koala::HTTPService.make_request("anything", { api_version: "v11"}, "get")
+        Koala::HTTPService.make_request("anything", { api_version: "v11" }, "get")
       end
 
       it "falls back to a version specified via Koala.config" do
