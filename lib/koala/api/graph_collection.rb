@@ -36,7 +36,15 @@ module Koala
         # The Ads API (uniquely so far) returns a hash rather than an array when queried
         # with get_connections.
         def self.evaluate(response, api)
-          response.is_a?(Hash) && response["data"].is_a?(Array) ? self.new(response, api) : response
+          if self.is_graph_collection?(response)
+            return self.new(response, api)
+          else
+            response
+          end
+        end
+
+        def self.is_graph_collection?(response)
+          response.is_a?(Hash) && response["data"].is_a?(Array)
         end
 
         # Retrieve the next page of results.

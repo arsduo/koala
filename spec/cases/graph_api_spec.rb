@@ -86,5 +86,21 @@ describe 'Koala::Facebook::GraphAPIMethods' do
         @api.graph_call(path)
       end
     end
+
+    describe "the http_component option" do
+      it "sends the http_component option to the API call" do
+        path = "/path"
+        api = Koala::Facebook::API.new(@token, "mysecret")
+        response = Koala::HTTPService::Response.new(200, "", "")
+        expect(api).to receive(:api).with(
+          path,
+          {},
+          'get',
+          { appsecret_proof: true, http_component: :response },
+        ).and_return(response)
+
+        api.graph_call(path, {}, 'get', http_component: :response)
+      end
+    end
   end
 end
