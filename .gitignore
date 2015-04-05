@@ -6,3 +6,4 @@ Gemfile.lock
 *~
 .yardoc/
 .DS_Store
+coverage
