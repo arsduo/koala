@@ -1,3 +1,10 @@
+v2.1.0
+======
+
+Documentation improvements:
+
+* extend/clean up code quality badges (thanks, jbender!)
+
 v2.0.0
 ======
 
