@@ -14,4 +14,4 @@ rvm:
 bundler_args: --without development
 addons:
   code_climate:
-    repo_token: 87f08cb4f9c851e1207d04105d809edb4564ea7f2e9b45dd616aa71b55e99c8a
+    repo_token: 7af99d9225b4c14640f9ec3cb2e24d2f7103ac49417b0bd989188fb6c25f2909
