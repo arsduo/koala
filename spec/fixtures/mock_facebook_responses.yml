@@ -241,6 +241,10 @@ graph_api:
           headers:
             Location: https://facebook.com/large
 
+    redirect=false:
+      get:
+        no_token: '{"is_silhouette": true, "url": "https://facebook.com/large"}'
+        with_token: '{"is_silhouette": true, "url": "https://facebook.com/large"}'
   /comments:
     ids=http://developers.facebook.com/blog/post/472:
       get:

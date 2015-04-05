@@ -523,6 +523,14 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       expect(pictures.first).to match(/http\:\/\//) # works both live & stubbed
     end
 
+    it 'takes an after processing block for a get_picture call inside of a batch' do
+      picture = nil
+      @api.batch do |batch_api|
+        batch_api.get_picture('me') { |pic| picture = pic }
+      end
+      expect(picture).to match(/http\:\/\//) # works both live & stubbed
+    end
+
     it "handles requests for two different tokens" do
       me, insights = @api.batch do |batch_api|
         batch_api.get_object('me')

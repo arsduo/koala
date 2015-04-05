@@ -177,10 +177,21 @@ module Koala
       # @return the URL to the image
       def get_picture(object, args = {}, options = {}, &block)
         # Gets a picture object, returning the URL (which Facebook sends as a header)
-        resolved_result = graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
-          result ? result["Location"] : nil
+        graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
+          resolved_result = result ? result["Location"] : nil
+          block ? block.call(resolved_result) : resolved_result
         end
-        block ? block.call(resolved_result) : resolved_result
+      end
+
+      # Fetches a photo data.
+      #
+      # @param args (see #get_object)
+      # @param options (see Koala::Facebook::API#api)
+      # @param block (see Koala::Facebook::API#api)
+      #
+      # @return a hash of object data
+      def get_user_picture_data(object, args = {}, options = {}, &block)
+        graph_call("#{object}/picture", args.merge(:redirect => false), "get", options, &block)
       end
 
       # Upload a photo.
