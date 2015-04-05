@@ -15,13 +15,20 @@ Installation
 
 In Bundler:
 ```ruby
-gem "koala", "~> 1.11.0rc"
+gem "koala", "~> 2.0"
 ```
 
 Otherwise:
 ```bash
-[sudo|rvm] gem install koala --pre
+[sudo|rvm] gem install koala
 ```
+
+Upgrading to 2.0
+---------
+
+Koala 2.0 is not a major refactor, but rather a set of small, mostly internal
+refactors, which should not require significant changes by users. See changelog.md for more
+details.
 
 Graph API
 ---------
