@@ -16,6 +16,13 @@ refactors:
   * OAuth methods for dealing with session tokens (which Facebook stopped
     providing)
   * OAuth#get\_user\_from\_cookies (use get\_user\_info\_from\_cookies instead)
+* Blocks passed to API#get_picture will work in the batch API (thanks, cwhetung!)
+* Added API#get_user_picture_data to get data about a picture (thanks, morgoth!)
+
+Other changes:
+
+* Test against modern Ruby versions on Travis (thanks, nicolasleger!)
+* Speed up Travis builds (thanks, morgoth!)
 
 v.1.11.1
 ========
