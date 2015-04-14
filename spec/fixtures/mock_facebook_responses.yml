@@ -79,7 +79,7 @@ graph_api:
         with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"id\":\"456\"}"}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/picture"}]) %>:
       post:
-        with_token: '[{"code": 200, "headers":[{"name":"Location","value":"http://google.com"}]}]'
+        with_token: '[{"code": 302, "headers":[{"name":"Location","value":"http://google.com"}]}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"koppel\"}"}, {"code": 200, "body":"{\"data\":[{\"id\":\"lukeshepard\"}],\"paging\":{}}"}]'
