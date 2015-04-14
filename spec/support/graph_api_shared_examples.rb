@@ -99,7 +99,10 @@ shared_examples_for "Koala GraphAPI" do
 
   it "can access a user's picture data" do
     result = @api.get_user_picture_data(KoalaTest.user2)
-    expect(result.key?("is_silhouette")).to be_truthy
+    expect(result).to be_kind_of(Hash)
+    expect(result["data"]).to be_kind_of(Hash)
+    expect(result['data']).to be_truthy
+    expect(result['data'].keys).to include('is_silhouette', 'url')
   end
 
   it "can access connections from public Pages" do
