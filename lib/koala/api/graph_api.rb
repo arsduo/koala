@@ -164,9 +164,10 @@ module Koala
         graph_call("#{id}/#{connection_name}", args, "delete", options, &block)
       end
 
-      # Fetches a photo.
-      # (Facebook returns the src of the photo as a response header; this method parses that properly,
-      # unlike using get_connections("photo").)
+      # Fetches a photo url.
+      # Note that this method returns the picture url, not the full API
+      # response. For the hash containing the full metadata for the photo, use
+      # #get_user_picture_data instead.
       #
       # @param options options for Facebook (see #get_object).
       #                        To get a different size photo, pass :type => size (small, normal, large, square).
@@ -176,14 +177,14 @@ module Koala
       #
       # @return the URL to the image
       def get_picture(object, args = {}, options = {}, &block)
-        # Gets a picture object, returning the URL (which Facebook sends as a header)
-        graph_call("#{object}/picture", args, "get", options.merge(:http_component => :headers)) do |result|
-          resolved_result = result ? result["Location"] : nil
-          block ? block.call(resolved_result) : resolved_result
+        get_user_picture_data(object, args, options) do |result|
+          # Try to extract the URL
+          result = result.fetch('data', {})['url'] if result.respond_to?(:fetch)
+          block ? block.call(result) : result
         end
       end
 
-      # Fetches a photo data.
+      # Fetches a photo data hash.
       #
       # @param args (see #get_object)
       # @param options (see Koala::Facebook::API#api)
@@ -191,7 +192,12 @@ module Koala
       #
       # @return a hash of object data
       def get_user_picture_data(object, args = {}, options = {}, &block)
-        graph_call("#{object}/picture", args.merge(:redirect => false), "get", options, &block)
+        # The default response for a Graph API query like GET /me/picture is to
+        # return a 302 redirect. This is a surprising difference from the
+        # common return type, so we add the `redirect: false` parameter to get
+        # a RESTful API response instead.
+        args = args.merge(:redirect => false)
+        graph_call("#{object}/picture", args, "get", options, &block)
       end
 
       # Upload a photo.
