@@ -61,7 +61,7 @@ module Koala
         end
 
         # Translate any arrays in the params into comma-separated strings
-        args = sanitize_request_parameters(args)
+        args = sanitize_request_parameters(args) if options.fetch :join_array_params, Koala.config.join_array_params
 
         # add a leading / if needed...
         path = "/#{path}" unless path =~ /^\//

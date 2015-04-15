@@ -75,9 +75,29 @@ describe "Koala::Facebook::API" do
     expect(@service.api('anything', {}, 'get', :http_component => http_component)).to eq(response)
   end
 
-  it "turns arrays of non-enumerables into comma-separated arguments" do
+  it "turns arrays of non-enumerables into comma-separated arguments by default" do
     args = [12345, {:foo => [1, 2, "3", :four]}]
     expected = ["/12345", {:foo => "1,2,3,four"}, "get", {}]
+    response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(Koala).to receive(:make_request).with(*expected).and_return(response)
+    @service.api(*args)
+  end
+
+  it "can be configured to leave arrays of non-enumerables as is" do
+    Koala.configure do |config|
+      config.join_array_params = false
+    end
+
+    args = [12345, {:foo => [1, 2, "3", :four]}]
+    expected = ["/12345", {:foo => [1, 2, "3", :four]}, "get", {}]
+    response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(Koala).to receive(:make_request).with(*expected).and_return(response)
+    @service.api(*args)
+  end
+
+  it "can be configured on a per-request basis to leave arrays as is" do
+    args = [12345, {foo: [1, 2, "3", :four]}, "get", { join_array_params: false }]
+    expected = ["/12345", {foo: [1, 2, "3", :four]}, "get", { join_array_params: false }]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
