@@ -194,6 +194,14 @@ graph_api:
       post:
         <<: *token_required
         with_token: '{"id": "MOCK_PHOTO"}'
+    file_url=http://techslides.com/demos/sample-videos/small.mp4:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
+    description=my message&file_url=http://techslides.com/demos/sample-videos/small.mp4:
+      post:
+        <<: *token_required
+        with_token: '{"id": "MOCK_PHOTO_FROM_URL"}'
 
   /koppel:
     no_args:
