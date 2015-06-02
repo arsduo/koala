@@ -99,9 +99,14 @@ module Koala
 
       # set up our Faraday connection
       # we have to manually assign params to the URL or the
-      conn = Faraday.new(server(request_options), faraday_options(request_options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
-
-      response = conn.send(verb, path, (verb == "post" ? params : {}))
+      if options[:format] && options[:format].to_s.downcase == "json" && verb == "post"
+        response = conn.post do |req|
+          req.headers['Content-Type'] = 'application/json'
+          req.body = params.to_json
+        end
+      else
+        response = conn.send(verb, path, (verb == "post" ? params : {}))
+      end
 
       # Log URL information
       Koala::Utils.debug "#{verb.upcase}: #{path} params: #{params.inspect}"
