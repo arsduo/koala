@@ -103,6 +103,7 @@ module Koala
 
       if options[:format] && options[:format].to_s.downcase == "json" && verb == "post"
         response = conn.post do |req|
+          req.path = path
           req.headers['Content-Type'] = 'application/json'
           req.body = params.to_json
         end
