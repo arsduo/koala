@@ -252,6 +252,29 @@ describe Koala::HTTPService do
         Koala::HTTPService.make_request("anything", {"access_token" => "foo"}, "get", options)
       end
 
+      it "calls server with a json object when provided a format option for post requests" do
+        mock_request = double("Faraday::Request")
+
+        allow(mock_request).to receive("path=")
+        allow(mock_request).to receive("body=")
+        content = {}
+        allow(mock_request).to receive("headers").and_return(content)
+
+        mock_connection = double("Faraday connection")
+        allow(mock_connection).to receive(:post).and_yield(mock_request).and_return(@mock_http_response)
+        allow(Faraday).to receive(:new).and_return(mock_connection)
+
+        options = {:a => 2, :c => "3"}
+
+        expect(mock_connection).to receive(:post)
+        expect(mock_request).to receive("path=").with("anything")
+        expect(mock_request).to receive("body=").with(options.to_json)
+
+        Koala::HTTPService.make_request("anything", options, "post", {format: :json})
+
+        expect(mock_request.headers["Content-Type"]).to eq("application/json")
+      end
+
       it "calls server with the composite options" do
         options = {:a => 2, :c => "3"}
         http_options = {:a => :a}
