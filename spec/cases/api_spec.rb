@@ -95,9 +95,9 @@ describe "Koala::Facebook::API" do
     @service.api(*args)
   end
 
-  it "doesn't modify any data if the option format of JSON is provided" do
-    args = [12345, {:foo => [1, 2, "3", :four]}, 'get', {format: :json}]
-    expected = ["/12345", {:foo => [1, 2, "3", :four]}, 'get', {format: :json}]
+  it "doesn't modify any data if the option format of :json is provided" do
+    args = [12345, {:foo => [1, 2, "3", :four]}, 'get', format: :json]
+    expected = ["/12345", {:foo => [1, 2, "3", :four]}, 'get', format: :json]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)

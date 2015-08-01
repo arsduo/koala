@@ -74,7 +74,7 @@ module Koala
     #
     # @return [Koala::HTTPService::Response] a response object representing the results from Facebook
     def self.make_request(path, args, verb, options = {})
-      # if the verb isn't get or post, send it as a post argument
+      # if the verb isn't get or post, send it as a post argument with a method param
       args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
 
       # turn all the keys to strings (Faraday has issues with symbols under 1.8.7) and resolve UploadableIOs
@@ -100,11 +100,14 @@ module Koala
       # set up our Faraday connection
       # we have to manually assign params to the URL or the
       conn = Faraday.new(server(request_options), faraday_options(request_options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
-      if options[:format] && options[:format].to_s.downcase == "json" && verb == "post"
+
+      # remember, all non-GET requests are turned into POSTs -- see the the start of this method
+      if verb == "post" && options[:format] == :json
         response = conn.post do |req|
           req.path = path
-          req.headers['Content-Type'] = 'application/json'
+          req.headers["Content-Type"] = "application/json"
           req.body = params.to_json
+          req
         end
       else
         response = conn.send(verb, path, (verb == "post" ? params : {}))

@@ -37,6 +37,8 @@ module Koala
       # @param options request-related options for Koala and Faraday.
       #                See https://github.com/arsduo/koala/wiki/HTTP-Services for additional options.
       # @option options [Symbol] :http_component which part of the response (headers, body, or status) to return
+      # @option options [Symbol] :format which request format to use. Currently, :json is
+      #                                  supported.
       # @option options [Boolean] :beta use Facebook's beta tier
       # @option options [Boolean] :use_ssl force SSL for this request, even if it's tokenless.
       #                                    (All API requests with access tokens use SSL.)
@@ -61,7 +63,7 @@ module Koala
         end
 
         # Translate any arrays in the params into comma-separated strings
-        args = sanitize_request_parameters(args) if !options[:format] || (options[:format] && options[:format].to_s.downcase != "json")
+        args = sanitize_request_parameters(args) unless options[:format] == :json
 
         # add a leading / if needed...
         path = "/#{path}" unless path =~ /^\//

@@ -253,26 +253,27 @@ describe Koala::HTTPService do
       end
 
       it "calls server with a json object when provided a format option for post requests" do
-        mock_request = double("Faraday::Request")
+        # Unstub the now somewhat regrettable stubbing above
+        allow(Faraday).to receive(:new).and_call_original
 
-        allow(mock_request).to receive("path=")
-        allow(mock_request).to receive("body=")
-        content = {}
-        allow(mock_request).to receive("headers").and_return(content)
+        mock_request_klass = Class.new do
+          attr_accessor :path, :body, :headers, :status
+          def initialize
+            @headers = {}
+          end
+        end
 
-        mock_connection = double("Faraday connection")
-        allow(mock_connection).to receive(:post).and_yield(mock_request).and_return(@mock_http_response)
-        allow(Faraday).to receive(:new).and_return(mock_connection)
+        mock_request = mock_request_klass.new
+        allow_any_instance_of(Faraday::Connection).to receive(:post).and_yield(mock_request)
 
-        options = {:a => 2, :c => "3"}
+        path = "California"
+        args = {:a => 2, :c => "3"}
 
-        expect(mock_connection).to receive(:post)
-        expect(mock_request).to receive("path=").with("anything")
-        expect(mock_request).to receive("body=").with(options.to_json)
+        Koala::HTTPService.make_request(path, args, "post", format: :json)
 
-        Koala::HTTPService.make_request("anything", options, "post", {format: :json})
-
-        expect(mock_request.headers["Content-Type"]).to eq("application/json")
+        expect(mock_request.path).to eq(path)
+        expect(mock_request.headers).to eq("Content-Type" => "application/json")
+        expect(mock_request.body).to eq(args.to_json)
       end
 
       it "calls server with the composite options" do
