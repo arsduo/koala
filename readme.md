@@ -40,14 +40,14 @@ Then, go exploring:
 
 profile = @graph.get_object("me")
 friends = @graph.get_connections("me", "friends")
-@graph.put_connections("me", "feed", :message => "I am writing on my wall!")
+@graph.put_connections("me", "feed", message: "I am writing on my wall!")
 
 # Three-part queries are easy too!
 @graph.get_connections("me", "mutualfriends/#{friend_id}")
 
 # You can use the Timeline API:
 # (see https://developers.facebook.com/docs/beta/opengraph/tutorial/)
-@graph.put_connections("me", "namespace:action", :object => object_url)
+@graph.put_connections("me", "namespace:action", object: object_url)
 
 # For extra security (recommended), you can provide an appsecret parameter,
 # tying your access tokens to your app secret.
@@ -194,7 +194,7 @@ Sometimes, reaching out to Facebook is a pain -- let it reach out to you instead
 
 Koala makes it easy to interact with your applications using the RealtimeUpdates class:
 ```ruby
-@updates = Koala::Facebook::RealtimeUpdates.new(:app_id => app_id, :secret => secret)
+@updates = Koala::Facebook::RealtimeUpdates.new(app_id: app_id, secret: secret)
 ```
 You can do just about anything with your real-time update subscriptions using the RealtimeUpdates class:
 ```ruby
@@ -219,7 +219,7 @@ Test Users
 
 We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph or REST API:
 ```ruby
-@test_users = Koala::Facebook::TestUsers.new(:app_id => id, :secret => secret)
+@test_users = Koala::Facebook::TestUsers.new(app_id: id, secret: secret)
 user = @test_users.create(is_app_installed, desired_permissions)
 user_graph_api = Koala::Facebook::API.new(user["access_token"])
 # or, if you want to make a whole community:
@@ -232,10 +232,10 @@ Koala uses Faraday to make HTTP requests, which means you have complete control 
 ```ruby
 # Set an SSL certificate to avoid Net::HTTP errors
 Koala.http_service.http_options = {
-  :ssl => { :ca_path => "/etc/ssl/certs" }
+  ssl: { ca_path: "/etc/ssl/certs" }
 }
 # or on a per-request basis
-@api.get_object(id, args_hash, { :request => { :timeout => 10 } })
+@api.get_object(id, args_hash, { request: { timeout: 10 } })
 ```
 The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services wiki page</a> has more information on what options are available, as well as on how to configure your own Faraday middleware stack (for instance, to implement request logging).
 
