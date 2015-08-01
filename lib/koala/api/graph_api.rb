@@ -222,7 +222,8 @@ module Koala
         put_connections(*parse_media_args(picture_args, "photos"), &block)
       end
 
-      # Upload a video.  Functions exactly the same as put_picture.
+      # Upload a video.  Functions exactly the same as put_picture (URLs supported as of Facebook
+      # API version 2.3).
       # @see #put_picture
       def put_video(*video_args, &block)
         args = parse_media_args(video_args, "videos")

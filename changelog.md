@@ -1,3 +1,19 @@
+v2.2.0
+======
+
+Updated features:
+
+* You can now specify format: :json in http_options to make Content-Type application/json requests (thanks, adparlor!)
+* Koala now supports uploading videos by URL (thanks, filipegiusti!)
+
+Internal Improvements:
+
+* Use MultiJson::LoadError instead of the newer ParseError for backward compatibility (thanks, bunshin!)
+
+Documentation improvements:
+
+* modernize the hash syntax in the readme (thanks, st0012!)
+
 v2.1.0
 ======
 
