@@ -85,7 +85,7 @@ describe "Koala::Facebook::API" do
 
   it "can be configured to leave arrays of non-enumerables as is" do
     Koala.configure do |config|
-      config.join_array_params = false
+      config.preserve_form_arguments = true
     end
 
     args = [12345, {:foo => [1, 2, "3", :four]}]
@@ -96,8 +96,8 @@ describe "Koala::Facebook::API" do
   end
 
   it "can be configured on a per-request basis to leave arrays as is" do
-    args = [12345, {foo: [1, 2, "3", :four]}, "get", { join_array_params: false }]
-    expected = ["/12345", {foo: [1, 2, "3", :four]}, "get", { join_array_params: false }]
+    args = [12345, {foo: [1, 2, "3", :four]}, "get", preserve_form_arguments: true]
+    expected = ["/12345", {foo: [1, 2, "3", :four]}, "get", preserve_form_arguments: true]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)

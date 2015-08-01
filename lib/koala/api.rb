@@ -65,7 +65,7 @@ module Koala
         end
 
         # Translate any arrays in the params into comma-separated strings
-        args = sanitize_request_parameters(args) if preserve_form_arguments?(options)
+        args = sanitize_request_parameters(args) unless preserve_form_arguments?(options)
 
         # add a leading / if needed...
         path = "/#{path}" unless path =~ /^\//
@@ -111,7 +111,7 @@ module Koala
       end
 
       def preserve_form_arguments?(options)
-        options[:format] == :json || options[:preserve_form_arguments]
+        options[:format] == :json || options[:preserve_form_arguments] || Koala.config[:preserve_form_arguments]
       end
     end
   end

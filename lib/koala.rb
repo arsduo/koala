@@ -22,8 +22,6 @@ module Koala
   # See http://github.com/arsduo/koala/wiki for a general introduction to Koala
   # and the Graph API.
 
-  OPTIONS = HTTPService::DEFAULT_SERVERS.merge(join_array_params: true)
-
   # Making HTTP requests
   class << self
     # Control which HTTP service framework Koala uses.
@@ -45,7 +43,7 @@ module Koala
     #   * api_version: controls which Facebook API version to use (v1.0, v2.0,
     #   etc)
     def config
-      @config ||= OpenStruct.new(OPTIONS)
+      @config ||= OpenStruct.new(HTTPService::DEFAULT_SERVERS)
     end
 
     # Used for testing.

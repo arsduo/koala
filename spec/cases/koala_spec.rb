@@ -39,7 +39,7 @@ describe Koala do
 
   describe ".config" do
     it "exposes the basic configuration" do
-      Koala::OPTIONS.each_pair do |k, v|
+      Koala::HTTPService::DEFAULT_SERVERS.each_pair do |k, v|
         expect(Koala.config.send(k)).to eq(v)
       end
     end
