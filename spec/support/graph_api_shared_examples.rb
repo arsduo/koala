@@ -358,6 +358,25 @@ shared_examples_for "Koala GraphAPI with an access token" do
     # note: Facebook doesn't post videos immediately to the wall, due to processing time
     # during which get_object(video_id) will return false
     # hence we can't do the same verify test we do for photos
+
+
+    describe "using a URL instead of a file" do
+      before :each do
+        @url = "http://techslides.com/demos/sample-videos/small.mp4"
+      end
+
+      it "can post photo to the user's wall using a URL" do
+        result = @api.put_video(@url)
+        @temporary_object_id = result["id"]
+        expect(@temporary_object_id).not_to be_nil
+      end
+
+      it "can post photo to the user's wall using a URL and an additional param" do
+        result = @api.put_video(@url, :description => "my message")
+        @temporary_object_id = result["id"]
+        expect(@temporary_object_id).not_to be_nil
+      end
+    end
   end
 
   it "can verify a message with an attachment posted to a feed" do

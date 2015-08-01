@@ -557,7 +557,8 @@ module Koala
 
         if url?(media_args.first)
           # If media_args is a URL, we can upload without UploadableIO
-          args.merge!(:url => media_args.first)
+          url_arg_name = method == "photos" ? :url : :file_url
+          args.merge!(url_arg_name => media_args.first)
         else
           args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
         end
