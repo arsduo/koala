@@ -111,7 +111,7 @@ module Koala
       end
 
       def preserve_form_arguments?(options)
-        options[:format] == :json || options[:preserve_form_arguments] || Koala.config[:preserve_form_arguments]
+        options[:format] == :json || options[:preserve_form_arguments] || Koala.config.preserve_form_arguments
       end
     end
   end
