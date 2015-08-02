@@ -5,6 +5,7 @@ Updated features:
 
 * You can now specify format: :json in http_options to make Content-Type application/json requests (thanks, adparlor!)
 * Koala now supports uploading videos by URL (thanks, filipegiusti!)
+* GraphCollections now offer direct access to the collection summary data via #summary (thanks, vhoof!)
 
 Internal Improvements:
 
