@@ -10,6 +10,8 @@ module Koala
 
         # The raw paging information from Facebook (next/previous URLs).
         attr_reader :paging
+        # The raw summary information from Facebook (total counts).
+        attr_reader :summary
         # @return [Koala::Facebook::GraphAPI] the api used to make requests.
         attr_reader :api
         # The entire raw response from Facebook.
@@ -22,10 +24,11 @@ module Koala
         #            (usually the API that made the original call).
         #
         # @return [Koala::Facebook::GraphCollection] an initialized GraphCollection
-        #         whose paging, raw_response, and api attributes are populated.
+        #         whose paging, summary, raw_response, and api attributes are populated.
         def initialize(response, api)
           super response["data"]
           @paging = response["paging"]
+          @summary = response["summary"]
           @raw_response = response
           @api = api
         end
