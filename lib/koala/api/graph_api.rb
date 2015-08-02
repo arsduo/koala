@@ -312,6 +312,20 @@ module Koala
         graph_call("#{id}/likes", {}, "delete", options, &block)
       end
 
+      # Search for a given query among visible Facebook objects.
+      # See {http://developers.facebook.com/docs/reference/api/#searching Facebook documentation} for more information.
+      #
+      # @param search_terms the query to search for
+      # @param args additional arguments, such as type, fields, etc.
+      # @param options (see #get_object)
+      # @param block (see Koala::Facebook::API#api)
+      #
+      # @return [Koala::Facebook::API::GraphCollection] an array of search results
+      def search(search_terms, args = {}, options = {}, &block)
+        args.merge!({:q => search_terms}) unless search_terms.nil?
+        graph_call("search", args, "get", options, &block)
+      end
+
       # Convenience Methods
       # In general, we're trying to avoid adding convenience methods to Koala
       # except to support cases where the Facebook API requires non-standard input

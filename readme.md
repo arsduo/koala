@@ -69,7 +69,7 @@ Koala.config.api_version = "v2.0"
 
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
-When retrieving data that returns an array of results (for example, when calling `API#get_connections`)
+When retrieving data that returns an array of results (for example, when calling `API#get_connections` or `API#search`)
 a GraphCollection object will be returned, which makes it easy to page through the results:
 
 ```ruby

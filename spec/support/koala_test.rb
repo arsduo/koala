@@ -3,7 +3,7 @@ module KoalaTest
 
   class << self
     attr_accessor :oauth_token, :app_id, :secret, :app_access_token, :code, :session_key
-    attr_accessor :oauth_test_data, :subscription_test_data
+    attr_accessor :oauth_test_data, :subscription_test_data, :search_time
     attr_accessor :test_user_api
     attr_accessor :vcr_oauth_token
   end
@@ -107,6 +107,9 @@ module KoalaTest
     self.session_key = data["oauth_test_data"]["session_key"]
 
     self.vcr_oauth_token = data["vcr_data"]["oauth_token"]
+
+    # fix the search time so it can be used in the mock responses
+    self.search_time = data["search_time"] || (Time.now - 3600).to_s
   end
 
   def self.testing_permissions

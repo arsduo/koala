@@ -271,6 +271,16 @@ graph_api:
         code: 500
         body: '{"error": {"type": "Exception","message": "No node specified"}}'
 
+  /search:
+    q=facebook:
+      get:
+        with_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+        no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+    "limit=25&q=facebook&until=<%= TEST_DATA['search_time'] %>":
+      get:
+        with_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+        no_token: '{"data": [{"id": "507731521_100412693339488"}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+
   /fql:
     q=select uid, first_name from user where uid = 2901279:
       get:
