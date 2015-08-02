@@ -6,7 +6,8 @@ describe Koala::Facebook::GraphCollection do
   before(:each) do
     @result = {
       "data" => [1, 2, :three],
-      "paging" => paging
+      "paging" => paging,
+      "summary" => [3]
     }
     @api = Koala::Facebook::API.new("123")
     @collection = Koala::Facebook::GraphCollection.new(@result, @api)
@@ -31,6 +32,10 @@ describe Koala::Facebook::GraphCollection do
 
   it "sets paging to results['paging']" do
     expect(@collection.paging).to eq(@result["paging"])
+  end
+
+  it "sets summary to results['summary']" do
+    expect(@collection.summary).to eq(@result["summary"])
   end
 
   it "sets raw_response to the original results" do
