@@ -3,6 +3,7 @@ v2.2.0
 
 Updated features:
 
+* Restore API#search, since Facebook still supports that for certain usecases (thanks, vhoof!)
 * You can now specify format: :json in http_options to make Content-Type application/json requests (thanks, adparlor!)
 * Koala now supports uploading videos by URL (thanks, filipegiusti!)
 * GraphCollections now offer direct access to the collection summary data via #summary (thanks, vhoof!)
