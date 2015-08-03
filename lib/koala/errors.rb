@@ -1,6 +1,12 @@
+require 'faraday/error'
+
 module Koala
 
   class KoalaError < StandardError; end
+
+  # TODO: make it subclass of Koala::KoalaError in 3.0
+  # For backward compatibility is not subclasssed from Koala::KoalaError
+  class KoalaError::ConnectionFailed < ::Faraday::Error::ConnectionFailed; end
 
   module Facebook
 

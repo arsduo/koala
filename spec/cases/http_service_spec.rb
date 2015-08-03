@@ -344,6 +344,23 @@ describe Koala::HTTPService do
       Koala::HTTPService.make_request("anything", {}, "get")
     end
 
+    it "throws Koala::KoalaError::ConnectionFailed on Faraday::Error::ConnectionFailed" do
+      expect(@mock_connection).to receive(:get).and_raise(Faraday::Error::ConnectionFailed.new("backtrace"))
+
+      expect {
+        Koala::HTTPService.make_request("anything", {}, "get")
+      }.to raise_error(Koala::KoalaError::ConnectionFailed)
+    end
+
+    it "Koala::KoalaError::ConnectionFailed error still can be catched by his parent error" do
+      expect(@mock_connection).to receive(:get).and_raise(Faraday::Error::ConnectionFailed.new("backtrace"))
+
+      begin
+        Koala::HTTPService.make_request("anything", {}, "get")
+      rescue Faraday::Error::ConnectionFailed
+      end
+    end
+
     describe "for GETs" do
       it "submits the arguments in the body" do
         # technically this is done for all requests, but you don't send GET requests with files
