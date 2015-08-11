@@ -7,12 +7,14 @@ Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/
 * Flexible: Koala should be useful to everyone, regardless of their current configuration.  We support JRuby, Rubinius, and REE as well as vanilla Ruby (1.8.7, 1.9.2, 1.9.3, and 2.0.0), and use the Faraday library to provide complete flexibility over how HTTP requests are made.
 * Tested: Koala should have complete test coverage, so you can rely on it.  Our test coverage is complete and can be run against either mocked responses or the live Facebook servers; we're also on [Travis CI](http://travis-ci.org/arsduo/koala/).
 
+**Found a bug? Interested in contributing?** Check out the Maintenance section below!
+
 Installation
----
+------------
 
 In Bundler:
 ```ruby
-gem "koala", "~> 2.0"
+gem "koala", "~> 2.2"
 ```
 
 Otherwise:
@@ -20,8 +22,8 @@ Otherwise:
 [sudo|rvm] gem install koala
 ```
 
-Upgrading to 2.0
----------
+Upgrading to 2.0+
+-----------------
 
 Koala 2.0 is not a major refactor, but rather a set of small, mostly internal
 refactors, which should not require significant changes by users. See changelog.md for more
@@ -112,7 +114,8 @@ the results apart from a long list of array entries:
 Check out the wiki for more details and examples.
 
 The REST API
------
+------------
+
 Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.
 
 Fortunately, Koala supports the REST API using the very same interface; to use this, instantiate an API:
@@ -132,7 +135,8 @@ fql = @api.fql_query(my_fql_query)
 ```
 
 Configuration
-----
+-------------
+
 You can change the host that koala makes requests to (point to a mock server, apigee, runscope etc..)
 ```ruby
 # config/initializers/koala.rb
@@ -150,6 +154,7 @@ tier and video upload matching and replacement strings.
 
 OAuth
 -----
+
 You can use the Graph and REST APIs without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
 ```ruby
 @oauth = Koala::Facebook::OAuth.new(app_id, app_secret, callback_url)
@@ -189,7 +194,8 @@ Or, if for some horrible reason, you're still using session keys, despair not!  
 That's it!  It's pretty simple once you get the hang of it.  If you're new to OAuth, though, check out the wiki and the OAuth Playground example site (see below).
 
 Real-time Updates
------
+-----------------
+
 Sometimes, reaching out to Facebook is a pain -- let it reach out to you instead.  The Graph API allows your application to subscribe to real-time updates for certain objects in the graph; check the [official Facebook documentation](http://developers.facebook.com/docs/api/realtime) for more details on what objects you can subscribe to and what limitations may apply.
 
 Koala makes it easy to interact with your applications using the RealtimeUpdates class:
@@ -215,7 +221,7 @@ Koala::Facebook::RealtimeUpdates.meet_challenge(params, your_verify_token)
 For more information about meet_challenge and the RealtimeUpdates class, check out the Real-Time Updates page on the wiki.
 
 Test Users
------
+----------
 
 We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph or REST API:
 ```ruby
@@ -226,7 +232,7 @@ user_graph_api = Koala::Facebook::API.new(user["access_token"])
 @test_users.create_network(network_size, is_app_installed, common_permissions)
 ```
 Talking to Facebook
------
+-------------------
 
 Koala uses Faraday to make HTTP requests, which means you have complete control over how your app makes HTTP requests to Facebook.  You can set Faraday options globally or pass them in on a per-request (or both):
 ```ruby
@@ -240,7 +246,7 @@ Koala.http_service.http_options = {
 The <a href="https://github.com/arsduo/koala/wiki/HTTP-Services">HTTP Services wiki page</a> has more information on what options are available, as well as on how to configure your own Faraday middleware stack (for instance, to implement request logging).
 
 See examples, ask questions
------
+---------------------------
 
 Some resources to help you as you play with Koala and the Graph API:
 
@@ -257,7 +263,7 @@ issues filed about how to use the Facebook API may be closed with a reference
 to the Facebook Stack Overflow page.
 
 Testing
------
+-------
 
 Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box:
 ```bash
@@ -273,3 +279,25 @@ LIVE=true bundle exec rake spec
 LIVE=true BETA=true bundle exec rake spec
 ```
 By default, the live tests are run against test users, so you can run them as frequently as you want.  If you want to run them against a real user, however, you can fill in the OAuth token, code, and access\_token values in spec/fixtures/facebook_data.yml.  See the wiki for more details.
+
+Maintenance
+-----------
+
+_Pull requests_: Koala exists as it does thanks to the amazing support and work of community members of all
+backgrounds and levels of experience. Pull requests are very welcome! If you have any questions,
+just open an issue.
+
+Please note that this project is released with a Contributor Code of Conduct. By participating in
+this project you agree to abide by its terms. See
+[code_of_conduct.md](https://github.com/arsduo/koala/blob/master/code_of_conduct.md) for more information.
+
+_Schedule_: In order to keep Koala moving forward on a regular and predictable schedule, I will
+address issues and pull requests at least three times a year: late July/early August, late
+December/early January, and late March/early April. I may respond to issues in between maintenance
+periods, but it'll depend on other life/work goings-on.
+
+Breaking/new Facebook changes and other urgent issues obviously will get addressed much more
+quickly. (We've never had a security issue, but obviously that would be priority 0.)
+
+Have questions? Found a breaking bug or urgent issue? [Tweet at me](http://twitter.com/arsduo) --
+I'm always happy to respond.
