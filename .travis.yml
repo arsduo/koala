@@ -8,9 +8,10 @@ rvm:
   - 2.1
   - 2.2
   # rbx
-  - rbx-2.4.1
+  - rbx-2
   # jruby
   - jruby-19mode
+  - jruby-9.0.1.0
 bundler_args: --without development
 addons:
   code_climate:
