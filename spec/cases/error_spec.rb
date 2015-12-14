@@ -5,7 +5,7 @@ describe Koala::Facebook::APIError do
     expect(Koala::Facebook::APIError.new(nil, nil)).to be_a(Koala::KoalaError)
   end
 
-  [:fb_error_type, :fb_error_code, :fb_error_subcode, :fb_error_message, :fb_error_user_msg, :fb_error_user_title, :http_status, :response_body].each do |accessor|
+  [:fb_error_type, :fb_error_code, :fb_error_subcode, :fb_error_message, :fb_error_user_msg, :fb_error_user_title, :fb_error_trace_id, :fb_error_rev, :fb_error_debug, :http_status, :response_body].each do |accessor|
     it "has an accessor for #{accessor}" do
       expect(Koala::Facebook::APIError.instance_methods.map(&:to_sym)).to include(accessor)
       expect(Koala::Facebook::APIError.instance_methods.map(&:to_sym)).to include(:"#{accessor}=")
@@ -29,7 +29,10 @@ describe Koala::Facebook::APIError do
         'code' => 1,
         'error_subcode' => 'subcode',
         'error_user_msg' => 'error user message',
-        'error_user_title' => 'error user title'
+        'error_user_title' => 'error user title',
+        'x-fb-trace-id' => 'fb trace id',
+        'x-fb-debug' => 'fb debug token',
+        'x-fb-rev' => 'fb revision'
       }
       Koala::Facebook::APIError.new(400, '', error_info)
     }
@@ -40,7 +43,10 @@ describe Koala::Facebook::APIError do
       :fb_error_code => 1,
       :fb_error_subcode => 'subcode',
       :fb_error_user_msg => 'error user message',
-      :fb_error_user_title => 'error user title'
+      :fb_error_user_title => 'error user title',
+      :fb_error_trace_id => 'fb trace id',
+      :fb_error_debug => 'fb debug token',
+      :fb_error_rev => 'fb revision'
     }.each_pair do |accessor, value|
       it "sets #{accessor} to #{value}" do
         expect(error.send(accessor)).to eq(value)
@@ -48,7 +54,7 @@ describe Koala::Facebook::APIError do
     end
 
     it "sets the error message appropriately" do
-      expect(error.message).to eq("type: type, code: 1, error_subcode: subcode, message: message, error_user_title: error user title, error_user_msg: error user message [HTTP 400]")
+      expect(error.message).to eq("type: type, code: 1, error_subcode: subcode, message: message, error_user_title: error user title, error_user_msg: error user message, x-fb-trace-id: fb trace id [HTTP 400]")
     end
   end
 

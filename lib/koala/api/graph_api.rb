@@ -511,7 +511,7 @@ module Koala
         # enable appsecret_proof by default
         options = {:appsecret_proof => true}.merge(options) if @app_secret
         result = api(path, args, verb, options) do |response|
-          error = check_response(response.status, response.body)
+          error = check_response(response.status, response.body, response.headers)
           raise error if error
         end
 
@@ -524,7 +524,7 @@ module Koala
 
       private
 
-      def check_response(http_status, response_body)
+      def check_response(http_status, response_body, response_headers = {})
         # Check for Graph API-specific errors. This returns an error of the appropriate type
         # which is immediately raised (non-batch) or added to the list of batch results (batch)
         http_status = http_status.to_i
@@ -545,6 +545,10 @@ module Koala
             }
           else
             error_info = response_hash['error'] || {}
+          end
+
+          %w(x-fb-debug x-fb-rev x-fb-trace-id).each do |debug_header|
+            error_info[debug_header] = response_headers[debug_header] if response_headers.has_key?(debug_header)
           end
 
           if error_info['type'] == 'OAuthException' &&

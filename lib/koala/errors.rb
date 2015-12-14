@@ -14,7 +14,7 @@ module Koala
     # http_status, then the error was detected before making a call to Facebook. (e.g. missing access token)
     class APIError < ::Koala::KoalaError
       attr_accessor :fb_error_type, :fb_error_code, :fb_error_subcode, :fb_error_message,
-                    :fb_error_user_msg, :fb_error_user_title, :http_status, :response_body
+                    :fb_error_user_msg, :fb_error_user_title, :fb_error_trace_id, :fb_error_debug, :fb_error_rev, :http_status, :response_body
 
       # Create a new API Error
       #
@@ -54,8 +54,12 @@ module Koala
           self.fb_error_user_msg = error_info["error_user_msg"]
           self.fb_error_user_title = error_info["error_user_title"]
 
+          self.fb_error_trace_id = error_info["x-fb-trace-id"]
+          self.fb_error_debug = error_info["x-fb-debug"]
+          self.fb_error_rev = error_info["x-fb-rev"]
+
           error_array = []
-          %w(type code error_subcode message error_user_title error_user_msg).each do |key|
+          %w(type code error_subcode message error_user_title error_user_msg x-fb-trace-id).each do |key|
             error_array << "#{key}: #{error_info[key]}" if error_info[key]
           end
 
