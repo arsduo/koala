@@ -28,9 +28,15 @@ module Koala
           raise AuthenticationError.new(nil, nil, "Batch operations require an access token, none provided.") unless @access_token
         end
 
-        def to_batch_params(main_access_token)
+        def to_batch_params(main_access_token, app_secret)
           # set up the arguments
-          args_string = Koala.http_service.encode_params(@access_token == main_access_token ? @args : @args.merge(:access_token => @access_token))
+          if @access_token != main_access_token
+            @args[:access_token] = @access_token
+            if app_secret
+              @args[:appsecret_proof] = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), app_secret, @access_token)
+            end
+          end
+          args_string = Koala.http_service.encode_params(@args)
 
           response = {
             :method => @method.to_s,

@@ -38,7 +38,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       it "doesn't change the original http_options" do
         @args[:http_options][:name] = "baz2"
         expected = @args[:http_options].dup
-        Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)
+        Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)
         expect(@args[:http_options]).to eq(expected)
       end
 
@@ -102,7 +102,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
         it "removes the value from the arguments" do
           @args[:args].merge!("source" => @binary)
-          expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)[:body]).not_to match(/source=/)
+          expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:body]).not_to match(/source=/)
         end
       end
 
@@ -116,7 +116,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             @args[:url] = url = "/"
             allow(Koala.http_service).to receive(:encode_params).and_return(test_args)
 
-            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)[:relative_url]).to eq("#{url}?#{test_args}")
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:relative_url]).to eq("#{url}?#{test_args}")
           end
 
           it "adds the args to the URL string, with & if args previously present" do
@@ -124,16 +124,16 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             @args[:url] = url = "/?a=2"
             allow(Koala.http_service).to receive(:encode_params).and_return(test_args)
 
-            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)[:relative_url]).to eq("#{url}&#{test_args}")
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:relative_url]).to eq("#{url}&#{test_args}")
           end
 
           it "adds nothing to the URL string if there are no args to be added" do
             @args[:args] = {}
-            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token])[:relative_url]).to eq(@args[:url])
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token], nil)[:relative_url]).to eq(@args[:url])
           end
 
           it "adds nothing to the body" do
-            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)[:body]).to be_nil
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:body]).to be_nil
           end
         end
 
@@ -142,13 +142,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             test_args = "foo"
             allow(Koala.http_service).to receive(:encode_params).and_return(test_args)
 
-            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)[:body]).to eq(test_args)
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:body]).to eq(test_args)
           end
 
           it "does not set the body if there are no args" do
             test_args = ""
             allow(Koala.http_service).to receive(:encode_params).and_return(test_args)
-            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)[:body]).to be_nil
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:body]).to be_nil
           end
 
 
@@ -156,7 +156,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             test_args = "foo"
             allow(Koala.http_service).to receive(:encode_params).and_return(test_args)
 
-            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)[:relative_url]).to eq(@args[:url])
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:relative_url]).to eq(@args[:url])
           end
         end
 
@@ -194,45 +194,50 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
 
       it "includes the access token if the token is not the main one for the request" do
-         params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)
+         params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)
          expect(params[:relative_url]).to match(/access_token=#{@args[:access_token]}/)
+      end
+
+      it "re-signs the access token if the token is not the main one for the request" do
+         params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, '1234')
+         expect(params[:relative_url]).to match(/appsecret_proof=[^?&]+/)
       end
 
       it "includes the other arguments if the token is not the main one for the request" do
         @args[:args] = {:a => 2}
-        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)
+        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)
         expect(params[:relative_url]).to match(/a=2/)
       end
 
       it "does not include the access token if the token is the main one for the request" do
-         params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token])
+         params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token], nil)
          expect(params[:relative_url]).not_to match(/access_token=#{@args[:access_token]}/)
       end
 
       it "includes the other arguments if the token is the main one for the request" do
         @args[:args] = {:a => 2}
-        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token])
+        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token], nil)
         expect(params[:relative_url]).to match(/a=2/)
       end
 
       it "includes any arguments passed as http_options[:batch_args]" do
         batch_args = {:name => "baz", :headers => {:some_param => true}}
         @args[:http_options][:batch_args] = batch_args
-        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil)
+        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)
         expect(params).to include(batch_args)
       end
 
       it "includes the method" do
-        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token])
+        params = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(@args[:access_token], nil)
         expect(params[:method]).to eq(@args[:method].to_s)
       end
 
       it "works with nil http_options" do
-        expect { Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args.merge(:http_options => nil)).to_batch_params(nil) }.not_to raise_exception
+        expect { Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args.merge(:http_options => nil)).to_batch_params(nil, nil) }.not_to raise_exception
       end
 
       it "works with nil args" do
-        expect { Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args.merge(:args => nil)).to_batch_params(nil) }.not_to raise_exception
+        expect { Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args.merge(:args => nil)).to_batch_params(nil, nil) }.not_to raise_exception
       end
 
       describe "with binary files" do
@@ -254,7 +259,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           @args[:args].merge!("source" => @binary, "source2" => @binary)
           batch_op = Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args)
           file_ids = batch_op.files.find_all {|k, v| v == @uploadable_io}.map {|k, v| k}
-          params = batch_op.to_batch_params(nil)
+          params = batch_op.to_batch_params(nil, nil)
           expect(params[:attached_files]).to eq(file_ids.join(","))
         end
       end
@@ -317,7 +322,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           allow(Koala::Facebook::GraphBatchAPI::BatchOperation).to receive(:new).and_return(op)
 
           # two requests should generate two batch operations
-          expected = MultiJson.dump([op.to_batch_params(access_token), op.to_batch_params(access_token)])
+          expected = MultiJson.dump([op.to_batch_params(access_token, nil), op.to_batch_params(access_token, nil)])
           expect(Koala).to receive(:make_request).with(anything, hash_including("batch" => expected), anything, anything).and_return(@fake_response)
           Koala::Facebook::API.new(access_token).batch do |batch_api|
             batch_api.get_object('me')
