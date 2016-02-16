@@ -46,7 +46,7 @@ module Koala
         args = {}
         args["batch"] = MultiJson.dump(batch_calls.map { |batch_op|
           args.merge!(batch_op.files) if batch_op.files
-          batch_op.to_batch_params(access_token)
+          batch_op.to_batch_params(access_token, app_secret)
         })
 
         batch_result = graph_call_outside_batch('/', args, 'post', http_options) do |response|
