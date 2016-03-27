@@ -177,6 +177,8 @@ module Koala
       #
       # @return the URL to the image
       def get_picture(object, args = {}, options = {}, &block)
+        Koala::Utils.deprecate("API#get_picture will be removed in a future version. Please use API#get_picture_data, which returns a hash including the url.")
+
         get_user_picture_data(object, args, options) do |result|
           # Try to extract the URL
           result = result.fetch('data', {})['url'] if result.respond_to?(:fetch)
@@ -191,13 +193,18 @@ module Koala
       # @param block (see Koala::Facebook::API#api)
       #
       # @return a hash of object data
-      def get_user_picture_data(object, args = {}, options = {}, &block)
+      def get_picture_data(object, args = {}, options = {}, &block)
         # The default response for a Graph API query like GET /me/picture is to
         # return a 302 redirect. This is a surprising difference from the
         # common return type, so we add the `redirect: false` parameter to get
         # a RESTful API response instead.
         args = args.merge(:redirect => false)
         graph_call("#{object}/picture", args, "get", options, &block)
+      end
+
+      def get_user_picture_data(*args, &block)
+        Koala::Utils.deprecate("API#get_user_picture_data is deprecated and will be removed in a future version. Please use API#get_picture_data, which has the same signature.")
+        get_picture_data(*args, &block)
       end
 
       # Upload a photo.

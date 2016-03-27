@@ -1,3 +1,15 @@
+v2.3.0
+======
+
+Updated features:
+* API#get_user_picture_data is now API#get_picture_data. The old method and API#get_picture both
+  remain with deprecation warnings. (Thanks noahsilas for earlier work on this!)
+
+Testing improvements:
+
+* Upgraded RSpec to 3.3.0
+* Removed pended specs that were no longer relevant
+
 v2.2.0
 ======
 
