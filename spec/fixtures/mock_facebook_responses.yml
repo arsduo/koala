@@ -79,7 +79,10 @@ graph_api:
         with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"id\":\"456\"}"}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/picture"}]) %>:
       post:
-        with_token: '[{"code": 200, "headers":[{"name":"Location","value":"http://google.com"}]}]'
+        with_token: '[{"code": 302, "headers":[{"name":"Location","value":"http://google.com"}]}]'
+    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/picture?redirect=false"}]) %>:
+      post:
+        with_token: '[{"code": 200, "body":"{\"data\":{\"is_silhouette\":false,\"url\":\"http:\/\/google.com\"}}"}]'
     batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"koppel\"}"}, {"code": 200, "body":"{\"data\":[{\"id\":\"lukeshepard\"}],\"paging\":{}}"}]'
@@ -167,6 +170,11 @@ graph_api:
       post:
         with_token: '{"id": "FEED_ITEM_DICTIONARY"}'
 
+  /me/picture:
+    redirect=false:
+      no_token: '{ "data": { "is_silhouette": true, "url": "https://facebook.com" } }'
+      with_token: '{ "data": { "is_silhouette": true, "url": "https://facebook.com" } }'
+
   /me/photos:
     source=[FILE]:
       post:
@@ -248,11 +256,15 @@ graph_api:
           code: 302
           headers:
             Location: https://facebook.com/large
-
     redirect=false:
       get:
-        no_token: '{"is_silhouette": true, "url": "https://facebook.com/large"}'
-        with_token: '{"is_silhouette": true, "url": "https://facebook.com/large"}'
+        no_token: '{ "data": { "is_silhouette": true, "url": "https://facebook.com" } }'
+        with_token: '{ "data": { "is_silhouette": true, "url": "https://facebook.com" } }'
+    redirect=false&type=large:
+      get:
+        no_token: '{ "data": { "is_silhouette": true, "url": "https://facebook.com/large" } }'
+        with_token: '{ "data": { "is_silhouette": true, "url": "https://facebook.com/large" } }'
+
   /comments:
     ids=http://developers.facebook.com/blog/post/472:
       get:
