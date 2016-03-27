@@ -90,11 +90,11 @@ shared_examples_for "Koala GraphAPI" do
 
   describe "#get_picture" do
     it "can access a user's picture" do
-      expect(@api.get_picture(KoalaTest.user2)).to match(/http[s]*\:\/\//)
+      expect(@api.get_picture(KoalaTest.user2)).to match(/https?\:\/\//)
     end
 
     it "can access a user's picture, given a picture type"  do
-      expect(@api.get_picture(KoalaTest.user2, {:type => 'large'})).to match(/^http[s]*\:\/\//)
+      expect(@api.get_picture(KoalaTest.user2, {:type => 'large'})).to match(/^https?\:\/\//)
     end
 
     it "works even if Facebook returns nil" do
