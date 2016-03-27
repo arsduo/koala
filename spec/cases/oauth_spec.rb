@@ -585,18 +585,18 @@ describe "Koala::Facebook::OAuth" do
       # so we only need to test at a high level that it works
       it "throws an error if the algorithm is unsupported" do
         allow(MultiJson).to receive(:load).and_return("algorithm" => "my fun algorithm")
-        expect { @oauth.parse_signed_request(@signed_request) }.to raise_error
+        expect { @oauth.parse_signed_request(@signed_params) }.to raise_error(Koala::Facebook::OAuthSignatureError)
       end
 
       it "throws an error if the signature is invalid" do
         allow(OpenSSL::HMAC).to receive(:hexdigest).and_return("i'm an invalid signature")
-        expect { @oauth.parse_signed_request(@signed_request) }.to raise_error
+        expect { @oauth.parse_signed_request(@signed_params) }.to raise_error(Koala::Facebook::OAuthSignatureError)
       end
 
       it "throws an error if the signature string is empty" do
         # this occasionally happens due to Facebook error
-        expect { @oauth.parse_signed_request("") }.to raise_error
-        expect { @oauth.parse_signed_request("abc-def") }.to raise_error
+        expect { @oauth.parse_signed_request("") }.to raise_error(Koala::Facebook::OAuthSignatureError)
+        expect { @oauth.parse_signed_request("abc-def") }.to raise_error(Koala::Facebook::OAuthSignatureError)
       end
 
       it "properly parses requests" do
