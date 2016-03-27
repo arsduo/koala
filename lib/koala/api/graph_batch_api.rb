@@ -71,7 +71,7 @@ module Koala
                 {}
               end
 
-              if ( error = check_response(call_result['code'], call_result['body'].to_s, parsed_headers) )
+              if (error = check_response(call_result['code'], call_result['body'].to_s, parsed_headers))
                 raw_result = error
               else
                 # (see note in regular api method about JSON parsing)

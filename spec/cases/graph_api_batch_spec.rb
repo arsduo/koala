@@ -401,30 +401,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             }.to raise_exception(Koala::Facebook::BadFacebookResponse)
           end
 
-          context "with the old style" do
-            before :each do
-              allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(400, '{"error_code":190,"error_description":"Error validating access token."}', {}))
-            end
-
-            it "throws an error" do
-              expect {
-                Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
-              }.to raise_exception(Koala::Facebook::APIError)
-            end
-
-            it "passes all the error details" do
-              begin
-                Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
-              rescue Koala::Facebook::APIError => err
-                expect(err.fb_error_code).to eq(190)
-                expect(err.fb_error_message).to eq("Error validating access token.")
-                err.http_status == 400
-                err.response_body == '{"error_code":190,"error_description":"Error validating access token."}'
-              end
-            end
-          end
-
-          context "with the new style" do
+          context "with error info" do
             before :each do
               allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(400, '{"error":{"message":"Request 0 cannot depend on an  unresolved request with  name f. Requests can only depend on preceding requests","type":"GraphBatchException"}}', {}))
             end

@@ -13,8 +13,17 @@ module Koala
     # Facebook responded with an error to an API request. If the exception contains a nil
     # http_status, then the error was detected before making a call to Facebook. (e.g. missing access token)
     class APIError < ::Koala::KoalaError
-      attr_accessor :fb_error_type, :fb_error_code, :fb_error_subcode, :fb_error_message,
-                    :fb_error_user_msg, :fb_error_user_title, :fb_error_trace_id, :fb_error_debug, :fb_error_rev, :http_status, :response_body
+      attr_accessor :http_status,
+                    :response_body,
+                    :fb_error_type,
+                    :fb_error_code,
+                    :fb_error_subcode,
+                    :fb_error_message,
+                    :fb_error_user_msg,
+                    :fb_error_user_title,
+                    :fb_error_trace_id,
+                    :fb_error_debug,
+                    :fb_error_rev
 
       # Create a new API Error
       #

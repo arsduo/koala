@@ -2,6 +2,7 @@ require 'addressable/uri'
 
 require 'koala/api/graph_collection'
 require 'koala/http_service/uploadable_io'
+require 'koala/api/graph_error_checker'
 
 module Koala
   module Facebook
@@ -537,43 +538,8 @@ module Koala
 
       private
 
-      def check_response(http_status, response_body, response_headers = {})
-        # Check for Graph API-specific errors. This returns an error of the appropriate type
-        # which is immediately raised (non-batch) or added to the list of batch results (batch)
-        http_status = http_status.to_i
-
-        if http_status >= 400
-          begin
-            response_hash = MultiJson.load(response_body)
-          rescue MultiJson::DecodeError
-            response_hash = {}
-          end
-
-          if response_hash['error_code']
-            # Old batch api error format. This can be removed on July 5, 2012.
-            # See https://developers.facebook.com/roadmap/#graph-batch-api-exception-format
-            error_info = {
-              'code' => response_hash['error_code'],
-              'message' => response_hash['error_description']
-            }
-          else
-            error_info = response_hash['error'] || {}
-          end
-
-          %w(x-fb-debug x-fb-rev x-fb-trace-id).each do |debug_header|
-            error_info[debug_header] = response_headers[debug_header] if response_headers.has_key?(debug_header)
-          end
-
-          if error_info['type'] == 'OAuthException' &&
-             ( !error_info['code'] || [102, 190, 450, 452, 2500].include?(error_info['code'].to_i))
-
-            # See: https://developers.facebook.com/docs/authentication/access-token-expiration/
-            #      https://developers.facebook.com/bugs/319643234746794?browse=search_4fa075c0bd9117b20604672
-            AuthenticationError.new(http_status, response_body, error_info)
-          else
-            ClientError.new(http_status, response_body, error_info)
-          end
-        end
+      def check_response(http_status, body, headers)
+        GraphErrorChecker.new(http_status, body, headers).error_if_appropriate
       end
 
       def parse_media_args(media_args, method)
