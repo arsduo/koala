@@ -5,6 +5,9 @@ Updated features:
 
 * API#get_user_picture_data is now API#get_picture_data. The old method and API#get_picture both
   remain with deprecation warnings. (Thanks noahsilas for earlier work on this!)
+* Koala::Facebook::APIError now includes [debug and trace
+  info](https://github.com/arsduo/koala/blob/master/lib/koala/errors.rb) provided by Facebook in the headers
+  (thanks, @elhu!)
 
 Internal Improvements:
 
