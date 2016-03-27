@@ -261,10 +261,6 @@ describe "Koala::Facebook::TestUsers" do
         expect(result).to be_truthy
       end
 
-      it "does not accept user IDs anymore" do
-        expect { @test_users.befriend(@user1["id"], @user2["id"]) }.to raise_exception
-      end
-
       it "accepts http options passed to both calls" do
         options = {:some_http_option => true}
         # should come twice, once for each user

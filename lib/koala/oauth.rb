@@ -197,7 +197,7 @@ module Koala
       # @return the application access token
       def get_app_access_token(options = {})
         if info = get_app_access_token_info(options)
-          string = info["access_token"]
+          info["access_token"]
         end
       end
 

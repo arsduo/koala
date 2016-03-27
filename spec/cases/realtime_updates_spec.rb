@@ -106,18 +106,6 @@ describe "Koala::Facebook::RealtimeUpdates" do
       @updates.subscribe("user", "name", @subscription_path, @verify_token)
     end
 
-    pending "doesn't require a verify_token" do
-      # see https://github.com/arsduo/koala/issues/150
-      obj = "user"
-      fields = "name"
-      expect(@updates.api).not_to receive(:graph_call).with(anything, hash_including(:verify_token => anything), anything, anything)
-      @updates.subscribe("user", "name", @subscription_path)
-    end
-
-    it "requires verify_token" do
-      expect { @updates.subscribe("user", "name", @subscription_path) }.to raise_exception
-    end
-
     it "accepts an options hash" do
       options = {:a => 2, :b => "c"}
       expect(@updates.api).to receive(:graph_call).with(anything, anything, anything, hash_including(options))
@@ -127,10 +115,6 @@ describe "Koala::Facebook::RealtimeUpdates" do
     describe "in practice" do
       it "sends a subscription request" do
         expect { @updates.subscribe("user", "name", @subscription_path, @verify_token) }.to_not raise_error
-      end
-
-      pending "sends a subscription request without a verify token" do
-        expect { @updates.subscribe("user", "name", @subscription_path) }.to_not raise_error
       end
 
       it "fails if you try to hit an invalid path on your valid server" do
