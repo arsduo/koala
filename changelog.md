@@ -1,3 +1,17 @@
+v2.4.0
+======
+
+Updated features:
+
+* Batch API requests will now properly calculate appsecret_proofs for multiple access tokens
+  (thanks, mwpastore!)
+
+Internal improvements:
+
+* Koala now explicitly depends on MultiJson >= 1.3.0, since it uses methods introduced in that
+  version
+
+
 v2.3.0
 ======
 
