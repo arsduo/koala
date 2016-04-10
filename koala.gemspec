@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.extra_rdoc_files = ["readme.md", "changelog.md"]
   gem.rdoc_options     = ["--line-numbers", "--inline-source", "--title", "Koala"]
 
-  gem.add_runtime_dependency("multi_json")
+  gem.add_runtime_dependency("multi_json", ">= 1.3.0")
   gem.add_runtime_dependency("faraday")
   gem.add_runtime_dependency("addressable")
 end
