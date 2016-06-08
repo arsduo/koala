@@ -130,7 +130,7 @@ module Koala
     # @return the appropriately-encoded string
     def self.encode_params(param_hash)
       ((param_hash || {}).sort_by{|k, v| k.to_s}.collect do |key_and_value|
-        key_and_value[1] = MultiJson.dump(key_and_value[1]) unless key_and_value[1].is_a? String
+        key_and_value[1] = JSON.dump(key_and_value[1]) unless key_and_value[1].is_a? String
         "#{key_and_value[0].to_s}=#{CGI.escape key_and_value[1]}"
       end).join("&")
     end

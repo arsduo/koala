@@ -20,7 +20,7 @@ module Koala
       # @return true if successful, false if not.  (This call currently doesn't give useful feedback on failure.)
       def set_app_properties(properties, args = {}, options = {})
         raise AuthenticationError.new(nil, nil, "setAppProperties requires an access token") unless @access_token
-        rest_call("admin.setAppProperties", args.merge(:properties => MultiJson.dump(properties)), options, "post")
+        rest_call("admin.setAppProperties", args.merge(:properties => JSON.dump(properties)), options, "post")
       end
 
       # Make a call to the REST API. 
@@ -44,8 +44,8 @@ module Koala
           # check for REST API-specific errors
           if response.status >= 400
             begin
-              response_hash = MultiJson.load(response.body)
-            rescue MultiJson::DecodeError
+              response_hash = JSON.load(response.body)
+            rescue JSON::ParserError
               response_hash = {}
             end
 
