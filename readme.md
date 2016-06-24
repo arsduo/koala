@@ -225,7 +225,7 @@ Test Users
 
 We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph or REST API:
 ```ruby
-@test_users = Koala::Facebook::TestUsers.new(app_id: id, secret: secret)
+@test_users = Koala::Facebook::TestUsers.new(app_id: id, app_access_token: secret)
 user = @test_users.create(is_app_installed, desired_permissions)
 user_graph_api = Koala::Facebook::API.new(user["access_token"])
 # or, if you want to make a whole community:
