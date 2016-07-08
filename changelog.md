@@ -1,3 +1,10 @@
+v2.5.0
+======
+
+Internal improvements:
+
+* Remove MultiJson dependency (thanks, sakuro!)
+
 v2.4.0
 ======
 
@@ -13,7 +20,7 @@ Internal improvements:
 
 Testing improvements:
 
-* Test Koala against Ruby 2.3.0
+* Test Koala against Ruby 2.3.0 (thanks, thedrow!)
 
 
 v2.3.0
