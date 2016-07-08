@@ -11,6 +11,10 @@ Internal improvements:
 * Koala now explicitly depends on MultiJson >= 1.3.0, since it uses methods introduced in that
   version
 
+Testing improvements:
+
+* Test Koala against Ruby 2.3.0
+
 
 v2.3.0
 ======
