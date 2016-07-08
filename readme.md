@@ -38,6 +38,8 @@ Facebook's [Graph API Explorer](https://developers.facebook.com/tools/explorer) 
 Then, go exploring:
 
 ```ruby
+require 'koala'
+ 
 @graph = Koala::Facebook::API.new(oauth_access_token)
 
 profile = @graph.get_object("me")
