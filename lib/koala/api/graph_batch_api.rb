@@ -44,7 +44,7 @@ module Koala
         return [] unless batch_calls.length > 0
         # Turn the call args collected into what facebook expects
         args = {}
-        args["batch"] = MultiJson.dump(batch_calls.map { |batch_op|
+        args["batch"] = JSON.dump(batch_calls.map { |batch_op|
           args.merge!(batch_op.files) if batch_op.files
           batch_op.to_batch_params(access_token, app_secret)
         })
@@ -75,7 +75,7 @@ module Koala
                 raw_result = error
               else
                 # (see note in regular api method about JSON parsing)
-                body = MultiJson.load("[#{call_result['body'].to_s}]")[0]
+                body = JSON.load("[#{call_result['body'].to_s}]")[0]
 
                 # Get the HTTP component they want
                 raw_result = case batch_op.http_options[:http_component]

@@ -1,6 +1,6 @@
 # useful tools
 require 'digest/md5'
-require 'multi_json'
+require 'json'
 
 # include koala modules
 require 'koala/errors'

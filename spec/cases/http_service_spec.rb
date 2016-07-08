@@ -141,7 +141,7 @@ describe Koala::HTTPService do
       val = 'json_value'
       not_a_string = 'not_a_string'
       allow(not_a_string).to receive(:is_a?).and_return(false)
-      expect(MultiJson).to receive(:dump).with(not_a_string).and_return(val)
+      expect(JSON).to receive(:dump).with(not_a_string).and_return(val)
 
       string = "hi"
 

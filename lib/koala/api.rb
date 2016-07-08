@@ -84,9 +84,10 @@ module Koala
           component == :response ? result : result.send(options[:http_component])
         else
           # parse the body as JSON and run it through the error checker (if provided)
-          # Note: Facebook sometimes sends results like "true" and "false", which aren't strictly objects
-          # and cause MultiJson.load to fail -- so we account for that by wrapping the result in []
-          MultiJson.load("[#{result.body.to_s}]")[0]
+          # Note: Facebook sometimes sends results like "true" and "false", which are valid[RFC7159]
+          # but unsupported by Ruby's stdlib[RFC4627] and cause JSON.load to fail -- so we account for
+          # that by wrapping the result in []
+          JSON.load("[#{result.body.to_s}]")[0]
         end
       end
 

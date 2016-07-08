@@ -74,58 +74,58 @@ graph_api:
         no_token: '{"facebook":"{}","koppel":"{}"}'
 
     # Ruby 1.8.7 and 1.9.2 generate JSON with different key ordering, hence we have to dynamically generate it here
-    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}]) %>:
+    batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "koppel"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"id\":\"456\"}"}]'
-    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/picture"}]) %>:
+    batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me/picture"}]) %>:
       post:
         with_token: '[{"code": 302, "headers":[{"name":"Location","value":"http://google.com"}]}]'
-    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/picture?redirect=false"}]) %>:
+    batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me/picture?redirect=false"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"data\":{\"is_silhouette\":false,\"url\":\"http:\/\/google.com\"}}"}]'
-    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
+    batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"koppel\"}"}, {"code": 200, "body":"{\"data\":[{\"id\":\"lukeshepard\"}],\"paging\":{}}"}]'
-    batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
+    batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"data\":[],\"paging\":{}}"}]'
-    batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"2/invalidconnection"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
+    batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"2/invalidconnection"}, {"method"=>"get", "relative_url"=>"koppel?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
         with_token: '[{"code": 400, "body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"code": 200, "body":"{\"id\":\"123\"}"}]'
-    batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"FEED_ITEM_BATCH/likes"}, {"method"=>"delete", "relative_url"=> "FEED_ITEM_BATCH"}]) %>:
+    batch=<%= JSON.dump([{"method"=>"post", "relative_url"=>"FEED_ITEM_BATCH/likes"}, {"method"=>"delete", "relative_url"=> "FEED_ITEM_BATCH"}]) %>:
       post:
         with_token: '[{"code": 200, "body": "{\"id\": \"MOCK_LIKE\"}"},{"code": 200, "body":true}]'
-    batch=<%= MultiJson.dump([{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+first_name+from+user+where+uid%3D2905623"}]) %>:
+    batch=<%= JSON.dump([{"method" => "post", "relative_url" => "method/fql.query", "body" => "query=select+first_name+from+user+where+uid%3D2905623"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"[{\"first_name\":\"Alex\"}]"}]'
 
     # dependencies
-    batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}]) %>:
+    batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getme"}]) %>:
       post:
         with_token: '[null,{"code": 200, "body":"{\"id\":\"123\"}"}]'
-    batch=<%= MultiJson.dump([{"method"=>"get", "relative_url"=>"2/invalidconnection", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}]) %>:
+    batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"2/invalidconnection", "name" => "getdata"}, {"method"=>"get", "relative_url"=>"koppel", "depends_on" => "getdata"}]) %>:
       post:
         with_token: '[{"code": 400, "body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
-    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:
+    batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:
       post:
         with_token: '[null,{"code": 200, "body":"{}"}]'
-    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends", "omit_response_on_success" => false}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:
+    batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me/friends?limit=5", "name" => "get-friends", "omit_response_on_success" => false}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=get-friends:$.data.*.id}"}"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"data\":[],\"paging\":{}}"},{"code": 200, "body":"{}"}]'
-    batch=<%= MultiJson.dump([{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}]) %>:
+    batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me/friends?limit=5"}, {"method" => "get", "relative_url" => "?ids=#{CGI.escape "{result=i-dont-exist:$.data.*.id}"}"}]) %>:
       post:
         with_token:
           code: 400
           body: '{"error_code":190,"error_description":"Error validating access token."}'
 
     # attached files tests
-    batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
+    batch=<%= JSON.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
       post:
         with_token: '[{"code": 400, body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},null]'
-    batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
+    batch=<%= JSON.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}]) %>&op1_file0=[FILE]:
       post:
         with_token: '[{"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}]'
-    batch=<%= MultiJson.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}, {"method"=>"post", "relative_url"=>"koppel/photos", "attached_files" => "op2_file0"}]) %>&op1_file0=[FILE]&op2_file0=[FILE]:
+    batch=<%= JSON.dump([{"method"=>"post", "relative_url"=>"me/photos", "attached_files" => "op1_file0"}, {"method"=>"post", "relative_url"=>"koppel/photos", "attached_files" => "op2_file0"}]) %>&op1_file0=[FILE]&op2_file0=[FILE]:
       post:
         with_token: '[{"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}, {"code": 200, "body":"{\"id\": \"MOCK_PHOTO\"}"}]'
 
@@ -166,7 +166,7 @@ graph_api:
     link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
-    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= MultiJson.encode({"Link1"=>{"text"=>"Left", "href"=>"http://oauth.twoalex.com/"}, "other" => {"text"=>"Straight ahead", "href"=>"http://oauth.twoalex.com/?"}}) %>&type=link:
+    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= JSON.dump({"Link1"=>{"text"=>"Left", "href"=>"http://oauth.twoalex.com/"}, "other" => {"text"=>"Straight ahead", "href"=>"http://oauth.twoalex.com/?"}}) %>&type=link:
       post:
         with_token: '{"id": "FEED_ITEM_DICTIONARY"}'
 
@@ -302,11 +302,11 @@ graph_api:
       get:
         <<: *token_required
         with_token: '[{"read_stream":1}]'
-    'q=<%= MultiJson.dump({"query1" => "select post_id from stream where source_id = me()", "query2" => "select fromid from comment where post_id in (select post_id from #query1)", "query3" => "select uid, name from user where uid in (select fromid from #query2)"}) %>':
+    'q=<%= JSON.dump({"query1" => "select post_id from stream where source_id = me()", "query2" => "select fromid from comment where post_id in (select post_id from #query1)", "query3" => "select uid, name from user where uid in (select fromid from #query2)"}) %>':
       get:
         <<: *token_required
         with_token: '[{"name":"query1", "fql_result_set":[]},{"name":"query2", "fql_result_set":[]},{"name":"query3", "fql_result_set":[]}]'
-    'q=<%= MultiJson.dump({"query1" => "select uid, first_name from user where uid = 2901279", "query2" => "select uid, first_name from user where uid = 2905623"}) %>':
+    'q=<%= JSON.dump({"query1" => "select uid, first_name from user where uid = 2901279", "query2" => "select uid, first_name from user where uid = 2905623"}) %>':
       get:
         with_token: '[{"name":"query1", "fql_result_set":[{"uid":2901279,"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"uid":"2905623","first_name":"Alex"}]}]'
         no_token: '[{"name":"query1", "fql_result_set":[{"uid":2901279,"first_name":"Luke"}]},{"name":"query2", "fql_result_set":[{"uid":"2905623","first_name":"Alex"}]}]'
@@ -325,7 +325,7 @@ graph_api:
 
 
   '/<%= APP_ID %>':
-    restrictions=<%= MultiJson.dump({"age_distr" => "13+"}) %>:
+    restrictions=<%= JSON.dump({"age_distr" => "13+"}) %>:
       post:
         with_token: "true"
 
