@@ -5,9 +5,6 @@ module Koala
   module MockHTTPService
     include Koala::HTTPService
 
-    # fix our specs to use ok_json, so we always get the same results from to_json
-    MultiJson.use :ok_json
-
     # Mocks all HTTP requests for with koala_spec_with_mocks.rb
     # Mocked values to be included in TEST_DATA used in specs
     ACCESS_TOKEN = '*'
@@ -91,7 +88,7 @@ module Koala
       args = arguments.inject({}) do |hash, (k, v)|
         # ensure our args are all stringified
         value = if v.is_a?(String)
-          should_json_decode?(v) ? MultiJson.load(v) : v
+          should_json_decode?(v) ? JSON.load(v) : v
         elsif v.is_a?(Koala::UploadableIO)
           # obviously there are no files in the yaml
           "[FILE]"
@@ -122,7 +119,7 @@ module Koala
         # will remove +'s in restriction strings
         string.split("&").reduce({}) do |hash, component|
           k, v = component.split("=", 2) # we only care about the first =
-          value = should_json_decode?(v) ? MultiJson.decode(v) : v.to_s rescue v.to_s
+          value = should_json_decode?(v) ? JSON.load(v) : v.to_s rescue v.to_s
           # some special-casing, unfortunate but acceptable in this testing
           # environment
           value = nil if value.empty?

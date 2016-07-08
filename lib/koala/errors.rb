@@ -50,7 +50,7 @@ module Koala
         else
           unless error_info
             begin
-              error_info = MultiJson.load(response_body)['error'] if response_body
+              error_info = JSON.load(response_body)['error'] if response_body
             rescue
             end
             error_info ||= {}

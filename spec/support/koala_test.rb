@@ -243,7 +243,7 @@ module KoalaTest
           require 'typhoeus/adapters/faraday' if adapter.to_s == "typhoeus"
           Faraday.default_adapter = adapter.to_sym
         end
-      rescue LoadError
+      rescue ParserError
         puts "Unable to load adapter #{adapter}, using Net::HTTP."
       ensure
         @adapter_activation_attempted = true

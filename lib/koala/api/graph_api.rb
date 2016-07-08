@@ -274,7 +274,7 @@ module Koala
       # @return (see #put_connections)
       def put_wall_post(message, attachment = {}, target_id = "me", options = {}, &block)
         if properties = attachment.delete(:properties) || attachment.delete("properties")
-          properties = MultiJson.dump(properties) if properties.is_a?(Hash) || properties.is_a?(Array)
+          properties = JSON.dump(properties) if properties.is_a?(Hash) || properties.is_a?(Array)
           attachment["properties"] = properties
         end
         put_connections(target_id, "feed", attachment.merge({:message => message}), options, &block)
@@ -376,7 +376,7 @@ module Koala
       #
       # @return a hash of FQL results keyed to the appropriate query
       def fql_multiquery(queries = {}, args = {}, options = {}, &block)
-        resolved_results = if results = get_object("fql", args.merge(:q => MultiJson.dump(queries)), options)
+        resolved_results = if results = get_object("fql", args.merge(:q => JSON.dump(queries)), options)
           # simplify the multiquery result format
           results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
         end
@@ -441,7 +441,7 @@ module Koala
       # @param options (see #get_object)
       # @param block (see Koala::Facebook::API#api)
       def set_app_restrictions(app_id, restrictions_hash, args = {}, options = {}, &block)
-        graph_call(app_id, args.merge(:restrictions => MultiJson.dump(restrictions_hash)), "post", options, &block)
+        graph_call(app_id, args.merge(:restrictions => JSON.dump(restrictions_hash)), "post", options, &block)
       end
 
       # Certain calls such as {#get_connections} return an array of results which you can page through

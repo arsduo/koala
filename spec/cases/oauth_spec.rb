@@ -401,7 +401,7 @@ describe "Koala::Facebook::OAuth" do
           allow(Koala).to receive(:make_request).and_return(
             Koala::HTTPService::Response.new(
               200,
-              MultiJson.dump(result),
+              JSON.dump(result),
               {}
             )
           )
@@ -584,7 +584,7 @@ describe "Koala::Facebook::OAuth" do
       # the signed request code is ported directly from Facebook
       # so we only need to test at a high level that it works
       it "throws an error if the algorithm is unsupported" do
-        allow(MultiJson).to receive(:load).and_return("algorithm" => "my fun algorithm")
+        allow(JSON).to receive(:load).and_return("algorithm" => "my fun algorithm")
         expect { @oauth.parse_signed_request(@signed_params) }.to raise_error(Koala::Facebook::OAuthSignatureError)
       end
 

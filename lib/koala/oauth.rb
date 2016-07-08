@@ -134,7 +134,7 @@ module Koala
         if response == ''
           raise BadFacebookResponse.new(200, '', 'generate_client_code received an error: empty response body')
         else
-          result = MultiJson.load(response)
+          result = JSON.load(response)
         end
 
         result.has_key?('code') ? result['code'] : raise(Koala::KoalaError.new("Facebook returned a valid response without the expected 'code' in the body (response = #{response})"))
@@ -240,7 +240,7 @@ module Koala
         raise OAuthSignatureError, 'Invalid (incomplete) signature data' unless encoded_sig && encoded_envelope
 
         signature = base64_url_decode(encoded_sig).unpack("H*").first
-        envelope = MultiJson.load(base64_url_decode(encoded_envelope))
+        envelope = JSON.load(base64_url_decode(encoded_envelope))
 
         raise OAuthSignatureError, "Unsupported algorithm #{envelope['algorithm']}" if envelope['algorithm'] != 'HMAC-SHA256'
 
@@ -260,8 +260,8 @@ module Koala
       end
 
       def parse_access_token(response_text)
-        MultiJson.load(response_text)
-      rescue MultiJson::LoadError
+        JSON.load(response_text)
+      rescue JSON::ParserError
         response_text.split("&").inject({}) do |hash, bit|
           key, value = bit.split("=")
           hash.merge!(key => value)
