@@ -7,6 +7,7 @@ rvm:
   - 2.0
   - 2.1
   - 2.2
+  - 2.3.0
   # Rubinius is failing due to segfaults on Travis (and takes significantly longer to run)
   # those builds will be restored later
   # jruby
