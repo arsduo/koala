@@ -1,6 +1,10 @@
 v2.5.0
 ======
 
+Documentation improvements:
+
+* Add explicit require to examples in readme.md (thanks, dwkns!)
+
 Internal improvements:
 
 * Remove MultiJson dependency (thanks, sakuro!)
