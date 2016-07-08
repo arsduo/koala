@@ -1,6 +1,11 @@
 v2.4.0
 ======
 
+**Note:** Koala is no longer officially supported on Ruby 1.9.3 (which was [end-of-lifed back in
+2015](https://www.ruby-lang.org/en/news/2014/01/10/ruby-1-9-3-will-end-on-2015/)). Versions may
+still work (until version 3.0, when we may start using keyword arguments), but will not be tested
+on 1.9.3.
+
 Updated features:
 
 * Batch API requests will now properly calculate appsecret_proofs for multiple access tokens
