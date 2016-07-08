@@ -216,6 +216,9 @@ graph_api:
       get:
         with_token: '{"id": 1, "name": 1, "updated_time": 1}'
         no_token: '{"id": 1, "name": 1}'
+    metadata=1:
+      get:
+        with_token: '{"name": "Alex Koppel","metadata": {"fields": [{"name": "id"}],"type": "user","connections": {}},"id": "2905623"}'
 
   /facebook:
     no_args:

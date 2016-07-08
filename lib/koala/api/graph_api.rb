@@ -57,19 +57,18 @@ module Koala
         graph_call(id, args, "get", options, &block)
       end
 
-      # Get type of a Facebook object
-      # 
+      # Get the metadata of a Facebook object, including its type.
+      #
       # @param id the object ID (string or number)
       #
       # @raise [Koala::Facebook::ClientError] if the ID is invalid
       # @example
-      #     get_object_type("442575165800306")=>"page"
-      #     get_object_type("190822584430113")=>"status"
+      #     get_object_metadata("442575165800306")=>{"metadata" => "page", ...}
+      #     get_object_metadata("190822584430113")=>{"metadata" => "status", ...}
       # @return a string of Facebook object type
-      def get_object_type(id)
-        res = graph_call("#{id}?metadata=1")
-        metadata = res["metadata"]
-        metadata["type"]
+      def get_object_metadata(id, &block)
+        result = graph_call(id, {"metadata" => "1"}, "get", {}, &block)
+        result["metadata"]
       end
 
       # Get information about multiple Facebook objects in one call.

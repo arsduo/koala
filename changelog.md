@@ -1,6 +1,10 @@
 v2.5.0
 ======
 
+New features:
+
+* API#get_object_metadata provides a convenient accessor to an object's graph metadata (thanks, sancopanco!)
+
 Documentation improvements:
 
 * Add explicit require to examples in readme.md (thanks, dwkns!)

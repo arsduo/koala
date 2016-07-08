@@ -234,6 +234,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result = @api.get_objects([KoalaTest.page, KoalaTest.user1])
     expect(result.length).to eq(2)
   end
+
+  describe "#get_object_metadata" do
+    it "can access an object's metadata" do
+      result = @api.get_object_metadata(KoalaTest.user1)
+      expect(result["type"]).to eq("user")
+    end
+  end
+
   it "can access connections from users" do
     result = @api.get_connections(KoalaTest.user2, "friends")
     expect(result.length).to be > 0
