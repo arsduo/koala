@@ -49,57 +49,69 @@ module Koala
           args.merge! call.files || {}
         end
 
-        batch_result = graph_call_outside_batch('/', args, 'post', http_options) do |response|
-          unless response
-            # Facebook sometimes reportedly returns an empty body at times
-            # see https://github.com/arsduo/koala/issues/184
-            raise BadFacebookResponse.new(200, '', "Facebook returned an empty body")
-          end
+        graph_call_outside_batch('/', args, 'post', http_options, &handle_response)
+      end
 
-          # map the results with post-processing included
-          index = 0 # keep compat with ruby 1.8 - no with_index for map
-          response.map do |call_result|
-            # Get the options hash
-            batch_op = batch_calls[index]
-            index += 1
+      def handle_response
+        -> (response) do
+          raise bad_response if response.nil?
+          response.map(&generate_results)
+        end
+      end
 
-            raw_result = nil
-            if call_result
-              parsed_headers = if call_result.has_key?('headers')
-                call_result['headers'].inject({}) { |headers, h| headers[h['name']] = h['value']; headers}
-              else
-                {}
-              end
+      def generate_results
+        index = 0
+        -> (call_result) do
+          batch_op     = batch_calls[index]; index += 1
+          post_process = batch_op.post_processing
 
-              if (error = check_response(call_result['code'], call_result['body'].to_s, parsed_headers))
-                raw_result = error
-              else
-                # (see note in regular api method about JSON parsing)
-                body = JSON.load("[#{call_result['body'].to_s}]")[0]
+          # turn any results that are pageable into GraphCollections
+          result = GraphCollection.evaluate(
+            result_from_response(call_result, batch_op),
+            original_api
+          )
 
-                # Get the HTTP component they want
-                raw_result = case batch_op.http_options[:http_component]
-                when :status
-                  call_result["code"].to_i
-                when :headers
-                  # facebook returns the headers as an array of k/v pairs, but we want a regular hash
-                  parsed_headers
-                else
-                  body
-                end
-              end
-            end
-
-            # turn any results that are pageable into GraphCollections
-            # and pass to post-processing callback if given
-            result = GraphCollection.evaluate(raw_result, @original_api)
-            if batch_op.post_processing
-              batch_op.post_processing.call(result)
-            else
-              result
-            end
+          # and pass to post-processing callback if given
+          if post_process
+            post_process.call(result)
+          else
+            result
           end
         end
+      end
+
+      def bad_response
+        # Facebook sometimes reportedly returns an empty body at times
+        BadFacebookResponse.new(200, '', "Facebook returned an empty body")
+      end
+
+      def result_from_response(response, options)
+        return nil if response.nil?
+
+        headers   = coerced_headers_from_response(response)
+        error     = error_from_response(response, headers)
+        component = options.http_options[:http_component]
+
+        error || result_from_component({
+          :component => component,
+          :response  => response,
+          :headers   => headers
+        })
+      end
+
+      def coerced_headers_from_response(response)
+        headers = response.fetch('headers', [])
+
+        headers.each_with_object({}) do |h, memo|
+          memo.merge! h.fetch('name') => h.fetch('value')
+        end
+      end
+
+      def error_from_response(response, headers)
+        code = response['code']
+        body = response['body'].to_s
+
+        check_response(code, body, headers)
       end
 
       def batch_args
@@ -108,6 +120,26 @@ module Koala
         end
 
         JSON.dump calls
+      end
+
+      def json_body(response)
+        body = response.fetch('body')
+        JSON.load("[#{body}]").first
+      end
+
+      def result_from_component(options)
+        component = options.fetch(:component)
+        response  = options.fetch(:response)
+        headers   = options.fetch(:headers)
+
+        # Get the HTTP component they want
+        case component
+        when :status  then response["code"].to_i
+        # facebook returns the headers as an array of k/v pairs, but we want a regular hash
+        when :headers then headers
+        # (see note in regular api method about JSON parsing)
+        else json_body(response)
+        end
       end
     end
   end
