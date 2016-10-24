@@ -53,7 +53,7 @@ module Koala
       end
 
       def handle_response
-        -> (response) do
+        lambda do (response)
           raise bad_response if response.nil?
           response.map(&generate_results)
         end
@@ -61,7 +61,7 @@ module Koala
 
       def generate_results
         index = 0
-        -> (call_result) do
+        lambda do (call_result)
           batch_op     = batch_calls[index]; index += 1
           post_process = batch_op.post_processing
 
