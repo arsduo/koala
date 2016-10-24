@@ -18,7 +18,7 @@ module Koala
         @batch_calls ||= []
       end
 
-      def graph_call_in_batch(path, args = {}, verb = "get", options = {}, &post_processing)
+      def graph_call_in_batch(path, args = {}, verb = 'get', options = {}, &post_processing)
         # normalize options for consistency
         options = Koala::Utils.symbolize_hash(options)
 
@@ -82,7 +82,7 @@ module Koala
 
       def bad_response
         # Facebook sometimes reportedly returns an empty body at times
-        BadFacebookResponse.new(200, '', "Facebook returned an empty body")
+        BadFacebookResponse.new(200, '', 'Facebook returned an empty body')
       end
 
       def result_from_response(response, options)
@@ -134,7 +134,7 @@ module Koala
 
         # Get the HTTP component they want
         case component
-        when :status  then response["code"].to_i
+        when :status  then response['code'].to_i
         # facebook returns the headers as an array of k/v pairs, but we want a regular hash
         when :headers then headers
         # (see note in regular api method about JSON parsing)
