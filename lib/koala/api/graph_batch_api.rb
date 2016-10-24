@@ -41,7 +41,8 @@ module Koala
 
       # execute the queued batch calls
       def execute(http_options = {})
-        return [] unless batch_calls.length > 0
+        return [] if batch_calls.empty?
+
         # Turn the call args collected into what facebook expects
         args = {}
         args["batch"] = JSON.dump(batch_calls.map { |batch_op|
