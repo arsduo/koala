@@ -44,11 +44,10 @@ module Koala
         return [] if batch_calls.empty?
 
         # Turn the call args collected into what facebook expects
-        args = {}
-        args["batch"] = JSON.dump(batch_calls.map { |batch_op|
-          args.merge!(batch_op.files) if batch_op.files
-          batch_op.to_batch_params(access_token, app_secret)
-        })
+        args = { 'batch' => batch_args }
+        batch_calls.each do |call|
+          args.merge! call.files || {}
+        end
 
         batch_result = graph_call_outside_batch('/', args, 'post', http_options) do |response|
           unless response
@@ -103,6 +102,13 @@ module Koala
         end
       end
 
+      def batch_args
+        calls = batch_calls.map do |batch_op|
+          batch_op.to_batch_params(access_token, app_secret)
+        end
+
+        JSON.dump calls
+      end
     end
   end
 end
