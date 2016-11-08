@@ -336,7 +336,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           # right now, we want to make sure that batch_api handles them properly
           @key = "file0_0"
           @uploadable_io = double("UploadableIO")
-          batch_op = double("Koala Batch Operation", :files => {@key => @uploadable_io}, :to_batch_params => {}, :access_token => "foo")
+          batch_op = double("Koala Batch Operation", :files => {@key => @uploadable_io}, :to_batch_params => {}, :access_token => "foo", :http_method => 'post', :url => 'me')
           allow(Koala::Facebook::GraphBatchAPI::BatchOperation).to receive(:new).and_return(batch_op)
 
           expect(Koala).to receive(:make_request).with(anything, hash_including(@key => @uploadable_io), anything, anything).and_return(@fake_response)
