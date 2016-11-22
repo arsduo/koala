@@ -99,7 +99,7 @@ module Koala
 
       # set up our Faraday connection
       # we have to manually assign params to the URL or the
-      conn = Faraday.new(server(request_options), faraday_options(request_options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
+      conn = Faraday.new(server(request_options), faraday_options(request_options).reject{|k, v| k == :use_ssl}, &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
       # remember, all non-GET requests are turned into POSTs -- see the the start of this method
       if verb == "post" && options[:format] == :json
