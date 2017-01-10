@@ -259,6 +259,17 @@ module Koala
         put_connections(*args, &block)
       end
 
+      # Write a note.
+      #
+      # @param subject the new note subject 
+      # @param message the new note message
+      # @example
+      #       @api.put_note("new note", "some info here")
+      #
+      def put_note(subject, message, target_id="me")
+        self.put_object(target_id, "notes", {:subject => subject, :message => message})
+      end
+
       # Write directly to the user's wall.
       # Convenience method equivalent to put_connections(id, "feed").
       #
