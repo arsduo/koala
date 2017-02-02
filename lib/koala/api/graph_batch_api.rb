@@ -17,6 +17,7 @@ module Koala
       def initialize(api)
         super(api.access_token, api.app_secret)
         @original_api = api
+        @mutex = Mutex.new
       end
 
       def batch_calls
@@ -28,14 +29,16 @@ module Koala
         options = Koala::Utils.symbolize_hash(options)
 
         # for batch APIs, we queue up the call details (incl. post-processing)
-        batch_calls << BatchOperation.new(
-          :url => path,
-          :args => args,
-          :method => verb.downcase,
-          :access_token => options[:access_token] || access_token,
-          :http_options => options,
-          :post_processing => post_processing
-        )
+        @mutex.synchronize {
+          batch_calls << BatchOperation.new(
+              :url => path,
+              :args => args,
+              :method => verb.downcase,
+              :access_token => options[:access_token] || access_token,
+              :http_options => options,
+              :post_processing => post_processing
+          )
+        }
         nil # batch operations return nothing immediately
       end
 
@@ -51,12 +54,19 @@ module Koala
       def execute(http_options = {})
         return [] unless batch_calls.length > 0
 
-        batch_calls.reverse!  # reverse so we can pop while preserving order
+        process_batch = nil
+        @mutex.synchronize{
+          process_batch = batch_calls
+          @batch_calls = []
+        }
         batch_result = []
-        until batch_calls.empty? do
-          batch, batch_params = pop_batch(args = {})
+        process_batch.each_slice(MAX_CALLS) do |batch|
           # Turn the call args collected into what facebook expects
-          args["batch"] = JSON.dump(batch_params)
+          args = {}
+          args['batch'] = JSON.dump(batch.map { |batch_op|
+            args.merge!(batch_op.files) if batch_op.files
+            batch_op.to_batch_params(access_token, app_secret)
+          })
 
           graph_call_outside_batch('/', args, 'post', http_options) do |response|
             unless response
@@ -65,9 +75,7 @@ module Koala
               raise BadFacebookResponse.new(200, '', "Facebook returned an empty body")
             end
 
-            # map the results with post-processing included
-            index = 0 # keep compat with ruby 1.8 - no with_index for map
-            response.map do |call_result|
+            response.each_with_index do |call_result, index|
               # Get the options hash
               batch_op = batch[index]
               index += 1
@@ -113,25 +121,6 @@ module Koala
         batch_result
       end
 
-      def pop_batch(args)
-        batch_ad_count = 0
-        batch = []
-        batch_params = []
-        MAX_CALLS.times do
-          batch_op = batch_calls.pop
-          return batch, batch_params if batch_op.nil?
-
-          batch << batch_op
-
-          batch_ad_count += 1 if batch_op.http_method == 'post' && batch_op.url =~ AD_SUBMISSION_REGEX
-
-          args.merge!(batch_op.files) if batch_op.files
-          batch_params << batch_op.to_batch_params(access_token, app_secret)
-
-          return batch, batch_params if batch_ad_count >= MAX_AD_SUBMISSIONS
-        end
-        return batch, batch_params
-      end
     end
   end
 end
