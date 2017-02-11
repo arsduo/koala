@@ -138,21 +138,15 @@ describe Koala::HTTPService do
     end
 
     it "converts values to JSON if the value is not a String" do
-      val = 'json_value'
-      not_a_string = 'not_a_string'
-      allow(not_a_string).to receive(:is_a?).and_return(false)
-      expect(JSON).to receive(:dump).with(not_a_string).and_return(val)
-
-      string = "hi"
+      not_a_string = {not_a_string: 2}
 
       args = {
-        not_a_string => not_a_string,
-        string => string
+        :arg => not_a_string,
       }
 
       result = Koala::HTTPService.encode_params(args)
       expect(result.split('&').find do |key_and_val|
-        key_and_val.match("#{not_a_string}=#{val}")
+        key_and_val.match("arg=#{CGI.escape not_a_string.to_json}")
       end).to be_truthy
     end
 

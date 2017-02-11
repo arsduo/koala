@@ -186,11 +186,9 @@ shared_examples_for "Koala GraphAPI" do
     end
 
     it "passes a queries argument" do
-      queries = double('query string')
-      queries_json = "some JSON"
-      allow(JSON).to receive(:dump).with(queries).and_return(queries_json)
+      queries = {foo: :x}
 
-      expect(@api).to receive(:get_object).with(anything, hash_including(:q => queries_json), anything)
+      expect(@api).to receive(:get_object).with(anything, hash_including(:q => queries.to_json), anything)
       @api.fql_multiquery(queries)
     end
 
