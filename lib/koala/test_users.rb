@@ -149,8 +149,9 @@ module Koala
         u1_graph_api = API.new(user1_token, secret)
         u2_graph_api = API.new(user2_token, secret)
 
-        u1_graph_api.graph_call("#{user1_id}/friends/#{user2_id}", {}, "post", options) &&
-          u2_graph_api.graph_call("#{user2_id}/friends/#{user1_id}", {}, "post", options)
+        # if we have a secret token, flag that we want the appsecret_proof to be generated
+        u1_graph_api.graph_call("#{user1_id}/friends/#{user2_id}", {}, "post", options.merge(appsecret_proof: !!secret)) &&
+          u2_graph_api.graph_call("#{user2_id}/friends/#{user1_id}", {}, "post", options.merge(appsecret_proof: !!secret))
       end
 
       # Create a network of test users, all of whom are friends and have the same permissions.
