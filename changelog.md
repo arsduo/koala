@@ -6,6 +6,10 @@ Internal improvements:
 * Completely rewrote HTTPService#make_request and several others, extracting most logic into
   HTTPService::Request
 
+Testing improvements:
+
+* Fixed a bunch of failing specs
+
 v2.5.0
 ======
 
