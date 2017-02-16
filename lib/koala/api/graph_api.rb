@@ -390,7 +390,7 @@ module Koala
       #
       # @return a hash of FQL results keyed to the appropriate query
       def fql_multiquery(queries = {}, args = {}, options = {}, &block)
-        resolved_results = if results = get_object("fql", args.merge(:q => JSON.dump(queries)), options)
+        resolved_results = if results = get_object("fql", args.merge(:q => queries.to_json), options)
           # simplify the multiquery result format
           results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
         end

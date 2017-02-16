@@ -1,6 +1,6 @@
 # Quantify coverage
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
+require 'simplecov'
+SimpleCov.start
 
 # load the library
 require 'koala'
