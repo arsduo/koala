@@ -5,8 +5,6 @@ SimpleCov.start
 # load the library
 require 'koala'
 
-require 'byebug'
-
 # Support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
