@@ -1,3 +1,11 @@
+v3.0.0
+======
+
+Internal improvements:
+
+* Completely rewrote HTTPService#make_request and several others, extracting most logic into
+  HTTPService::Request
+
 v2.5.0
 ======
 
