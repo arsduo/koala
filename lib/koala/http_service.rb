@@ -61,9 +61,9 @@ module Koala
         # JSON requires a bit more handling
         # remember, all non-GET requests are turned into POSTs, so this covers everything but GETs
         response = conn.post do |req|
-          req.path = path
+          req.path = request.path
           req.headers["Content-Type"] = "application/json"
-          req.body = request.post_params.to_json
+          req.body = request.post_args.to_json
           req
         end
       else

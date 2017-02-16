@@ -121,7 +121,8 @@ describe Koala::HTTPService do
     let(:mock_http_response) { double("Faraday Response", status: 200, headers: mock_headers_hash, body: mock_body) }
 
     let(:verb) { "get" }
-    let(:request) { Koala::HTTPService::Request.new(path: "/foo", verb: verb, args: {"an" => :arg}) }
+    let(:options) { {} }
+    let(:request) { Koala::HTTPService::Request.new(path: "/foo", verb: verb, args: {"an" => :arg}, options: options) }
 
     shared_examples_for :making_a_request do
       before :each do
@@ -167,6 +168,26 @@ describe Koala::HTTPService do
       let(:verb) { "post" }
 
       it_should_behave_like :making_a_request
+    end
+
+    context "for JSON requests" do
+      let(:verb) { "post" }
+      let(:options) { {format: :json} }
+
+      it "makes a Faraday request appropriately" do
+        expect_any_instance_of(Faraday::Connection).to receive(verb) do |instance, path, &block|
+          faraday_request = Faraday::Request.new
+          faraday_request.headers = {}
+          block.call(faraday_request)
+          expect(faraday_request.path).to eq(request.path)
+          expect(faraday_request.body).to eq(request.post_args.to_json)
+          expect(faraday_request.headers).to include("Content-Type" => "application/json")
+
+          mock_http_response
+        end
+
+        Koala::HTTPService.make_request(request)
+      end
     end
 
     it "uses the default builder block if HTTPService.faraday_middleware block is not defined" do
