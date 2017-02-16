@@ -88,7 +88,7 @@ module Koala
       args = arguments.inject({}) do |hash, (k, v)|
         # ensure our args are all stringified
         value = if v.is_a?(String)
-          should_json_decode?(v) ? JSON.load(v) : v
+          should_json_decode?(v) ? JSON.parse(v) : v
         elsif v.is_a?(Koala::UploadableIO)
           # obviously there are no files in the yaml
           "[FILE]"
@@ -119,7 +119,7 @@ module Koala
         # will remove +'s in restriction strings
         string.split("&").reduce({}) do |hash, component|
           k, v = component.split("=", 2) # we only care about the first =
-          value = should_json_decode?(v) ? JSON.load(v) : v.to_s rescue v.to_s
+          value = should_json_decode?(v) ? JSON.parse(v) : v.to_s rescue v.to_s
           # some special-casing, unfortunate but acceptable in this testing
           # environment
           value = nil if value.empty?
