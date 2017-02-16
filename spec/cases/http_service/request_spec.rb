@@ -25,6 +25,10 @@ module Koala
         expect { Request.new(path: path) }.to raise_exception(ArgumentError)
       end
 
+      it "raises an ArgumentError if no path is supplied" do
+        expect { Request.new(verb: verb) }.to raise_exception(ArgumentError)
+      end
+
       describe "#verb" do
         it "returns get for get" do
           expect(Request.new(path: path, verb: "get").verb).to eq("get")

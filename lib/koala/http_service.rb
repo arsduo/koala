@@ -48,7 +48,7 @@ module Koala
     # @see Koala::Facebook::GraphAPIMethods#graph_call
     # @see Koala::Facebook::RestAPIMethods#rest_call
     #
-    # @param request a Koala::Facebook::HTTPService::Request object
+    # @param request a Koala::HTTPService::Request object
     #
     # @raise an appropriate connection error if unable to make the request to Facebook
     #

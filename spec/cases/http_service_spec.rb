@@ -16,32 +16,32 @@ describe Koala::HTTPService do
   end
 
   describe "DEFAULT_MIDDLEWARE" do
-    before :each do
-      @builder = double("Faraday connection builder")
-      allow(@builder).to receive(:request)
-      allow(@builder).to receive(:adapter)
-      allow(@builder).to receive(:use)
+    class FakeBuilder
+      attr_reader :requests, :uses, :adapters
+
+      def use(arg)
+        @uses ||= []
+        @uses << arg
+      end
+
+      def request(arg)
+        @requests ||= []
+        @requests << arg
+      end
+
+      def adapter(arg)
+        @adapters ||= []
+        @adapters << arg
+      end
     end
 
-    it "is defined" do
-      expect(Koala::HTTPService.const_defined?("DEFAULT_MIDDLEWARE")).to be_truthy
-    end
+    let(:builder) { FakeBuilder.new }
 
-    it "adds multipart" do
-      expect(@builder).to receive(:use).with(Koala::HTTPService::MultipartRequest)
-      Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
-    end
-
-    it "adds url_encoded" do
-      expect(@builder).to receive(:request).with(:url_encoded)
-      Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
-    end
-
-    it "uses the default adapter" do
-      adapter = :testing_now
-      allow(Faraday).to receive(:default_adapter).and_return(adapter)
-      expect(@builder).to receive(:adapter).with(adapter)
-      Koala::HTTPService::DEFAULT_MIDDLEWARE.call(@builder)
+    it "adds the right default middleware" do
+      Koala::HTTPService::DEFAULT_MIDDLEWARE.call(builder)
+      expect(builder.requests).to eq([:url_encoded])
+      expect(builder.uses).to eq([Koala::HTTPService::MultipartRequest])
+      expect(builder.adapters).to eq([Faraday.default_adapter])
     end
   end
 
