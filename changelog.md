@@ -1,12 +1,16 @@
 v3.0.0
 ======
 
-Key breaking changes:
+**Key breaking changes:**
 
 * HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does
   not)
 * HTTPService behavior *should not* change, but in edge cases might. (If so, please let me know.)
-* Empty response bodies in batch API calls will raise a JSON parse error rather than returning nil
+* Empty response bodies in batch API calls will raise a JSON::ParserError rather than returning nil
+
+Updated features:
+
+* TestUser#befriend will provide the appsecret_proof if a secret is set (thanks, kwasimensah!)
 
 Removed features:
 
