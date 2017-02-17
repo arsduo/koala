@@ -82,10 +82,9 @@ module Koala
           component == :response ? result : result.send(options[:http_component])
         else
           # parse the body as JSON and run it through the error checker (if provided)
-          # Note: Facebook sometimes sends results like "true" and "false", which are valid[RFC7159]
-          # but unsupported by Ruby's stdlib[RFC4627] and cause JSON.parse to fail -- so we account for
-          # that by wrapping the result in []
-          JSON.parse("[#{result.body.to_s}]")[0]
+          # quirks_mode is needed because Facebook sometimes returns a raw true or false value --
+          # in Ruby 2.4 we can drop that.
+          JSON.parse(result.body.to_s, quirks_mode: true) unless result.body.empty?
         end
       end
 

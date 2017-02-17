@@ -19,6 +19,8 @@ Internal improvements:
 * Completely rewrote HTTPService.make_request and several others, extracting most logic into
   HTTPService::Request (#566)
 * Use the more secure JSON.parse instead of JSON.load (thanks, lautis!) (#567)
+* Use JSON's quirks_mode option to remove hacky JSON hack (#573 -- thanks sakuro for the
+  suggestion!)
 
 Testing improvements:
 
