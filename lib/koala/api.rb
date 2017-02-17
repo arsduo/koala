@@ -1,6 +1,5 @@
 # graph_batch_api and legacy are required at the bottom, since they depend on API being defined
 require 'koala/api/graph_api'
-require 'koala/api/rest_api'
 require 'openssl'
 
 module Koala
@@ -23,13 +22,11 @@ module Koala
       attr_reader :access_token, :app_secret
 
       include GraphAPIMethods
-      include RestAPIMethods
 
       # Makes a request to the appropriate Facebook API.
       # @note You'll rarely need to call this method directly.
       #
       # @see GraphAPIMethods#graph_call
-      # @see RestAPIMethods#rest_call
       #
       # @param path the server path for this request (leading / is prepended if not present)
       # @param args arguments to be sent to Facebook
@@ -117,5 +114,3 @@ module Koala
     end
   end
 end
-
-require 'koala/api/graph_batch_api'
