@@ -75,7 +75,7 @@ module Koala
                 raw_result = error
               else
                 # (see note in regular api method about JSON parsing)
-                body = JSON.load("[#{call_result['body'].to_s}]")[0]
+                body = JSON.parse("[#{call_result['body'].to_s}]")[0]
 
                 # Get the HTTP component they want
                 raw_result = case batch_op.http_options[:http_component]
