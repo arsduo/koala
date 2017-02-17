@@ -1,6 +1,6 @@
 require 'faraday'
 
-module Koala  
+module Koala
   module HTTPService
     class MultipartRequest < Faraday::Request::Multipart
       # Facebook expects nested parameters to be passed in a certain way
@@ -8,15 +8,15 @@ module Koala
       # Faraday needs two changes to make that work:
       # 1) [] need to be escaped (e.g. params[foo]=bar ==> params%5Bfoo%5D=bar)
       # 2) such messages need to be multipart-encoded
-    
+
       self.mime_type = 'multipart/form-data'.freeze
-    
+
       def process_request?(env)
         # if the request values contain any hashes or arrays, multipart it
         super || !!(env[:body].respond_to?(:values) && env[:body].values.find {|v| v.is_a?(Hash) || v.is_a?(Array)})
-      end   
-    
-    
+      end
+
+
       def process_params(params, prefix = nil, pieces = nil, &block)
         params.inject(pieces || []) do |all, (key, value)|
           key = "#{prefix}%5B#{key}%5D" if prefix
@@ -34,8 +34,4 @@ module Koala
       end
     end
   end
-  
-  # @private
-  # legacy support for when MultipartRequest lived directly under Koala
-  MultipartRequest = HTTPService::MultipartRequest  
 end

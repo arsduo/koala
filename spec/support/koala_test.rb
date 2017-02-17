@@ -157,12 +157,12 @@ module KoalaTest
     print "Validating permissions for live testing..."
     # make sure we have the necessary permissions
     api = Koala::Facebook::API.new(token)
-    perms = api.fql_query("select #{testing_permissions} from permissions where uid = me()")[0]
-    perms.each_pair do |perm, value|
-      if value == (perm == "read_insights" ? 1 : 0) # live testing depends on insights calls failing
-        puts "failed!\n" # put a new line after the print above
-        raise ArgumentError, "Your access token must have #{testing_permissions.join(", ")}, and lack read_insights.  You have: #{perms.inspect}"
-      end
+    perms = api.get_connect("me", "permissions")["data"]
+
+    # live testing depends on insights calls failing
+    if perms.keys.include?("read_insights") || (perms.keys & testing_permissions) != testing_permissions
+      puts "failed!\n" # put a new line after the print above
+      raise ArgumentError, "Your access token must have #{testing_permissions.join(", ")}, and lack read_insights.  You have: #{perms.inspect}"
     end
     puts "done!"
   end

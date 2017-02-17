@@ -12,7 +12,7 @@ shared_examples_for "MIME::Types can't return results" do
       else
         @koala_io_params[0] = path
       end
-      expect(Koala::UploadableIO.new(*@koala_io_params).content_type).to eq(mime_type)
+      expect(Koala::HTTPService::UploadableIO.new(*@koala_io_params).content_type).to eq(mime_type)
     end
 
     it "should get content types for #{extension} using basic analysis with file names with more than one dot" do
@@ -22,7 +22,7 @@ shared_examples_for "MIME::Types can't return results" do
       else
         @koala_io_params[0] = path
       end
-      expect(Koala::UploadableIO.new(*@koala_io_params).content_type).to eq(mime_type)
+      expect(Koala::HTTPService::UploadableIO.new(*@koala_io_params).content_type).to eq(mime_type)
     end
   end
 
@@ -37,7 +37,7 @@ shared_examples_for "MIME::Types can't return results" do
     end
 
     it "should throw an exception" do
-      expect { Koala::UploadableIO.new(*@koala_io_params) }.to raise_exception(Koala::KoalaError)
+      expect { Koala::HTTPService::UploadableIO.new(*@koala_io_params) }.to raise_exception(Koala::KoalaError)
     end
   end
 end
@@ -47,7 +47,7 @@ shared_examples_for "determining a mime type" do
     it "should return an UploadIO with MIME::Types-determined type if the type exists" do
       type_result = ["type"]
       allow(Koala::MIME::Types).to receive(:type_for).and_return(type_result)
-      expect(Koala::UploadableIO.new(*@koala_io_params).content_type).to eq(type_result.first)
+      expect(Koala::HTTPService::UploadableIO.new(*@koala_io_params).content_type).to eq(type_result.first)
     end
   end
 

@@ -359,45 +359,6 @@ module Koala
       # except to support cases where the Facebook API requires non-standard input
       # such as JSON-encoding arguments, posts directly to objects, etc.
 
-      # Make an FQL query.
-      # Convenience method equivalent to get_object("fql", :q => query).
-      #
-      # @param query the FQL query to perform
-      # @param args (see #get_object)
-      # @param options (see #get_object)
-      # @param block (see Koala::Facebook::API#api)
-      #
-      # @return the result of the FQL query.
-      def fql_query(query, args = {}, options = {}, &block)
-        get_object("fql", args.merge(:q => query), options, &block)
-      end
-
-      # Make an FQL multiquery.
-      # This method simplifies the result returned from multiquery into a more logical format.
-      #
-      # @param queries a hash of query names => FQL queries
-      # @param args (see #get_object)
-      # @param options (see #get_object)
-      # @param block (see Koala::Facebook::API#api)
-      #
-      # @example
-      #     @api.fql_multiquery({
-      #       "query1" => "select post_id from stream where source_id = me()",
-      #       "query2" => "select fromid from comment where post_id in (select post_id from #query1)"
-      #     })
-      #     # returns {"query1" => [obj1, obj2, ...], "query2" => [obj3, ...]}
-      #     # instead of [{"name":"query1", "fql_result_set":[]},{"name":"query2", "fql_result_set":[]}]
-      #
-      # @return a hash of FQL results keyed to the appropriate query
-      def fql_multiquery(queries = {}, args = {}, options = {}, &block)
-        resolved_results = if results = get_object("fql", args.merge(:q => JSON.dump(queries)), options)
-          # simplify the multiquery result format
-          results.inject({}) {|outcome, data| outcome[data["name"]] = data["fql_result_set"]; outcome}
-        end
-
-        block ? block.call(resolved_results) : resolved_results
-      end
-
       # Get a page's access token, allowing you to act as the page.
       # Convenience method for @api.get_object(page_id, :fields => "access_token").
       #
@@ -463,13 +424,13 @@ module Koala
       # Those methods use get_page to request another set of results from Facebook.
       #
       # @note You'll rarely need to use this method unless you're using Sinatra or another non-Rails framework
-      #       (see {Koala::Facebook::GraphCollection GraphCollection} for more information).
+      #       (see {Koala::Facebook::API::GraphCollection GraphCollection} for more information).
       #
       # @param params an array of arguments to graph_call
-      #               as returned by {Koala::Facebook::GraphCollection.parse_page_url}.
+      #               as returned by {Koala::Facebook::API::GraphCollection.parse_page_url}.
       # @param block (see Koala::Facebook::API#api)
       #
-      # @return Koala::Facebook::GraphCollection the appropriate page of results (an empty array if there are none)
+      # @return Koala::Facebook::API::GraphCollection the appropriate page of results (an empty array if there are none)
       def get_page(params, &block)
         graph_call(*params, &block)
       end
@@ -529,7 +490,7 @@ module Koala
       # @yield response when making a batch API call, you can pass in a block
       #        that parses the results, allowing for cleaner code.
       #        The block's return value is returned in the batch results.
-      #        See the code for {#get_picture} or {#fql_multiquery} for examples.
+      #        See the code for {#get_picture} for examples.
       #        (Not needed in regular calls; you'll probably rarely use this.)
       #
       # @raise [Koala::Facebook::APIError] if Facebook returns an error
@@ -544,7 +505,7 @@ module Koala
         end
 
         # turn this into a GraphCollection if it's pageable
-        result = GraphCollection.evaluate(result, self)
+        result = API::GraphCollection.evaluate(result, self)
 
         # now process as appropriate for the given call (get picture header, etc.)
         post_processing ? post_processing.call(result) : result
@@ -573,7 +534,7 @@ module Koala
           fb_expected_arg_name = method == "photos" ? :url : :file_url
           args.merge!(fb_expected_arg_name => media_args.first)
         else
-          args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
+          args["source"] = Koala::HTTPService::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
         end
 
         [target_id, method, args, options]

@@ -5,6 +5,7 @@ require 'json'
 # include koala modules
 require 'koala/errors'
 require 'koala/api'
+require 'koala/api/graph_batch_api'
 require 'koala/oauth'
 require 'koala/realtime_updates'
 require 'koala/test_users'
@@ -61,7 +62,7 @@ module Koala
 
   # An convenenient alias to Koala.http_service.make_request.
   def self.make_request(path, args, verb, options = {})
-    http_service.make_request(path, args, verb, options)
+    http_service.make_request(HTTPService::Request.new(path: path, args: args, verb: verb, options: options))
   end
 
   # we use Faraday as our main service, with mock as the other main one

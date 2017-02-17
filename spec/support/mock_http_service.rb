@@ -32,8 +32,8 @@ module Koala
     mock_response_file_path = File.join(File.dirname(__FILE__), '..', 'fixtures', 'mock_facebook_responses.yml')
     RESPONSES = YAML.load(ERB.new(IO.read(mock_response_file_path)).result(binding))
 
-    def self.make_request(path, args, verb, options = {})
-      if response = match_response(path, args, verb, options)
+    def self.make_request(request)
+      if response = match_response(request.raw_path, request.raw_args, request.raw_verb, request.raw_options)
         # create response class object
         response_object = if response.is_a? String
           Koala::HTTPService::Response.new(200, response, {})
@@ -65,7 +65,7 @@ module Koala
 
     # For a given query, see if our mock responses YAML has a resopnse for it.
     def self.match_response(path, args, verb, options = {})
-      server = options[:rest_api] ? 'rest_api' : 'graph_api'
+      server = 'graph_api'
       path = 'root' if path == '' || path == '/'
       verb = (verb || 'get').to_s
       token = args.delete('access_token')
@@ -88,8 +88,8 @@ module Koala
       args = arguments.inject({}) do |hash, (k, v)|
         # ensure our args are all stringified
         value = if v.is_a?(String)
-          should_json_decode?(v) ? JSON.load(v) : v
-        elsif v.is_a?(Koala::UploadableIO)
+          should_json_decode?(v) ? JSON.parse(v) : v
+        elsif v.is_a?(Koala::HTTPService::UploadableIO)
           # obviously there are no files in the yaml
           "[FILE]"
         else
@@ -119,7 +119,7 @@ module Koala
         # will remove +'s in restriction strings
         string.split("&").reduce({}) do |hash, component|
           k, v = component.split("=", 2) # we only care about the first =
-          value = should_json_decode?(v) ? JSON.load(v) : v.to_s rescue v.to_s
+          value = should_json_decode?(v) ? JSON.parse(v) : v.to_s rescue v.to_s
           # some special-casing, unfortunate but acceptable in this testing
           # environment
           value = nil if value.empty?

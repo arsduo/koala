@@ -1,6 +1,6 @@
 # graph_batch_api and legacy are required at the bottom, since they depend on API being defined
 require 'koala/api/graph_api'
-require 'koala/api/rest_api'
+require 'koala/api/graph_collection'
 require 'openssl'
 
 module Koala
@@ -23,13 +23,11 @@ module Koala
       attr_reader :access_token, :app_secret
 
       include GraphAPIMethods
-      include RestAPIMethods
 
       # Makes a request to the appropriate Facebook API.
       # @note You'll rarely need to call this method directly.
       #
       # @see GraphAPIMethods#graph_call
-      # @see RestAPIMethods#rest_call
       #
       # @param path the server path for this request (leading / is prepended if not present)
       # @param args arguments to be sent to Facebook
@@ -86,9 +84,9 @@ module Koala
         else
           # parse the body as JSON and run it through the error checker (if provided)
           # Note: Facebook sometimes sends results like "true" and "false", which are valid[RFC7159]
-          # but unsupported by Ruby's stdlib[RFC4627] and cause JSON.load to fail -- so we account for
+          # but unsupported by Ruby's stdlib[RFC4627] and cause JSON.parse to fail -- so we account for
           # that by wrapping the result in []
-          JSON.load("[#{result.body.to_s}]")[0]
+          JSON.parse("[#{result.body.to_s}]")[0]
         end
       end
 
@@ -118,5 +116,3 @@ module Koala
     end
   end
 end
-
-require 'koala/api/graph_batch_api'

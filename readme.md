@@ -1,6 +1,6 @@
 Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/gems/koala) [![Dependencies](https://img.shields.io/gemnasium/arsduo/koala.svg)](https://gemnasium.com/arsduo/koala) [![Build Status](https://img.shields.io/travis/arsduo/koala.svg)](http://travis-ci.org/arsduo/koala) [![Code Climate](https://img.shields.io/codeclimate/github/arsduo/koala.svg)](https://codeclimate.com/github/arsduo/koala) [![Code Coverage](https://img.shields.io/codeclimate/coverage/github/arsduo/koala.svg)](https://codeclimate.com/github/arsduo/koala)
 ====
-[Koala](http://github.com/arsduo/koala) is a Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), the REST API, realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
+[Koala](http://github.com/arsduo/koala) is a Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
 
 * Lightweight: Koala should be as light and simple as Facebook’s own libraries, providing API accessors and returning simple JSON.
 * Fast: Koala should, out of the box, be quick. Out of the box, we use Facebook's faster read-only servers when possible and if available, the Typhoeus gem to make snappy Facebook requests.  Of course, that brings us to our next topic:
@@ -39,7 +39,7 @@ Then, go exploring:
 
 ```ruby
 require 'koala'
- 
+
 @graph = Koala::Facebook::API.new(oauth_access_token)
 
 profile = @graph.get_object("me")
@@ -115,27 +115,6 @@ the results apart from a long list of array entries:
 
 Check out the wiki for more details and examples.
 
-The REST API
-------------
-
-Where the Graph API and the old REST API overlap, you should choose the Graph API.  Unfortunately, that overlap is far from complete, and there are many important API calls that can't yet be done via the Graph.
-
-Fortunately, Koala supports the REST API using the very same interface; to use this, instantiate an API:
-```ruby
-@rest = Koala::Facebook::API.new(oauth_access_token)
-
-@rest.fql_query(my_fql_query) # convenience method
-@rest.fql_multiquery(fql_query_hash) # convenience method
-@rest.rest_call("stream.publish", arguments_hash) # generic version
-```
-
-Of course, you can use the Graph API methods on the same object -- the power of two APIs right in the palm of your hand.
-```ruby
-@api = Koala::Facebook::API.new(oauth_access_token)
-fql = @api.fql_query(my_fql_query)
-@api.put_wall_post(process_result(fql))
-```
-
 Configuration
 -------------
 
@@ -146,7 +125,7 @@ require 'koala'
 
 Koala.configure do |config|
   config.graph_server = 'my-graph-mock.mysite.com'
-  # other common options are `rest_server` and `dialog_host`
+  # another common option: `dialog_host`
   # see lib/koala/http_service.rb
 end
 ```
@@ -157,7 +136,7 @@ tier and video upload matching and replacement strings.
 OAuth
 -----
 
-You can use the Graph and REST APIs without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
+You can use the Graph API without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
 ```ruby
 @oauth = Koala::Facebook::OAuth.new(app_id, app_secret, callback_url)
 ```
@@ -225,7 +204,7 @@ For more information about meet_challenge and the RealtimeUpdates class, check o
 Test Users
 ----------
 
-We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph or REST API:
+We also support the test users API, allowing you to conjure up fake users and command them to do your bidding using the Graph API:
 ```ruby
 @test_users = Koala::Facebook::TestUsers.new(app_id: id, secret: secret)
 user = @test_users.create(is_app_installed, desired_permissions)

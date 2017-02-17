@@ -23,7 +23,7 @@ module Koala
         # @param api the Graph {Koala::Facebook::API API} instance to use to make calls
         #            (usually the API that made the original call).
         #
-        # @return [Koala::Facebook::GraphCollection] an initialized GraphCollection
+        # @return [Koala::Facebook::API::GraphCollection] an initialized GraphCollection
         #         whose paging, summary, raw_response, and api attributes are populated.
         def initialize(response, api)
           super response["data"]
@@ -113,9 +113,5 @@ module Koala
         end
       end
     end
-
-    # @private
-    # legacy support for when GraphCollection lived directly under Koala::Facebook
-    GraphCollection = API::GraphCollection
   end
 end

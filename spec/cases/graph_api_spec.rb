@@ -35,25 +35,6 @@ describe 'Koala::Facebook::GraphAPIMethods' do
       end
     end
 
-    context '#fql_multiquery' do
-      before do
-        expect(@api).to receive(:get_object).and_return([
-          {"name" => "query1", "fql_result_set" => [{"id" => 123}]},
-          {"name" => "query2", "fql_result_set" => ["id" => 456]}
-        ])
-      end
-
-      it 'is called with resolved response' do
-        resolved_result = {
-          'query1' => [{'id' => 123}],
-          'query2' => [{'id' => 456}]
-        }
-        response = @api.fql_multiquery({}, &post_processing)
-        expect(response["args"]).to eq(resolved_result)
-        expect(response["result"]).to eq(result)
-      end
-    end
-
     context '#get_page_access_token' do
       it 'returns result of block' do
         token = Koala::MockHTTPService::APP_ACCESS_TOKEN

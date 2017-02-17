@@ -128,7 +128,7 @@ describe "Koala::Facebook::API" do
     allow(Koala).to receive(:make_request).and_return(response)
 
     json_body = double('JSON body')
-    allow(JSON).to receive(:load).and_return([json_body])
+    allow(JSON).to receive(:parse).and_return([json_body])
 
     expect(@service.api('anything')).to eq(json_body)
   end
@@ -181,9 +181,6 @@ describe "Koala::Facebook::API" do
       @api = Koala::Facebook::API.new(@token)
     end
 
-    it_should_behave_like "Koala RestAPI"
-    it_should_behave_like "Koala RestAPI with an access token"
-
     it_should_behave_like "Koala GraphAPI"
     it_should_behave_like "Koala GraphAPI with an access token"
     it_should_behave_like "Koala GraphAPI with GraphCollection"
@@ -193,9 +190,6 @@ describe "Koala::Facebook::API" do
     before(:each) do
       @api = Koala::Facebook::API.new
     end
-
-    it_should_behave_like "Koala RestAPI"
-    it_should_behave_like "Koala RestAPI without an access token"
 
     it_should_behave_like "Koala GraphAPI"
     it_should_behave_like "Koala GraphAPI without an access token"
