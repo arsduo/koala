@@ -101,7 +101,6 @@ module Koala
           end
         end
       end
-
     end
   end
 end

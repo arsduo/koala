@@ -28,7 +28,6 @@ module Koala
     DEFAULT_SERVERS = {
       :graph_server => 'graph.facebook.com',
       :dialog_host => 'www.facebook.com',
-      :rest_server => 'api.facebook.com',
       # certain Facebook services (beta, video) require you to access different
       # servers. If you're using your own servers, for instance, for a proxy,
       # you can change both the matcher and the replacement values.
@@ -43,14 +42,13 @@ module Koala
     # The address of the appropriate Facebook server.
     #
     # @param options various flags to indicate which server to use.
-    # @option options :rest_api use the old REST API instead of the Graph API
     # @option options :video use the server designated for video uploads
     # @option options :beta use the beta tier
     # @option options :use_ssl force https, even if not needed
     #
     # @return a complete server address with protocol
     def self.server(options = {})
-      server = "#{options[:rest_api] ? Koala.config.rest_server : Koala.config.graph_server}"
+      server = Koala.config.graph_server
       server.gsub!(Koala.config.host_path_matcher, Koala.config.video_replace) if options[:video]
       server.gsub!(Koala.config.host_path_matcher, Koala.config.beta_replace) if options[:beta]
       "#{options[:use_ssl] ? "https" : "http"}://#{server}"
@@ -61,7 +59,6 @@ module Koala
     #
     # @see Koala::Facebook::API#api
     # @see Koala::Facebook::GraphAPIMethods#graph_call
-    # @see Koala::Facebook::RestAPIMethods#rest_call
     #
     # @param path the server path for this request
     # @param args (see Koala::Facebook::API#api)

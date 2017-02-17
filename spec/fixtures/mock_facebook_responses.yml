@@ -10,22 +10,6 @@
 #       with_token:
 #       no_token:
 
-# ====== REST API =====
-rest_api:
-
-# -- Stubbed Responses --
-  /method/admin.setAppProperties:
-    'properties={"desktop":0}':
-      post:
-        with_token: 'true'
-  /method/fql.query: # for testing the beta tier
-    query=select first_name from user where uid = 2901279:
-      get:
-        no_token: '[{"first_name":"Luke"}]'
-        with_token: '[{"first_name":"Luke"}]'
-
-
-
 # ====== GRAPH API =====
 graph_api:
 
