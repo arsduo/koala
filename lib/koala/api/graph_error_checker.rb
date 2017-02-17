@@ -61,7 +61,7 @@ module Koala
         # Normally, we start with the response body. If it isn't valid JSON, we start with an empty
         # hash and fill it with error data.
         @response_hash ||= begin
-          JSON.load(body)
+          JSON.parse(body)
         rescue JSON::ParserError
           {}
         end
