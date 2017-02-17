@@ -272,11 +272,14 @@ describe "Koala::Facebook::TestUsers" do
         @test_users.befriend(@user1, @user2, options)
       end
 
-      it "includes the secret => appsecret_proof in both calls if provided" do
+      it "includes the secret, generating the appsecret_proof in both calls if provided" do
         # should come twice, once for each user
         @stubbed = true
         test_users = Koala::Facebook::TestUsers.new({:secret => @secret, :app_id => @app_id})
-        expect(Koala.http_service).to receive(:make_request).with(anything, hash_including("appsecret_proof"), anything, anything).twice.and_return(Koala::HTTPService::Response.new(200, "{}", {}))
+        expect(Koala.http_service).to receive(:make_request).twice do |request|
+          expect(request.post_args).to include("appsecret_proof")
+          Koala::HTTPService::Response.new(200, "{}", {})
+        end
         test_users.befriend(@user1, @user2)
       end
     end
