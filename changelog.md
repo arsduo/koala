@@ -4,7 +4,8 @@ v3.0.0
 Internal improvements:
 
 * Completely rewrote HTTPService#make_request and several others, extracting most logic into
-  HTTPService::Request
+  HTTPService::Request (#566)
+* Use the more secure JSON.parse instead of JSON.load (thanks, lautis!) (#567)
 
 Testing improvements:
 

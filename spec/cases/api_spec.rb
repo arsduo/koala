@@ -128,7 +128,7 @@ describe "Koala::Facebook::API" do
     allow(Koala).to receive(:make_request).and_return(response)
 
     json_body = double('JSON body')
-    allow(JSON).to receive(:load).and_return([json_body])
+    allow(JSON).to receive(:parse).and_return([json_body])
 
     expect(@service.api('anything')).to eq(json_body)
   end
