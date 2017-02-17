@@ -265,7 +265,10 @@ describe "Koala::Facebook::TestUsers" do
         options = {:some_http_option => true}
         # should come twice, once for each user
         @stubbed = true
-        expect(Koala.http_service).to receive(:make_request).with(anything, anything, anything, options).twice.and_return(Koala::HTTPService::Response.new(200, "{}", {}))
+        expect(Koala.http_service).to receive(:make_request).twice do |request|
+          expect(request.raw_options).to eq(options)
+          Koala::HTTPService::Response.new(200, "{}", {})
+        end
         @test_users.befriend(@user1, @user2, options)
       end
     end
