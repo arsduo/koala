@@ -32,14 +32,14 @@ shared_examples_for "Koala GraphAPI" do
     it "passes the results through GraphCollection.evaluate" do
       result = {}
       allow(@api).to receive(:api).and_return(result)
-      expect(Koala::Facebook::GraphCollection).to receive(:evaluate).with(result, @api)
+      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).with(result, @api)
       @api.graph_call("/me")
     end
 
     it "returns the results of GraphCollection.evaluate" do
       expected = {}
       allow(@api).to receive(:api).and_return([])
-      expect(Koala::Facebook::GraphCollection).to receive(:evaluate).and_return(expected)
+      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).and_return(expected)
       expect(@api.graph_call("/me")).to eq(expected)
     end
 
@@ -313,7 +313,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
     it "sets options[:video] to true" do
       source = double("UploadIO")
-      allow(Koala::UploadableIO).to receive(:new).and_return(source)
+      allow(Koala::HTTPService::UploadableIO).to receive(:new).and_return(source)
       allow(source).to receive(:requires_base_http_service).and_return(false)
       expect(Koala).to receive(:make_request).with(anything, anything, anything, hash_including(:video => true)).and_return(Koala::HTTPService::Response.new(200, "[]", {}))
       @api.put_video("foo")
@@ -506,7 +506,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
     # GraphCollection methods
     it "gets a GraphCollection when getting connections" do
       @result = @api.get_connections(KoalaTest.page, "photos")
-      expect(@result).to be_a(Koala::Facebook::GraphCollection)
+      expect(@result).to be_a(Koala::Facebook::API::GraphCollection)
     end
 
     it "returns nil if the get_collections call fails with nil" do
@@ -517,7 +517,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
     it "gets a GraphCollection when searching" do
       result = @api.search("facebook")
-      expect(result).to be_a(Koala::Facebook::GraphCollection)
+      expect(result).to be_a(Koala::Facebook::API::GraphCollection)
     end
 
     it "returns nil if the search call fails with nil" do
@@ -528,7 +528,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
 
     it "gets a GraphCollection when paging through results" do
       @results = @api.get_page(["search", {"q"=>"facebook", "limit"=>"25", "until"=> KoalaTest.search_time}])
-      expect(@results).to be_a(Koala::Facebook::GraphCollection)
+      expect(@results).to be_a(Koala::Facebook::API::GraphCollection)
     end
 
     it "returns nil if the page call fails with nil" do

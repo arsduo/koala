@@ -113,7 +113,7 @@ module Koala
         it "turns any UploadableIOs to UploadIOs" do
           # technically this is done for all requests, but you don't send GET requests with files
           upload_io = double("UploadIO")
-          u = Koala::UploadableIO.new("/path/to/stuff", "img/jpg")
+          u = Koala::HTTPService::UploadableIO.new("/path/to/stuff", "img/jpg")
           allow(u).to receive(:to_upload_io).and_return(upload_io)
           request = Request.new(path: path, verb: "post", args: {an_upload: u})
           expect(request.post_args[:an_upload]).to eq(upload_io)

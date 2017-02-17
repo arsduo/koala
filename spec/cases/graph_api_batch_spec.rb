@@ -58,11 +58,11 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           @batch_queue = []
           allow(Koala::Facebook::API).to receive(:batch_calls).and_return(@batch_queue)
 
-          allow(Koala::UploadableIO).to receive(:new).with(@binary).and_return(@uploadable_io)
-          allow(Koala::UploadableIO).to receive(:binary_content?).and_return(false)
-          allow(Koala::UploadableIO).to receive(:binary_content?).with(@binary).and_return(true)
-          allow(Koala::UploadableIO).to receive(:binary_content?).with(@uploadable_io).and_return(true)
-          allow(@uploadable_io).to receive(:is_a?).with(Koala::UploadableIO).and_return(true)
+          allow(Koala::HTTPService::UploadableIO).to receive(:new).with(@binary).and_return(@uploadable_io)
+          allow(Koala::HTTPService::UploadableIO).to receive(:binary_content?).and_return(false)
+          allow(Koala::HTTPService::UploadableIO).to receive(:binary_content?).with(@binary).and_return(true)
+          allow(Koala::HTTPService::UploadableIO).to receive(:binary_content?).with(@uploadable_io).and_return(true)
+          allow(@uploadable_io).to receive(:is_a?).with(Koala::HTTPService::UploadableIO).and_return(true)
 
           @args[:method] = "post" # files are always post
         end
@@ -243,11 +243,11 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       describe "with binary files" do
         before :each do
           @binary = double("Binary file")
-          allow(Koala::UploadableIO).to receive(:binary_content?).and_return(false)
-          allow(Koala::UploadableIO).to receive(:binary_content?).with(@binary).and_return(true)
+          allow(Koala::HTTPService::UploadableIO).to receive(:binary_content?).and_return(false)
+          allow(Koala::HTTPService::UploadableIO).to receive(:binary_content?).with(@binary).and_return(true)
           @uploadable_io = double("UploadableIO")
-          allow(Koala::UploadableIO).to receive(:new).with(@binary).and_return(@uploadable_io)
-          allow(@uploadable_io).to receive(:is_a?).with(Koala::UploadableIO).and_return(true)
+          allow(Koala::HTTPService::UploadableIO).to receive(:new).with(@binary).and_return(@uploadable_io)
+          allow(@uploadable_io).to receive(:is_a?).with(Koala::HTTPService::UploadableIO).and_return(true)
 
           @batch_queue = []
           allow(Koala::Facebook::API).to receive(:batch_calls).and_return(@batch_queue)
@@ -486,7 +486,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         batch_api.get_object('me')
         batch_api.get_connections('me', 'friends')
       end
-      expect(friends).to be_a(Koala::Facebook::GraphCollection)
+      expect(friends).to be_a(Koala::Facebook::API::GraphCollection)
     end
 
     it 'turns pageable results into GraphCollections' do
@@ -519,7 +519,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         batch_api.get_connections(@app_id, 'insights', {}, {"access_token" => @app_api.access_token})
       end
       expect(me['id']).not_to be_nil
-      expect(insights).to be_an(Koala::Facebook::GraphCollection)
+      expect(insights).to be_an(Koala::Facebook::API::GraphCollection)
     end
 
     it "handles requests passing the access token option as a symbol instead of a string" do
@@ -528,7 +528,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         batch_api.get_connections(@app_id, 'insights', {}, {:access_token => @app_api.access_token})
       end
       expect(me['id']).not_to be_nil
-      expect(insights).to be_an(Koala::Facebook::GraphCollection)
+      expect(insights).to be_an(Koala::Facebook::API::GraphCollection)
     end
 
     it "preserves batch-op specific access tokens in GraphCollection returned from batch" do

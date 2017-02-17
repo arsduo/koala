@@ -424,13 +424,13 @@ module Koala
       # Those methods use get_page to request another set of results from Facebook.
       #
       # @note You'll rarely need to use this method unless you're using Sinatra or another non-Rails framework
-      #       (see {Koala::Facebook::GraphCollection GraphCollection} for more information).
+      #       (see {Koala::Facebook::API::GraphCollection GraphCollection} for more information).
       #
       # @param params an array of arguments to graph_call
-      #               as returned by {Koala::Facebook::GraphCollection.parse_page_url}.
+      #               as returned by {Koala::Facebook::API::GraphCollection.parse_page_url}.
       # @param block (see Koala::Facebook::API#api)
       #
-      # @return Koala::Facebook::GraphCollection the appropriate page of results (an empty array if there are none)
+      # @return Koala::Facebook::API::GraphCollection the appropriate page of results (an empty array if there are none)
       def get_page(params, &block)
         graph_call(*params, &block)
       end
@@ -505,7 +505,7 @@ module Koala
         end
 
         # turn this into a GraphCollection if it's pageable
-        result = GraphCollection.evaluate(result, self)
+        result = API::GraphCollection.evaluate(result, self)
 
         # now process as appropriate for the given call (get picture header, etc.)
         post_processing ? post_processing.call(result) : result
@@ -534,7 +534,7 @@ module Koala
           fb_expected_arg_name = method == "photos" ? :url : :file_url
           args.merge!(fb_expected_arg_name => media_args.first)
         else
-          args["source"] = Koala::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
+          args["source"] = Koala::HTTPService::UploadableIO.new(*media_args.slice(0, 1 + args_offset))
         end
 
         [target_id, method, args, options]
