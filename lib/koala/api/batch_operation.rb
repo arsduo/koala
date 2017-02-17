@@ -81,9 +81,5 @@ module Koala
         end
       end
     end
-
-    # @private
-    # legacy support for when BatchOperation lived directly under Koala::Facebook
-    BatchOperation = GraphBatchAPI::BatchOperation
   end
 end

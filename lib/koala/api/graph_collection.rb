@@ -113,9 +113,5 @@ module Koala
         end
       end
     end
-
-    # @private
-    # legacy support for when GraphCollection lived directly under Koala::Facebook
-    GraphCollection = API::GraphCollection
   end
 end
