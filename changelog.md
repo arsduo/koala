@@ -1,14 +1,22 @@
 v3.0.0
 ======
 
+Key breaking changes:
+
+* HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does
+  not)
+* HTTPService behavior *should not* change, but in edge cases might. (If so, please let me know.)
+* Empty response bodies in batch API calls will raise a JSON parse error rather than returning nil
+
 Removed features:
 
-* Removed the old Rest API, since Facebook doesn't support it (#568)
+* Removed support for the Rest API, since Facebook removed support for it (#568)
 * Removed support for FQL, which Facebook removed on August 8, 2016 (#569)
+* Removed legacy duplication of serveral constants in the Koala module (#569)
 
 Internal improvements:
 
-* Completely rewrote HTTPService#make_request and several others, extracting most logic into
+* Completely rewrote HTTPService.make_request and several others, extracting most logic into
   HTTPService::Request (#566)
 * Use the more secure JSON.parse instead of JSON.load (thanks, lautis!) (#567)
 

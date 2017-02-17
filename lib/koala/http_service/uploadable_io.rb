@@ -181,8 +181,4 @@ module Koala
       end
     end
   end
-
-  # @private
-  # legacy support for when UploadableIO lived directly under Koala
-  UploadableIO = HTTPService::UploadableIO
 end

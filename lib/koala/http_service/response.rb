@@ -11,8 +11,4 @@ module Koala
       end
     end
   end
-  
-  # @private
-  # legacy support for when Response lived directly under Koala
-  Response = HTTPService::Response
 end

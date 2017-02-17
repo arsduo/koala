@@ -1,4 +1,5 @@
 require 'koala/api'
+require 'koala/api/graph_batch_api'
 
 module Koala
   module Facebook
@@ -65,13 +66,13 @@ module Koala
         def process_binary_args
           # collect binary files
           @args.each_pair do |key, value|
-            if UploadableIO.binary_content?(value)
+            if HTTPService::UploadableIO.binary_content?(value)
               @files ||= {}
               # we use a class-level counter to ensure unique file identifiers across multiple batch operations
               # (this is thread safe, since we just care about uniqueness)
               # so remove the file from the original hash and add it to the file store
               id = "op#{identifier}_file#{@files.keys.length}"
-              @files[id] = @args.delete(key).is_a?(UploadableIO) ? value : UploadableIO.new(value)
+              @files[id] = @args.delete(key).is_a?(HTTPService::UploadableIO) ? value : HTTPService::UploadableIO.new(value)
             end
           end
         end
@@ -81,9 +82,5 @@ module Koala
         end
       end
     end
-
-    # @private
-    # legacy support for when BatchOperation lived directly under Koala::Facebook
-    BatchOperation = GraphBatchAPI::BatchOperation
   end
 end

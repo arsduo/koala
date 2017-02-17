@@ -89,7 +89,7 @@ module Koala
         # ensure our args are all stringified
         value = if v.is_a?(String)
           should_json_decode?(v) ? JSON.parse(v) : v
-        elsif v.is_a?(Koala::UploadableIO)
+        elsif v.is_a?(Koala::HTTPService::UploadableIO)
           # obviously there are no files in the yaml
           "[FILE]"
         else

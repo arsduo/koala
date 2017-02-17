@@ -1,5 +1,6 @@
 # graph_batch_api and legacy are required at the bottom, since they depend on API being defined
 require 'koala/api/graph_api'
+require 'koala/api/graph_collection'
 require 'openssl'
 
 module Koala
