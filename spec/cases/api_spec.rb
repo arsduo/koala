@@ -124,13 +124,11 @@ describe "Koala::Facebook::API" do
   end
 
   it "returns the body of the request as JSON if no http_component is given" do
-    response = double('response', :body => 'body', :status => 200)
+    result = {"a" => 2}
+    response = double('response', :body => result.to_json, :status => 200)
     allow(Koala).to receive(:make_request).and_return(response)
 
-    json_body = double('JSON body')
-    allow(JSON).to receive(:parse).and_return([json_body])
-
-    expect(@service.api('anything')).to eq(json_body)
+    expect(@service.api('anything')).to eq(result)
   end
 
   it "executes an error checking block if provided" do

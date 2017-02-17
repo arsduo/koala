@@ -74,8 +74,9 @@ module Koala
               if (error = check_response(call_result['code'], call_result['body'].to_s, parsed_headers))
                 raw_result = error
               else
-                # (see note in regular api method about JSON parsing)
-                body = JSON.parse("[#{call_result['body'].to_s}]")[0]
+                # quirks_mode is needed because Facebook sometimes returns a raw true or false value --
+                # in Ruby 2.4 we can drop that.
+                body = JSON.parse(call_result['body'].to_s, quirks_mode: true)
 
                 # Get the HTTP component they want
                 raw_result = case batch_op.http_options[:http_component]
