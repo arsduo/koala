@@ -40,13 +40,11 @@ module Koala
       :beta_replace => '.beta.facebook'
     }
 
-
     # Makes a request directly to Facebook.
     # @note You'll rarely need to call this method directly.
     #
     # @see Koala::Facebook::API#api
     # @see Koala::Facebook::GraphAPIMethods#graph_call
-    # @see Koala::Facebook::RestAPIMethods#rest_call
     #
     # @param request a Koala::HTTPService::Request object
     #

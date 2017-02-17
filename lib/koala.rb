@@ -5,6 +5,7 @@ require 'json'
 # include koala modules
 require 'koala/errors'
 require 'koala/api'
+require 'koala/api/graph_batch_api'
 require 'koala/oauth'
 require 'koala/realtime_updates'
 require 'koala/test_users'
