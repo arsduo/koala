@@ -6,12 +6,16 @@ module Koala
     class GraphBatchAPI < API
       # @private
       class BatchOperation
-        attr_reader :access_token, :http_options, :post_processing, :files, :batch_api, :identifier
+        attr_reader :access_token, :http_options, :post_processing, :files, :batch_api, :identifier, :url
 
         @identifier = 0
 
         def self.next_identifier
           @identifier += 1
+        end
+
+        def http_method
+          @method
         end
 
         def initialize(options = {})
