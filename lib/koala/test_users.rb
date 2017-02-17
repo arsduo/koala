@@ -146,8 +146,8 @@ module Koala
           raise ArgumentError, "TestUsers#befriend requires hash arguments for both users with id and access_token"
         end
 
-        u1_graph_api = API.new(user1_token)
-        u2_graph_api = API.new(user2_token)
+        u1_graph_api = API.new(user1_token, secret)
+        u2_graph_api = API.new(user2_token, secret)
 
         u1_graph_api.graph_call("#{user1_id}/friends/#{user2_id}", {}, "post", options) &&
           u2_graph_api.graph_call("#{user2_id}/friends/#{user1_id}", {}, "post", options)
