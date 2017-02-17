@@ -577,16 +577,6 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
     end
 
-    it "allows FQL" do
-      result = @api.batch do |batch_api|
-        batch_api.graph_call("method/fql.query", {:query=>"select first_name from user where uid=#{KoalaTest.user1_id}"}, "post")
-      end
-
-      fql_result = result[0]
-      expect(fql_result[0]).to be_a(Hash)
-      expect(fql_result[0]["first_name"]).to eq("Alex")
-    end
-
     describe 'with post-processing callback' do
       let(:me_result) { double("me result") }
       let(:friends_result) { [double("friends result")] }

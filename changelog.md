@@ -1,9 +1,10 @@
 v3.0.0
 ======
 
-Updated features:
+Removed features:
 
 * Removed the old Rest API, since Facebook doesn't support it (#568)
+* Removed support for FQL, which Facebook removed on August 8, 2016 (#569)
 
 Internal improvements:
 
