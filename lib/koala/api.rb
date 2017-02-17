@@ -58,6 +58,7 @@ module Koala
         # This is explicitly needed in batch requests so GraphCollection
         # results preserve any specific access tokens provided
         args["access_token"] ||= @access_token || @app_access_token if @access_token || @app_access_token
+
         if options.delete(:appsecret_proof) && args["access_token"] && @app_secret
           args["appsecret_proof"] = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), @app_secret, args["access_token"])
         end
