@@ -158,61 +158,6 @@ shared_examples_for "Koala GraphAPI" do
     # the results should have an ID and a name, among other things
     expect(result["id"] && result["name"]).to be_truthy
   end
-
-  # FQL
-  describe "#fql_query" do
-    it "makes a request to /fql" do
-      expect(@api).to receive(:get_object).with("fql", anything, anything)
-      @api.fql_query double('query string')
-    end
-
-    it "passes a query argument" do
-      query = double('query string')
-      expect(@api).to receive(:get_object).with(anything, hash_including(:q => query), anything)
-      @api.fql_query(query)
-    end
-
-    it "passes on any other arguments provided" do
-      args = {:a => 2}
-      expect(@api).to receive(:get_object).with(anything, hash_including(args), anything)
-      @api.fql_query("a query", args)
-    end
-  end
-
-  describe "#fql_multiquery" do
-    it "makes a request to /fql" do
-      expect(@api).to receive(:get_object).with("fql", anything, anything)
-      @api.fql_multiquery 'query string'
-    end
-
-    it "passes a queries argument" do
-      queries = {foo: :x}
-
-      expect(@api).to receive(:get_object).with(anything, hash_including(:q => queries.to_json), anything)
-      @api.fql_multiquery(queries)
-    end
-
-    it "simplifies the response format" do
-      raw_results = [
-        {"name" => "query1", "fql_result_set" => [1, 2, 3]},
-        {"name" => "query2", "fql_result_set" => [:a, :b, :c]}
-      ]
-      expected_results = {
-        "query1" => [1, 2, 3],
-        "query2" => [:a, :b, :c]
-      }
-
-      allow(@api).to receive(:get_object).and_return(raw_results)
-      results = @api.fql_multiquery({:query => true})
-      expect(results).to eq(expected_results)
-    end
-
-    it "passes on any other arguments provided" do
-      args = {:a => 2}
-      expect(@api).to receive(:get_object).with(anything, hash_including(args), anything)
-      @api.fql_multiquery("a query", args)
-    end
-  end
 end
 
 
@@ -506,51 +451,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
     end
   end
 
-  it "can access public information via FQL" do
-    result = @api.fql_query("select uid, first_name from user where uid = #{KoalaTest.user2_id}")
-    expect(result.size).to eq(1)
-    expect(result.first['first_name']).to eq(KoalaTest.user2_name)
-    expect(result.first['uid']).to eq(KoalaTest.user2_id.to_i)
-  end
-
-  it "can access public information via FQL.multiquery" do
-    result = @api.fql_multiquery(
-      :query1 => "select uid, first_name from user where uid = #{KoalaTest.user2_id}",
-      :query2 => "select uid, first_name from user where uid = #{KoalaTest.user1_id}"
-    )
-    expect(result.size).to eq(2)
-    # this should check for first_name, but there's an FB bug currently
-    expect(result["query1"].first['uid']).to eq(KoalaTest.user2_id.to_i)
-    # result["query1"].first['first_name'].should == KoalaTest.user2_name
-    expect(result["query2"].first['first_name']).to eq(KoalaTest.user1_name)
-  end
-
-  it "can access protected information via FQL" do
-    # Tests agains the permissions fql table
-
-    # get the current user's ID
-    # we're sneakily using the Graph API, which should be okay since it has its own tests
-    g = Koala::Facebook::API.new(@token)
-    id = g.get_object("me", :fields => "id")["id"]
-
-    # now send a query about your permissions
-    result = @api.fql_query("select read_stream from permissions where uid = #{id}")
-
-    expect(result.size).to eq(1)
-    # we've verified that you have read_stream permissions, so we can test against that
-    expect(result.first["read_stream"]).to eq(1)
-  end
-
-  it "can access protected information via FQL.multiquery" do
-    result = @api.fql_multiquery(
-      :query1 => "select post_id from stream where source_id = me()",
-      :query2 => "select fromid from comment where post_id in (select post_id from #query1)",
-      :query3 => "select uid, name from user where uid in (select fromid from #query2)"
-    )
-    expect(result.size).to eq(3)
-    expect(result.keys).to include("query1", "query2", "query3")
-  end
-
   # test all methods to make sure they pass data through to the API
   # we run the tests here (rather than in the common shared example group)
   # since some require access tokens
@@ -570,7 +470,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :search => 3,
       :set_app_restrictions => 4,
       :get_page_access_token => 3,
-      :fql_query => 3, :fql_multiquery => 3,
       # methods that have special arguments
       :get_comments_for_urls => [["url1", "url2"], {}],
       :put_picture => ["x.jpg", "image/jpg", {}, "me"],
@@ -688,38 +587,5 @@ shared_examples_for "Koala GraphAPI without an access token" do
 
   it "can't delete a like" do
     expect { @api.delete_like("7204941866_119776748033392") }.to raise_error(Koala::Facebook::AuthenticationError)
-  end
-
-  # FQL_QUERY
-  describe "when making a FQL request" do
-    it "can access public information via FQL" do
-      result = @api.fql_query("select uid, first_name from user where uid = #{KoalaTest.user2_id}")
-      expect(result.size).to eq(1)
-      expect(result.first['first_name']).to eq(KoalaTest.user2_name)
-    end
-
-    it "can access public information via FQL.multiquery" do
-      result = @api.fql_multiquery(
-        :query1 => "select uid, first_name from user where uid = #{KoalaTest.user2_id}",
-        :query2 => "select uid, first_name from user where uid = #{KoalaTest.user1_id}"
-      )
-      expect(result.size).to eq(2)
-      expect(result["query1"].first['first_name']).to eq(KoalaTest.user2_name)
-      expect(result["query2"].first['first_name']).to eq(KoalaTest.user1_name)
-    end
-
-    it "can't access protected information via FQL" do
-      expect { @api.fql_query("select read_stream from permissions where uid = #{KoalaTest.user2_id}") }.to raise_error(Koala::Facebook::APIError)
-    end
-
-    it "can't access protected information via FQL.multiquery" do
-      expect {
-        @api.fql_multiquery(
-          :query1 => "select post_id from stream where source_id = me()",
-          :query2 => "select fromid from comment where post_id in (select post_id from #query1)",
-          :query3 => "select uid, name from user where uid in (select fromid from #query2)"
-        )
-      }.to raise_error(Koala::Facebook::APIError)
-    end
   end
 end
