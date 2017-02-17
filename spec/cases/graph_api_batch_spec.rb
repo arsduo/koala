@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'json' unless Hash.respond_to?(:to_json)
 
 describe "Koala::Facebook::GraphAPI in batch mode" do
 
@@ -468,6 +469,46 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         expect(thread_one_count).to eq(first_count)
         expect(thread_two_count).to eq(second_count)
       end
+
+    end
+  end
+
+  describe '#big_batches' do
+    before :each do
+      payload = [{code: 200, headers: [{name: "Content-Type", value: "text/javascript; charset=UTF-8"}], body: "{\"id\":\"1234\"}"}]
+      allow(Koala).to receive(:make_request) do |_request, args, _verb, _options|
+        request_count = JSON.parse(args['batch']).length
+        expect(request_count).to be <= 50   # check FB's limit
+        Koala::HTTPService::Response.new(200, (payload * request_count).to_json, {})
+      end
+    end
+
+    it 'stays within fb limits' do
+      count_calls = 0
+      expected_calls = 100
+      @api.batch do |batch_api|
+        expected_calls.times { |_i| batch_api.get_object('me') { |_ret| count_calls += 1 } }
+      end
+
+      expect(count_calls).to eq(expected_calls)
+    end
+
+    it 'is recursive safe' do
+      # ensure batch operations whose callbacks call batch operations don't resubmit
+      call_count = 0
+      iterations = 60
+      @api.batch do |batch_api|
+        # must do enough calls to provoke a batch submission
+        iterations.times { |_i|
+          batch_api.get_object('me') { |_ret|
+            call_count += 1
+            batch_api.get_object('me') { |_ret|
+              call_count += 1
+            }
+          }
+        }
+      end
+      expect(call_count).to eq(2 * iterations)
     end
   end
 
