@@ -2,6 +2,7 @@ require 'faraday'
 require 'koala/http_service/multipart_request'
 require 'koala/http_service/uploadable_io'
 require 'koala/http_service/response'
+require 'koala/http_service/request'
 
 module Koala
   module HTTPService
@@ -28,7 +29,6 @@ module Koala
     DEFAULT_SERVERS = {
       :graph_server => 'graph.facebook.com',
       :dialog_host => 'www.facebook.com',
-      :rest_server => 'api.facebook.com',
       # certain Facebook services (beta, video) require you to access different
       # servers. If you're using your own servers, for instance, for a proxy,
       # you can change both the matcher and the replacement values.
@@ -40,21 +40,6 @@ module Koala
       :beta_replace => '.beta.facebook'
     }
 
-    # The address of the appropriate Facebook server.
-    #
-    # @param options various flags to indicate which server to use.
-    # @option options :rest_api use the old REST API instead of the Graph API
-    # @option options :video use the server designated for video uploads
-    # @option options :beta use the beta tier
-    # @option options :use_ssl force https, even if not needed
-    #
-    # @return a complete server address with protocol
-    def self.server(options = {})
-      server = "#{options[:rest_api] ? Koala.config.rest_server : Koala.config.graph_server}"
-      server.gsub!(Koala.config.host_path_matcher, Koala.config.video_replace) if options[:video]
-      server.gsub!(Koala.config.host_path_matcher, Koala.config.beta_replace) if options[:beta]
-      "#{options[:use_ssl] ? "https" : "http"}://#{server}"
-    end
 
     # Makes a request directly to Facebook.
     # @note You'll rarely need to call this method directly.
@@ -63,58 +48,30 @@ module Koala
     # @see Koala::Facebook::GraphAPIMethods#graph_call
     # @see Koala::Facebook::RestAPIMethods#rest_call
     #
-    # @param path the server path for this request
-    # @param args (see Koala::Facebook::API#api)
-    # @param verb the HTTP method to use.
-    #             If not get or post, this will be turned into a POST request with the appropriate :method
-    #             specified in the arguments.
-    # @param options (see Koala::Facebook::API#api)
+    # @param request a Koala::HTTPService::Request object
     #
     # @raise an appropriate connection error if unable to make the request to Facebook
     #
     # @return [Koala::HTTPService::Response] a response object representing the results from Facebook
-    def self.make_request(path, args, verb, options = {})
-      # if the verb isn't get or post, send it as a post argument with a method param
-      args.merge!({:method => verb}) && verb = "post" if verb != "get" && verb != "post"
-
-      # turn all the keys to strings (Faraday has issues with symbols under 1.8.7) and resolve UploadableIOs
-      params = args.inject({}) {|hash, kv| hash[kv.first.to_s] = kv.last.is_a?(UploadableIO) ? kv.last.to_upload_io : kv.last; hash}
-
-      # figure out our options for this request
-      request_options = {:params => (verb == "get" ? params : {})}.merge(http_options || {}).merge(options)
-      request_options[:use_ssl] = true if args["access_token"] # require https if there's a token
-      if request_options[:use_ssl]
-        ssl = (request_options[:ssl] ||= {})
-        ssl[:verify] = true unless ssl.has_key?(:verify)
-      end
-
-      # if an api_version is specified and the path does not already contain
-      # one, prepend it to the path
-      api_version = request_options[:api_version] || Koala.config.api_version
-      if api_version && !path_contains_api_version?(path)
-        begins_with_slash = path[0] == "/"
-        divider = begins_with_slash ? "" : "/"
-        path = "/#{api_version}#{divider}#{path}"
-      end
-
+    def self.make_request(request)
       # set up our Faraday connection
-      # we have to manually assign params to the URL or the
-      conn = Faraday.new(server(request_options), faraday_options(request_options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
+      conn = Faraday.new(request.server, faraday_options(request.options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
-      # remember, all non-GET requests are turned into POSTs -- see the the start of this method
-      if verb == "post" && options[:format] == :json
+      if request.verb == "post" && request.json?
+        # JSON requires a bit more handling
+        # remember, all non-GET requests are turned into POSTs, so this covers everything but GETs
         response = conn.post do |req|
-          req.path = path
+          req.path = request.path
           req.headers["Content-Type"] = "application/json"
-          req.body = params.to_json
+          req.body = request.post_args.to_json
           req
         end
       else
-        response = conn.send(verb, path, (verb == "post" ? params : {}))
+        response = conn.send(request.verb, request.path, request.post_args)
       end
 
       # Log URL information
-      Koala::Utils.debug "#{verb.upcase}: #{path} params: #{params.inspect}"
+      Koala::Utils.debug "#{request.verb.upcase}: #{request.path} params: #{request.raw_args.inspect}"
       Koala::HTTPService::Response.new(response.status.to_i, response.body, response.headers)
     end
 
@@ -136,16 +93,6 @@ module Koala
         end
         "#{key_and_value[0].to_s}=#{CGI.escape value}"
       end).join("&")
-    end
-
-    # Determines whether a given path already contains an API version.
-    #
-    # @param path the URL path.
-    #
-    # @return true or false accordingly.
-    def self.path_contains_api_version?(path)
-      match = /^\/?(v\d+(?:\.\d+)?)\//.match(path)
-      !!(match && match[1])
     end
 
     private

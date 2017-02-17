@@ -19,7 +19,12 @@ describe Koala do
       verb = "get"
       options = {:c => :d}
 
-      expect(Koala.http_service).to receive(:make_request).with(path, args, verb, options)
+      expect(Koala.http_service).to receive(:make_request) do |request|
+        expect(request.raw_path).to eq(path)
+        expect(request.raw_args).to eq(args)
+        expect(request.raw_verb).to eq(verb)
+        expect(request.raw_options).to eq(options)
+      end
       Koala.make_request(path, args, verb, options)
     end
   end
