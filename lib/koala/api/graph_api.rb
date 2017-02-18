@@ -393,21 +393,6 @@ module Koala
         block ? block.call(access_token_info) : access_token_info
       end
 
-      # Fetches the comments from fb:comments widgets for a given set of URLs (array or comma-separated string).
-      # See https://developers.facebook.com/blog/post/490.
-      #
-      # @param urls the URLs for which you want comments
-      # @param args (see #get_object)
-      # @param options (see #get_object)
-      # @param block (see Koala::Facebook::API#api)
-      #
-      # @returns a hash of urls => comment arrays
-      def get_comments_for_urls(urls = [], args = {}, options = {}, &block)
-        return [] if urls.empty?
-        args.merge!(:ids => urls.respond_to?(:join) ? urls.join(",") : urls)
-        get_object("comments", args, options, &block)
-      end
-
       # App restrictions require you to JSON-encode the restriction value. This
       # is neither obvious nor intuitive, so this convenience method is
       # provided.
