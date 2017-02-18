@@ -344,14 +344,16 @@ module Koala
       # See {http://developers.facebook.com/docs/reference/api/#searching Facebook documentation} for more information.
       #
       # @param search_terms the query to search for
-      # @param args additional arguments, such as type, fields, etc.
+      # @param args object type and any additional arguments, such as fields, etc.
       # @param options (see #get_object)
       # @param block (see Koala::Facebook::API#api)
       #
       # @return [Koala::Facebook::API::GraphCollection] an array of search results
       def search(search_terms, args = {}, options = {}, &block)
-        args.merge!({:q => search_terms}) unless search_terms.nil?
-        graph_call("search", args, "get", options, &block)
+        # Normally we wouldn't enforce Facebook API behavior, but the API fails with cryptic error
+        # messages if you fail to include a type term. For a convenience method, that is valuable.
+        raise ArgumentError, "type must be includedin args when searching" unless args[:type] || args["type"]
+        graph_call("search", args.merge("q" => search_terms), "get", options, &block)
       end
 
       # Convenience Methods

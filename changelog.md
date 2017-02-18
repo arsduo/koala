@@ -4,14 +4,17 @@ v3.0.0
 **Key breaking changes:**
 
 * Koala now requires Ruby 2.1+ (or equivalent for JRuby, etc.)
+* Empty response bodies in batch API calls will raise a JSON::ParserError rather than returning nil
 * HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does
   not)
 * HTTPService behavior *should not* change, but in edge cases might. (If so, please let me know.)
-* Empty response bodies in batch API calls will raise a JSON::ParserError rather than returning nil
+* API#search now requires a "type"/:type argument, matching Facebook's behavior (improving their
+  cryptic error message)
 
 Updated features:
 
 * TestUser#befriend will provide the appsecret_proof if a secret is set (thanks, kwasimensah!)
+* API#search now requires an object type parameter to be included, matching Facebook's API (#575)
 
 Removed features:
 
