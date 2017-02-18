@@ -3,14 +3,15 @@ v3.0.0
 
 **Key breaking changes:**
 
-* HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does
-  not)
-* HTTPService behavior *should not* change, but in edge cases might. (If so, please let me know.)
+* API#search now takes both term and type, since both are required: `api.search("facebook", "page")` vs `api.search("page", type: "page")`
+* HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does not, so most users shouldn't see a change)
 * Empty response bodies in batch API calls will raise a JSON::ParserError rather than returning nil
+* HTTPService behavior *should not* change, but in edge cases might. (If so, please let me know.)
 
 Updated features:
 
 * TestUser#befriend will provide the appsecret_proof if a secret is set (thanks, kwasimensah!)
+* API#search now requires an object type argument, matching Facebook's API (#575)
 
 Removed features:
 

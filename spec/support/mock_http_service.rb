@@ -45,12 +45,12 @@ module Koala
         # to place a mock as well as a URL to request from
         # Facebook's servers for the actual data
         # (Don't forget to replace ACCESS_TOKEN with a real access token)
-        data_trace = [path, args, verb, options] * ': '
+        data_trace = [request.raw_path, request.raw_args, request.raw_verb, request.raw_options] * ': '
 
-        args = args == 'no_args' ? '' : "#{args}&"
+        args = request.raw_args == 'no_args' ? '' : "#{request.raw_args}&"
         args += 'format=json'
 
-        raise "Missing a mock response for #{data_trace}\nAPI PATH: #{[path, args].join('?')}"
+        raise "Missing a mock response for #{data_trace}\nAPI PATH: #{[request.path, request.raw_args].join('?')}"
       end
 
       response_object

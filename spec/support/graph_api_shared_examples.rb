@@ -51,12 +51,6 @@ shared_examples_for "Koala GraphAPI" do
     end
   end
 
-  # SEARCH
-  it "can search" do
-    result = @api.search("facebook")
-    expect(result.length).to be_an(Integer)
-  end
-
   # DATA
   # access public info
 
@@ -138,12 +132,6 @@ shared_examples_for "Koala GraphAPI" do
     expect(result["http://developers.facebook.com/blog/post/490"] && result["http://developers.facebook.com/blog/post/472"]).to be_truthy
   end
 
-  # SEARCH
-  it "can search" do
-    result = @api.search("facebook")
-    expect(result.length).to be_an(Integer)
-  end
-
   # PAGING THROUGH COLLECTIONS
   # see also graph_collection_tests
   it "makes a request for a page when provided a specific set of page params" do
@@ -188,6 +176,12 @@ shared_examples_for "Koala GraphAPI with an access token" do
   it "can access connections from users" do
     result = @api.get_connections(KoalaTest.user2, "friends")
     expect(result.length).to be > 0
+  end
+
+  # SEARCH
+  it "can search" do
+    result = @api.search("facebook", "page")
+    expect(result.length).to be_an(Integer)
   end
 
   # PUT
@@ -467,7 +461,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :put_wall_post => 4,
       :put_comment => 3,
       :put_like => 2, :delete_like => 2,
-      :search => 3,
+      :search => 4,
       :set_app_restrictions => 4,
       :get_page_access_token => 3,
       # methods that have special arguments
@@ -516,18 +510,18 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
     end
 
     it "gets a GraphCollection when searching" do
-      result = @api.search("facebook")
+      result = @api.search("facebook", "page")
       expect(result).to be_a(Koala::Facebook::API::GraphCollection)
     end
 
     it "returns nil if the search call fails with nil" do
       # this happens sometimes
       expect(@api).to receive(:graph_call).and_return(nil)
-      expect(@api.search("facebook")).to be_nil
+      expect(@api.search("facebook", "page")).to be_nil
     end
 
     it "gets a GraphCollection when paging through results" do
-      @results = @api.get_page(["search", {"q"=>"facebook", "limit"=>"25", "until"=> KoalaTest.search_time}])
+      @results = @api.get_page(["search", {"q"=>"facebook", "type" => "page", "limit"=>"25", "until"=> KoalaTest.search_time}])
       expect(@results).to be_a(Koala::Facebook::API::GraphCollection)
     end
 

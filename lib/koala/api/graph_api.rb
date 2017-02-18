@@ -344,14 +344,14 @@ module Koala
       # See {http://developers.facebook.com/docs/reference/api/#searching Facebook documentation} for more information.
       #
       # @param search_terms the query to search for
+      # @param type the type of Facebook object to search
       # @param args additional arguments, such as type, fields, etc.
       # @param options (see #get_object)
       # @param block (see Koala::Facebook::API#api)
       #
       # @return [Koala::Facebook::API::GraphCollection] an array of search results
-      def search(search_terms, args = {}, options = {}, &block)
-        args.merge!({:q => search_terms}) unless search_terms.nil?
-        graph_call("search", args, "get", options, &block)
+      def search(search_terms, type, args = {}, options = {}, &block)
+        graph_call("search", args.merge("q" => search_terms, "type" => type), "get", options, &block)
       end
 
       # Convenience Methods
