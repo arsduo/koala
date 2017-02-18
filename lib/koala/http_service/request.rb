@@ -14,11 +14,7 @@ module Koala
       # @option options :beta use the beta tier
       # @option options :use_ssl force https, even if not needed
       # @option options :json whether or not to send JSON to Facebook
-      def initialize(path: nil, args: {}, verb: nil, options: {})
-        # we still support Ruby 2.0 so we can't use required keyword arguments
-        raise ArgumentError, "Missing required argument verb" unless verb
-        raise ArgumentError, "Missing required argument path" unless path
-
+      def initialize(path:, verb:, args: {}, options: {})
         @raw_path = path
         @raw_args = args
         @raw_verb = verb
