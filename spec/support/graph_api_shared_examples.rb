@@ -180,7 +180,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
   # SEARCH
   it "can search" do
-    result = @api.search("facebook", "page")
+    result = @api.search("facebook", type: "page")
     expect(result.length).to be_an(Integer)
   end
 
@@ -461,14 +461,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :put_wall_post => 4,
       :put_comment => 3,
       :put_like => 2, :delete_like => 2,
-      :search => 4,
       :set_app_restrictions => 4,
       :get_page_access_token => 3,
       # methods that have special arguments
       :get_comments_for_urls => [["url1", "url2"], {}],
       :put_picture => ["x.jpg", "image/jpg", {}, "me"],
       :put_video => ["x.mp4", "video/mpeg4", {}, "me"],
-      :get_objects => [["x"], {}]
+      :get_objects => [["x"], {}],
+      :search => ["facebook", {"type" => "page"}]
     }.each_pair do |method_name, params|
       it "passes http options through for #{method_name}" do
         options = {:a => 2}
@@ -510,14 +510,14 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
     end
 
     it "gets a GraphCollection when searching" do
-      result = @api.search("facebook", "page")
+      result = @api.search("facebook", type: "page")
       expect(result).to be_a(Koala::Facebook::API::GraphCollection)
     end
 
     it "returns nil if the search call fails with nil" do
       # this happens sometimes
       expect(@api).to receive(:graph_call).and_return(nil)
-      expect(@api.search("facebook", "page")).to be_nil
+      expect(@api.search("facebook", type: "page")).to be_nil
     end
 
     it "gets a GraphCollection when paging through results" do
@@ -528,7 +528,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
     it "returns nil if the page call fails with nil" do
       # this happens sometimes
       expect(@api).to receive(:graph_call).and_return(nil)
-      expect(@api.get_page(["search", {"q"=>"facebook", "limit"=>"25", "until"=> KoalaTest.search_time}])).to be_nil
+      expect(@api.get_page(["search", {"q"=>"facebook", "type" => "page", "limit"=>"25", "until"=> KoalaTest.search_time}])).to be_nil
     end
   end
 end
