@@ -367,12 +367,12 @@ graph_api:
         with_token:
           code: 200
       get:
-        with_token: '{"data":[{"callback_url":"http://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
+        with_token: '{"data":[{"callback_url":"https://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
 
 
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>:
       get:
-        with_token: '{"data":[{"callback_url":"http://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
+        with_token: '{"data":[{"callback_url":"https://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
 
 # -- Mock Item Responses --
 
