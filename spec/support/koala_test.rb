@@ -183,7 +183,7 @@ module KoalaTest
   # Data for testing
   def self.user1
     # user ID, either numeric or username
-    test_user? ? @live_testing_user["id"] : "koppel"
+    test_user? ? @live_testing_user["id"] : "barackobama"
   end
 
   def self.user1_id

@@ -473,12 +473,12 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
   describe "usage tests" do
     it "gets two results at once" do
-      me, koppel = @api.batch do |batch_api|
+      me, barackobama = @api.batch do |batch_api|
         batch_api.get_object('me')
         batch_api.get_object(KoalaTest.user1)
       end
       expect(me['id']).not_to be_nil
-      expect(koppel['id']).not_to be_nil
+      expect(barackobama['id']).not_to be_nil
     end
 
     it 'makes mixed calls inside of a batch' do
@@ -559,19 +559,19 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     end
 
     it "inserts errors in the appropriate place, without breaking other results" do
-      failed_call, koppel = @api.batch do |batch_api|
+      failed_call, barackobama = @api.batch do |batch_api|
         batch_api.get_connection("2", "invalidconnection")
         batch_api.get_object(KoalaTest.user1, {}, {"access_token" => @app_api.access_token})
       end
       expect(failed_call).to be_a(Koala::Facebook::ClientError)
-      expect(koppel["id"]).not_to be_nil
+      expect(barackobama["id"]).not_to be_nil
     end
 
     it "handles different request methods" do
       result = @api.put_wall_post("Hello, world, from the test suite batch API!")
       wall_post = result["id"]
 
-      wall_post, koppel = @api.batch do |batch_api|
+      wall_post, barackobama = @api.batch do |batch_api|
         batch_api.put_like(wall_post)
         batch_api.delete_object(wall_post)
       end
@@ -658,23 +658,23 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
 
       it "allows you to create dependencies" do
-        me, koppel = @api.batch do |batch_api|
+        me, barackobama = @api.batch do |batch_api|
           batch_api.get_object("me", {}, :batch_args => {:name => "getme"})
           batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getme"})
         end
 
         expect(me).to be_nil # gotcha!  it's omitted because it's a successfully-executed dependency
-        expect(koppel["id"]).not_to be_nil
+        expect(barackobama["id"]).not_to be_nil
       end
 
       it "properly handles dependencies that fail" do
-        failed_call, koppel = @api.batch do |batch_api|
+        failed_call, barackobama = @api.batch do |batch_api|
           batch_api.get_connections("2", "invalidconnection", {}, :batch_args => {:name => "getdata"})
           batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getdata"})
         end
 
         expect(failed_call).to be_a(Koala::Facebook::ClientError)
-        expect(koppel).to be_nil
+        expect(barackobama).to be_nil
       end
 
       it "throws an error for badly-constructed request relationships" do
