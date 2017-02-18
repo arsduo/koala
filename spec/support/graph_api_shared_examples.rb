@@ -196,7 +196,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     result = @api.put_wall_post("Hello, world, from the test suite delete method!")
     object_id_to_delete = result["id"]
     delete_result = @api.delete_object(object_id_to_delete)
-    expect(delete_result).to eq(true)
+    expect(delete_result).to eq("success" => true)
   end
 
   it "can delete likes" do
@@ -204,7 +204,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
     @temporary_object_id = result["id"]
     @api.put_like(@temporary_object_id)
     delete_like_result = @api.delete_like(@temporary_object_id)
-    expect(delete_like_result).to eq(true)
+    expect(delete_like_result).to eq("success" => true)
   end
 
   # additional put tests
@@ -359,7 +359,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
     # make sure the result we fetch includes all the parameters we sent
     it_matches = attachment.inject(true) {|valid, param| valid && (get_result[param[0]] == attachment[param[0]])}
-    expect(it_matches).to eq(true)
+    expect(it_matches).to be true
   end
 
   it "can comment on an object" do

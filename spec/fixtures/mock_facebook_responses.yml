@@ -24,7 +24,7 @@ graph_api:
   # Common mock item responses
   item_deleted: &item_deleted
     delete:
-      with_token: 'true'
+      with_token: '{"success":true}'
 
   # OAuth error response
   oauth_error: &oauth_error
