@@ -198,7 +198,7 @@ module KoalaTest
 
   def self.user2
     # see notes for user1
-    test_user? ? @live_testing_friend["id"] : "lukeshepard"
+    test_user? ? @live_testing_friend["id"] : "koppel"
   end
 
   def self.user2_id
