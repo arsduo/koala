@@ -31,7 +31,7 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     context '#get_picture' do
       it 'returns result of block' do
         allow(@api).to receive(:api).and_return({"data" => {"is_silhouette" => false, "url" => result}})
-        expect(@api.get_picture('lukeshepard', &post_processing)["result"]).to eq(result)
+        expect(@api.get_picture('koppel', &post_processing)["result"]).to eq(result)
       end
     end
 

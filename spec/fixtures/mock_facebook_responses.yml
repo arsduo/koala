@@ -207,11 +207,11 @@ graph_api:
         with_token: '{"id": 1, "name": 1}'
         no_token: '{"id": 1, "name": 1}'
 
-  /facebook/photos:
+  /facebook/events:
     no_args:
       get:
-        with_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
-        no_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/photos?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+        with_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/events?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/events?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
+        no_token: '{"data": [{}], "paging": {"previous": "https:\/\/graph.facebook.com\/7204941866\/events?limit=25&until=2008-09-15T18%3A30%3A25%2B0000", "next": "https:\/\/graph.facebook.com\/7204941866\/events?limit=25&until=2008-09-15T18%3A30%3A25%2B0000"}}'
 
   /koppel/likes:
     no_args:
