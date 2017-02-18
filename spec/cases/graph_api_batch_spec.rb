@@ -514,36 +514,36 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     end
 
     it "handles requests for two different tokens" do
-      me, insights = @api.batch do |batch_api|
+      me, app_event_types = @api.batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_connections(@app_id, 'insights', {}, {"access_token" => @app_api.access_token})
+        batch_api.get_connections(@app_id, 'app_event_types', {}, {"access_token" => @app_api.access_token})
       end
       expect(me['id']).not_to be_nil
-      expect(insights).to be_an(Koala::Facebook::API::GraphCollection)
+      expect(app_event_types).to be_an(Koala::Facebook::API::GraphCollection)
     end
 
     it "handles requests passing the access token option as a symbol instead of a string" do
-      me, insights = @api.batch do |batch_api|
+      me, app_event_types = @api.batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_connections(@app_id, 'insights', {}, {:access_token => @app_api.access_token})
+        batch_api.get_connections(@app_id, 'app_event_types', {}, {:access_token => @app_api.access_token})
       end
       expect(me['id']).not_to be_nil
-      expect(insights).to be_an(Koala::Facebook::API::GraphCollection)
+      expect(app_event_types).to be_an(Koala::Facebook::API::GraphCollection)
     end
 
     it "preserves batch-op specific access tokens in GraphCollection returned from batch" do
       # Provide an alternate token for a batch operation
       @other_access_token_args = { 'access_token' => @app_api.access_token }
 
-      # make a batch call for insights using another token
-      me, insights = @api.batch do |batch_api|
+      # make a batch call for app_event_types using another token
+      me, app_event_types = @api.batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_connections(@app_id, 'insights', {}, @other_access_token_args)
+        batch_api.get_connections(@app_id, 'app_event_types', {}, @other_access_token_args)
       end
 
       # The alternate token is returned with the next page parameters
       # The GraphCollection should receive a request for the next_page_params during paging
-      expect(insights).to receive(:next_page_params).and_return([double("base"), @other_access_token_args.dup])
+      expect(app_event_types).to receive(:next_page_params).and_return([double("base"), @other_access_token_args.dup])
 
       # The alternate access token should pass through to making the request
       # Koala should receive a request during paging using the alternate token
@@ -555,7 +555,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       ).and_return(Koala::HTTPService::Response.new(200, "", ""))
 
       # Page the collection
-      insights.next_page
+      app_event_types.next_page
     end
 
     it "inserts errors in the appropriate place, without breaking other results" do

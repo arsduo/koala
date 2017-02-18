@@ -69,8 +69,8 @@ graph_api:
         with_token: '[{"code": 200, "body":"{\"data\":{\"is_silhouette\":false,\"url\":\"http:\/\/google.com\"}}"}]'
     batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
-        with_token: '[{"code": 200, "body":"{\"id\":\"barackobama\"}"}, {"code": 200, "body":"{\"data\":[{\"id\":\"lukeshepard\"}],\"paging\":{}}"}]'
-    batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/insights?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
+        with_token: '[{"code": 200, "body":"{\"id\":\"barackobama\"}"}, {"code": 200, "body":"{\"data\":[{\"id\":\"koppel\"}],\"paging\":{}}"}]'
+    batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"me"}, {"method"=>"get", "relative_url"=>"#{OAUTH_DATA["app_id"]}/app_event_types?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"data\":[],\"paging\":{}}"}]'
     batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"2/invalidconnection"}, {"method"=>"get", "relative_url"=>"barackobama?access_token=#{CGI.escape APP_ACCESS_TOKEN}"}]) %>:
