@@ -6,6 +6,8 @@ v3.0.0
 * HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does not, so most users shouldn't see a change)
 * Empty response bodies in batch API calls will raise a JSON::ParserError rather than returning nil
 * HTTPService behavior *should not* change, but in edge cases might. (If so, please let me know.)
+* API#search now requires a "type"/:type argument, matching Facebook's behavior (improving their
+  cryptic error message)
 
 Updated features:
 
