@@ -63,10 +63,10 @@ graph_api:
         with_token: '[{"code": 200, "body":"{\"id\":\"123\"}"}, {"code": 200, "body":"{\"id\":\"456\"}"}]'
     batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me/picture"}]) %>:
       post:
-        with_token: '[{"code": 302, "headers":[{"name":"Location","value":"http://google.com"}]}]'
+        with_token: '[{"code": 302, "headers":[{"name":"Location","value":"https://google.com"}]}]'
     batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me/picture?redirect=false"}]) %>:
       post:
-        with_token: '[{"code": 200, "body":"{\"data\":{\"is_silhouette\":false,\"url\":\"http:\/\/google.com\"}}"}]'
+        with_token: '[{"code": 200, "body":"{\"data\":{\"is_silhouette\":false,\"url\":\"https:\/\/google.com\"}}"}]'
     batch=<%= JSON.dump([{"method" => "get", "relative_url" => "me"},{"method" => "get", "relative_url" => "me/friends"}]) %>:
       post:
         with_token: '[{"code": 200, "body":"{\"id\":\"barackobama\"}"}, {"code": 200, "body":"{\"data\":[{\"id\":\"koppel\"}],\"paging\":{}}"}]'
