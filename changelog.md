@@ -21,6 +21,7 @@ Removed features:
 * Removed support for the Rest API, since Facebook removed support for it (#568)
 * Removed support for FQL, which Facebook removed on August 8, 2016 (#569)
 * Removed legacy duplication of serveral constants in the Koala module (#569)
+* Removed API#get_comments_for_urls, which pointed to a no-longer-extant endpoint(#570)
 
 Internal improvements:
 
@@ -32,7 +33,7 @@ Internal improvements:
 
 Testing improvements:
 
-* Fixed a bunch of failing specs
+* Fixed a bunch of failing mocked specs
 
 v2.5.0
 ======

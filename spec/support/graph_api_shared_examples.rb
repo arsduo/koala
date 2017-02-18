@@ -122,16 +122,6 @@ shared_examples_for "Koala GraphAPI" do
     expect(result).to be_a(Array)
   end
 
-  it "can access comments for a URL" do
-    result = @api.get_comments_for_urls(["http://developers.facebook.com/blog/post/472"])
-    expect(result["http://developers.facebook.com/blog/post/472"]).to be_truthy
-  end
-
-  it "can access comments for 2 URLs" do
-    result = @api.get_comments_for_urls(["http://developers.facebook.com/blog/post/490", "http://developers.facebook.com/blog/post/472"])
-    expect(result["http://developers.facebook.com/blog/post/490"] && result["http://developers.facebook.com/blog/post/472"]).to be_truthy
-  end
-
   # PAGING THROUGH COLLECTIONS
   # see also graph_collection_tests
   it "makes a request for a page when provided a specific set of page params" do
@@ -462,7 +452,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
       :search,
       :set_app_restrictions,
       :get_page_access_token,
-      :get_comments_for_urls,
       :get_objects
     ].each do |method_name|
       it "passes http options through for #{method_name}" do
