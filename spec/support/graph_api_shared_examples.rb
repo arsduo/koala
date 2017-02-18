@@ -247,52 +247,53 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   describe "#put_picture" do
-    it "can post photos to the user's wall with an open file object" do
-      content_type = "image/jpg"
-      file = File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg"))
+    context "with a file object" do
+      let(:content_type) { "image/jpg" }
+      let(:file) { File.open(File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")) }
+      let(:file_path) { File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg") }
 
-      result = @api.put_picture(file, content_type)
-      @temporary_object_id = result["id"]
-      expect(@temporary_object_id).not_to be_nil
-    end
-
-    it "can post photos to the user's wall without an open file object" do
-      content_type = "image/jpg",
-      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
-
-      result = @api.put_picture(file_path, content_type)
-      @temporary_object_id = result["id"]
-      expect(@temporary_object_id).not_to be_nil
-    end
-
-    it "can verify a photo posted to a user's wall" do
-      content_type = "image/jpg",
-      file_path = File.join(File.dirname(__FILE__), "..", "fixtures", "beach.jpg")
-
-      expected_message = "This is the test message"
-
-      result = @api.put_picture(file_path, content_type, :message => expected_message)
-      @temporary_object_id = result["id"]
-      expect(@temporary_object_id).not_to be_nil
-
-      get_result = @api.get_object(@temporary_object_id)
-      expect(get_result["name"]).to eq(expected_message)
-    end
-
-
-    describe "using a URL instead of a file" do
-      before :each do
-        @url = "http://img.slate.com/images/redesign2008/slate_logo.gif"
-      end
-
-      it "can post photo to the user's wall using a URL" do
-        result = @api.put_picture(@url)
+      it "can post photos to the user's wall with an open file object" do
+        result = @api.put_picture(file, content_type)
         @temporary_object_id = result["id"]
         expect(@temporary_object_id).not_to be_nil
       end
 
-      it "can post photo to the user's wall using a URL and an additional param" do
-        result = @api.put_picture(@url, :message => "my message")
+      it "can post photos to the user's wall without an open file object" do
+        result = @api.put_picture(file_path, content_type)
+        @temporary_object_id = result["id"]
+        expect(@temporary_object_id).not_to be_nil
+      end
+
+      it "can verify a photo posted to a user's wall" do
+        expected_message = "This is the test message"
+
+        result = @api.put_picture(file_path, content_type, :message => expected_message)
+        @temporary_object_id = result["id"]
+        expect(@temporary_object_id).not_to be_nil
+
+        get_result = @api.get_object(@temporary_object_id)
+        expect(get_result["name"]).to eq(expected_message)
+      end
+
+      it "passes options and block through" do
+        opts = {a: 2}
+        block = Proc.new {}
+        expect(@api).to receive(:graph_call).with(anything, anything, anything, hash_including(opts), &block)
+        @api.put_picture(file_path, content_type, {:message => "my message"}, "target", opts, &block)
+      end
+    end
+
+    describe "using a URL instead of a file" do
+      let(:url) { "http://img.slate.com/images/redesign2008/slate_logo.gif" }
+
+      it "can post photo to the user's wall using a URL" do
+        result = @api.put_picture(url)
+        @temporary_object_id = result["id"]
+        expect(@temporary_object_id).not_to be_nil
+      end
+
+      it "can post photo to the user's wall using aurl and an additional param" do
+        result = @api.put_picture(url, :message => "my message")
         @temporary_object_id = result["id"]
         expect(@temporary_object_id).not_to be_nil
       end
@@ -300,10 +301,8 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   describe "#put_video" do
-    before :each do
-      @cat_movie = File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v")
-      @content_type = "video/mpeg4"
-    end
+    let(:cat_movie) { File.join(File.dirname(__FILE__), "..", "fixtures", "cat.m4v") }
+    let(:content_type) { "video/mpeg4" }
 
     it "sets options[:video] to true" do
       source = double("UploadIO")
@@ -313,16 +312,24 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @api.put_video("foo")
     end
 
-    it "can post videos to the user's wall with an open file object" do
-      file = File.open(@cat_movie)
+    it "passes options and block through" do
+      opts = {a: 2}
+      block = Proc.new {}
+      expect(@api).to receive(:graph_call).with(anything, anything, anything, hash_including(opts), &block)
+      file = File.open(cat_movie)
+      @api.put_video(file, content_type, {}, "target", opts, &block)
+    end
 
-      result = @api.put_video(file, @content_type)
+    it "can post videos to the user's wall with an open file object" do
+      file = File.open(cat_movie)
+
+      result = @api.put_video(file, content_type)
       @temporary_object_id = result["id"]
       expect(@temporary_object_id).not_to be_nil
     end
 
     it "can post videos to the user's wall without an open file object" do
-      result = @api.put_video(@cat_movie, @content_type)
+      result = @api.put_video(cat_movie, content_type)
       @temporary_object_id = result["id"]
       expect(@temporary_object_id).not_to be_nil
     end
@@ -330,21 +337,17 @@ shared_examples_for "Koala GraphAPI with an access token" do
     # note: Facebook doesn't post videos immediately to the wall, due to processing time
     # during which get_object(video_id) will return false
     # hence we can't do the same verify test we do for photos
+    describe "using aurl instead of a file" do
+      let(:url) { "http://techslides.com/demos/sample-videos/small.mp4" }
 
-
-    describe "using a URL instead of a file" do
-      before :each do
-        @url = "http://techslides.com/demos/sample-videos/small.mp4"
-      end
-
-      it "can post photo to the user's wall using a URL" do
-        result = @api.put_video(@url)
+      it "can post photo to the user's wall using aurl" do
+        result = @api.put_video(url)
         @temporary_object_id = result["id"]
         expect(@temporary_object_id).not_to be_nil
       end
 
-      it "can post photo to the user's wall using a URL and an additional param" do
-        result = @api.put_video(@url, :description => "my message")
+      it "can post photo to the user's wall using aurl and an additional param" do
+        result = @api.put_video(url, :description => "my message")
         @temporary_object_id = result["id"]
         expect(@temporary_object_id).not_to be_nil
       end
@@ -449,37 +452,23 @@ shared_examples_for "Koala GraphAPI with an access token" do
   # we run the tests here (rather than in the common shared example group)
   # since some require access tokens
   describe "HTTP options" do
-    # Each of the below methods should take an options hash as their last argument
-    # ideally we'd use introspection to determine how many arguments a method has
-    # but some methods require specially formatted arguments for processing
-    # (and anyway, Ruby 1.8's arity method fails (for this) for methods w/ 2+ optional arguments)
-    # (Ruby 1.9's parameters method is perfect, but only in 1.9)
-    # so we have to double-document
-    {
-      :get_object => 3, :put_object => 4, :delete_object => 2,
-      :get_connections => 4, :put_connections => 4, :delete_connections => 4,
-      :put_wall_post => 4,
-      :put_comment => 3,
-      :put_like => 2, :delete_like => 2,
-      :set_app_restrictions => 4,
-      :get_page_access_token => 3,
-      # methods that have special arguments
-      :get_comments_for_urls => [["url1", "url2"], {}],
-      :put_picture => ["x.jpg", "image/jpg", {}, "me"],
-      :put_video => ["x.mp4", "video/mpeg4", {}, "me"],
-      :get_objects => [["x"], {}],
-      :search => ["facebook", {"type" => "page"}]
-    }.each_pair do |method_name, params|
+    # Each of the below methods should take an options hash as their last argument.
+    [
+      :get_object,
+      :get_connections,
+      :put_wall_post,
+      :put_comment,
+      :put_like,
+      :search,
+      :set_app_restrictions,
+      :get_page_access_token,
+      :get_comments_for_urls,
+      :get_objects
+    ].each do |method_name|
       it "passes http options through for #{method_name}" do
-        options = {:a => 2}
-        # graph call should ultimately receive options as the fourth argument
-        expect(@api).to receive(:graph_call).with(anything, anything, anything, options)
-
-        # if we supply args, use them (since some methods process params)
-        # the method should receive as args n-1 anythings and then options
-        args = (params.is_a?(Integer) ? ([{}] * (params - 1)) : params) + [options]
-
-        @api.send(method_name, *args)
+        params = @api.method(method_name).parameters
+        expect(params.last).to eq([:block, :block])
+        expect(params[-2]).to eq([:opt, :options])
       end
     end
 
