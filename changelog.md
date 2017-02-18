@@ -3,6 +3,7 @@ v3.0.0
 
 **Key breaking changes:**
 
+* Koala now requires Ruby 2.1+ (or equivalent for JRuby, etc.)
 * HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does
   not)
 * HTTPService behavior *should not* change, but in edge cases might. (If so, please let me know.)
