@@ -80,7 +80,13 @@ module Koala
 
         # if we want a component other than the body (e.g. redirect header for images), return that
         if component = options[:http_component]
-          component == :response ? result : result.send(options[:http_component])
+          if component == :response
+            parsed_body = MultiJson.load("[#{result.body.to_s}]")[0]
+            result.body = parsed_body
+            result
+          else
+            result.send(options[:http_component])
+          end
         else
           # parse the body as JSON and run it through the error checker (if provided)
           # quirks_mode is needed because Facebook sometimes returns a raw true or false value --

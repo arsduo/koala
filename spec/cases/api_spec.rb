@@ -70,7 +70,7 @@ describe "Koala::Facebook::API" do
 
   it "returns the entire response if http_component => :response" do
     http_component = :response
-    response = double('Mock KoalaResponse', :body => '', :status => 200)
+    response = Koala::HTTPService::Response.new(200, {}, {})
     allow(Koala).to receive(:make_request).and_return(response)
     expect(@service.api('anything', {}, 'get', :http_component => http_component)).to eq(response)
   end
