@@ -32,6 +32,7 @@ module Koala
     # for the active user from the cookie provided by Facebook.
     # See the Koala and Facebook documentation for more information.
     module GraphAPIMethods
+
       # Objects
 
       # Get information about a Facebook object.
@@ -106,7 +107,7 @@ module Koala
       # @return true if successful, false (or an APIError) if not
       def delete_object(id, options = {}, &block)
         # Deletes the object with the given ID from the graph.
-        raise AuthenticationError.new(nil, nil, "Delete requires an access token") unless access_token
+        raise AuthenticationError.new(nil, nil, "Delete requires an access token") unless @access_token
         graph_call(id, {}, "delete", options, &block)
       end
 
@@ -156,7 +157,7 @@ module Koala
       # @return a hash containing the new object's id
       def put_connections(id, connection_name, args = {}, options = {}, &block)
         # Posts a certain connection
-        raise AuthenticationError.new(nil, nil, "Write operations require an access token") unless access_token
+        raise AuthenticationError.new(nil, nil, "Write operations require an access token") unless @access_token
 
         graph_call("#{id}/#{connection_name}", args, "post", options, &block)
       end
@@ -174,7 +175,7 @@ module Koala
       # @return (see #delete_object)
       def delete_connections(id, connection_name, args = {}, options = {}, &block)
         # Deletes a given connection
-        raise AuthenticationError.new(nil, nil, "Delete requires an access token") unless access_token
+        raise AuthenticationError.new(nil, nil, "Delete requires an access token") unless @access_token
         graph_call("#{id}/#{connection_name}", args, "delete", options, &block)
       end
 
@@ -335,7 +336,7 @@ module Koala
       # @return (see #delete_object)
       def delete_like(id, options = {}, &block)
         # Unlikes a given object for the logged-in user
-        raise AuthenticationError.new(nil, nil, "Unliking requires an access token") unless access_token
+        raise AuthenticationError.new(nil, nil, "Unliking requires an access token") unless @access_token
         graph_call("#{id}/likes", {}, "delete", options, &block)
       end
 
@@ -465,7 +466,43 @@ module Koala
         end
       end
 
+      # Make a call directly to the Graph API.
+      # (See any of the other methods for example invocations.)
+      #
+      # @param path the Graph API path to query (no leading / needed)
+      # @param args (see #get_object)
+      # @param verb the type of HTTP request to make (get, post, delete, etc.)
+      # @options (see #get_object)
+      #
+      # @yield response when making a batch API call, you can pass in a block
+      #        that parses the results, allowing for cleaner code.
+      #        The block's return value is returned in the batch results.
+      #        See the code for {#get_picture} for examples.
+      #        (Not needed in regular calls; you'll probably rarely use this.)
+      #
+      # @raise [Koala::Facebook::APIError] if Facebook returns an error
+      #
+      # @return the result from Facebook
+      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
+        # enable appsecret_proof by default
+        options = {:appsecret_proof => true}.merge(options) if @app_secret
+        result = api(path, args, verb, options) do |response|
+          error = check_response(response.status, response.body, response.headers)
+          raise error if error
+        end
+
+        # turn this into a GraphCollection if it's pageable
+        result = API::GraphCollection.evaluate(result, self)
+
+        # now process as appropriate for the given call (get picture header, etc.)
+        post_processing ? post_processing.call(result) : result
+      end
+
       private
+
+      def check_response(http_status, body, headers)
+        GraphErrorChecker.new(http_status, body, headers).error_if_appropriate
+      end
 
       def parse_media_args(media_args, method)
         # photo and video uploads can accept different types of arguments (see above)
