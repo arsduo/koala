@@ -16,6 +16,8 @@ module Koala
         attr_reader :api
         # The entire raw response from Facebook.
         attr_reader :raw_response
+        # The headers from the raw response from Facebook
+        attr_reader :headers
 
         # Initialize the array of results and store various additional paging-related information.
         #
@@ -31,6 +33,7 @@ module Koala
           @summary = response["summary"]
           @raw_response = response
           @api = api
+          @headers = response["headers"]
         end
 
         # @private
