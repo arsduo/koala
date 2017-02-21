@@ -1,5 +1,5 @@
 # graph_batch_api and legacy are required at the bottom, since they depend on API being defined
-require 'koala/api/graph_api'
+require 'koala/api/graph_api_methods'
 require 'koala/api/graph_collection'
 require 'openssl'
 
@@ -23,6 +23,40 @@ module Koala
       attr_reader :access_token, :app_secret
 
       include GraphAPIMethods
+
+      # Make a call directly to the Graph API.
+      # (See any of the other methods for example invocations.)
+      #
+      # @param path the Graph API path to query (no leading / needed)
+      # @param args (see #get_object)
+      # @param verb the type of HTTP request to make (get, post, delete, etc.)
+      # @options (see #get_object)
+      #
+      # @yield response when making a batch API call, you can pass in a block
+      #        that parses the results, allowing for cleaner code.
+      #        The block's return value is returned in the batch results.
+      #        See the code for {#get_picture} for examples.
+      #        (Not needed in regular calls; you'll probably rarely use this.)
+      #
+      # @raise [Koala::Facebook::APIError] if Facebook returns an error
+      #
+      # @return the result from Facebook
+      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
+        # enable appsecret_proof by default
+        options = {:appsecret_proof => true}.merge(options) if @app_secret
+        result = api(path, args, verb, options) do |response|
+          error = GraphErrorChecker.new(response.status, response.body, response.headers).error_if_appropriate
+
+          raise error if error
+        end
+
+        # turn this into a GraphCollection if it's pageable
+        result = API::GraphCollection.evaluate(result, self)
+
+        # now process as appropriate for the given call (get picture header, etc.)
+        post_processing ? post_processing.call(result) : result
+      end
+
 
       # Makes a request to the appropriate Facebook API.
       # @note You'll rarely need to call this method directly.
@@ -111,6 +145,9 @@ module Koala
 
       def preserve_form_arguments?(options)
         options[:format] == :json || options[:preserve_form_arguments] || Koala.config.preserve_form_arguments
+      end
+
+      def check_response(http_status, body, headers)
       end
     end
   end
