@@ -4,13 +4,12 @@ require 'koala/api/batch_operation'
 module Koala
   module Facebook
     # @private
-    class GraphBatchAPI < API
+    class GraphBatchAPI
       # inside a batch call we can do anything a regular Graph API can do
       include GraphAPIMethods
 
       attr_reader :original_api
       def initialize(api)
-        super(api.access_token, api.app_secret)
         @original_api = api
       end
 
@@ -18,7 +17,9 @@ module Koala
         @batch_calls ||= []
       end
 
-      def graph_call_in_batch(path, args = {}, verb = 'get', options = {}, &post_processing)
+      # Enqueue a call into the batch for later processing.
+      # See API#graph_call
+      def graph_call(path, args = {}, verb = 'get', options = {}, &post_processing)
         # normalize options for consistency
         options = Koala::Utils.symbolize_hash(options)
 
@@ -34,11 +35,6 @@ module Koala
         nil # batch operations return nothing immediately
       end
 
-      # redefine the graph_call method so we can use this API inside the batch block
-      # just like any regular Graph API
-      alias_method :graph_call_outside_batch, :graph_call
-      alias_method :graph_call, :graph_call_in_batch
-
       # execute the queued batch calls
       def execute(http_options = {})
         return [] if batch_calls.empty?
@@ -49,7 +45,7 @@ module Koala
           args.merge! call.files || {}
         end
 
-        graph_call_outside_batch('/', args, 'post', http_options, &handle_response)
+        original_api.graph_call('/', args, 'post', http_options, &handle_response)
       end
 
       def handle_response
@@ -111,7 +107,7 @@ module Koala
         code = response['code']
         body = response['body'].to_s
 
-        check_response(code, body, headers)
+        GraphErrorChecker.new(code, body, headers).error_if_appropriate
       end
 
       def batch_args
@@ -141,6 +137,14 @@ module Koala
         # (see note in regular api method about JSON parsing)
         else json_body(response)
         end
+      end
+
+      def access_token
+        original_api.access_token
+      end
+
+      def app_secret
+        original_api.app_secret
       end
     end
   end
