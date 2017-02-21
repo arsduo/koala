@@ -16,6 +16,8 @@ module Koala
         attr_reader :api
         # The entire raw response from Facebook.
         attr_reader :raw_response
+        # The headers from the raw response from Facebook
+        attr_reader :headers
 
         # Initialize the array of results and store various additional paging-related information.
         #
@@ -25,12 +27,13 @@ module Koala
         #
         # @return [Koala::Facebook::GraphCollection] an initialized GraphCollection
         #         whose paging, summary, raw_response, and api attributes are populated.
-        def initialize(response, api)
+        def initialize(response, headers, api)
           super response["data"]
           @paging = response["paging"]
           @summary = response["summary"]
           @raw_response = response
           @api = api
+          @headers = headers
         end
 
         # @private
@@ -38,8 +41,8 @@ module Koala
         # if not, return the original response.
         # The Ads API (uniquely so far) returns a hash rather than an array when queried
         # with get_connections.
-        def self.evaluate(response, api)
-          response.is_a?(Hash) && response["data"].is_a?(Array) ? self.new(response, api) : response
+        def self.evaluate(response, headers, api)
+          response.is_a?(Hash) && response["data"].is_a?(Array) ? self.new(response, headers, api) : response
         end
 
         # Retrieve the next page of results.

@@ -11,7 +11,7 @@ describe "Koala::Facebook::API" do
       hash_not_including('access_token' => 1),
       anything,
       anything
-    ).and_return(Koala::HTTPService::Response.new(200, "", ""))
+    ).and_return(Koala::HTTPService::Response.new(200, "", {}))
 
     @service.api('anything')
   end
@@ -25,7 +25,7 @@ describe "Koala::Facebook::API" do
       hash_including('access_token' => token),
       anything,
       anything
-    ).and_return(Koala::HTTPService::Response.new(200, "", ""))
+    ).and_return(Koala::HTTPService::Response.new(200, "", {}))
 
     service.api('anything')
   end
@@ -39,7 +39,7 @@ describe "Koala::Facebook::API" do
                        hash_including('access_token' => token),
                        anything,
                        anything
-                     ).and_return(Koala::HTTPService::Response.new(200, "", ""))
+                     ).and_return(Koala::HTTPService::Response.new(200, "", {}))
 
     args = {}.freeze
     service.api('anything', args)
@@ -79,6 +79,7 @@ describe "Koala::Facebook::API" do
     args = [12345, {:foo => [1, 2, "3", :four]}]
     expected = ["/12345", {:foo => "1,2,3,four"}, "get", {}]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(response).to receive(:headers).and_return({})
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
   end
@@ -91,6 +92,7 @@ describe "Koala::Facebook::API" do
     args = [12345, {:foo => [1, 2, "3", :four]}]
     expected = ["/12345", {:foo => [1, 2, "3", :four]}, "get", {}]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(response).to receive(:headers).and_return({})
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
   end
@@ -99,6 +101,7 @@ describe "Koala::Facebook::API" do
     args = [12345, {foo: [1, 2, "3", :four]}, "get", preserve_form_arguments: true]
     expected = ["/12345", {foo: [1, 2, "3", :four]}, "get", preserve_form_arguments: true]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(response).to receive(:headers).and_return({})
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
   end
@@ -111,6 +114,7 @@ describe "Koala::Facebook::API" do
     # or raise an exception
     expected = ["/12345", params, "get", {}]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(response).to receive(:headers).and_return({})
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
   end
@@ -119,18 +123,22 @@ describe "Koala::Facebook::API" do
     args = [12345, {:foo => [1, 2, "3", :four]}, 'get', format: :json]
     expected = ["/12345", {:foo => [1, 2, "3", :four]}, 'get', format: :json]
     response = double('Mock KoalaResponse', :body => '', :status => 200)
+    expect(response).to receive(:headers).and_return({})
     expect(Koala).to receive(:make_request).with(*expected).and_return(response)
     @service.api(*args)
   end
 
-  it "returns the body of the request as JSON if no http_component is given" do
+  it "returns the body of the request as JSON with headers if no http_component is given" do
     response = double('response', :body => 'body', :status => 200)
+    headers = double('headers')
+    expect(headers).to receive(:to_h).and_return(headers)
+    expect(response).to receive(:headers).and_return(headers)
     allow(Koala).to receive(:make_request).and_return(response)
 
     json_body = double('JSON body')
     allow(JSON).to receive(:load).and_return([json_body])
 
-    expect(@service.api('anything')).to eq(json_body)
+    expect(@service.api('anything')).to eq([json_body, headers])
   end
 
   it "executes an error checking block if provided" do
@@ -157,7 +165,7 @@ describe "Koala::Facebook::API" do
     expect(@service.api('anything')).to be_truthy
 
     expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'false', {}))
-    expect(@service.api('anything')).to be_falsey
+    expect(@service.api('anything').first).to be_falsey
   end
 
   describe "path manipulation" do
@@ -210,7 +218,7 @@ describe "Koala::Facebook::API" do
     let(:token_args) { { 'access_token' => access_token } }
     let(:appsecret_proof_args) { { 'appsecret_proof' => OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), appsecret, access_token) } }
     let(:verb) { 'get' }
-    let(:response) { Koala::HTTPService::Response.new(200, '', '') }
+    let(:response) { Koala::HTTPService::Response.new(200, '', {}) }
 
     describe "the appsecret_proof arguments" do
       describe "with an API access token present" do

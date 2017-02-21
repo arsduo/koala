@@ -64,6 +64,7 @@ module Koala
             index += 1
 
             raw_result = nil
+            parsed_headers = nil
             if call_result
               parsed_headers = if call_result.has_key?('headers')
                 call_result['headers'].inject({}) { |headers, h| headers[h['name']] = h['value']; headers}
@@ -92,7 +93,7 @@ module Koala
 
             # turn any results that are pageable into GraphCollections
             # and pass to post-processing callback if given
-            result = GraphCollection.evaluate(raw_result, @original_api)
+            result = GraphCollection.evaluate(raw_result, parsed_headers, @original_api)
             if batch_op.post_processing
               batch_op.post_processing.call(result)
             else
