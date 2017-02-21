@@ -31,8 +31,8 @@ shared_examples_for "Koala GraphAPI" do
 
     it "passes the results through GraphCollection.evaluate" do
       result = {}
-      allow(@api).to receive(:api).and_return(result)
-      expect(Koala::Facebook::GraphCollection).to receive(:evaluate).with(result, @api)
+      allow(@api).to receive(:api).and_return([result, {}])
+      expect(Koala::Facebook::GraphCollection).to receive(:evaluate).with(result, {}, @api)
       @api.graph_call("/me")
     end
 
