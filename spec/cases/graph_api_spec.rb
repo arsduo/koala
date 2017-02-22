@@ -18,20 +18,20 @@ describe 'Koala::Facebook::GraphAPIMethods' do
     context '#get_object' do
       it 'returns result of block' do
         allow(@api).to receive(:api).and_return(double("other results"))
-        expect(@api.get_object('koppel', &post_processing)["result"]).to eq(result)
+        expect(@api.get_object('barackobama', &post_processing)["result"]).to eq(result)
       end
 
       it "doesn't add token to received arguments" do
         args = {}.freeze
         expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, "", ""))
-        expect(@api.get_object('koppel', args, &post_processing)["result"]).to eq(result)
+        expect(@api.get_object('barackobama', args, &post_processing)["result"]).to eq(result)
       end
     end
 
     context '#get_picture' do
       it 'returns result of block' do
         allow(@api).to receive(:api).and_return({"data" => {"is_silhouette" => false, "url" => result}})
-        expect(@api.get_picture('lukeshepard', &post_processing)["result"]).to eq(result)
+        expect(@api.get_picture('koppel', &post_processing)["result"]).to eq(result)
       end
     end
 

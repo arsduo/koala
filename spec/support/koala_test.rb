@@ -106,8 +106,6 @@ module KoalaTest
     self.code = data["oauth_test_data"]["code"]
     self.session_key = data["oauth_test_data"]["session_key"]
 
-    self.vcr_oauth_token = data["vcr_data"]["oauth_token"]
-
     # fix the search time so it can be used in the mock responses
     self.search_time = data["search_time"] || (Time.now - 3600).to_s
   end
@@ -183,7 +181,7 @@ module KoalaTest
   # Data for testing
   def self.user1
     # user ID, either numeric or username
-    test_user? ? @live_testing_user["id"] : "koppel"
+    test_user? ? @live_testing_user["id"] : "barackobama"
   end
 
   def self.user1_id
@@ -198,7 +196,7 @@ module KoalaTest
 
   def self.user2
     # see notes for user1
-    test_user? ? @live_testing_friend["id"] : "lukeshepard"
+    test_user? ? @live_testing_friend["id"] : "koppel"
   end
 
   def self.user2_id

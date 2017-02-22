@@ -177,6 +177,7 @@ describe "Koala::Facebook::API" do
   describe "with an access token" do
     before(:each) do
       @api = Koala::Facebook::API.new(@token)
+      @app_access_token = KoalaTest.app_access_token
     end
 
     it_should_behave_like "Koala GraphAPI"
