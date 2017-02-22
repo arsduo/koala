@@ -1,6 +1,11 @@
 v3.0.0
 ======
 
+Most users should not see any difference upgrading from 2.x to 3.0. Most of the changes are
+internal to how requests go from a graph method (like `get_connections`) through the API to the
+HTTP layer and back. If you're not using API#api or HTTPService#make_request directly, upgrading
+should (in theory) require no code changes. (Let me know if you run into any issues.)
+
 **Key breaking changes:**
 
 * Koala now requires Ruby 2.1+ (or equivalent for JRuby, etc.)

@@ -4,7 +4,7 @@ Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/
 
 * Lightweight: Koala should be as light and simple as Facebook’s own libraries, providing API accessors and returning simple JSON.
 * Fast: Koala should, out of the box, be quick. Out of the box, we use Facebook's faster read-only servers when possible and if available, the Typhoeus gem to make snappy Facebook requests.  Of course, that brings us to our next topic:
-* Flexible: Koala should be useful to everyone, regardless of their current configuration.  We support JRuby, Rubinius, and REE as well as vanilla Ruby (1.8.7, 1.9.2, 1.9.3, and 2.0.0), and use the Faraday library to provide complete flexibility over how HTTP requests are made.
+* Flexible: Koala should be useful to everyone, regardless of their current configuration.  We support all currently-supported Ruby versions (MRI 2.1-2.4) and Koala should work on JRuby and Rubinius.
 * Tested: Koala should have complete test coverage, so you can rely on it.  Our test coverage is complete and can be run against either mocked responses or the live Facebook servers; we're also on [Travis CI](http://travis-ci.org/arsduo/koala/).
 
 **Found a bug? Interested in contributing?** Check out the Maintenance section below!
@@ -12,13 +12,20 @@ Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/
 Installation
 ------------
 
+**Koala 3.0 is in beta! There should be no significant changes** for most users -- please check it
+out!
+
 In Bundler:
 ```ruby
-gem "koala", "~> 2.2"
+gem "koala", "~> 3.0.0.beta2"
+# if you need the previous release
+gem "koala", "~> 2.4"
 ```
 
 Otherwise:
 ```bash
+[sudo|rvm] gem install koala --pre
+# if you need the previous release
 [sudo|rvm] gem install koala
 ```
 
