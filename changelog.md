@@ -4,6 +4,7 @@ v3.0.0
 **Key breaking changes:**
 
 * Koala now requires Ruby 2.1+ (or equivalent for JRuby, etc.)
+* API#api now returns a Koala::HTTPService::Response object; graph_call handles further processing
 * GraphBatchAPI no longer inherits from API (the interface is otherwise unchanged)
 * Empty response bodies in batch API calls will raise a JSON::ParserError rather than returning nil
 * HTTPService.make_request now requires an HTTPService::Request object (Koala.make_request does
@@ -28,6 +29,7 @@ Internal improvements:
 
 * Completely rewrote HTTPService.make_request and several others, extracting most logic into
   HTTPService::Request (#566)
+* API#api now returns a Koala::HTTPService::Response object (#584)
 * GraphBatchAPI no longer inherits from API (#580)
 * GraphBatchAPI has been refactored to be simpler and more readable (thanks, acuppy!) (#551)
 * Use the more secure JSON.parse instead of JSON.load (thanks, lautis!) (#567)
