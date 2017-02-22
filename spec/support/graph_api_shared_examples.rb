@@ -15,35 +15,6 @@ shared_examples_for "Koala GraphAPI" do
   end
 
   # DATA
-  # access public info
-
-  # get_object
-  it "gets public data about a user" do
-    result = @api.get_object(KoalaTest.user1)
-    # the results should have an ID and a name, among other things
-    expect(result["id"] && result["name"]).not_to be_nil
-  end
-
-  it "gets public data about a Page" do
-    result = @api.get_object(KoalaTest.page)
-    # the results should have an ID and a name, among other things
-    expect(result["id"] && result["name"]).to be_truthy
-  end
-
-  it "returns [] from get_objects if passed an empty array" do
-    results = @api.get_objects([])
-    expect(results).to eq([])
-  end
-
-  it "gets multiple objects" do
-    results = @api.get_objects([KoalaTest.page, KoalaTest.user1])
-    expect(results.size).to eq(2)
-  end
-
-  it "gets multiple objects if they're a string" do
-    results = @api.get_objects("facebook,#{KoalaTest.user1}")
-    expect(results.size).to eq(2)
-  end
 
   describe "#get_picture" do
     it "can access a user's picture" do
@@ -80,11 +51,6 @@ shared_examples_for "Koala GraphAPI" do
     end
   end
 
-  it "can access connections from public Pages" do
-    result = @api.get_connections(KoalaTest.page, "photos")
-    expect(result).to be_a(Array)
-  end
-
   # PAGING THROUGH COLLECTIONS
   # see also graph_collection_tests
   it "makes a request for a page when provided a specific set of page params" do
@@ -92,18 +58,43 @@ shared_examples_for "Koala GraphAPI" do
     expect(@api).to receive(:graph_call).with(*query)
     @api.get_page(query)
   end
-
-  # Beta tier
-  it "can use the beta tier" do
-    result = @api.get_object(KoalaTest.user1, {}, :beta => true)
-    # the results should have an ID and a name, among other things
-    expect(result["id"] && result["name"]).to be_truthy
-  end
 end
 
 
 shared_examples_for "Koala GraphAPI with an access token" do
   let(:dummy_response) { double("fake response", data: {}, status: 200, body: "", headers: {}) }
+
+  it "gets public data about a user" do
+    result = @api.get_object(KoalaTest.user1)
+    # the results should have an ID and a name, among other things
+    expect(result["id"] && result["name"]).not_to be_nil
+  end
+
+  it "gets public data about a Page" do
+    begin
+      Koala::Utils.level = 0
+      result = @api.get_object(KoalaTest.page)
+      # the results should have an ID and a name, among other things
+      expect(result["id"] && result["name"]).to be_truthy
+    ensure
+      Koala::Utils.level = Logger::ERROR
+    end
+  end
+
+  it "returns [] from get_objects if passed an empty array" do
+    results = @api.get_objects([])
+    expect(results).to eq([])
+  end
+
+  it "gets multiple objects" do
+    results = @api.get_objects([KoalaTest.page, KoalaTest.user1])
+    expect(results.size).to eq(2)
+  end
+
+  it "gets multiple objects if they're a string" do
+    results = @api.get_objects("facebook,#{KoalaTest.user1}")
+    expect(results.size).to eq(2)
+  end
 
   it "gets private data about a user" do
     result = @api.get_object(KoalaTest.user1)
@@ -117,8 +108,18 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "gets multiple objects" do
-    result = @api.get_objects([KoalaTest.page, KoalaTest.user1])
-    expect(result.length).to eq(2)
+    begin
+      Koala::Utils.level = 0
+      result = @api.get_objects([KoalaTest.page, KoalaTest.user1])
+      expect(result.length).to eq(2)
+    ensure
+      Koala::Utils.level = Logger::ERROR
+    end
+  end
+
+  it "can access connections from public Pages" do
+    result = @api.get_connections(KoalaTest.page, "events")
+    expect(result).to be_a(Array)
   end
 
   describe "#get_object_metadata" do
@@ -129,7 +130,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "can access connections from users" do
-    result = @api.get_connections(KoalaTest.user2, "friends")
+    result = @api.get_connections(KoalaTest.user2, "likes")
     expect(result.length).to be > 0
   end
 
@@ -317,7 +318,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
 
     # make sure the result we fetch includes all the parameters we sent
     it_matches = attachment.inject(true) {|valid, param| valid && (get_result[param[0]] == attachment[param[0]])}
-    expect(it_matches).to eq(true)
+    expect(it_matches).to be true
   end
 
   it "can comment on an object" do
@@ -346,7 +347,8 @@ shared_examples_for "Koala GraphAPI with an access token" do
   it "can like an object" do
     result = @api.put_wall_post("Hello, world, from the test suite, testing liking!")
     @temporary_object_id = result["id"]
-    like_result = @api.put_like(@temporary_object_id)
+    app_api = Koala::Facebook::API.new(@app_access_token)
+    like_result = app_api.put_like(@temporary_object_id)
     expect(like_result).to be_truthy
   end
 
@@ -434,6 +436,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
       @api.send(:get_picture, "x", {}, options)
     end
   end
+
+  # Beta tier
+  # In theory this is usable by both but so few operations now allow access without a token
+  it "can use the beta tier" do
+    result = @api.get_object(KoalaTest.user1, {}, :beta => true)
+    # the results should have an ID and a name, among other things
+    expect(result["id"] && result["name"]).to be_truthy
+  end
 end
 
 
@@ -444,7 +454,7 @@ shared_examples_for "Koala GraphAPI with GraphCollection" do
   describe "when getting a collection" do
     # GraphCollection methods
     it "gets a GraphCollection when getting connections" do
-      @result = @api.get_connections(KoalaTest.page, "photos")
+      @result = @api.get_connections(KoalaTest.page, "events")
       expect(@result).to be_a(Koala::Facebook::API::GraphCollection)
     end
 
@@ -480,18 +490,12 @@ end
 
 
 shared_examples_for "Koala GraphAPI without an access token" do
-  it "can't get private data about a user" do
-    result = @api.get_object(KoalaTest.user1)
-    # updated_time should be a pretty fixed test case
-    expect(result["updated_time"]).to be_nil
-  end
-
   it "can't get data about 'me'" do
     expect { @api.get_object("me") }.to raise_error(Koala::Facebook::ClientError)
   end
 
   it "can't access connections from users" do
-    expect { @api.get_connections(KoalaTest.user2, "friends") }.to raise_error(Koala::Facebook::ClientError)
+    expect { @api.get_connections(KoalaTest.user2, "likes") }.to raise_error(Koala::Facebook::ClientError)
   end
 
   it "can't put an object" do

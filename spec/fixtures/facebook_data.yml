@@ -54,7 +54,7 @@ oauth_test_data:
       issued_at: 1301917299
 
 subscription_test_data:
-  subscription_path: http://oauth.twoalex.com/subscriptions
+  subscription_path: https://oauth.twoalex.com/subscriptions
   verify_token: "myverificationtoken|1f54545d5f722733e17faae15377928f"
   challenge_data:
     "hub.challenge": "1290024882"

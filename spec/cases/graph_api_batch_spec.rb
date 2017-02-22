@@ -473,12 +473,12 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
   describe "usage tests" do
     it "gets two results at once" do
-      me, koppel = @api.batch do |batch_api|
+      me, barackobama = @api.batch do |batch_api|
         batch_api.get_object('me')
         batch_api.get_object(KoalaTest.user1)
       end
       expect(me['id']).not_to be_nil
-      expect(koppel['id']).not_to be_nil
+      expect(barackobama['id']).not_to be_nil
     end
 
     it 'makes mixed calls inside of a batch' do
@@ -502,7 +502,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       pictures = @api.batch do |batch_api|
         batch_api.get_picture('me')
       end
-      expect(pictures.first).to match(/http\:\/\//) # works both live & stubbed
+      expect(pictures.first).to match(/https\:\/\//) # works both live & stubbed
     end
 
     it 'takes an after processing block for a get_picture call inside of a batch' do
@@ -510,40 +510,40 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       @api.batch do |batch_api|
         batch_api.get_picture('me') { |pic| picture = pic }
       end
-      expect(picture).to match(/http\:\/\//) # works both live & stubbed
+      expect(picture).to match(/https\:\/\//) # works both live & stubbed
     end
 
     it "handles requests for two different tokens" do
-      me, insights = @api.batch do |batch_api|
+      me, app_event_types = @api.batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_connections(@app_id, 'insights', {}, {"access_token" => @app_api.access_token})
+        batch_api.get_connections(@app_id, 'app_event_types', {}, {"access_token" => @app_api.access_token})
       end
       expect(me['id']).not_to be_nil
-      expect(insights).to be_an(Koala::Facebook::API::GraphCollection)
+      expect(app_event_types).to be_an(Koala::Facebook::API::GraphCollection)
     end
 
     it "handles requests passing the access token option as a symbol instead of a string" do
-      me, insights = @api.batch do |batch_api|
+      me, app_event_types = @api.batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_connections(@app_id, 'insights', {}, {:access_token => @app_api.access_token})
+        batch_api.get_connections(@app_id, 'app_event_types', {}, {:access_token => @app_api.access_token})
       end
       expect(me['id']).not_to be_nil
-      expect(insights).to be_an(Koala::Facebook::API::GraphCollection)
+      expect(app_event_types).to be_an(Koala::Facebook::API::GraphCollection)
     end
 
     it "preserves batch-op specific access tokens in GraphCollection returned from batch" do
       # Provide an alternate token for a batch operation
       @other_access_token_args = { 'access_token' => @app_api.access_token }
 
-      # make a batch call for insights using another token
-      me, insights = @api.batch do |batch_api|
+      # make a batch call for app_event_types using another token
+      me, app_event_types = @api.batch do |batch_api|
         batch_api.get_object('me')
-        batch_api.get_connections(@app_id, 'insights', {}, @other_access_token_args)
+        batch_api.get_connections(@app_id, 'app_event_types', {}, @other_access_token_args)
       end
 
       # The alternate token is returned with the next page parameters
       # The GraphCollection should receive a request for the next_page_params during paging
-      expect(insights).to receive(:next_page_params).and_return([double("base"), @other_access_token_args.dup])
+      expect(app_event_types).to receive(:next_page_params).and_return([double("base"), @other_access_token_args.dup])
 
       # The alternate access token should pass through to making the request
       # Koala should receive a request during paging using the alternate token
@@ -555,23 +555,23 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       ).and_return(Koala::HTTPService::Response.new(200, "", ""))
 
       # Page the collection
-      insights.next_page
+      app_event_types.next_page
     end
 
     it "inserts errors in the appropriate place, without breaking other results" do
-      failed_call, koppel = @api.batch do |batch_api|
+      failed_call, barackobama = @api.batch do |batch_api|
         batch_api.get_connection("2", "invalidconnection")
         batch_api.get_object(KoalaTest.user1, {}, {"access_token" => @app_api.access_token})
       end
       expect(failed_call).to be_a(Koala::Facebook::ClientError)
-      expect(koppel["id"]).not_to be_nil
+      expect(barackobama["id"]).not_to be_nil
     end
 
     it "handles different request methods" do
       result = @api.put_wall_post("Hello, world, from the test suite batch API!")
       wall_post = result["id"]
 
-      wall_post, koppel = @api.batch do |batch_api|
+      wall_post, barackobama = @api.batch do |batch_api|
         batch_api.put_like(wall_post)
         batch_api.delete_object(wall_post)
       end
@@ -658,23 +658,23 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
       end
 
       it "allows you to create dependencies" do
-        me, koppel = @api.batch do |batch_api|
+        me, barackobama = @api.batch do |batch_api|
           batch_api.get_object("me", {}, :batch_args => {:name => "getme"})
           batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getme"})
         end
 
         expect(me).to be_nil # gotcha!  it's omitted because it's a successfully-executed dependency
-        expect(koppel["id"]).not_to be_nil
+        expect(barackobama["id"]).not_to be_nil
       end
 
       it "properly handles dependencies that fail" do
-        failed_call, koppel = @api.batch do |batch_api|
+        failed_call, barackobama = @api.batch do |batch_api|
           batch_api.get_connections("2", "invalidconnection", {}, :batch_args => {:name => "getdata"})
           batch_api.get_object(KoalaTest.user1, {}, :batch_args => {:depends_on => "getdata"})
         end
 
         expect(failed_call).to be_a(Koala::Facebook::ClientError)
-        expect(koppel).to be_nil
+        expect(barackobama).to be_nil
       end
 
       it "throws an error for badly-constructed request relationships" do
