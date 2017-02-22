@@ -78,7 +78,7 @@ graph_api:
         with_token: '[{"code": 400, "body": "{\"error\":{\"type\":\"AnError\", \"message\":\"An error occurred!.\"}}"},{"code": 200, "body":"{\"id\":\"123\"}"}]'
     batch=<%= JSON.dump([{"method"=>"post", "relative_url"=>"FEED_ITEM_BATCH/likes"}, {"method"=>"delete", "relative_url"=> "FEED_ITEM_BATCH"}]) %>:
       post:
-        with_token: '[{"code": 200, "body": "{\"id\": \"MOCK_LIKE\"}"},{"code": 200, "body":true}]'
+        with_token: '[{"code": 200, "body": "{\"id\": \"MOCK_LIKE\"}"},{"code": 200, "body":"{\"success\":true}"}]'
 
     # dependencies
     batch=<%= JSON.dump([{"method"=>"get", "relative_url"=>"me", "name" => "getme"}, {"method"=>"get", "relative_url"=>"barackobama", "depends_on" => "getme"}]) %>:
