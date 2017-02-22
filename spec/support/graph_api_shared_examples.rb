@@ -1,5 +1,6 @@
 shared_examples_for "Koala GraphAPI" do
   # all Graph API instances should pass these tests, regardless of configuration
+  let(:dummy_response) { double("fake response", data: {}, status: 200, body: "", headers: {}) }
 
   # API
   it "never uses the rest api server" do
@@ -11,44 +12,6 @@ shared_examples_for "Koala GraphAPI" do
     ).and_return(Koala::HTTPService::Response.new(200, "", {}))
 
     @api.api("anything")
-  end
-
-  # GRAPH CALL
-  describe "graph_call" do
-    it "passes all arguments to the api method" do
-      user = KoalaTest.user1
-      args = {}
-      verb = 'get'
-      opts = {:a => :b}
-      expect(@api).to receive(:api).with(user, args, verb, opts)
-      @api.graph_call(user, args, verb, opts)
-    end
-
-    it "throws an APIError if the result hash has an error key" do
-      allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(500, '{"error": "An error occurred!"}', {}))
-      expect { @api.graph_call(KoalaTest.user1, {}) }.to raise_exception(Koala::Facebook::APIError)
-    end
-
-    it "passes the results through GraphCollection.evaluate" do
-      result = {}
-      allow(@api).to receive(:api).and_return(result)
-      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).with(result, @api)
-      @api.graph_call("/me")
-    end
-
-    it "returns the results of GraphCollection.evaluate" do
-      expected = {}
-      allow(@api).to receive(:api).and_return([])
-      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).and_return(expected)
-      expect(@api.graph_call("/me")).to eq(expected)
-    end
-
-    it "returns the post_processing block's results if one is supplied" do
-      other_result = [:a, 2, :three]
-      block = Proc.new {|r| other_result}
-      allow(@api).to receive(:api).and_return({})
-      expect(@api.graph_call("/me", {}, "get", {}, &block)).to eq(other_result)
-    end
   end
 
   # DATA
@@ -99,6 +62,8 @@ end
 
 
 shared_examples_for "Koala GraphAPI with an access token" do
+  let(:dummy_response) { double("fake response", data: {}, status: 200, body: "", headers: {}) }
+
   it "gets public data about a user" do
     result = @api.get_object(KoalaTest.user1)
     # the results should have an ID and a name, among other things
@@ -146,7 +111,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
     begin
       Koala::Utils.level = 0
       result = @api.get_objects([KoalaTest.page, KoalaTest.user1])
-      puts result.inspect
       expect(result.length).to eq(2)
     ensure
       Koala::Utils.level = Logger::ERROR
@@ -383,7 +347,6 @@ shared_examples_for "Koala GraphAPI with an access token" do
   it "can like an object" do
     result = @api.put_wall_post("Hello, world, from the test suite, testing liking!")
     @temporary_object_id = result["id"]
-    puts @app_access_token.inspect
     app_api = Koala::Facebook::API.new(@app_access_token)
     like_result = app_api.put_like(@temporary_object_id)
     expect(like_result).to be_truthy
@@ -393,14 +356,14 @@ shared_examples_for "Koala GraphAPI with an access token" do
   describe "#get_page_access_token" do
     it "gets the page object with the access_token field" do
       # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
-      expect(@api).to receive(:api).with("my_page", hash_including({:fields => "access_token"}), "get", anything)
+      expect(@api).to receive(:api).with("my_page", hash_including({:fields => "access_token"}), "get", anything).and_return(dummy_response)
       @api.get_page_access_token("my_page")
     end
 
     it "merges in any other arguments" do
       # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
       args = {:a => 3}
-      expect(@api).to receive(:api).with("my_page", hash_including(args), "get", anything)
+      expect(@api).to receive(:api).with("my_page", hash_including(args), "get", anything).and_return(dummy_response)
       @api.get_page_access_token("my_page", args)
     end
   end
@@ -486,6 +449,8 @@ end
 
 # GraphCollection
 shared_examples_for "Koala GraphAPI with GraphCollection" do
+  let(:dummy_response) { double("fake response", data: {}, status: 200, body: "", headers: {}) }
+
   describe "when getting a collection" do
     # GraphCollection methods
     it "gets a GraphCollection when getting connections" do

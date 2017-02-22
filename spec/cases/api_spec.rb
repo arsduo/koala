@@ -1,9 +1,10 @@
 require 'spec_helper'
 
 describe "Koala::Facebook::API" do
-  before(:each) do
+  before :each do
     @service = Koala::Facebook::API.new
   end
+  let(:dummy_response) { double("fake response", data: {}, status: 200, body: "", headers: {}) }
 
   it "doesn't include an access token if none was given" do
     expect(Koala).to receive(:make_request).with(
@@ -57,24 +58,6 @@ describe "Koala::Facebook::API" do
     expect(service.app_secret).to eq(secret)
   end
 
-  it "gets the attribute of a Koala::HTTPService::Response given by the http_component parameter" do
-    http_component = :method_name
-
-    response = double('Mock KoalaResponse', :body => '', :status => 200)
-    result = double("result")
-    allow(response).to receive(http_component).and_return(result)
-    allow(Koala).to receive(:make_request).and_return(response)
-
-    expect(@service.api('anything', {}, 'get', :http_component => http_component)).to eq(result)
-  end
-
-  it "returns the entire response if http_component => :response" do
-    http_component = :response
-    response = double('Mock KoalaResponse', :body => '', :status => 200)
-    allow(Koala).to receive(:make_request).and_return(response)
-    expect(@service.api('anything', {}, 'get', :http_component => http_component)).to eq(response)
-  end
-
   it "turns arrays of non-enumerables into comma-separated arguments by default" do
     args = [12345, {:foo => [1, 2, "3", :four]}]
     expected = ["/12345", {:foo => "1,2,3,four"}, "get", {}]
@@ -123,39 +106,10 @@ describe "Koala::Facebook::API" do
     @service.api(*args)
   end
 
-  it "returns the body of the request as JSON if no http_component is given" do
-    result = {"a" => 2}
-    response = double('response', :body => result.to_json, :status => 200)
-    allow(Koala).to receive(:make_request).and_return(response)
-
-    expect(@service.api('anything')).to eq(result)
-  end
-
-  it "executes an error checking block if provided" do
-    response = Koala::HTTPService::Response.new(200, '{}', {})
-    allow(Koala).to receive(:make_request).and_return(response)
-
-    yield_test = double('Yield Tester')
-    expect(yield_test).to receive(:pass)
-
-    @service.api('anything', {}, "get") do |arg|
-      yield_test.pass
-      expect(arg).to eq(response)
-    end
-  end
-
   it "raises an API error if the HTTP response code is greater than or equal to 500" do
     allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(500, 'response body', {}))
 
     expect { @service.api('anything') }.to raise_exception(Koala::Facebook::APIError)
-  end
-
-  it "handles rogue true/false as responses" do
-    expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
-    expect(@service.api('anything')).to be_truthy
-
-    expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'false', {}))
-    expect(@service.api('anything')).to be_falsey
   end
 
   describe "path manipulation" do
@@ -244,6 +198,80 @@ describe "Koala::Facebook::API" do
           end
         end
       end
+    end
+  end
+
+  describe "#graph_call" do
+    it "passes all arguments to the api method" do
+      user = KoalaTest.user1
+      args = {}
+      verb = 'get'
+      opts = {:a => :b}
+      expect(@service).to receive(:api).with(user, args, verb, opts).and_return(dummy_response)
+      @service.graph_call(user, args, verb, opts)
+    end
+
+    it "throws an APIError if the result hash has an error key" do
+      allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(500, '{"error": "An error occurred!"}', {}))
+      expect { @service.graph_call(KoalaTest.user1, {}) }.to raise_exception(Koala::Facebook::APIError)
+    end
+
+    it "passes the results through GraphCollection.evaluate" do
+      allow(@service).to receive(:api).and_return(dummy_response)
+      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).with(dummy_response.data, @service)
+      @service.graph_call("/me")
+    end
+
+    it "returns the results of GraphCollection.evaluate" do
+      expected = {}
+      allow(@service).to receive(:api).and_return(dummy_response)
+      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).and_return(expected)
+      expect(@service.graph_call("/me")).to eq(expected)
+    end
+
+    it "returns the post_processing block's results if one is supplied" do
+      other_result = [:a, 2, :three]
+      block = Proc.new {|r| other_result}
+      allow(@service).to receive(:api).and_return(dummy_response)
+      expect(@service.graph_call("/me", {}, "get", {}, &block)).to eq(other_result)
+    end
+
+    it "gets the status of a Koala::HTTPService::Response if requested" do
+      response = Koala::HTTPService::Response.new(200, '', {})
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      expect(@service.graph_call('anything', {}, 'get', http_component: :status)).to eq(200)
+    end
+
+    it "gets the headers of a Koala::HTTPService::Response if requested" do
+      headers = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, '', headers)
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      expect(@service.graph_call('anything', {}, 'get', :http_component => :headers)).to eq(headers)
+    end
+
+    it "returns the entire response if http_component => :response" do
+      http_component = :response
+      response = Koala::HTTPService::Response.new(200, '', {})
+      allow(Koala).to receive(:make_request).and_return(response)
+      expect(@service.graph_call('anything', {}, 'get', :http_component => http_component)).to eq(response)
+    end
+
+    it "returns the body of the request as JSON if no http_component is given" do
+      result = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, result.to_json, {})
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      expect(@service.graph_call('anything')).to eq(result)
+    end
+
+    it "handles rogue true/false as responses" do
+      expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'true', {}))
+      expect(@service.graph_call('anything')).to be_truthy
+
+      expect(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, 'false', {}))
+      expect(@service.graph_call('anything')).to be_falsey
     end
   end
 end
