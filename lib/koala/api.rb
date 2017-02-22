@@ -44,17 +44,22 @@ module Koala
       def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
         # enable appsecret_proof by default
         options = {:appsecret_proof => true}.merge(options) if @app_secret
-        result = api(path, args, verb, options) do |response|
-          error = GraphErrorChecker.new(response.status, response.body, response.headers).error_if_appropriate
+        response = api(path, args, verb, options)
 
-          raise error if error
+        error = GraphErrorChecker.new(response.status, response.body, response.headers).error_if_appropriate
+        raise error if error
+
+        # if we want a component other than the body (e.g. redirect header for images), provide that
+        http_component = options[:http_component]
+        desired_data = if options[:http_component]
+          http_component == :response ? response : response.send(http_component)
+        else
+          # turn this into a GraphCollection if it's pageable
+          API::GraphCollection.evaluate(response.data, self)
         end
 
-        # turn this into a GraphCollection if it's pageable
-        result = API::GraphCollection.evaluate(result, self)
-
         # now process as appropriate for the given call (get picture header, etc.)
-        post_processing ? post_processing.call(result) : result
+        post_processing ? post_processing.call(desired_data) : desired_data
       end
 
 
@@ -76,14 +81,10 @@ module Koala
       # @option options [Boolean] :beta use Facebook's beta tier
       # @option options [Boolean] :use_ssl force SSL for this request, even if it's tokenless.
       #                                    (All API requests with access tokens use SSL.)
-      # @param error_checking_block a block to evaluate the response status for additional JSON-encoded errors
-      #
-      # @yield The response for evaluation
-      #
       # @raise [Koala::Facebook::ServerError] if Facebook returns an error (response status >= 500)
       #
-      # @return the body of the response from Facebook (unless another http_component is requested)
-      def api(path, args = {}, verb = "get", options = {}, &error_checking_block)
+      # @return a Koala::HTTPService::Response object representing the returned Facebook data
+      def api(path, args = {}, verb = "get", options = {})
         # we make a copy of args so the modifications (added access_token & appsecret_proof)
         # do not affect the received argument
         args = args.dup
@@ -110,17 +111,7 @@ module Koala
           raise Koala::Facebook::ServerError.new(result.status.to_i, result.body)
         end
 
-        yield result if error_checking_block
-
-        # if we want a component other than the body (e.g. redirect header for images), return that
-        if component = options[:http_component]
-          component == :response ? result : result.send(options[:http_component])
-        else
-          # parse the body as JSON and run it through the error checker (if provided)
-          # quirks_mode is needed because Facebook sometimes returns a raw true or false value --
-          # in Ruby 2.4 we can drop that.
-          JSON.parse(result.body.to_s, quirks_mode: true) unless result.body.empty?
-        end
+        result
       end
 
       private

@@ -49,7 +49,7 @@ describe Koala::Facebook::API::GraphCollection do
   describe "when getting a whole page" do
     before(:each) do
       @second_page = {
-        "data" => [:second, :page, :data],
+        "data" => ["second", "page", "data"],
         "paging" => {}
       }
       @base = double("base")
@@ -59,14 +59,14 @@ describe Koala::Facebook::API::GraphCollection do
 
     it "should return the previous page of results" do
       expect(@collection).to receive(:previous_page_params).and_return([@base, @args])
-      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(@second_page)
+      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(Koala::HTTPService::Response.new(200, @second_page.to_json, {}))
       expect(Koala::Facebook::API::GraphCollection).to receive(:new).with(@second_page, @api).and_return(@page_of_results)
       expect(@collection.previous_page).to eq(@page_of_results)
     end
 
     it "should return the next page of results" do
       expect(@collection).to receive(:next_page_params).and_return([@base, @args])
-      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(@second_page)
+      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(Koala::HTTPService::Response.new(200, @second_page.to_json, {}))
       expect(Koala::Facebook::API::GraphCollection).to receive(:new).with(@second_page, @api).and_return(@page_of_results)
 
       expect(@collection.next_page).to eq(@page_of_results)
