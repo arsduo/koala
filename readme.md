@@ -1,5 +1,9 @@
 Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/gems/koala) [![Dependencies](https://img.shields.io/gemnasium/arsduo/koala.svg)](https://gemnasium.com/arsduo/koala) [![Build Status](https://img.shields.io/travis/arsduo/koala.svg)](http://travis-ci.org/arsduo/koala) [![Code Climate](https://img.shields.io/codeclimate/github/arsduo/koala.svg)](https://codeclimate.com/github/arsduo/koala) [![Code Coverage](https://img.shields.io/codeclimate/coverage/github/arsduo/koala.svg)](https://codeclimate.com/github/arsduo/koala)
 ====
+
+**Koala 3.0 is in beta! There should be no significant changes** for most users -- please check it
+out!
+
 [Koala](http://github.com/arsduo/koala) is a Facebook library for Ruby, supporting the Graph API (including the batch requests and photo uploads), realtime updates, test users, and OAuth validation.  We wrote Koala with four goals:
 
 * Lightweight: Koala should be as light and simple as Facebook’s own libraries, providing API accessors and returning simple JSON.
@@ -11,9 +15,6 @@ Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/
 
 Installation
 ------------
-
-**Koala 3.0 is in beta! There should be no significant changes** for most users -- please check it
-out!
 
 In Bundler:
 ```ruby
