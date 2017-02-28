@@ -66,17 +66,19 @@ module Koala
           end
 
           context "set by Koala.config" do
-            let(:version) { "v2.1" }
+            let(:version) { "v2.7" }
 
             before :each do
-              allow(Koala.config).to receive(:api_version).and_return(version)
+              Koala.configure do |config|
+                config.api_version = version
+              end
             end
 
             it_should_behave_like :including_the_version
           end
 
           context "set in options" do
-            let(:version) { "v2.1" }
+            let(:version) { "v2.8" }
 
             let(:options) { {api_version: version} }
 

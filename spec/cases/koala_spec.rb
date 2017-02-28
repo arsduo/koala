@@ -31,9 +31,7 @@ describe Koala do
 
   describe ".configure" do
     it "yields a configurable object" do
-      expect {
-        Koala.configure {|c| c.foo = "bar"}
-      }.not_to raise_exception
+      Koala.configure {|c| expect(c).to be_a(Koala::Configuration)}
     end
 
     it "caches the config (singleton)" do
@@ -56,5 +54,4 @@ describe Koala do
       expect(Koala.config.graph_server).to eq("some-new.graph_server.com")
     end
   end
-
 end

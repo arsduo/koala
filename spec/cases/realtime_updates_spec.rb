@@ -36,6 +36,45 @@ describe "Koala::Facebook::RealtimeUpdates" do
       expect(updates).to be_a(Koala::Facebook::RealtimeUpdates)
     end
 
+    context "with global defaults" do
+      let(:app_id) { :app_id }
+      let(:app_secret) { :app_secret }
+      let(:app_access_token) { :app_access_token }
+
+      before :each do
+        Koala.configure do |config|
+          config.app_id = app_id
+          config.app_secret = app_secret
+          config.app_access_token = app_access_token
+        end
+      end
+
+      it "defaults to the configured data if not otherwise provided" do
+        rtu = Koala::Facebook::RealtimeUpdates.new
+        expect(rtu.app_id).to eq(app_id)
+        expect(rtu.secret).to eq(app_secret)
+        expect(rtu.app_access_token).to eq(app_access_token)
+      end
+
+      it "lets you override app_id" do
+        other_value = :another_id
+        rtu = Koala::Facebook::RealtimeUpdates.new(app_id: other_value)
+        expect(rtu.app_id).to eq(other_value)
+      end
+
+      it "lets you override secret" do
+        other_value = :another_secret
+        rtu = Koala::Facebook::RealtimeUpdates.new(secret: other_value)
+        expect(rtu.secret).to eq(other_value)
+      end
+
+      it "lets you override app_id" do
+        other_value = :another_token
+        rtu = Koala::Facebook::RealtimeUpdates.new(app_access_token: other_value)
+        expect(rtu.app_access_token).to eq(other_value)
+      end
+    end
+
     # attributes
     it "allows read access to app_id" do
       # in Ruby 1.9, .method returns symbols

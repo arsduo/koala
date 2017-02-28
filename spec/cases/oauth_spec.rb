@@ -53,6 +53,45 @@ describe "Koala::Facebook::OAuth" do
              @oauth.app_secret == @secret &&
              @oauth.oauth_callback_url == nil).to be_truthy
     end
+
+    context "with global defaults" do
+      let(:app_id) { :app_id }
+      let(:app_secret) { :app_secret }
+      let(:oauth_callback_url) { :oauth_callback_url }
+
+      before :each do
+        Koala.configure do |config|
+          config.app_id = app_id
+          config.app_secret = app_secret
+          config.oauth_callback_url = oauth_callback_url
+        end
+      end
+
+      it "defaults to the configured data if not otherwise provided" do
+        oauth = Koala::Facebook::OAuth.new
+        expect(oauth.app_id).to eq(app_id)
+        expect(oauth.app_secret).to eq(app_secret)
+        expect(oauth.oauth_callback_url).to eq(oauth_callback_url)
+      end
+
+      it "lets you override app_id" do
+        other_value = :another_id
+        oauth = Koala::Facebook::OAuth.new(other_value)
+        expect(oauth.app_id).to eq(other_value)
+      end
+
+      it "lets you override secret" do
+        other_value = :another_secret
+        oauth = Koala::Facebook::OAuth.new(nil, other_value)
+        expect(oauth.app_secret).to eq(other_value)
+      end
+
+      it "lets you override app_id" do
+        other_value = :another_token
+        oauth = Koala::Facebook::OAuth.new(nil, nil, other_value)
+        expect(oauth.oauth_callback_url).to eq(other_value)
+      end
+    end
   end
 
   describe "for cookie parsing" do
