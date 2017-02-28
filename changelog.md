@@ -45,6 +45,10 @@ Testing improvements:
 
 * Fixed a bunch of failing mocked specs
 
+Others:
+
+* Added an issue and pull request template
+
 v2.5.0
 ======
 
