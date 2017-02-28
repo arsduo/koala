@@ -14,6 +14,7 @@ require 'koala/test_users'
 require 'koala/http_service'
 
 # miscellaneous
+require 'koala/configuration'
 require 'koala/utils'
 require 'koala/version'
 require 'ostruct'
@@ -44,7 +45,7 @@ module Koala
     #   * api_version: controls which Facebook API version to use (v1.0, v2.0,
     #   etc)
     def config
-      @config ||= OpenStruct.new(HTTPService::DEFAULT_SERVERS)
+      @config ||= Configuration.new
     end
 
     # Used for testing.
