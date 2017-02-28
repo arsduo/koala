@@ -226,7 +226,7 @@ describe "Koala::Facebook::API" do
 
     it "passes the results through GraphCollection.evaluate" do
       allow(@service).to receive(:api).and_return(dummy_response)
-      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).with(dummy_response.data, @service)
+      expect(Koala::Facebook::API::GraphCollection).to receive(:evaluate).with(dummy_response, @service)
       @service.graph_call("/me")
     end
 

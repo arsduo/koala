@@ -1,4 +1,4 @@
-v3.0.0
+v3.0.0 (not released yet)
 ======
 
 Most users should not see any difference upgrading from 2.x to 3.0. Most of the changes are
@@ -50,7 +50,11 @@ Testing improvements:
 
 * Fixed a bunch of failing mocked specs
 
-v2.5.0
+Others:
+
+* Added an issue and pull request template
+
+v2.5.0 (2017-02-17)
 ======
 
 New features:
@@ -65,7 +69,7 @@ Internal improvements:
 
 * Remove MultiJson dependency (thanks, sakuro!)
 
-v2.4.0
+v2.4.0 (2016-07-08)
 ======
 
 **Note:** Koala is no longer officially supported on Ruby 1.9.3 (which was [end-of-lifed back in
@@ -88,7 +92,7 @@ Testing improvements:
 * Test Koala against Ruby 2.3.0 (thanks, thedrow!)
 
 
-v2.3.0
+v2.3.0 (2016-04-10)
 ======
 
 Updated features:
@@ -109,7 +113,7 @@ Testing improvements:
 * Removed pended specs that were no longer relevant
 * Improved https regex in test suite (thanks, lucaskds!)
 
-v2.2.0
+v2.2.0 (2015-08-11)
 ======
 
 Updated features:
