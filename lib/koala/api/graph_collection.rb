@@ -16,30 +16,41 @@ module Koala
         attr_reader :api
         # The entire raw response from Facebook.
         attr_reader :raw_response
+        # The headers from the Facebook response
+        attr_reader :headers
 
         # Initialize the array of results and store various additional paging-related information.
         #
-        # @param response the response from Facebook (a hash whose "data" key is an array)
+        # @param [Koala::HTTPService::Response] response object wrapping the raw Facebook response
         # @param api the Graph {Koala::Facebook::API API} instance to use to make calls
         #            (usually the API that made the original call).
         #
         # @return [Koala::Facebook::API::GraphCollection] an initialized GraphCollection
         #         whose paging, summary, raw_response, and api attributes are populated.
         def initialize(response, api)
-          super response["data"]
-          @paging = response["paging"]
-          @summary = response["summary"]
-          @raw_response = response
+          super response.data["data"]
+          @paging = response.data["paging"]
+          @summary = response.data["summary"]
+          @raw_response = response.data
           @api = api
+          @headers = response.headers
         end
 
         # @private
         # Turn the response into a GraphCollection if they're pageable;
-        # if not, return the original response.
+        # if not, return the data of the original response.
         # The Ads API (uniquely so far) returns a hash rather than an array when queried
         # with get_connections.
         def self.evaluate(response, api)
-          response.is_a?(Hash) && response["data"].is_a?(Array) ? self.new(response, api) : response
+          return nil if response.nil?
+
+          is_pageable?(response) ? self.new(response, api) : response.data
+        end
+
+        # response will always be an instance of Koala::HTTPService::Response
+        # since that is what we get from Koala::Facebook::API#api
+        def self.is_pageable?(response)
+          response.data.is_a?(Hash) && response.data["data"].is_a?(Array)
         end
 
         # Retrieve the next page of results.
