@@ -62,10 +62,7 @@ module Koala
           post_process = batch_op.post_processing
 
           # turn any results that are pageable into GraphCollections
-          result = GraphCollection.evaluate(
-            result_from_response(call_result, batch_op),
-            original_api
-          )
+          result = result_from_response(call_result, batch_op)
 
           # and pass to post-processing callback if given
           if post_process
@@ -129,13 +126,15 @@ module Koala
         response  = options.fetch(:response)
         headers   = options.fetch(:headers)
 
+        result = Koala::HTTPService::Response.new(response['status'], response['body'], headers)
+
         # Get the HTTP component they want
         case component
         when :status  then response['code'].to_i
         # facebook returns the headers as an array of k/v pairs, but we want a regular hash
         when :headers then headers
         # (see note in regular api method about JSON parsing)
-        else json_body(response)
+        else GraphCollection.evaluate(result, original_api)
         end
       end
 
