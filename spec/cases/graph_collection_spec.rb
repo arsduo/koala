@@ -4,12 +4,13 @@ describe Koala::Facebook::API::GraphCollection do
   let(:paging){ {"paging" => true} }
 
   before(:each) do
+    @headers = {'Content-Type' => 'application/json'}
     @data = {
       "data" => [1, 2, 'three'],
       "paging" => paging,
       "summary" => [3]
     }
-    @result = Koala::HTTPService::Response.new(200, @data.to_json, {})
+    @result = Koala::HTTPService::Response.new(200, @data.to_json, @headers)
     @api = Koala::Facebook::API.new("123")
     @collection = Koala::Facebook::API::GraphCollection.new(@result, @api)
   end
@@ -45,6 +46,10 @@ describe Koala::Facebook::API::GraphCollection do
 
   it "sets the API to the provided API" do
     expect(@collection.api).to eq(@api)
+  end
+
+  it "sets the headers correctly" do
+    expect(@collection.headers).to eq(@headers)
   end
 
   describe "when getting a whole page" do
