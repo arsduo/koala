@@ -55,7 +55,7 @@ module Koala
           http_component == :response ? response : response.send(http_component)
         else
           # turn this into a GraphCollection if it's pageable
-          API::GraphCollection.evaluate(response.data, self)
+          API::GraphCollection.evaluate(response, self)
         end
 
         # now process as appropriate for the given call (get picture header, etc.)
