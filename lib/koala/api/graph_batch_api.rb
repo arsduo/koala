@@ -1,5 +1,5 @@
-require 'koala/api'
-require 'koala/api/batch_operation'
+require "koala/api"
+require "koala/api/batch_operation"
 
 module Koala
   module Facebook
@@ -19,7 +19,7 @@ module Koala
 
       # Enqueue a call into the batch for later processing.
       # See API#graph_call
-      def graph_call(path, args = {}, verb = 'get', options = {}, &post_processing)
+      def graph_call(path, args = {}, verb = "get", options = {}, &post_processing)
         # normalize options for consistency
         options = Koala::Utils.symbolize_hash(options)
 
@@ -40,25 +40,22 @@ module Koala
         return [] if batch_calls.empty?
 
         # Turn the call args collected into what facebook expects
-        args = { 'batch' => batch_args }
+        args = {"batch" => batch_args}
         batch_calls.each do |call|
           args.merge! call.files || {}
         end
 
-        original_api.graph_call('/', args, 'post', http_options, &handle_response)
-      end
-
-      def handle_response
-        lambda do |response|
+        original_api.graph_call("/", args, "post", http_options) do |response|
           raise bad_response if response.nil?
-          response.map(&generate_results)
+          generate_results(response)
         end
       end
 
-      def generate_results
+      def generate_results(response)
         index = 0
-        lambda do |call_result|
-          batch_op     = batch_calls[index]; index += 1
+        response.map do |call_result|
+          batch_op = batch_calls[index]
+          index += 1
           post_process = batch_op.post_processing
 
           # turn any results that are pageable into GraphCollections
@@ -78,34 +75,34 @@ module Koala
 
       def bad_response
         # Facebook sometimes reportedly returns an empty body at times
-        BadFacebookResponse.new(200, '', 'Facebook returned an empty body')
+        BadFacebookResponse.new(200, "", "Facebook returned an empty body")
       end
 
       def result_from_response(response, options)
         return nil if response.nil?
 
-        headers   = coerced_headers_from_response(response)
+        headers   = headers_from_response(response)
         error     = error_from_response(response, headers)
         component = options.http_options[:http_component]
 
-        error || result_from_component({
-          :component => component,
-          :response  => response,
-          :headers   => headers
-        })
+        error || desired_component(
+          component: component,
+          response: response,
+          headers: headers
+        )
       end
 
-      def coerced_headers_from_response(response)
-        headers = response.fetch('headers', [])
+      def headers_from_response(response)
+        headers = response.fetch("headers", [])
 
-        headers.each_with_object({}) do |h, memo|
-          memo.merge! h.fetch('name') => h.fetch('value')
+        headers.inject({}) do |compiled_headers, header|
+          compiled_headers.merge(header.fetch("name") => header.fetch("value"))
         end
       end
 
       def error_from_response(response, headers)
-        code = response['code']
-        body = response['body'].to_s
+        code = response["code"]
+        body = response["body"].to_s
 
         GraphErrorChecker.new(code, body, headers).error_if_appropriate
       end
@@ -121,17 +118,13 @@ module Koala
       def json_body(response)
         # quirks_mode is needed because Facebook sometimes returns a raw true or false value --
         # in Ruby 2.4 we can drop that.
-        JSON.parse(response.fetch('body'), quirks_mode: true)
+        JSON.parse(response.fetch("body"), quirks_mode: true)
       end
 
-      def result_from_component(options)
-        component = options.fetch(:component)
-        response  = options.fetch(:response)
-        headers   = options.fetch(:headers)
-
+      def desired_component(component:, response:, headers:)
         # Get the HTTP component they want
         case component
-        when :status  then response['code'].to_i
+        when :status  then response["code"].to_i
         # facebook returns the headers as an array of k/v pairs, but we want a regular hash
         when :headers then headers
         # (see note in regular api method about JSON parsing)
