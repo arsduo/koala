@@ -32,6 +32,8 @@ Otherwise:
 Configuration
 -------------
 
+**Available with 3.0.0.beta3**
+
 Most applications will only use one application configuration. Rather than having toprovide that
 value every time, you can configure Koala to use global settings:
 
