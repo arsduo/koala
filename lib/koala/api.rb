@@ -15,7 +15,7 @@ module Koala
       #                 https://developers.facebook.com/docs/graph-api/securing-requests/)
       # @note If no access token is provided, you can only access some public information.
       # @return [Koala::Facebook::API] the API client
-      def initialize(access_token = nil, app_secret = nil)
+      def initialize(access_token = Koala.config.access_token, app_secret = Koala.config.app_secret)
         @access_token = access_token
         @app_secret = app_secret
       end

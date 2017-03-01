@@ -23,9 +23,9 @@ module Koala
       #
       # @raise ArgumentError if the application ID and one of the app access token or the secret are not provided.
       def initialize(options = {})
-        @app_id = options[:app_id]
-        @app_access_token = options[:app_access_token]
-        @secret = options[:secret]
+        @app_id = options[:app_id] || Koala.config.app_id
+        @app_access_token = options[:app_access_token] || Koala.config.app_access_token
+        @secret = options[:secret] || Koala.config.app_secret
         unless @app_id && (@app_access_token || @secret) # make sure we have what we need
           raise ArgumentError, "Initialize must receive a hash with :app_id and either :app_access_token or :secret! (received #{options.inspect})"
         end

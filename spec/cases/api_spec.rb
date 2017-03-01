@@ -6,6 +6,26 @@ describe "Koala::Facebook::API" do
   end
   let(:dummy_response) { double("fake response", data: {}, status: 200, body: "", headers: {}) }
 
+  it "defaults to the globally configured token if one's provided" do
+    token = "Foo"
+
+    Koala.configure do |config|
+      config.access_token = token
+    end
+
+    expect(Koala::Facebook::API.new.access_token).to eq(token)
+  end
+
+  it "defaults to the globally configured app_secret if one's provided" do
+    app_secret = "Foo"
+
+    Koala.configure do |config|
+      config.app_secret = app_secret
+    end
+
+    expect(Koala::Facebook::API.new.app_secret).to eq(app_secret)
+  end
+
   it "doesn't include an access token if none was given" do
     expect(Koala).to receive(:make_request).with(
       anything,
@@ -44,18 +64,6 @@ describe "Koala::Facebook::API" do
 
     args = {}.freeze
     service.api('anything', args)
-  end
-
-  it "has an attr_reader for access token" do
-    token = 'adfadf'
-    service = Koala::Facebook::API.new token
-    expect(service.access_token).to eq(token)
-  end
-
-  it "has an attr_reader for app_secret" do
-    secret = double
-    service = Koala::Facebook::API.new(@token, secret)
-    expect(service.app_secret).to eq(secret)
   end
 
   it "turns arrays of non-enumerables into comma-separated arguments by default" do

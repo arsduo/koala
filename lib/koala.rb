@@ -14,6 +14,7 @@ require 'koala/test_users'
 require 'koala/http_service'
 
 # miscellaneous
+require 'koala/configuration'
 require 'koala/utils'
 require 'koala/version'
 require 'ostruct'
@@ -37,14 +38,10 @@ module Koala
     end
 
     # Allows you to control various Koala configuration options.
-    # Notable options:
-    #   * server endpoints: you can override any or all the server endpoints
-    #   (see HTTPService::DEFAULT_SERVERS) if you want to run requests through
-    #   other servers.
-    #   * api_version: controls which Facebook API version to use (v1.0, v2.0,
-    #   etc)
+    # NOTE: this is not currently threadsafe.
+    # See Koala::Configuration.
     def config
-      @config ||= OpenStruct.new(HTTPService::DEFAULT_SERVERS)
+      @config ||= Configuration.new
     end
 
     # Used for testing.

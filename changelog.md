@@ -18,8 +18,13 @@ should (in theory) require no code changes. (Let me know if you run into any iss
 * API#search now requires a "type"/:type argument, matching Facebook's behavior (improving their
   cryptic error message)
 
+New features:
+
+* Koala now supports global configuration for tokens, secrets, etc! See the readme.
+
 Updated features:
 
+* Koala.config now uses a dedicated Koala::Configuration object
 * TestUser#befriend will provide the appsecret_proof if a secret is set (thanks, kwasimensah!)
 * API#search now requires an object type parameter to be included, matching Facebook's API (#575)
 
