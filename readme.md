@@ -138,46 +138,20 @@ the results apart from a long list of array entries:
 
 Check out the wiki for more details and examples.
 
-OAuth
+App Access Tokens
 -----
 
-You can use the Graph API without an OAuth access token, but the real magic happens when you provide Facebook an OAuth token to prove you're authenticated.  Koala provides an OAuth class to make that process easy:
+You get your application's own access token, which can be used without a user session for subscriptions and certain other requests:
 ```ruby
 @oauth = Koala::Facebook::OAuth.new(app_id, app_secret, callback_url)
 @oauth.get_app_access_token
 ```
-```
-
-If your application uses Koala and the Facebook [JavaScript SDK](http://github.com/facebook/facebook-js-sdk) (formerly Facebook Connect), you can use the OAuth class to parse the cookies:
-```ruby
-# parses and returns a hash including the token and the user id
-# NOTE: this method can only be called once per session, as the OAuth code
-# Facebook supplies can only be redeemed once.  Your application must handle
-# cross-request storage of this information; you can no longer call this method
-# multiple times.
-@oauth.get_user_info_from_cookies(cookies)
-```
-And if you have to use the more complicated [redirect-based OAuth process](http://developers.facebook.com/docs/authentication/), Koala helps out there, too:
-
-```ruby
-# generate authenticating URL
-@oauth.url_for_oauth_code
-# fetch the access token once you have the code
-@oauth.get_access_token(code)
-```
-
-You can also get your application's own access token, which can be used without a user session for subscriptions and certain other requests:
-```ruby
 For those building apps on Facebook, parsing signed requests is simple:
 ```ruby
 @oauth.parse_signed_request(signed_request_string)
 ```
-Or, if for some horrible reason, you're still using session keys, despair not!  It's easy to turn them into shiny, modern OAuth tokens:
-```ruby
-@oauth.get_token_from_session_key(session_key)
-@oauth.get_tokens_from_session_keys(array_of_session_keys)
-```
-That's it!  It's pretty simple once you get the hang of it.  If you're new to OAuth, though, check out the wiki and the OAuth Playground example site (see below).
+
+The OAuth class has additional methods that may occasionally be useful.
 
 Real-time Updates
 -----------------
@@ -242,14 +216,6 @@ Some resources to help you as you play with Koala and the Graph API:
 * Complete Koala documentation <a href="https://github.com/arsduo/koala/wiki">on the wiki</a>
 * Facebook's <a href="http://facebook.stackoverflow.com/">Stack Overflow site</a> is a stupendous place to ask questions, filled with people who will help you figure out what's up with the Facebook API.
 * Facebook's <a href="http://developers.facebook.com/tools/explorer/">Graph API Explorer</a>, where you can play with the Graph API in your browser
-* The Koala-powered <a href="http://oauth.twoalex.com" target="_blank">OAuth Playground</a>, where you can easily generate OAuth access tokens and any other data needed to test out the APIs or OAuth
-* Follow Koala on <a href="http://www.facebook.com/pages/Koala/315368291823667">Facebook</a> and <a href="https://twitter.com/#!/koala_fb">Twitter</a> for SDK updates and occasional news about Facebook API changes.
-
-*Note*: I use the Koala issues tracker on Github to triage and address issues
-with the gem itself; if you need help using the Facebook API, the above
-resources will be far more effective. Depending on how much time I have, Github
-issues filed about how to use the Facebook API may be closed with a reference
-to the Facebook Stack Overflow page.
 
 Testing
 -------
@@ -274,28 +240,11 @@ Maintenance
 -----------
 
 _Pull requests_: Koala exists as it does thanks to the amazing support and work of community members of all
-backgrounds and levels of experience. Pull requests are very welcome! If you have any questions,
-* The Koala-powered <a href="http://oauth.twoalex.com" target="_blank">OAuth Playground</a>, where you can easily generate OAuth access tokens and any other data needed to test out the APIs or OAuth
-* Follow Koala on <a href="http://www.facebook.com/pages/Koala/315368291823667">Facebook</a> and <a href="https://twitter.com/#!/koala_fb">Twitter</a> for SDK updates and occasional news about Facebook API changes.
+backgrounds and levels of experience. Pull requests are very welcome!
 
-*Note*: I use the Koala issues tracker on Github to triage and address issues
-with the gem itself; if you need help using the Facebook API, the above
-resources will be far more effective. Depending on how much time I have, Github
-issues filed about how to use the Facebook API may be closed with a reference
-to the Facebook Stack Overflow page.
-just open an issue.
+_Issues_: If you have any questions about the gem, found an issue in the Ruby code or
+documentation, or have another question that isn't right for StackOverflow, just open an issue and fill out the template.
 
 Please note that this project is released with a Contributor Code of Conduct. By participating in
 this project you agree to abide by its terms. See
 [code_of_conduct.md](https://github.com/arsduo/koala/blob/master/code_of_conduct.md) for more information.
-
-_Schedule_: In order to keep Koala moving forward on a regular and predictable schedule, I will
-address issues and pull requests at least three times a year: late July/early August, late
-December/early January, and late March/early April. I may respond to issues in between maintenance
-periods, but it'll depend on other life/work goings-on.
-
-Breaking/new Facebook changes and other urgent issues obviously will get addressed much more
-quickly. (We've never had a security issue, but obviously that would be priority 0.)
-
-Have questions? Found a breaking bug or urgent issue? [Tweet at me](http://twitter.com/arsduo) --
-I'm always happy to respond.

@@ -21,6 +21,8 @@ should (in theory) require no code changes. (Let me know if you run into any iss
 New features:
 
 * Koala now supports global configuration for tokens, secrets, etc! See the readme.
+* GraphCollection now exposes #headers, allowing access to etag/rate limiting/etc. info (thanks,
+  pawandubey and jessieay!) (#589)
 
 Updated features:
 
