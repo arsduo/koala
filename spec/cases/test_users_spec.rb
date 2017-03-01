@@ -40,12 +40,52 @@ describe "Koala::Facebook::TestUsers" do
       expect(test_users).to be_a(Koala::Facebook::TestUsers)
     end
 
+    context "with global defaults" do
+      let(:app_id) { :app_id }
+      let(:app_secret) { :app_secret }
+      let(:app_access_token) { :app_access_token }
+
+      before :each do
+        Koala.configure do |config|
+          config.app_id = app_id
+          config.app_secret = app_secret
+          config.app_access_token = app_access_token
+        end
+      end
+
+      it "defaults to the configured data if not otherwise provided" do
+        test_users = Koala::Facebook::TestUsers.new
+        expect(test_users.app_id).to eq(app_id)
+        expect(test_users.secret).to eq(app_secret)
+        expect(test_users.app_access_token).to eq(app_access_token)
+      end
+
+      it "lets you override app_id" do
+        other_value = :another_id
+        test_users = Koala::Facebook::TestUsers.new(app_id: other_value)
+        expect(test_users.app_id).to eq(other_value)
+      end
+
+      it "lets you override secret" do
+        other_value = :another_secret
+        test_users = Koala::Facebook::TestUsers.new(secret: other_value)
+        expect(test_users.secret).to eq(other_value)
+      end
+
+      it "lets you override app_id" do
+        other_value = :another_token
+        test_users = Koala::Facebook::TestUsers.new(app_access_token: other_value)
+        expect(test_users.app_access_token).to eq(other_value)
+      end
+    end
+
+
     it "uses the OAuth class to fetch a token when provided an app_id and a secret" do
       oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
       token = oauth.get_app_access_token
       expect(oauth).to receive(:get_app_access_token).and_return(token)
       expect(Koala::Facebook::OAuth).to receive(:new).with(@app_id, @secret).and_return(oauth)
-      test_users = Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
+      Koala::Facebook::TestUsers.new(:app_id => @app_id, :secret => @secret)
     end
 
     # attributes

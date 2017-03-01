@@ -1,14 +1,16 @@
 require 'spec_helper'
 
 describe Koala::Facebook::API::GraphCollection do
-  let(:paging){ {:paging => true} }
+  let(:paging){ {"paging" => true} }
 
   before(:each) do
-    @result = {
-      "data" => [1, 2, :three],
+    @headers = {'Content-Type' => 'application/json'}
+    @data = {
+      "data" => [1, 2, 'three'],
       "paging" => paging,
       "summary" => [3]
     }
+    @result = Koala::HTTPService::Response.new(200, @data.to_json, @headers)
     @api = Koala::Facebook::API.new("123")
     @collection = Koala::Facebook::API::GraphCollection.new(@result, @api)
   end
@@ -22,7 +24,7 @@ describe Koala::Facebook::API::GraphCollection do
   end
 
   it "contains the result data" do
-    @result["data"].each_with_index {|r, i| expect(@collection[i]).to eq(r)}
+    @data["data"].each_with_index {|r, i| expect(@collection[i]).to eq(r)}
   end
 
   it "has a read-only paging attribute" do
@@ -31,19 +33,23 @@ describe Koala::Facebook::API::GraphCollection do
   end
 
   it "sets paging to results['paging']" do
-    expect(@collection.paging).to eq(@result["paging"])
+    expect(@collection.paging).to eq(@data["paging"])
   end
 
   it "sets summary to results['summary']" do
-    expect(@collection.summary).to eq(@result["summary"])
+    expect(@collection.summary).to eq(@data["summary"])
   end
 
   it "sets raw_response to the original results" do
-    expect(@collection.raw_response).to eq(@result)
+    expect(@collection.raw_response).to eq(@result.data)
   end
 
   it "sets the API to the provided API" do
     expect(@collection.api).to eq(@api)
+  end
+
+  it "sets the headers correctly" do
+    expect(@collection.headers).to eq(@headers)
   end
 
   describe "when getting a whole page" do
@@ -55,19 +61,21 @@ describe Koala::Facebook::API::GraphCollection do
       @base = double("base")
       @args = {"a" => 1}
       @page_of_results = double("page of results")
+      @result = Koala::HTTPService::Response.new(200, @second_page.to_json, {})
+      @result.data
     end
 
     it "should return the previous page of results" do
       expect(@collection).to receive(:previous_page_params).and_return([@base, @args])
-      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(Koala::HTTPService::Response.new(200, @second_page.to_json, {}))
-      expect(Koala::Facebook::API::GraphCollection).to receive(:new).with(@second_page, @api).and_return(@page_of_results)
+      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(@result)
+      expect(Koala::Facebook::API::GraphCollection).to receive(:new).with(@result, @api).and_return(@page_of_results)
       expect(@collection.previous_page).to eq(@page_of_results)
     end
 
     it "should return the next page of results" do
       expect(@collection).to receive(:next_page_params).and_return([@base, @args])
-      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(Koala::HTTPService::Response.new(200, @second_page.to_json, {}))
-      expect(Koala::Facebook::API::GraphCollection).to receive(:new).with(@second_page, @api).and_return(@page_of_results)
+      expect(@api).to receive(:api).with(@base, @args, anything, anything).and_return(@result)
+      expect(Koala::Facebook::API::GraphCollection).to receive(:new).with(@result, @api).and_return(@page_of_results)
 
       expect(@collection.next_page).to eq(@page_of_results)
     end
@@ -121,9 +129,11 @@ describe Koala::Facebook::API::GraphCollection do
   end
 
   describe ".evaluate" do
-    it "returns the original result if it's provided a non-hash result" do
-      result = []
-      expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq(result)
+    it "returns the body of the original response if it's provided a Response with a non-hash data key" do
+      result = double('fake response')
+      allow(result).to receive(:is_a?).with(Hash).and_return(false)
+      allow(result).to receive(:data).and_return([])
+      expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq([])
     end
 
     it "returns the original result if it's provided a nil result" do
@@ -131,18 +141,21 @@ describe Koala::Facebook::API::GraphCollection do
       expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq(result)
     end
 
-    it "returns the original result if the result doesn't have a data key" do
-      result = {"paging" => {}}
-      expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq(result)
+    it "returns the original result body if the result doesn't have a data key" do
+      paging = {"paging" => {}}
+      result = Koala::HTTPService::Response.new(200, paging.to_json, {})
+      expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq(paging)
     end
 
     it "returns the original result if the result's data key isn't an array" do
-      result = {"data" => {}, "paging" => {}}
-      expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq(result)
+      body = {"data" => {}, "paging" => {}}
+      result = Koala::HTTPService::Response.new(200, body.to_json, {})
+      expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq(body)
     end
 
     it "returns a new GraphCollection of the result if it has an array data key and a paging key" do
-      result = {"data" => [], "paging" => {}}
+      body = {"data" => [], "paging" => {}}
+      result = Koala::HTTPService::Response.new(200, body.to_json, {})
       expected = :foo
       expect(Koala::Facebook::API::GraphCollection).to receive(:new).with(result, @api).and_return(expected)
       expect(Koala::Facebook::API::GraphCollection.evaluate(result, @api)).to eq(expected)

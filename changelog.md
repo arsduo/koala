@@ -1,4 +1,4 @@
-v3.0.0
+v3.0.0 (not released yet)
 ======
 
 Most users should not see any difference upgrading from 2.x to 3.0. Most of the changes are
@@ -18,8 +18,13 @@ should (in theory) require no code changes. (Let me know if you run into any iss
 * API#search now requires a "type"/:type argument, matching Facebook's behavior (improving their
   cryptic error message)
 
+New features:
+
+* Koala now supports global configuration for tokens, secrets, etc! See the readme.
+
 Updated features:
 
+* Koala.config now uses a dedicated Koala::Configuration object
 * TestUser#befriend will provide the appsecret_proof if a secret is set (thanks, kwasimensah!)
 * API#search now requires an object type parameter to be included, matching Facebook's API (#575)
 
@@ -49,7 +54,7 @@ Others:
 
 * Added an issue and pull request template
 
-v2.5.0
+v2.5.0 (2017-02-17)
 ======
 
 New features:
@@ -64,7 +69,7 @@ Internal improvements:
 
 * Remove MultiJson dependency (thanks, sakuro!)
 
-v2.4.0
+v2.4.0 (2016-07-08)
 ======
 
 **Note:** Koala is no longer officially supported on Ruby 1.9.3 (which was [end-of-lifed back in
@@ -87,7 +92,7 @@ Testing improvements:
 * Test Koala against Ruby 2.3.0 (thanks, thedrow!)
 
 
-v2.3.0
+v2.3.0 (2016-04-10)
 ======
 
 Updated features:
@@ -108,7 +113,7 @@ Testing improvements:
 * Removed pended specs that were no longer relevant
 * Improved https regex in test suite (thanks, lucaskds!)
 
-v2.2.0
+v2.2.0 (2015-08-11)
 ======
 
 Updated features:

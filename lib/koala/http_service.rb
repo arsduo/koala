@@ -24,17 +24,11 @@ module Koala
       builder.adapter Faraday.default_adapter
     end
 
-    # Default servers for Facebook. These are read into the config OpenStruct,
-    # and can be overridden via Koala.config.
+    # Default server information for Facebook. These can be overridden by setting config values.
+    # See Koala.config.
     DEFAULT_SERVERS = {
       :graph_server => 'graph.facebook.com',
       :dialog_host => 'www.facebook.com',
-      # certain Facebook services (beta, video) require you to access different
-      # servers. If you're using your own servers, for instance, for a proxy,
-      # you can change both the matcher and the replacement values.
-      # So for instance, if you're talking to fbproxy.mycompany.com, you could
-      # set up beta.fbproxy.mycompany.com for FB's beta tier, and set the
-      # matcher to /\.fbproxy/ and the beta_replace to '.beta.fbproxy'.
       :host_path_matcher => /\.facebook/,
       :video_replace => '-video.facebook',
       :beta_replace => '.beta.facebook'

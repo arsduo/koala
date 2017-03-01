@@ -12,10 +12,10 @@ module Koala
       # @param app_id [String, Integer] a Facebook application ID
       # @param app_secret a Facebook application secret
       # @param oauth_callback_url the URL in your app to which users authenticating with OAuth will be sent
-      def initialize(app_id, app_secret, oauth_callback_url = nil)
-        @app_id = app_id
-        @app_secret = app_secret
-        @oauth_callback_url = oauth_callback_url
+      def initialize(app_id = nil, app_secret = nil, oauth_callback_url = nil)
+        @app_id = app_id || Koala.config.app_id
+        @app_secret = app_secret || Koala.config.app_secret
+        @oauth_callback_url = oauth_callback_url || Koala.config.oauth_callback_url
       end
 
       # Parses the cookie set Facebook's JavaScript SDK.
