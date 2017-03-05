@@ -7,9 +7,6 @@ module Koala
       # @note: to subscribe to real-time updates, you must have an application access token
       #        or provide the app secret when initializing your RealtimeUpdates object.
 
-      # The application API interface used to communicate with Facebook.
-      # @return [Koala::Facebook::API]
-      attr_reader :api
       attr_reader :app_id, :app_access_token, :secret
 
       # Create a new RealtimeUpdates instance.
@@ -29,14 +26,21 @@ module Koala
         unless @app_id && (@app_access_token || @secret) # make sure we have what we need
           raise ArgumentError, "Initialize must receive a hash with :app_id and either :app_access_token or :secret! (received #{options.inspect})"
         end
+      end
 
-        # fetch the access token if we're provided a secret
-        if @secret && !@app_access_token
-          oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
-          @app_access_token = oauth.get_app_access_token
-        end
+      # The app access token, either provided on initialization or fetched from Facebook using the
+      # app_id and secret.
+      def app_access_token
+        # If a token isn't provided but we need it, fetch it
+        @app_access_token ||= Koala::Facebook::OAuth.new(@app_id, @secret).get_app_access_token
+      end
 
-        @api = API.new(@app_access_token)
+      # The application API interface used to communicate with Facebook.
+      # @return [Koala::Facebook::API]
+      def api
+        # Only instantiate the API if needed. validate_update doesn't require it, so we shouldn't
+        # make an unnecessary request to get the app_access_token.
+        @api ||= API.new(app_access_token)
       end
 
       # Subscribe to realtime updates for certain fields on a given object (user, page, etc.).
@@ -60,7 +64,7 @@ module Koala
           :callback_url => callback_url,
         }.merge(verify_token ? {:verify_token => verify_token} : {})
         # a subscription is a success if Facebook returns a 200 (after hitting your server for verification)
-        @api.graph_call(subscription_path, args, 'post', options)
+        api.graph_call(subscription_path, args, 'post', options)
       end
 
       # Unsubscribe from updates for a particular object or from updates.
@@ -71,7 +75,7 @@ module Koala
       #
       # @raise A subclass of Koala::Facebook::APIError if the subscription request failed.
       def unsubscribe(object = nil, options = {})
-        @api.graph_call(subscription_path, object ? {:object => object} : {}, "delete", options)
+        api.graph_call(subscription_path, object ? {:object => object} : {}, "delete", options)
       end
 
       # List all active subscriptions for this application.
@@ -80,7 +84,7 @@ module Koala
       #
       # @return [Array] a list of active subscriptions
       def list_subscriptions(options = {})
-        @api.graph_call(subscription_path, {}, "get", options)
+        api.graph_call(subscription_path, {}, "get", options)
       end
 
       # As a security measure (to prevent DDoS attacks), Facebook sends a verification request to your server
@@ -129,12 +133,13 @@ module Koala
           raise AppSecretNotDefinedError, "You must init RealtimeUpdates with your app secret in order to validate updates"
         end
 
-        if request_signature = headers['X-Hub-Signature'] || headers['HTTP_X_HUB_SIGNATURE'] and
-           signature_parts = request_signature.split("sha1=")
-          request_signature = signature_parts[1]
-          calculated_signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body)
-          calculated_signature == request_signature
-        end
+        request_signature = headers['X-Hub-Signature'] || headers['HTTP_X_HUB_SIGNATURE']
+        return unless request_signature
+
+        signature_parts = request_signature.split("sha1=")
+        request_signature = signature_parts[1]
+        calculated_signature = OpenSSL::HMAC.hexdigest('sha1', @secret, body)
+        calculated_signature == request_signature
       end
 
       # The Facebook subscription management URL for your application.
