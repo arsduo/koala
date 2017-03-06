@@ -144,10 +144,10 @@ graph_api:
     message=Hello, world, from the test suite batch API!:
       post:
         with_token: '{"id": "FEED_ITEM_BATCH"}'
-    link=http://oauth.twoalex.com/&message=Hello, world, from the test suite again!&name=OAuth Playground:
+    link=http://testdomain.koalatest.test/&message=Hello, world, from the test suite again!&name=OAuth Playground:
       post:
         with_token: '{"id": "FEED_ITEM_CONTEXT"}'
-    link=http://oauth.twoalex.com/&message=body&name=It's a big question&picture=http://oauth.twoalex.com//images/logo.png&properties=<%= JSON.dump({"Link1"=>{"text"=>"Left", "href"=>"http://oauth.twoalex.com/"}, "other" => {"text"=>"Straight ahead", "href"=>"http://oauth.twoalex.com/?"}}) %>&type=link:
+    link=http://testdomain.koalatest.test/&message=body&name=It's a big question&picture=http://testdomain.koalatest.test//images/logo.png&properties=<%= JSON.dump({"Link1"=>{"text"=>"Left", "href"=>"http://testdomain.koalatest.test/"}, "other" => {"text"=>"Straight ahead", "href"=>"http://testdomain.koalatest.test/?"}}) %>&type=link:
       post:
         with_token: '{"id": "FEED_ITEM_DICTIONARY"}'
 
@@ -367,12 +367,12 @@ graph_api:
         with_token:
           code: 200
       get:
-        with_token: '{"data":[{"callback_url":"https://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
+        with_token: '{"data":[{"callback_url":"https://testdomain.koalatest.test/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
 
 
     callback_url=<%= SUBSCRIPTION_DATA["subscription_path"] %>:
       get:
-        with_token: '{"data":[{"callback_url":"https://oauth.twoalex.com/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
+        with_token: '{"data":[{"callback_url":"https://testdomain.koalatest.test/subscriptions", "fields":["name"], "object":"user", "active":true}]}'
 
 # -- Mock Item Responses --
 
@@ -394,13 +394,13 @@ graph_api:
     no_args:
       <<: *item_deleted
       get:
-        with_token: '{"link":"http://oauth.twoalex.com/", "name": "OAuth Playground"}'
+        with_token: '{"link":"http://testdomain.koalatest.test/", "name": "OAuth Playground"}'
 
   /FEED_ITEM_DICTIONARY:
     no_args:
       <<: *item_deleted
       get:
-        with_token: '{"link":"http://oauth.twoalex.com/", "name": "OAuth Playground", "properties": {}}'
+        with_token: '{"link":"http://testdomain.koalatest.test/", "name": "OAuth Playground", "properties": {}}'
 
   /FEED_ITEM_CATS:
     no_args:

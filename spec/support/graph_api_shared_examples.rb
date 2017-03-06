@@ -175,7 +175,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "can post a message with an attachment to a feed" do
-    result = @api.put_wall_post("Hello, world, from the test suite again!", {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"})
+    result = @api.put_wall_post("Hello, world, from the test suite again!", {:name => "OAuth Playground", :link => "http://testdomain.koalatest.test/"})
     @temporary_object_id = result["id"]
     expect(@temporary_object_id).not_to be_nil
   end
@@ -311,7 +311,7 @@ shared_examples_for "Koala GraphAPI with an access token" do
   end
 
   it "can verify a message with an attachment posted to a feed" do
-    attachment = {"name" => "OAuth Playground", "link" => "http://oauth.twoalex.com/"}
+    attachment = {"name" => "OAuth Playground", "link" => "http://testdomain.koalatest.test/"}
     result = @api.put_wall_post("Hello, world, from the test suite again!", attachment)
     @temporary_object_id = result["id"]
     get_result = @api.get_object(@temporary_object_id)
@@ -508,7 +508,7 @@ shared_examples_for "Koala GraphAPI without an access token" do
   # but are here for completeness
   it "can't post to a feed" do
     expect(lambda do
-      attachment = {:name => "OAuth Playground", :link => "http://oauth.twoalex.com/"}
+      attachment = {:name => "OAuth Playground", :link => "http://testdomain.koalatest.test/"}
       @result = @api.put_wall_post("Hello, world", attachment, "facebook")
     end).to raise_error(Koala::Facebook::AuthenticationError)
   end

@@ -5,9 +5,7 @@
 # by enter an OAuth token, code, and session_key (for real users) or changing the app_id and secret (for test users)
 # (note for real users: this will leave some photos and videos posted to your wall, since they can't be deleted through the API)
 
-# These values are configured to work with the OAuth Playground app by default
-# Of course, you can change this to work with your own app.
-# Check out http://oauth.twoalex.com/ to easily generate tokens, cookies, etc.
+# These values are configured to work with a test app. If you want, you can change this to work with your own app.
 
 # Your OAuth token should have the read_stream, publish_stream, user_photos, user_videos, and read_insights permissions.
 oauth_token:
@@ -22,7 +20,7 @@ oauth_test_data:
   # These values will work out of the box
   app_id: 119908831367602
   secret: e45e55a333eec232d4206d2703de1307
-  callback_url: http://oauth.twoalex.com/
+  callback_url: http://testdomain.koalatest.test/
   app_access_token: 119908831367602|o3wswWQ88LYjEC9-ukR_gjRIOMw.
   raw_token_string: "access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.&expires=6621"
   raw_offline_access_token_string: access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.
@@ -54,7 +52,7 @@ oauth_test_data:
       issued_at: 1301917299
 
 subscription_test_data:
-  subscription_path: https://oauth.twoalex.com/subscriptions
+  subscription_path: https://testdomain.koalatest.test/subscriptions
   verify_token: "myverificationtoken|1f54545d5f722733e17faae15377928f"
   challenge_data:
     "hub.challenge": "1290024882"
