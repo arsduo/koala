@@ -48,7 +48,7 @@ Internal improvements:
 * Use the more secure JSON.parse instead of JSON.load (thanks, lautis!) (#567)
 * Use JSON's quirks_mode option to remove hacky JSON hack (#573 -- thanks sakuro for the
   suggestion!)
-* Remove Autotest framework (no longer used/needed)
+* Remove Autotest and Guard references (no longer used/needed)
 
 Testing improvements:
 
