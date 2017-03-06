@@ -49,24 +49,23 @@ module Koala
           # Turn the call args collected into what facebook expects
           args = {"batch" => batch_args(batch)}
           batch.each do |call|
-            args.merge! call.files || {}
+            args.merge!(call.files || {})
           end
 
           original_api.graph_call("/", args, "post", http_options) do |response|
             raise bad_response if response.nil?
-            generate_results(response)
 
-            batch_results += generate_results(response)
+            batch_results += generate_results(response, batch)
           end
         end
 
         batch_results
       end
 
-      def generate_results(response)
+      def generate_results(response, batch)
         index = 0
         response.map do |call_result|
-          batch_op = batch_calls[index]
+          batch_op = batch[index]
           index += 1
           post_process = batch_op.post_processing
 
