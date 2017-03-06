@@ -8,6 +8,9 @@ module Koala
       # inside a batch call we can do anything a regular Graph API can do
       include GraphAPIMethods
 
+      # Limits from @see https://developers.facebook.com/docs/marketing-api/batch-requests/v2.8
+      MAX_CALLS = 50
+
       attr_reader :original_api
       def initialize(api)
         @original_api = api
@@ -35,26 +38,34 @@ module Koala
         nil # batch operations return nothing immediately
       end
 
-      # execute the queued batch calls
+      # execute the queued batch calls. limits it to 50 requests per call.
+      # NOTE: if you use `name` and JsonPath references, you should ensure to call `execute` for each
+      # co-reference group and that the group size is not greater than the above limits.
       def execute(http_options = {})
         return [] if batch_calls.empty?
 
-        # Turn the call args collected into what facebook expects
-        args = {"batch" => batch_args}
-        batch_calls.each do |call|
-          args.merge! call.files || {}
+        batch_results = []
+        batch_calls.each_slice(MAX_CALLS) do |batch|
+          # Turn the call args collected into what facebook expects
+          args = {"batch" => batch_args(batch)}
+          batch.each do |call|
+            args.merge!(call.files || {})
+          end
+
+          original_api.graph_call("/", args, "post", http_options) do |response|
+            raise bad_response if response.nil?
+
+            batch_results += generate_results(response, batch)
+          end
         end
 
-        original_api.graph_call("/", args, "post", http_options) do |response|
-          raise bad_response if response.nil?
-          generate_results(response)
-        end
+        batch_results
       end
 
-      def generate_results(response)
+      def generate_results(response, batch)
         index = 0
         response.map do |call_result|
-          batch_op = batch_calls[index]
+          batch_op = batch[index]
           index += 1
           post_process = batch_op.post_processing
 
@@ -104,8 +115,8 @@ module Koala
         GraphErrorChecker.new(code, body, headers).error_if_appropriate
       end
 
-      def batch_args
-        calls = batch_calls.map do |batch_op|
+      def batch_args(calls_for_batch)
+        calls = calls_for_batch.map do |batch_op|
           batch_op.to_batch_params(access_token, app_secret)
         end
 
