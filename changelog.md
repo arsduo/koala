@@ -57,6 +57,7 @@ Testing improvements:
 Others:
 
 * Added an issue and pull request template
+* Updated Code of Conduct to 1.4
 
 v2.5.0 (2017-02-17)
 ======
