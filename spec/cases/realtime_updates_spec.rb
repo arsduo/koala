@@ -106,25 +106,24 @@ describe "Koala::Facebook::RealtimeUpdates" do
       expect(updates).to be_a(Koala::Facebook::RealtimeUpdates)
     end
 
-    it "fetches an app_token from Facebook when provided an app_id and a secret" do
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-      expect(updates.app_access_token).not_to be_nil
-    end
-
-    it "uses the OAuth class to fetch a token when provided an app_id and a secret" do
-      oauth = Koala::Facebook::OAuth.new(@app_id, @secret)
-      token = oauth.get_app_access_token
-      expect(oauth).to receive(:get_app_access_token).and_return(token)
-      expect(Koala::Facebook::OAuth).to receive(:new).with(@app_id, @secret).and_return(oauth)
-      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
-    end
-
-    it "sets up the with the app acces token" do
+    it "sets up the API with the app access token" do
       updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :app_access_token => @app_access_token)
       expect(updates.api).to be_a(Koala::Facebook::API)
       expect(updates.api.access_token).to eq(@app_access_token)
     end
+  end
 
+  describe "#app_access_token" do
+    it "fetches an app_token from Facebook when provided an app_id and a secret" do
+      # integration test
+      updates = Koala::Facebook::RealtimeUpdates.new(:app_id => @app_id, :secret => @secret)
+      expect(updates.app_access_token).not_to be_nil
+    end
+
+    it "returns the provided token if provided" do
+      updates = Koala::Facebook::RealtimeUpdates.new(app_id: @app_id, app_access_token: @app_access_token)
+      expect(updates.app_access_token).to eq(@app_access_token)
+    end
   end
 
   describe "#subscribe" do

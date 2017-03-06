@@ -29,6 +29,7 @@ Updated features:
 * Koala.config now uses a dedicated Koala::Configuration object
 * TestUser#befriend will provide the appsecret_proof if a secret is set (thanks, kwasimensah!)
 * API#search now requires an object type parameter to be included, matching Facebook's API (#575)
+* RealtimeUpdates will now only fetch the app access token if necessary, avoiding unnecessary calls
 
 Removed features:
 
