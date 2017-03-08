@@ -48,6 +48,7 @@ Internal improvements:
 * Use the more secure JSON.parse instead of JSON.load (thanks, lautis!) (#567)
 * Use JSON's quirks_mode option to remove hacky JSON hack (#573 -- thanks sakuro for the
   suggestion!)
+* The gemspec now allows both JSON 1.8 and 2.0 (#596) (thanks, pawandubey!)
 * Remove Autotest and Guard references (no longer used/needed)
 
 Testing improvements:
