@@ -1,4 +1,4 @@
-v3.0.0 (not released yet)
+v3.0.0 (2017-03-17)
 ======
 
 Most users should not see any difference upgrading from 2.x to 3.0. Most of the changes are

@@ -12,27 +12,21 @@ Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/
 Installation
 ------------
 
-**Koala 3.0 is in beta! There should be no significant changes** for most users -- please check it
-out!
+**Koala 3.0 is out! There should be no significant changes** for most users. If you encounter any
+problems, please file an issue and I'll take a look.
 
 In Bundler:
 ```ruby
-gem "koala", "~> 3.0.0.beta2"
-# if you need the previous release
-gem "koala", "~> 2.4"
+gem "koala"
 ```
 
 Otherwise:
 ```bash
-[sudo|rvm] gem install koala --pre
-# if you need the previous release
 [sudo|rvm] gem install koala
 ```
 
 Configuration
 -------------
-
-**Available with 3.0.0.beta3**
 
 Most applications will only use one application configuration. Rather than having to provide that
 value every time, you can configure Koala to use global settings:
