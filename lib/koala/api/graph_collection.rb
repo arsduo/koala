@@ -116,7 +116,9 @@ module Koala
           base = uri.path.sub(/^\//, '')
           params = CGI.parse(uri.query)
 
-          new_params = {}
+          api_version, base = $1, $3 if base =~ /(v\d\.\d)(\/)(.*)/
+
+          new_params = api_version ? {'api_version' => api_version} : {}
           params.each_pair do |key,value|
             new_params[key] = value.join ","
           end
