@@ -202,7 +202,7 @@ module Koala
       end
 
       # Fetches an access_token with extended expiration time, along with any other information provided by Facebook.
-      # See https://developers.facebook.com/docs/offline-access-deprecation/#extend_token (search for fb_exchange_token).
+      # See https://developers.facebook.com/docs/facebook-login/access-tokens/expiration-and-extension (search for fb_exchange_token).
       #
       # @param access_token the access token to exchange
       # @param options any additional parameters to send to Facebook when exchanging tokens.
