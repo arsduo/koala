@@ -474,12 +474,17 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
   end
 
   describe '#big_batches' do
+    before :all do
+      @random = Random.new
+    end
     before :each do
       payload = [{code: 200, headers: [{name: "Content-Type", value: "text/javascript; charset=UTF-8"}], body: "{\"id\":\"1234\"}"}]
       allow(Koala).to receive(:make_request) do |_request, args, _verb, _options|
         request_count = JSON.parse(args['batch']).length
         expect(request_count).to be <= 50   # check FB's limit
-        Koala::HTTPService::Response.new(200, (payload * request_count).to_json, {})
+        # simulate FB's result truncation
+        response_count = request_count > 35 ? request_count - @random.rand(15) : request_count
+        Koala::HTTPService::Response.new(200, (payload * response_count).to_json, {})
       end
     end
 
