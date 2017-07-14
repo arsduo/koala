@@ -112,6 +112,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
     describe "#to_batch_params" do
       describe "handling arguments and URLs" do
         shared_examples_for "request with no body" do
+          it "casts the URL to string" do
+            @args[:url] = url = 1923883983
+            allow(Koala.http_service).to receive(:encode_params).and_return('')
+
+            expect(Koala::Facebook::GraphBatchAPI::BatchOperation.new(@args).to_batch_params(nil, nil)[:relative_url]).to eq("#{url}")
+          end
+
           it "adds the args to the URL string, with ? if no args previously present" do
             test_args = "foo"
             @args[:url] = url = "/"

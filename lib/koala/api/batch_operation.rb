@@ -41,7 +41,7 @@ module Koala
 
           response = {
             :method => @method.to_s,
-            :relative_url => @url,
+            :relative_url => @url.to_s,
           }
 
           # handle batch-level arguments, such as name, depends_on, and attached_files
