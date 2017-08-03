@@ -538,7 +538,7 @@ describe "Koala::Facebook::OAuth" do
 
         it "passes on any options provided to make_request" do
           options = {:a => 2}
-          expect(Koala).to receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
+          expect(Koala).to receive(:make_request).with(anything, anything, 'get', hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
           @oauth.get_app_access_token(options)
         end
       end
