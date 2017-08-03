@@ -613,7 +613,7 @@ describe "Koala::Facebook::OAuth" do
         end
 
         it "fetches a proper token string from Facebook when asked for the app token" do
-          result = @oauth.send(:fetch_token_string, {:grant_type => 'client_credentials'}, true)
+          result = @oauth.send(:fetch_token_string, {:grant_type => 'client_credentials'})
           expect(result).to match(/^access_token/)
         end
       end

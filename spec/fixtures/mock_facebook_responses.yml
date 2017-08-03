@@ -306,7 +306,7 @@ graph_api:
       get:
         <<: *oauth_error
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&grant_type=client_credentials:
-      post:
+      get:
         no_token: access_token=<%= APP_ACCESS_TOKEN %>
     client_id=<%= APP_ID %>&client_secret=<%= SECRET %>&fb_exchange_token=<%= ACCESS_TOKEN %>&grant_type=fb_exchange_token:
       post:
