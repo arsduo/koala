@@ -11,10 +11,6 @@ module Koala
         @headers = headers
       end
 
-      # Facebook has a set of standardized error codes, some of which represent problems with the
-      # token.
-      AUTHENTICATION_ERROR_CODES = [102, 190, 450, 452, 2500]
-
       # Facebook can return debug information in the response headers -- see
       # https://developers.facebook.com/docs/graph-api/using-graph-api#bugdebug
       DEBUG_HEADERS = ["x-fb-debug", "x-fb-rev", "x-fb-trace-id"]
@@ -38,10 +34,7 @@ module Koala
       end
 
       def auth_error?
-        # tbh, I'm not sure why we restrict Facebook-reported OAuthExceptions to only those without
-        # codes or whose codes match the list above -- let's investigate changing this later.
-        error_info['type'] == 'OAuthException' &&
-          (!error_info['code'] || AUTHENTICATION_ERROR_CODES.include?(error_info['code'].to_i))
+        error_info['type'] == 'OAuthException'
       end
 
       def error_info
