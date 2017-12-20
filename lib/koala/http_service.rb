@@ -77,14 +77,35 @@ module Koala
     #   => "a=2&b=My+String"
     #
     # @return the appropriately-encoded string
-    def self.encode_params(param_hash)
-      ((param_hash || {}).sort_by{|k, v| k.to_s}.collect do |key_and_value|
-        value = key_and_value[1]
-        unless value.is_a? String
-          value = value.to_json
+    class EncodedParams
+      def initialize(params)
+        @params = (params || {}).sort_by{|k, _| k.to_s}
+      end
+
+      def to_s
+        encode_from_params(stringify_values_from_params(@params))
+      end
+
+      private
+
+      def stringify_values_from_params(params)
+        params.collect do |(key, value)|
+          unless value.is_a? String
+            value = value.to_json
+          end
+          [key, value]
         end
-        "#{key_and_value[0].to_s}=#{CGI.escape value}"
-      end).join("&")
+      end
+
+      def encode_from_params(params)
+        params.collect do |(key, value)|
+          "#{key}=#{CGI.escape value}"
+        end.join("&")
+      end
+    end
+
+    def self.encode_params(params)
+      EncodedParams.new(params).to_s
     end
 
     private
