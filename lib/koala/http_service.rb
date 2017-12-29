@@ -3,6 +3,7 @@ require 'koala/http_service/multipart_request'
 require 'koala/http_service/uploadable_io'
 require 'koala/http_service/response'
 require 'koala/http_service/request'
+require 'koala/http_service/encoded_params'
 
 module Koala
   module HTTPService
@@ -77,33 +78,6 @@ module Koala
     #   => "a=2&b=My+String"
     #
     # @return the appropriately-encoded string
-    class EncodedParams
-      def initialize(params)
-        @params = (params || {}).sort_by{|k, _| k.to_s}
-      end
-
-      def to_s
-        encode_from_params(stringify_values_from_params(@params))
-      end
-
-      private
-
-      def stringify_values_from_params(params)
-        params.collect do |(key, value)|
-          unless value.is_a? String
-            value = value.to_json
-          end
-          [key, value]
-        end
-      end
-
-      def encode_from_params(params)
-        params.collect do |(key, value)|
-          "#{key}=#{CGI.escape value}"
-        end.join("&")
-      end
-    end
-
     def self.encode_params(params)
       EncodedParams.new(params).to_s
     end
