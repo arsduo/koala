@@ -1,5 +1,4 @@
 require 'koala/api'
-require 'koala/api/graph_batch_api'
 
 module Koala
   module Facebook
