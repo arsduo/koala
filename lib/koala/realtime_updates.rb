@@ -7,7 +7,7 @@ module Koala
       # @note: to subscribe to real-time updates, you must have an application access token
       #        or provide the app secret when initializing your RealtimeUpdates object.
 
-      attr_reader :app_id, :app_access_token, :secret
+      attr_reader :app_id, :secret
 
       # Create a new RealtimeUpdates instance.
       # If you don't have your app's access token, provide the app's secret and
