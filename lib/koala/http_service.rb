@@ -49,6 +49,9 @@ module Koala
       # set up our Faraday connection
       conn = Faraday.new(request.server, faraday_options(request.options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
+      # Log URL information
+      Koala::Utils.debug "#{request.verb.upcase}: #{request.path} params: #{request.raw_args.inspect}"
+      
       if request.verb == "post" && request.json?
         # JSON requires a bit more handling
         # remember, all non-GET requests are turned into POSTs, so this covers everything but GETs
@@ -62,8 +65,6 @@ module Koala
         response = conn.send(request.verb, request.path, request.post_args)
       end
 
-      # Log URL information
-      Koala::Utils.debug "#{request.verb.upcase}: #{request.path} params: #{request.raw_args.inspect}"
       Koala::HTTPService::Response.new(response.status.to_i, response.body, response.headers)
     end
 
