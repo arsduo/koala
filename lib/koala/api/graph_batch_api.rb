@@ -1,5 +1,6 @@
 require "koala/api"
 require "koala/api/batch_operation"
+require 'byebug'
 
 module Koala
   module Facebook
@@ -53,7 +54,12 @@ module Koala
           end
 
           original_api.graph_call("/", args, "post", http_options) do |response|
+            byebug
             raise bad_response if response.nil?
+
+            unless Json.parse(response.body).is_a?(Array)
+              raise BadFacebookResponse.new(200, '', "Facebook returned an invalid body")
+            end
 
             batch_results += generate_results(response, batch)
           end
@@ -138,6 +144,11 @@ module Koala
         # facebook returns the headers as an array of k/v pairs, but we want a regular hash
         when :headers then headers
         # (see note in regular api method about JSON parsing)
+        when :response
+            Koala::HTTPService::Response.new(
+                response["code"].to_i,
+                response["body"],
+                headers)
         else GraphCollection.evaluate(result, original_api)
         end
       end
