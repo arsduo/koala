@@ -54,13 +54,13 @@ module Koala
           end
 
           original_api.graph_call("/", args, "post", http_options) do |response|
+            response = JSON.parse(response.body)
             byebug
             raise bad_response if response.nil?
 
-            unless Json.parse(response.body).is_a?(Array)
+            unless response.is_a?(Array)
               raise BadFacebookResponse.new(200, '', "Facebook returned an invalid body")
             end
-
             batch_results += generate_results(response, batch)
           end
         end
