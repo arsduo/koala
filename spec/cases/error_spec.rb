@@ -30,7 +30,8 @@ describe Koala::Facebook::APIError do
         'error_subcode' => 'subcode',
         'error_user_msg' => 'error user message',
         'error_user_title' => 'error user title',
-        'x-fb-trace-id' => 'fb trace id',
+        'fbtrace_id' => 'fb trace id',
+        'x-fb-trace-id' => 'x-fb trace id',
         'x-fb-debug' => 'fb debug token',
         'x-fb-rev' => 'fb revision'
       }
@@ -45,6 +46,7 @@ describe Koala::Facebook::APIError do
       :fb_error_user_msg => 'error user message',
       :fb_error_user_title => 'error user title',
       :fb_error_trace_id => 'fb trace id',
+      :fb_error_debug_trace_id => 'x-fb trace id',
       :fb_error_debug => 'fb debug token',
       :fb_error_rev => 'fb revision'
     }.each_pair do |accessor, value|
@@ -54,7 +56,7 @@ describe Koala::Facebook::APIError do
     end
 
     it "sets the error message appropriately" do
-      expect(error.message).to eq("type: type, code: 1, error_subcode: subcode, message: message, error_user_title: error user title, error_user_msg: error user message, x-fb-trace-id: fb trace id [HTTP 400]")
+      expect(error.message).to eq("type: type, code: 1, error_subcode: subcode, message: message, error_user_title: error user title, error_user_msg: error user message, fbtrace_id: fb trace id, x-fb-trace-id: x-fb trace id, x-fb-debug: fb debug token, x-fb-rev: fb revision [HTTP 400]")
     end
   end
 
