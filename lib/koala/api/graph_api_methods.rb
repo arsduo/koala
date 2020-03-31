@@ -351,7 +351,7 @@ module Koala
       def search(search_terms, args = {}, options = {}, &block)
         # Normally we wouldn't enforce Facebook API behavior, but the API fails with cryptic error
         # messages if you fail to include a type term. For a convenience method, that is valuable.
-        raise ArgumentError, "type must be includedin args when searching" unless args[:type] || args["type"]
+        raise ArgumentError, "type must be included in args when searching" unless args[:type] || args["type"]
         graph_call("search", args.merge("q" => search_terms), "get", options, &block)
       end
 
