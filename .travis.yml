@@ -2,8 +2,7 @@ language: ruby
 sudo: false
 cache: bundler
 rvm:
-  - 2.4
-  - 2.4.6
+  - 2.4.10
   - 2.5
   - 2.6
   - ruby-head
