@@ -3,7 +3,7 @@ sudo: false
 cache: bundler
 rvm:
   - 2.4.10
-  - 2.5
+  - 2.5.8
   - 2.6
   - ruby-head
 bundler_args: --without development
