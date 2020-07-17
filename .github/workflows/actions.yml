@@ -1,0 +1,43 @@
+name: repo-checks
+
+on: [push]
+
+jobs:
+  main:
+    name: java test
+    runs-on: [ self-hosted, zendesk-stable ]
+    steps:
+    - uses: zendesk/checkout@v2
+    - uses: zendesk/setup-java@v1
+      with:
+        java-version: '8'
+    - name: Cache Gradle
+      uses: zendesk/cache@v1
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    - name: build script
+      run: |
+        ./gradlew clean build
+  deploy:
+    name: deploy-job
+    runs-on: [ self-hosted, zendesk-stable ]
+    if: startsWith(github.ref, "refs/tags/")
+    steps:
+    - uses: zendesk/checkout@v2
+    - uses: zendesk/setup-java@v1
+      with:
+        java-version: '8'
+    - name: Cache Gradle
+      uses: zendesk/cache@v1
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    - name: build script
+      run: |
+        bash -v scripts/publishToBintray.sh
+  
