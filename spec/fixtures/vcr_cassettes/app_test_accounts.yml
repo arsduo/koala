@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://graph.facebook.com/v2.8/119908831367602/accounts?access_token=**
+    uri: https://graph.facebook.com/v2.8/119908831367602/accounts?access_token=********************
     body:
       encoding: US-ASCII
       string: ''
