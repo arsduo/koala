@@ -153,7 +153,8 @@ describe Koala::HTTPService do
 
       it "logs verb, url and params to debug" do
         log_message = "#{verb.upcase}: #{request.path} params: #{request.raw_args.inspect}"
-        expect(Koala::Utils.logger).to receive(:debug).with(log_message)
+        expect(Koala::Utils.logger).to receive(:debug).with("STARTED => #{log_message}")
+        expect(Koala::Utils.logger).to receive(:debug).with("FINISHED => #{log_message}")
 
         Koala::HTTPService.make_request(request)
       end
