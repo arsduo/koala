@@ -8,7 +8,7 @@ module Koala
     # Mocks all HTTP requests for with koala_spec_with_mocks.rb
     # Mocked values to be included in TEST_DATA used in specs
     ACCESS_TOKEN = '*'
-    APP_ACCESS_TOKEN = "**"
+    APP_ACCESS_TOKEN = "********************"
     OAUTH_CODE = 'OAUTHCODE'
 
     # Loads testing data
