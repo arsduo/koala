@@ -48,6 +48,6 @@ class Koala::Configuration
     Koala::HTTPService::DEFAULT_SERVERS.each_pair do |key, value|
       self.public_send("#{key}=", value)
     end
-    mask_tokens = true
+    self.mask_tokens = true
   end
 end
