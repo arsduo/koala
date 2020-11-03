@@ -49,7 +49,7 @@ module Koala
       # set up our Faraday connection
       conn = Faraday.new(request.server, faraday_options(request.options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
-      filtered_args = request.raw_args.dup
+      filtered_args = request.raw_args.dup.transform_keys(&:to_s)
 
       if Koala.config.mask_tokens
         %w(access_token input_token).each do |arg_token|
