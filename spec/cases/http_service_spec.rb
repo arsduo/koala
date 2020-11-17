@@ -257,6 +257,17 @@ describe Koala::HTTPService do
 
         Koala::HTTPService.make_request(request)
       end
+
+      it 'hides the token for the debug_token api endpoint' do
+        request = Koala::HTTPService::Request.new(path: "/debug_token", verb: verb, args: { input_token: 'myvisibleaccesstoken', 'access_token' => 'myvisibleaccesstoken' }, options: options)
+
+        allow(Koala.config).to receive(:mask_tokens) { true }
+
+        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
+        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
+
+        Koala::HTTPService.make_request(request)
+      end
     end
   end
 end
