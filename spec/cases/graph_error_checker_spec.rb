@@ -85,7 +85,7 @@ module Koala
               "x-fb-rev" => double("fb rev"),
               "x-fb-trace-id" => double("fb trace id"),
             )
-            expect(error.fb_error_trace_id).to eq(headers["x-fb-trace-id"])
+            expect(error.fb_error_debug_trace_id).to eq(headers["x-fb-trace-id"])
             expect(error.fb_error_debug).to eq(headers["x-fb-debug"])
             expect(error.fb_error_rev).to eq(headers["x-fb-rev"])
           end

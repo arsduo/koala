@@ -22,6 +22,7 @@ module Koala
                     :fb_error_user_msg,
                     :fb_error_user_title,
                     :fb_error_trace_id,
+                    :fb_error_debug_trace_id,
                     :fb_error_debug,
                     :fb_error_rev
 
@@ -62,13 +63,14 @@ module Koala
           self.fb_error_message = error_info["message"]
           self.fb_error_user_msg = error_info["error_user_msg"]
           self.fb_error_user_title = error_info["error_user_title"]
+          self.fb_error_trace_id = error_info["fbtrace_id"]
 
-          self.fb_error_trace_id = error_info["x-fb-trace-id"]
+          self.fb_error_debug_trace_id = error_info["x-fb-trace-id"]
           self.fb_error_debug = error_info["x-fb-debug"]
           self.fb_error_rev = error_info["x-fb-rev"]
 
           error_array = []
-          %w(type code error_subcode message error_user_title error_user_msg x-fb-trace-id).each do |key|
+          %w(type code error_subcode message error_user_title error_user_msg fbtrace_id x-fb-trace-id x-fb-debug x-fb-rev).each do |key|
             error_array << "#{key}: #{error_info[key]}" if error_info[key]
           end
 
