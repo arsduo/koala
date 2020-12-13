@@ -3,10 +3,6 @@ require 'spec_helper'
 module Koala
   module Facebook
     RSpec.describe GraphErrorChecker do
-      it "defines a set of AUTHENTICATION_ERROR_CODES" do
-        expect(GraphErrorChecker::AUTHENTICATION_ERROR_CODES).to match_array([102, 190, 450, 452, 2500])
-      end
-
       it "defines a set of DEBUG_HEADERS" do
         expect(GraphErrorChecker::DEBUG_HEADERS).to match_array([
           "x-fb-rev",
@@ -94,13 +90,6 @@ module Koala
             it "if FB says it's an OAuthException and it has no code" do
               body.replace({"error" => {"type" => "OAuthException"}}.to_json)
               expect(error).to be_an(AuthenticationError)
-            end
-
-            GraphErrorChecker::AUTHENTICATION_ERROR_CODES.each do |error_code|
-              it "if FB says it's an OAuthException and it has code #{error_code}" do
-                body.replace({"error" => {"type" => "OAuthException", "code" => error_code}}.to_json)
-                expect(error).to be_an(AuthenticationError)
-              end
             end
           end
 
