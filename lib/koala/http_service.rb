@@ -49,6 +49,18 @@ module Koala
       # set up our Faraday connection
       conn = Faraday.new(request.server, faraday_options(request.options), &(faraday_middleware || DEFAULT_MIDDLEWARE))
 
+      filtered_args = request.raw_args.dup.transform_keys(&:to_s)
+
+      if Koala.config.mask_tokens
+        %w(access_token input_token).each do |arg_token|
+          if (token = filtered_args[arg_token])
+            filtered_args[arg_token] = token[0, 10] + '*****' + token[-5, 5]
+          end
+        end
+      end
+
+      Koala::Utils.debug "STARTED => #{request.verb.upcase}: #{request.path} params: #{filtered_args.inspect}"
+
       if request.verb == "post" && request.json?
         # JSON requires a bit more handling
         # remember, all non-GET requests are turned into POSTs, so this covers everything but GETs
@@ -62,8 +74,7 @@ module Koala
         response = conn.send(request.verb, request.path, request.post_args)
       end
 
-      # Log URL information
-      Koala::Utils.debug "#{request.verb.upcase}: #{request.path} params: #{request.raw_args.inspect}"
+      Koala::Utils.debug "FINISHED => #{request.verb.upcase}: #{request.path} params: #{filtered_args.inspect}"
       Koala::HTTPService::Response.new(response.status.to_i, response.body, response.headers)
     end
 

@@ -122,7 +122,8 @@ describe Koala::HTTPService do
 
     let(:verb) { "get" }
     let(:options) { {} }
-    let(:request) { Koala::HTTPService::Request.new(path: "/foo", verb: verb, args: {"an" => :arg}, options: options) }
+    let(:args) { {"an" => :arg } }
+    let(:request) { Koala::HTTPService::Request.new(path: "/foo", verb: verb, args: args, options: options) }
 
     shared_examples_for :making_a_request do
       before :each do
@@ -153,7 +154,8 @@ describe Koala::HTTPService do
 
       it "logs verb, url and params to debug" do
         log_message = "#{verb.upcase}: #{request.path} params: #{request.raw_args.inspect}"
-        expect(Koala::Utils.logger).to receive(:debug).with(log_message)
+        expect(Koala::Utils.logger).to receive(:debug).with("STARTED => #{log_message}")
+        expect(Koala::Utils.logger).to receive(:debug).with("FINISHED => #{log_message}")
 
         Koala::HTTPService.make_request(request)
       end
@@ -229,6 +231,43 @@ describe Koala::HTTPService do
       end
 
       Koala::HTTPService.make_request(request)
+    end
+
+    context 'log_tokens configuration' do
+      let(:args) { { "an" => :arg, "access_token" => "myvisbleaccesstoken" } }
+
+      before(:each) do
+        allow_any_instance_of(Faraday::Connection).to receive(:get) { double(status: '200', body: 'ok', headers: {}) }
+      end
+
+      it 'logs tokens' do
+        allow(Koala.config).to receive(:mask_tokens) { false }
+
+        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleaccesstoken"}')
+        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleaccesstoken"}')
+
+        Koala::HTTPService.make_request(request)
+      end
+
+      it 'doesnt log tokens' do
+        allow(Koala.config).to receive(:mask_tokens) { true }
+
+        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleac*****token"}')
+        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleac*****token"}')
+
+        Koala::HTTPService.make_request(request)
+      end
+
+      it 'hides the token for the debug_token api endpoint' do
+        request = Koala::HTTPService::Request.new(path: "/debug_token", verb: verb, args: { input_token: 'myvisibleaccesstoken', 'access_token' => 'myvisibleaccesstoken' }, options: options)
+
+        allow(Koala.config).to receive(:mask_tokens) { true }
+
+        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
+        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
+
+        Koala::HTTPService.make_request(request)
+      end
     end
   end
 end
