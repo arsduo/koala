@@ -45,7 +45,9 @@ module Koala
         return [] if batch_calls.empty?
 
         batch_results = []
-        batch_calls.each_slice(MAX_CALLS) do |batch|
+        until batch_calls.empty? do
+          batch = batch_calls.shift(MAX_CALLS)
+
           # Turn the call args collected into what facebook expects
           args = {"batch" => batch_args(batch)}
           batch.each do |call|
@@ -55,7 +57,13 @@ module Koala
           original_api.graph_call("/", args, "post", http_options) do |response|
             raise bad_response if response.nil?
 
-            batch_results += generate_results(response, batch)
+            # FB sometimes truncates the submission batch. dhm thinks it may be limiting create actions
+            # without erroring
+            slice_results = generate_results(response, batch)
+            batch_results += slice_results
+            if slice_results.length < batch.length
+              batch_calls.unshift(*batch[slice_results.length .. batch.length])
+            end
           end
         end
 
