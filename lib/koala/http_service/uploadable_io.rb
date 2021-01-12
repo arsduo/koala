@@ -7,13 +7,14 @@ module Koala
       attr_reader :io_or_path, :content_type, :filename
 
       def initialize(io_or_path_or_mixed, content_type = nil, filename = nil)
+        @io_or_path = nil
         # see if we got the right inputs
         parse_init_mixed_param io_or_path_or_mixed, content_type
 
         # filename is used in the Ads API
         # if it's provided, take precedence over the detected filename
         # otherwise, fall back to a dummy name
-        @filename = filename || @filename || "koala-io-file.dum"
+        @filename = filename || (defined?(@filename) && @filename) || "koala-io-file.dum"
 
         raise KoalaError.new("Invalid arguments to initialize an UploadableIO") unless @io_or_path
         raise KoalaError.new("Unable to determine MIME type for UploadableIO") if !@content_type

@@ -1,5 +1,4 @@
 require 'koala/api'
-require 'koala/api/graph_batch_api'
 
 module Koala
   module Facebook
@@ -23,6 +22,7 @@ module Koala
           @url = options[:url]
           @method = options[:method].to_sym
           @post_processing = options[:post_processing]
+          @files = nil
 
           process_binary_args
 
