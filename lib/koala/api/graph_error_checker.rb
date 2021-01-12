@@ -13,7 +13,7 @@ module Koala
 
       # Facebook has a set of standardized error codes, some of which represent problems with the
       # token.
-      AUTHENTICATION_ERROR_CODES = [102, 190, 450, 452, 2500]
+      AUTHENTICATION_ERROR_CODES = [102, 190, 450, 452, 2500, 104].freeze
 
       # Facebook can return debug information in the response headers -- see
       # https://developers.facebook.com/docs/graph-api/using-graph-api#bugdebug
