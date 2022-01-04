@@ -39,8 +39,7 @@ describe Koala::HTTPService do
 
     it "adds the right default middleware" do
       Koala::HTTPService::DEFAULT_MIDDLEWARE.call(builder)
-      expect(builder.requests).to eq([:url_encoded])
-      expect(builder.uses).to eq([Koala::HTTPService::MultipartRequest])
+      expect(builder.requests).to eq([:multipart, :url_encoded])
       expect(builder.adapters).to eq([Faraday.default_adapter])
     end
   end
@@ -194,18 +193,16 @@ describe Koala::HTTPService do
 
     it "uses the default builder block if HTTPService.faraday_middleware block is not defined" do
       block = Proc.new { |builder|
-        builder.use Koala::HTTPService::MultipartRequest
+        builder.request :multipart
         builder.request :url_encoded
-        builder.use Koala::HTTPService::MultipartRequest
       }
       stub_const("Koala::HTTPService::DEFAULT_MIDDLEWARE", block)
       allow(Koala::HTTPService).to receive(:faraday_middleware).and_return(nil)
 
       expect_any_instance_of(Faraday::Connection).to receive(:get) do |instance|
         expect(instance.builder.handlers).to eq([
-          Koala::HTTPService::MultipartRequest,
+          Faraday::Request::Multipart,
           Faraday::Request::UrlEncoded,
-          Koala::HTTPService::MultipartRequest
         ])
         mock_http_response
       end
@@ -215,17 +212,15 @@ describe Koala::HTTPService do
 
     it "uses the defined HTTPService.faraday_middleware block if defined" do
       block = Proc.new { |builder|
-        builder.use Koala::HTTPService::MultipartRequest
+        builder.request :multipart
         builder.request :url_encoded
-        builder.use Koala::HTTPService::MultipartRequest
       }
       expect(Koala::HTTPService).to receive(:faraday_middleware).and_return(block)
 
       expect_any_instance_of(Faraday::Connection).to receive(:get) do |instance|
         expect(instance.builder.handlers).to eq([
-          Koala::HTTPService::MultipartRequest,
+          Faraday::Request::Multipart,
           Faraday::Request::UrlEncoded,
-          Koala::HTTPService::MultipartRequest
         ])
         mock_http_response
       end
