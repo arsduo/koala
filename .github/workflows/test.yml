@@ -31,3 +31,5 @@ jobs:
       uses: paambaati/codeclimate-action@v3.0.0
       env:
         CC_TEST_REPORTER_ID: 7af99d9225b4c14640f9ec3cb2e24d2f7103ac49417b0bd989188fb6c25f2909
+      with:
+        coverageCommand: "echo 'already done'"
