@@ -11,6 +11,8 @@ Removed features:
 
 Internal improvements:
 
+* Compatibility with ruby 3.x
+
 Testing improvements:
 
 Others:
