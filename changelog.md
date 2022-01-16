@@ -15,6 +15,8 @@ Removed features:
 
 Internal improvements:
 
+* Lock Faraday to < 2
+
 Testing improvements:
 
 * Run Travis on latest rubies and fix config
