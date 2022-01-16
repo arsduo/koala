@@ -11,8 +11,6 @@ Removed features:
 
 Internal improvements:
 
-* Compatibility with ruby 3.x
-
 Testing improvements:
 
 Others:
@@ -30,6 +28,7 @@ Updated features:
 
 Internal improvements:
 
+* Compatibility with ruby 3.x
 * Lock Faraday to < 2
 
 Testing improvements:
