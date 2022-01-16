@@ -27,7 +27,7 @@ jobs:
     - name: Specs
       run: bundle exec rspec
 
-    - name: Covergage
+    - name: Coverage
+      uses: paambaati/codeclimate-action@v3.0.0
       env:
-        CODECLIMATE_REPO_TOKEN: 7af99d9225b4c14640f9ec3cb2e24d2f7103ac49417b0bd989188fb6c25f2909
-      run: bundle exec codeclimate-test-reporter
+        CC_TEST_REPORTER_ID: 7af99d9225b4c14640f9ec3cb2e24d2f7103ac49417b0bd989188fb6c25f2909
