@@ -102,7 +102,7 @@ module Koala
         args = sanitize_request_parameters(args) unless preserve_form_arguments?(options)
 
         # add a leading / if needed...
-        path = "/#{path}" unless path =~ /^\//
+        path = "/#{path}" unless path.to_s =~ /^\//
 
         # make the request via the provided service
         result = Koala.make_request(path, args, verb, options)
