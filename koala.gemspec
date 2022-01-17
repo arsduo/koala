@@ -26,4 +26,5 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency("faraday", "< 2")
   gem.add_runtime_dependency("addressable")
   gem.add_runtime_dependency("json", ">= 1.8")
+  gem.add_runtime_dependency("rexml")
 end
