@@ -17,7 +17,8 @@ Internal improvements:
 
 Testing improvements:
 
-* Run Travis on latest rubies and fix config
+* Use Github actions for CI
+* Run CI on latest rubies
 
 Others:
 
