@@ -15,7 +15,7 @@ group :test do
   gem "rspec", '~> 3.4'
   gem "vcr"
   gem "webmock"
-  gem "codeclimate-test-reporter", "~> 1.0.0", require: nil
+  gem "simplecov"
 end
 
 gem "jruby-openssl" if defined? JRUBY_VERSION
