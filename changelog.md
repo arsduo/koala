@@ -5,13 +5,26 @@ Unreleased
 
 New features:
 
+Updated features:
+
+Removed features:
+
+Internal improvements:
+
+Testing improvements:
+
+Others:
+
+v3.1.0 (2022-18-01)
+======
+
+New features:
+
 * mask_tokens config (default: true) to mask tokens in logs
 
 Updated features:
 
 * Log before and after sending request
-
-Removed features:
 
 Internal improvements:
 
@@ -22,9 +35,6 @@ Testing improvements:
 
 * Use Github actions for CI
 * Run CI on latest rubies
-
-Others:
-
 
 v3.0.0 (2017-03-17)
 ======
