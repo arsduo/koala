@@ -5,11 +5,7 @@ Unreleased
 
 New features:
 
-* mask_tokens config (default: true) to mask tokens in logs
-
 Updated features:
-
-* Log before and after sending request
 
 Removed features:
 
@@ -17,10 +13,28 @@ Internal improvements:
 
 Testing improvements:
 
-* Run Travis on latest rubies and fix config
-
 Others:
 
+v3.1.0 (2022-18-01)
+======
+
+New features:
+
+* mask_tokens config (default: true) to mask tokens in logs
+
+Updated features:
+
+* Log before and after sending request
+
+Internal improvements:
+
+* Lock Faraday to < 2
+* Compatibility with ruby 3.x
+
+Testing improvements:
+
+* Use Github actions for CI
+* Run CI on latest rubies
 
 v3.0.0 (2017-03-17)
 ======
