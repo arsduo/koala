@@ -1,4 +1,5 @@
 require 'faraday'
+require 'faraday/multipart'
 require 'koala/http_service/uploadable_io'
 require 'koala/http_service/response'
 require 'koala/http_service/request'

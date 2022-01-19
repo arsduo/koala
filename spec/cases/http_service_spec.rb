@@ -201,7 +201,7 @@ describe Koala::HTTPService do
 
       expect_any_instance_of(Faraday::Connection).to receive(:get) do |instance|
         expect(instance.builder.handlers).to eq([
-          Faraday::Request::Multipart,
+          Faraday::Multipart::Middleware,
           Faraday::Request::UrlEncoded,
         ])
         mock_http_response
@@ -219,7 +219,7 @@ describe Koala::HTTPService do
 
       expect_any_instance_of(Faraday::Connection).to receive(:get) do |instance|
         expect(instance.builder.handlers).to eq([
-          Faraday::Request::Multipart,
+          Faraday::Multipart::Middleware,
           Faraday::Request::UrlEncoded,
         ])
         mock_http_response
