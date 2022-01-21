@@ -18,6 +18,7 @@ module Koala
       def initialize(access_token = Koala.config.access_token, app_secret = Koala.config.app_secret)
         @access_token = access_token
         @app_secret = app_secret
+        @app_access_token = nil
       end
 
       attr_reader :access_token, :app_secret
