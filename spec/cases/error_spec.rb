@@ -32,7 +32,9 @@ describe Koala::Facebook::APIError do
         'error_user_title' => 'error user title',
         'x-fb-trace-id' => 'fb trace id',
         'x-fb-debug' => 'fb debug token',
-        'x-fb-rev' => 'fb revision'
+        'x-fb-rev' => 'fb revision',
+        'x-business-use-case-usage' => '{\"123456789012345\":[{\"type\":\"messenger\",\"call_count\":1,\"total_cputime\":1,\"total_time\":1,\"estimated_time_to_regain_access\":0}]}',
+        'x-app-usage' => '{\"call_count\":0,\"total_cputime\":0,\"total_time\":0}'
       }
       Koala::Facebook::APIError.new(400, '', error_info)
     }
@@ -46,7 +48,9 @@ describe Koala::Facebook::APIError do
       :fb_error_user_title => 'error user title',
       :fb_error_trace_id => 'fb trace id',
       :fb_error_debug => 'fb debug token',
-      :fb_error_rev => 'fb revision'
+      :fb_error_rev => 'fb revision',
+      :fb_buc_usage => '{\"123456789012345\":[{\"type\":\"messenger\",\"call_count\":1,\"total_cputime\":1,\"total_time\":1,\"estimated_time_to_regain_access\":0}]}',
+      :fb_app_usage => '{\"call_count\":0,\"total_cputime\":0,\"total_time\":0}'
     }.each_pair do |accessor, value|
       it "sets #{accessor} to #{value}" do
         expect(error.send(accessor)).to eq(value)
@@ -76,7 +80,9 @@ describe Koala::Facebook::APIError do
         :fb_error_code => 1,
         :fb_error_subcode => 'subcode',
         :fb_error_user_msg => 'error user message',
-        :fb_error_user_title => 'error user title'
+        :fb_error_user_title => 'error user title',
+        :fb_buc_usage => nil,
+        :fb_app_usage => nil
       }.each_pair do |accessor, value|
         expect(error.send(accessor)).to eq(value)
       end
