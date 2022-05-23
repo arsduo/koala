@@ -13,6 +13,8 @@ Internal improvements:
 
 Testing improvements:
 
+* Fix builds for ruby 3.x
+
 Others:
 
 v3.1.0 (2022-18-01)
