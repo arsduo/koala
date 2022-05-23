@@ -58,6 +58,16 @@ module Koala
           API::GraphCollection.evaluate(response, self)
         end
 
+        limits = %w(x-business-use-case-usage x-ad-account-usage x-app-usage).each_with_object({}) do |key, hash|
+          value = response.headers.fetch(key, nil)
+          next unless value
+          hash[key] = JSON.parse(response.headers[key])
+        rescue JSON::ParserError => e
+          Koala::Utils.logger.error("#{e.class}: #{e.message} while parsing #{key} = #{string}")
+        end
+
+        Koala.config.rate_limit_hook&.call(limits)
+
         # now process as appropriate for the given call (get picture header, etc.)
         post_processing ? post_processing.call(desired_data) : desired_data
       end
