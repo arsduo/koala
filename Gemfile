@@ -13,7 +13,7 @@ group :development, :test do
 end
 
 group :test do
-  gem "rspec", '~> 3.4'
+  gem "rspec", "~> 3.0", "< 3.10" # resrict rspec version until https://github.com/rspec/rspec-support/pull/537 gets merged
   gem "vcr", github: 'vcr/vcr', ref: '8ced6c96e01737a418cd270e0382a8c2c6d85f7f' # needs https://github.com/vcr/vcr/pull/907 for ruby 3.1
   gem "webmock"
   gem "simplecov"
