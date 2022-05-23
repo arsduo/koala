@@ -99,7 +99,7 @@ module Koala
 
         JSON.parse(string)
       rescue JSON::ParserError => e
-        Koala::Utils.logger.error(JSON::ParserError.new("#{e.message}, error_info: #{error_info}"))
+        Koala::Utils.logger.error("#{e.class}: #{e.message} while parsing #{key} = #{string}")
         nil
       end
     end

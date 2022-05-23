@@ -99,6 +99,15 @@ module Koala
             expect(error.fb_app_usage).to eq({ 'e' => 5, 'f' => 6 })
           end
 
+          it "logs if one of the FB debug headers can't be parsed" do
+            headers.merge!(
+              "x-app-usage" => '{invalid:json}'
+            )
+
+            expect(Koala::Utils.logger).to receive(:error).with("JSON::ParserError: 859: unexpected token at '{invalid:json}' while parsing x-app-usage = {invalid:json}")
+            expect(error.fb_app_usage).to eq(nil)
+          end
+
           context "it returns an AuthenticationError" do
             it "if FB says it's an OAuthException and it has no code" do
               body.replace({"error" => {"type" => "OAuthException"}}.to_json)
