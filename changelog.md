@@ -5,6 +5,8 @@ Unreleased
 
 New features:
 
+  * Exposes limiting headers(`x-business-use-case-usage, x-ad-account-usage, x-app-usage`) to APIError ([#668](https://github.com/arsduo/koala/pull/668))
+
 Updated features:
 
 Removed features:
@@ -15,7 +17,7 @@ Testing improvements:
 
 Others:
 
-v3.1.0 (2022-18-01)
+v3.1.0 (2022-01-18)
 ======
 
 New features:
