@@ -66,10 +66,10 @@ module Koala
             next unless value
             hash[key] = JSON.parse(response.headers[key])
           rescue JSON::ParserError => e
-            Koala::Utils.logger.error("#{e.class}: #{e.message} while parsing #{key} = #{string}")
+            Koala::Utils.logger.error("#{e.class}: #{e.message} while parsing #{key} = #{value}")
           end
 
-          rate_limit_hook.call(limits)
+          rate_limit_hook.call(limits) if limits.keys.any?
         end
 
         # now process as appropriate for the given call (get picture header, etc.)
