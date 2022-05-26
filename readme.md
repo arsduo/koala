@@ -184,7 +184,7 @@ We support Facebook rate limit informations as defined here: [https://developers
 
 The information is available either via the `Facebook::APIError`:
 
-```
+```ruby
 error.fb_buc_usage
 error.fb_ada_usage
 error.fb_app_usage
@@ -192,7 +192,7 @@ error.fb_app_usage
 
 Or with the rate_limit_hook:
 
-```
+```ruby
 # App level configuration
 
 Koala.configure do |config|
