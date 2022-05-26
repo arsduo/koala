@@ -1,5 +1,9 @@
 require 'spec_helper'
 
+BUC_USAGE_JSON = "{\"123456789012345\":[{\"type\":\"messenger\",\"call_count\":1,\"total_cputime\":1,\"total_time\":1,\"estimated_time_to_regain_access\":0}]}"
+ADA_USAGE_JSON = "{\"acc_id_util_pct\":9.67}"
+APP_USAGE_JSON = "{\"call_count\":0,\"total_cputime\":0,\"total_time\":0}"
+
 describe Koala::Facebook::APIError do
   it "is a Koala::KoalaError" do
     expect(Koala::Facebook::APIError.new(nil, nil)).to be_a(Koala::KoalaError)
@@ -32,7 +36,10 @@ describe Koala::Facebook::APIError do
         'error_user_title' => 'error user title',
         'x-fb-trace-id' => 'fb trace id',
         'x-fb-debug' => 'fb debug token',
-        'x-fb-rev' => 'fb revision'
+        'x-fb-rev' => 'fb revision',
+        'x-business-use-case-usage' => BUC_USAGE_JSON,
+        'x-ad-account-usage' => ADA_USAGE_JSON,
+        'x-app-usage' => APP_USAGE_JSON
       }
       Koala::Facebook::APIError.new(400, '', error_info)
     }
@@ -46,7 +53,10 @@ describe Koala::Facebook::APIError do
       :fb_error_user_title => 'error user title',
       :fb_error_trace_id => 'fb trace id',
       :fb_error_debug => 'fb debug token',
-      :fb_error_rev => 'fb revision'
+      :fb_error_rev => 'fb revision',
+      :fb_buc_usage => JSON.parse(BUC_USAGE_JSON),
+      :fb_ada_usage => JSON.parse(ADA_USAGE_JSON),
+      :fb_app_usage => JSON.parse(APP_USAGE_JSON)
     }.each_pair do |accessor, value|
       it "sets #{accessor} to #{value}" do
         expect(error.send(accessor)).to eq(value)
@@ -76,7 +86,10 @@ describe Koala::Facebook::APIError do
         :fb_error_code => 1,
         :fb_error_subcode => 'subcode',
         :fb_error_user_msg => 'error user message',
-        :fb_error_user_title => 'error user title'
+        :fb_error_user_title => 'error user title',
+        :fb_buc_usage => nil,
+        :fb_ada_usage => nil,
+        :fb_app_usage => nil
       }.each_pair do |accessor, value|
         expect(error.send(accessor)).to eq(value)
       end

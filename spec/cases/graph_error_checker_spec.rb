@@ -11,7 +11,10 @@ module Koala
         expect(GraphErrorChecker::DEBUG_HEADERS).to match_array([
           "x-fb-rev",
           "x-fb-debug",
-          "x-fb-trace-id"
+          "x-fb-trace-id",
+          "x-business-use-case-usage",
+          "x-ad-account-usage",
+          "x-app-usage"
         ])
       end
 
@@ -84,10 +87,25 @@ module Koala
               "x-fb-debug" => double("fb debug"),
               "x-fb-rev" => double("fb rev"),
               "x-fb-trace-id" => double("fb trace id"),
+              "x-business-use-case-usage" => { 'a' => 1, 'b' => 2 }.to_json,
+              "x-ad-account-usage" => { 'c' => 3, 'd' => 4 }.to_json,
+              "x-app-usage" => { 'e' => 5, 'f' => 6 }.to_json
             )
             expect(error.fb_error_trace_id).to eq(headers["x-fb-trace-id"])
             expect(error.fb_error_debug).to eq(headers["x-fb-debug"])
             expect(error.fb_error_rev).to eq(headers["x-fb-rev"])
+            expect(error.fb_buc_usage).to eq({ 'a' => 1, 'b' => 2 })
+            expect(error.fb_ada_usage).to eq({ 'c' => 3, 'd' => 4 })
+            expect(error.fb_app_usage).to eq({ 'e' => 5, 'f' => 6 })
+          end
+
+          it "logs if one of the FB debug headers can't be parsed" do
+            headers.merge!(
+              "x-app-usage" => '{invalid:json}'
+            )
+
+            expect(Koala::Utils.logger).to receive(:error).with("JSON::ParserError: 859: unexpected token at '{invalid:json}' while parsing x-app-usage = {invalid:json}")
+            expect(error.fb_app_usage).to eq(nil)
           end
 
           context "it returns an AuthenticationError" do
