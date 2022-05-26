@@ -17,7 +17,7 @@ Testing improvements:
 
 Others:
 
-v3.1.0 (2022-18-01)
+v3.1.0 (2022-01-18)
 ======
 
 New features:
