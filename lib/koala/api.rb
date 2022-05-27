@@ -13,7 +13,7 @@ module Koala
       #                 signed by default, unless you pass appsecret_proof:
       #                 false as an option to the API call. (See
       #                 https://developers.facebook.com/docs/graph-api/securing-requests/)
-      # @param [Block]  rate_limit_hook block called with limit received in facebook response headers
+      # @param [Block]  rate_limit_hook block called with limits received in facebook response headers
       # @note If no access token is provided, you can only access some public information.
       # @return [Koala::Facebook::API] the API client
       def initialize(access_token = Koala.config.access_token, app_secret = Koala.config.app_secret, rate_limit_hook = Koala.config.rate_limit_hook)
