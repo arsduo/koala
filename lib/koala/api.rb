@@ -13,14 +13,16 @@ module Koala
       #                 signed by default, unless you pass appsecret_proof:
       #                 false as an option to the API call. (See
       #                 https://developers.facebook.com/docs/graph-api/securing-requests/)
+      # @param [Block]  rate_limit_hook block called with limits received in facebook response headers
       # @note If no access token is provided, you can only access some public information.
       # @return [Koala::Facebook::API] the API client
-      def initialize(access_token = Koala.config.access_token, app_secret = Koala.config.app_secret)
+      def initialize(access_token = Koala.config.access_token, app_secret = Koala.config.app_secret, rate_limit_hook = Koala.config.rate_limit_hook)
         @access_token = access_token
         @app_secret = app_secret
+        @rate_limit_hook = rate_limit_hook
       end
 
-      attr_reader :access_token, :app_secret
+      attr_reader :access_token, :app_secret, :rate_limit_hook
 
       include GraphAPIMethods
 
@@ -56,6 +58,18 @@ module Koala
         else
           # turn this into a GraphCollection if it's pageable
           API::GraphCollection.evaluate(response, self)
+        end
+
+        if rate_limit_hook
+          limits = %w(x-business-use-case-usage x-ad-account-usage x-app-usage).each_with_object({}) do |key, hash|
+            value = response.headers.fetch(key, nil)
+            next unless value
+            hash[key] = JSON.parse(response.headers[key])
+          rescue JSON::ParserError => e
+            Koala::Utils.logger.error("#{e.class}: #{e.message} while parsing #{key} = #{value}")
+          end
+
+          rate_limit_hook.call(limits) if limits.keys.any?
         end
 
         # now process as appropriate for the given call (get picture header, etc.)
