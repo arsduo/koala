@@ -593,7 +593,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           hash_including(@other_access_token_args.dup),
           anything,
           anything
-      ).and_return(Koala::HTTPService::Response.new(200, "", ""))
+      ).and_return(Koala::HTTPService::Response.new(200, "", {}))
 
       # Page the collection
       app_event_types.next_page

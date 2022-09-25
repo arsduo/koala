@@ -282,4 +282,81 @@ describe "Koala::Facebook::API" do
       expect(@service.graph_call('anything')).to be_falsey
     end
   end
+
+  describe "Rate limit hook" do
+    it "is called when x-business-use-case-usage header is present" do
+      api = Koala::Facebook::API.new('', '', ->(limits) {
+        expect(limits["x-business-use-case-usage"]).to eq({"123456789012345"=>[{"type"=>"messenger", "call_count"=>1, "total_cputime"=>1, "total_time"=>1, "estimated_time_to_regain_access"=>0}]})
+      })
+
+      result = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, result.to_json, { "x-business-use-case-usage" => "{\"123456789012345\":[{\"type\":\"messenger\",\"call_count\":1,\"total_cputime\":1,\"total_time\":1,\"estimated_time_to_regain_access\":0}]}" })
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      api.graph_call('anything')
+    end
+
+    it "is called when x-ad-account-usage header is present" do
+      api = Koala::Facebook::API.new('', '', ->(limits) {
+        expect(limits["x-ad-account-usage"]).to eq({"acc_id_util_pct"=>9.67})
+      })
+
+      result = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, result.to_json, { "x-ad-account-usage" => "{\"acc_id_util_pct\":9.67}" })
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      api.graph_call('anything')
+    end
+
+    it "is called when x-app-usage header is present" do
+      api = Koala::Facebook::API.new('', '', ->(limits) {
+        expect(limits["x-app-usage"]).to eq({"call_count"=>0, "total_cputime"=>0, "total_time"=>0})
+      })
+
+      result = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, result.to_json, { "x-app-usage" => "{\"call_count\":0,\"total_cputime\":0,\"total_time\":0}" })
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      api.graph_call('anything')
+    end
+
+    it "isn't called if none of the rate limit header is present" do
+      rate_limit_hook_called = false
+
+      api = Koala::Facebook::API.new('', '', ->(limits) {
+        rate_limit_hook_called = true
+      })
+
+      result = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, result.to_json, {})
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      api.graph_call('anything')
+
+      expect(rate_limit_hook_called).to be(false)
+    end
+
+    it "isn't called if no rate limit hook is defined" do
+      api = Koala::Facebook::API.new('', '', ->(limits) {
+        #noop
+      })
+
+      result = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, result.to_json, { "x-ad-account-usage" => "{\"acc_id_util_pct\"9.67}"})
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      expect(Koala::Utils.logger).to receive(:error).with("JSON::ParserError: 859: unexpected token at '{\"acc_id_util_pct\"9.67}' while parsing x-ad-account-usage = {\"acc_id_util_pct\"9.67}")
+      api.graph_call('anything')
+    end
+
+    it "logs an error if the rate limit header can't be properly parsed" do
+      api = Koala::Facebook::API.new('', '', nil)
+
+      result = {"a" => 2}
+      response = Koala::HTTPService::Response.new(200, result.to_json, {})
+      allow(Koala).to receive(:make_request).and_return(response)
+
+      api.graph_call('anything')
+    end
+  end
 end

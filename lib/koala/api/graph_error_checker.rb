@@ -17,7 +17,7 @@ module Koala
 
       # Facebook can return debug information in the response headers -- see
       # https://developers.facebook.com/docs/graph-api/using-graph-api#bugdebug
-      DEBUG_HEADERS = ["x-fb-debug", "x-fb-rev", "x-fb-trace-id"]
+      DEBUG_HEADERS = %w[x-fb-debug x-fb-rev x-fb-trace-id x-business-use-case-usage x-ad-account-usage x-app-usage]
 
       def error_if_appropriate
         if http_status >= 400
