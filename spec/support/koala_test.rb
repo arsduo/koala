@@ -238,7 +238,7 @@ module KoalaTest
         # JRuby doesn't support typhoeus on Travis
         unless defined? JRUBY_VERSION
           require adapter
-          require 'typhoeus/adapters/faraday' if adapter.to_s == "typhoeus"
+          require "faraday/#{adapter}"
           Faraday.default_adapter = adapter.to_sym
         end
       rescue => e

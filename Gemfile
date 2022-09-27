@@ -10,6 +10,7 @@ group :development, :test do
   gem "psych", '< 4.0.0' # safe_load signature not compatible with older rubies
   gem "rake"
   gem "typhoeus" unless defined? JRUBY_VERSION
+  gem 'faraday-typhoeus' unless defined? JRUBY_VERSION
 end
 
 group :test do
