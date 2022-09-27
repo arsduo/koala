@@ -345,7 +345,7 @@ describe "Koala::Facebook::API" do
       response = Koala::HTTPService::Response.new(200, result.to_json, { "x-ad-account-usage" => "{\"acc_id_util_pct\"9.67}"})
       allow(Koala).to receive(:make_request).and_return(response)
 
-      expect(Koala::Utils.logger).to receive(:error).with("JSON::ParserError: 859: unexpected token at '{\"acc_id_util_pct\"9.67}' while parsing x-ad-account-usage = {\"acc_id_util_pct\"9.67}")
+      expect(Koala::Utils.logger).to receive(:error).with(/JSON::ParserError:.*unexpected token at '{"acc_id_util_pct"9.67}' while parsing x-ad-account-usage = {"acc_id_util_pct"9.67}/)
       api.graph_call('anything')
     end
 
