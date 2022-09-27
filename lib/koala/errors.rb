@@ -23,7 +23,10 @@ module Koala
                     :fb_error_user_title,
                     :fb_error_trace_id,
                     :fb_error_debug,
-                    :fb_error_rev
+                    :fb_error_rev,
+                    :fb_buc_usage,
+                    :fb_ada_usage,
+                    :fb_app_usage
 
       # Create a new API Error
       #
@@ -66,6 +69,9 @@ module Koala
           self.fb_error_trace_id = error_info["x-fb-trace-id"]
           self.fb_error_debug = error_info["x-fb-debug"]
           self.fb_error_rev = error_info["x-fb-rev"]
+          self.fb_buc_usage = json_parse_for(error_info, "x-business-use-case-usage")
+          self.fb_ada_usage = json_parse_for(error_info, "x-ad-account-usage")
+          self.fb_app_usage = json_parse_for(error_info, "x-app-usage")
 
           error_array = []
           %w(type code error_subcode message error_user_title error_user_msg x-fb-trace-id).each do |key|
@@ -81,6 +87,20 @@ module Koala
         message += " [HTTP #{http_status}]" if http_status
 
         super(message)
+      end
+
+      private
+
+      # refs: https://developers.facebook.com/docs/graph-api/overview/rate-limiting/#headers
+      # NOTE: The header will contain a JSON-formatted string that describes current application rate limit usage.
+      def json_parse_for(error_info, key)
+        string = error_info[key]
+        return if string.nil?
+
+        JSON.parse(string)
+      rescue JSON::ParserError => e
+        Koala::Utils.logger.error("#{e.class}: #{e.message} while parsing #{key} = #{string}")
+        nil
       end
     end
 

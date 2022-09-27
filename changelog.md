@@ -13,9 +13,24 @@ Internal improvements:
 
 Testing improvements:
 
+ * Fix tests with ruby-head ([#674](https://github.com/arsduo/koala/pull/674))
+ * Keep supported rubies (non EOL) for CI ([#675](https://github.com/arsduo/koala/pull/675))
+
 Others:
 
-v3.1.0 (2022-18-01)
+v3.2.0 (2022-05-27)
+======
+
+New features:
+
+  * Exposes limiting headers(`x-business-use-case-usage, x-ad-account-usage, x-app-usage`) to APIError ([#668](https://github.com/arsduo/koala/pull/668))
+  * Add `rate_limit_hook` configuration to get rate limiting headers (`x-business-use-case-usage, x-ad-account-usage, x-app-usage`) ([#670](https://github.com/arsduo/koala/pull/670))
+
+Testing improvements:
+
+* Fix builds for ruby 3.x
+
+v3.1.0 (2022-01-18)
 ======
 
 New features:
