@@ -7,6 +7,23 @@ New features:
 
 Updated features:
 
+Removed features:
+
+Internal improvements:
+
+Testing improvements:
+
+Others:
+
+v3.3.0 (2022-09-27)
+======
+
+**Key breaking changes:**
+
+New features:
+
+Updated features:
+
   * Removed restriction on faraday < 2 ([#666](https://github.com/arsduo/koala/pull/666))
 
 Removed features:
