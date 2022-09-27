@@ -13,7 +13,12 @@ Removed features:
 
 Internal improvements:
 
+ * Remove multipart hack and use default faraday multipart middleware ([#664](https://github.com/arsduo/koala/pull/664))
+
 Testing improvements:
+
+ * Fix tests with ruby-head ([#674](https://github.com/arsduo/koala/pull/674))
+ * Keep supported rubies (non EOL) for CI ([#675](https://github.com/arsduo/koala/pull/675))
 
 Others:
 
