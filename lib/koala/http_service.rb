@@ -1,4 +1,5 @@
 require 'faraday'
+require 'faraday/multipart' unless defined? Faraday::FilePart # hack for faraday < 1.9 to avoid warnings
 require 'koala/http_service/uploadable_io'
 require 'koala/http_service/response'
 require 'koala/http_service/request'

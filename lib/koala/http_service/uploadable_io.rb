@@ -1,4 +1,3 @@
-require "net/http/post/multipart"
 require "tempfile"
 
 module Koala

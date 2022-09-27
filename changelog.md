@@ -7,6 +7,8 @@ New features:
 
 Updated features:
 
+  * Removed restriction on faraday < 2 ([#666](https://github.com/arsduo/koala/pull/666))
+
 Removed features:
 
 Internal improvements:
