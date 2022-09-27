@@ -18,15 +18,9 @@ Others:
 v3.3.0 (2022-09-27)
 ======
 
-**Key breaking changes:**
-
-New features:
-
 Updated features:
 
   * Removed restriction on faraday < 2 ([#666](https://github.com/arsduo/koala/pull/666))
-
-Removed features:
 
 Internal improvements:
 
@@ -36,8 +30,6 @@ Testing improvements:
 
  * Fix tests with ruby-head ([#674](https://github.com/arsduo/koala/pull/674))
  * Keep supported rubies (non EOL) for CI ([#675](https://github.com/arsduo/koala/pull/675))
-
-Others:
 
 v3.2.0 (2022-05-27)
 ======
