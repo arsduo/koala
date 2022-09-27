@@ -9,8 +9,10 @@ end
 group :development, :test do
   gem "psych", '< 4.0.0' # safe_load signature not compatible with older rubies
   gem "rake"
-  gem "typhoeus" unless defined? JRUBY_VERSION
-  gem 'faraday-typhoeus' unless defined? JRUBY_VERSION
+  unless defined? JRUBY_VERSION
+    gem "typhoeus"
+    gem "faraday-typhoeus" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7.0')
+  end
 end
 
 group :test do
