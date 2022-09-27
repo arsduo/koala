@@ -1,5 +1,4 @@
 require 'faraday'
-require 'koala/http_service/multipart_request'
 require 'koala/http_service/uploadable_io'
 require 'koala/http_service/response'
 require 'koala/http_service/request'
@@ -19,7 +18,7 @@ module Koala
     # We encode requests in a Facebook-compatible multipart request,
     # and use whichever adapter has been configured for this application.
     DEFAULT_MIDDLEWARE = Proc.new do |builder|
-      builder.use Koala::HTTPService::MultipartRequest
+      builder.request :multipart
       builder.request :url_encoded
       builder.adapter Faraday.default_adapter
     end
