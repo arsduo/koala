@@ -13,6 +13,8 @@ Internal improvements:
 
 Testing improvements:
 
+ * Fix tests with ruby-head ([#674](https://github.com/arsduo/koala/pull/674))
+
 Others:
 
 v3.2.0 (2022-05-27)
