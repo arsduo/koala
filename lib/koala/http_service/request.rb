@@ -106,9 +106,7 @@ module Koala
       end
 
       def add_ssl_options(opts)
-        # require https if there's a token
-        return opts unless raw_args["access_token"]
-
+        # always require https
         {
           use_ssl: true,
           ssl: {verify: true}.merge(opts[:ssl] || {})
