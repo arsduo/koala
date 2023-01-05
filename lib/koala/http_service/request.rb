@@ -106,7 +106,7 @@ module Koala
       end
 
       def add_ssl_options(opts)
-        # always require https
+        # require https by default (can be overriden by explicitly setting other SSL options)
         {
           use_ssl: true,
           ssl: {verify: true}.merge(opts[:ssl] || {})
