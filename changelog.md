@@ -7,7 +7,7 @@ New features:
 
 Updated features:
 
-* Force use by default of HTTPS (instead of HTTP) when there is no access token
+* Force use by default of HTTPS (instead of HTTP) when there is no access token.
   HTTP can still be used by passing :use_ssl => false in the options hash for an api call ([#678](https://github.com/arsduo/koala/pull/678/files))
 
 Removed features:
