@@ -176,9 +176,9 @@ module Koala
         end
 
         describe "ssl options" do
-          it "does nothing if there's no access token" do
+          it "includes the default SSL options even if there's no access token" do
             request_options = Request.new(path: path, args: args.delete_if {|k, _v| k == "access_token"}, verb: verb, options: options).options
-            expect(request_options).not_to include(:ssl, :use_ssl)
+            expect(request_options).to include(use_ssl: true, ssl: {verify: true})
           end
 
           context "if there is an access_token" do
@@ -193,9 +193,9 @@ module Koala
             end
 
             it "overrides default SSL options with what's provided" do
-              new_ssl_options = {verify: :dunno}
-              request_options = Request.new(path: path, args: args, verb: verb, options: options.merge(ssl: new_ssl_options)).options
-              expect(request_options[:ssl]).to include(new_ssl_options)
+              new_ssl_options = {use_ssl: false, ssl:{verify: :dunno}}
+              request_options = Request.new(path: path, args: args, verb: verb, options: options.merge(new_ssl_options)).options
+              expect(request_options).to include(new_ssl_options)
             end
           end
         end
@@ -211,8 +211,16 @@ module Koala
               expect(request.server).to eq("https://foo")
             end
 
-            context "if options[:use_ssl] is false (e.g. no access token)" do
+            context "if there is no access token" do
               let(:args) { {"a" => "b"} }
+
+              it "uses https" do
+                expect(request.server).to eq("https://graph.facebook.com")
+              end
+            end
+
+            context "if options[:use_ssl] is false" do
+              let(:options) { {use_ssl: false} }
 
               it "uses http" do
                 expect(request.server).to eq("http://graph.facebook.com")
