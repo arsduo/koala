@@ -63,6 +63,12 @@ module Koala
             expect(error.response_body).to eq(body)
           end
 
+          it "returns a ClientError if the body is null" do
+            body.replace("null")
+            expect(error).to be_a(ClientError)
+            expect(error.response_body).to eq(body)
+          end
+
           it "adds error data from the body" do
             error_data = {
               "type" => "FB error type",
