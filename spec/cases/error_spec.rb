@@ -139,3 +139,9 @@ describe Koala::Facebook::AuthenticationError do
      expect(Koala::Facebook::AuthenticationError.new(nil, nil)).to be_a(Koala::Facebook::ClientError)
   end
 end
+
+describe Koala::Facebook::PermissionError do
+  it "is a Koala::Facebook::ClientError" do
+     expect(Koala::Facebook::PermissionError.new(nil, nil)).to be_a(Koala::Facebook::ClientError)
+  end
+end

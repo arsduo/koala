@@ -119,6 +119,8 @@ module Koala
     # All graph API authentication failures.
     class AuthenticationError < ClientError; end
 
+    # API requests failing due to missing permission
+    class PermissionError < ClientError; end
   end
 
 end

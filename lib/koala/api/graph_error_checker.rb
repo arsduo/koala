@@ -15,6 +15,9 @@ module Koala
       # token.
       AUTHENTICATION_ERROR_CODES = [102, 190, 450, 452, 2500]
 
+      # Partial condition for an error to be indentified as permissions error
+      PERMISSION_ERROR_CODES = [100, 200]
+
       # Facebook can return debug information in the response headers -- see
       # https://developers.facebook.com/docs/graph-api/using-graph-api#bugdebug
       DEBUG_HEADERS = %w[x-fb-debug x-fb-rev x-fb-trace-id x-business-use-case-usage x-ad-account-usage x-app-usage]
@@ -32,16 +35,22 @@ module Koala
           # See: https://developers.facebook.com/docs/authentication/access-token-expiration/
           #      https://developers.facebook.com/bugs/319643234746794?browse=search_4fa075c0bd9117b20604672
           AuthenticationError
+        elsif permission_error?
+          PermissionError
         else
           ClientError
         end
       end
 
       def auth_error?
-        # tbh, I'm not sure why we restrict Facebook-reported OAuthExceptions to only those without
-        # codes or whose codes match the list above -- let's investigate changing this later.
         error_info['type'] == 'OAuthException' &&
           (!error_info['code'] || AUTHENTICATION_ERROR_CODES.include?(error_info['code'].to_i))
+      end
+
+      def permission_error?
+        error_info['type'] == 'OAuthException' &&
+          error_info['error_subcode'].nil? &&
+          PERMISSION_ERROR_CODES.include?(error_info['code'].to_i)
       end
 
       def error_info

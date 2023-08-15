@@ -122,9 +122,26 @@ module Koala
             end
           end
 
-          # Note: I'm not sure why this behavior was implemented, it may be incorrect. To
-          # investigate.
           it "doesn't return an AuthenticationError if FB says it's an OAuthException but the code doesn't match" do
+            body.replace({"error" => {"type" => "OAuthException", "code" => 2499}}.to_json)
+            expect(error).to be_an(ClientError)
+          end
+
+          context "it returns a PermissionError" do
+            GraphErrorChecker::PERMISSION_ERROR_CODES.each do |error_code|
+              it "if FB says it's an OAuthException and it has code #{error_code} and no subcode" do
+                body.replace({"error" => {"type" => "OAuthException", "code" => error_code}}.to_json)
+                expect(error).to be_an(PermissionError)
+              end
+            end
+          end
+
+          it "doesn't return a PermissionError if FB says it's an OAuthException but error_subcode is present" do
+            body.replace({"error" => {"type" => "OAuthException", "code" => 100, "error_subcode" => 33}}.to_json)
+            expect(error).to be_an(ClientError)
+          end
+
+          it "doesn't return a PermissionError if FB says it's an OAuthException but the code doesn't match" do
             body.replace({"error" => {"type" => "OAuthException", "code" => 2499}}.to_json)
             expect(error).to be_an(ClientError)
           end
