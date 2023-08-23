@@ -10,11 +10,16 @@ Updated features:
 Removed features:
 
 Internal improvements:
-* Raise ClientError instead of NoMethodError when body is 'null' ([#673](https://github.com/arsduo/koala/issues/673))
 
 Testing improvements:
 
 Others:
+
+v3.5.0 (2023-08-23)
+======
+
+Internal improvements:
+* Raise ClientError instead of NoMethodError when body is 'null' ([#673](https://github.com/arsduo/koala/issues/673))
 
 v3.4.0 (2023-01-05)
 ======
