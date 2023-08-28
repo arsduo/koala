@@ -4,7 +4,7 @@ module Koala
   module Facebook
     RSpec.describe GraphErrorChecker do
       it "defines a set of AUTHENTICATION_ERROR_CODES" do
-        expect(GraphErrorChecker::AUTHENTICATION_ERROR_CODES).to match_array([102, 190, 450, 452, 2500])
+        expect(GraphErrorChecker::AUTHENTICATION_ERROR_CODES).to match_array([102, 190, 450, 452, 2500, 104])
       end
 
       it "defines a set of DEBUG_HEADERS" do
