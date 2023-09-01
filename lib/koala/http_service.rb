@@ -3,6 +3,7 @@ require 'faraday/multipart' unless defined? Faraday::FilePart # hack for faraday
 require 'koala/http_service/uploadable_io'
 require 'koala/http_service/response'
 require 'koala/http_service/request'
+require 'koala/http_service/encoded_params'
 
 module Koala
   module HTTPService
@@ -88,14 +89,8 @@ module Koala
     #   => "a=2&b=My+String"
     #
     # @return the appropriately-encoded string
-    def self.encode_params(param_hash)
-      ((param_hash || {}).sort_by{|k, v| k.to_s}.collect do |key_and_value|
-        value = key_and_value[1]
-        unless value.is_a? String
-          value = value.to_json
-        end
-        "#{key_and_value[0].to_s}=#{CGI.escape value}"
-      end).join("&")
+    def self.encode_params(params)
+      EncodedParams.new(params).to_s
     end
 
     private
