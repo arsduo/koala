@@ -53,14 +53,14 @@ module Koala
           end
 
           original_api.graph_call("/", args, "post", http_options) do |response|
-            raise bad_response if response.nil?
+            raise bad_response("Facebook returned an empty body") if response.nil?
 
               #when http_component is set we receive Koala::Http_service response object
             # from graph_call.so thiis needs to be parsed
             # as generate_results method handles only JSON rsponse
             if http_options[:http_component]
               response = JSON.load(response.body)
-              raise bad_response unless response.is_a?(Array)
+              raise bad_response("Facebook returned an invalid body") unless response.is_a?(Array)
             end
 
             batch_results += generate_results(response, batch)
@@ -89,9 +89,9 @@ module Koala
         end
       end
 
-      def bad_response
+      def bad_response(message)
         # Facebook sometimes reportedly returns an empty body at times
-        BadFacebookResponse.new(200, "", "Facebook returned an empty body")
+        BadFacebookResponse.new(200, "", message)
       end
 
       def result_from_response(response, options)

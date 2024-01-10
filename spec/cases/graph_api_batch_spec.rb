@@ -416,6 +416,13 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
               Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
             }.to raise_exception(Koala::Facebook::BadFacebookResponse)
           end
+          
+          it "raises a BadFacebookResponse if the body is non-empty, non-array" do
+            allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, "200", {}))
+            expect {
+              Koala::Facebook::API.new("foo").batch(http_component: :response) {|batch_api| batch_api.get_object('me') }
+            }.to raise_exception(Koala::Facebook::BadFacebookResponse, /Facebook returned an invalid body \[HTTP 200\]/)
+          end
 
           context "with error info" do
             before :each do
