@@ -55,6 +55,14 @@ module Koala
           original_api.graph_call("/", args, "post", http_options) do |response|
             raise bad_response if response.nil?
 
+              #when http_component is set we receive Koala::Http_service response object
+            # from graph_call.so thiis needs to be parsed
+            # as generate_results method handles only JSON rsponse
+            if http_options[:http_component]
+              response = JSON.load(response.body)
+              raise bad_response unless response.is_a?(Array)
+            end
+
             batch_results += generate_results(response, batch)
           end
         end
