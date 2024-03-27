@@ -97,7 +97,7 @@ module Koala
               "x-ad-account-usage" => { 'c' => 3, 'd' => 4 }.to_json,
               "x-app-usage" => { 'e' => 5, 'f' => 6 }.to_json
             )
-            expect(error.fb_error_trace_id).to eq(headers["x-fb-trace-id"])
+            expect(error.fb_error_debug_trace_id).to eq(headers["x-fb-trace-id"])
             expect(error.fb_error_debug).to eq(headers["x-fb-debug"])
             expect(error.fb_error_rev).to eq(headers["x-fb-rev"])
             expect(error.fb_buc_usage).to eq({ 'a' => 1, 'b' => 2 })
