@@ -146,6 +146,11 @@ module Koala
         # facebook returns the headers as an array of k/v pairs, but we want a regular hash
         when :headers then headers
         # (see note in regular api method about JSON parsing)
+        when :response
+          Koala::HTTPService::Response.new(
+              response["code"].to_i,
+              response["body"],
+              headers)
         else GraphCollection.evaluate(result, original_api)
         end
       end
