@@ -76,10 +76,12 @@ module Koala
               "error_subcode" => "FB error subcode",
               "message" => "An error occurred!",
               "error_user_msg" => "A user msg",
-              "error_user_title" => "usr title"
+              "error_user_title" => "usr title",
+              "fbtrace_id" => "fbtrace_id"
             }
             body.replace({"error" => error_data}.to_json)
 
+            expect(error.fb_error_trace_id).to eq(error_data["fbtrace_id"])
             expect(error.fb_error_type).to eq(error_data["type"])
             expect(error.fb_error_code).to eq(error_data["code"])
             expect(error.fb_error_subcode).to eq(error_data["error_subcode"])
