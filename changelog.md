@@ -11,8 +11,11 @@ Removed features:
 
 Internal improvements:
 
+* Require base64 for ruby 3.4 support ([#688](https://github.com/arsduo/koala/pull/688))
+
 Testing improvements:
 
+* Fix CI for ruby 3.4 ([#688](https://github.com/arsduo/koala/pull/688))
 * Add latest rubies to CI ([#687](https://github.com/arsduo/koala/pull/687))
 
 Others:
