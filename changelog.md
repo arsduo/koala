@@ -7,6 +7,8 @@ New features:
 
 Updated features:
 
+ * Add fbtrace_id, x-fb-rev, x-fb-debug to error messages and error class ([#668](https://github.com/arsduo/koala/pull/686))
+
 Removed features:
 
 Internal improvements:
