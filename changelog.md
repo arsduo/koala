@@ -13,6 +13,8 @@ Internal improvements:
 
 Testing improvements:
 
+* Add latest rubies to CI ([#687](https://github.com/arsduo/koala/pull/687))
+
 Others:
 
 v3.5.0 (2023-08-23)
