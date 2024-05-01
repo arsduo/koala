@@ -76,10 +76,12 @@ module Koala
               "error_subcode" => "FB error subcode",
               "message" => "An error occurred!",
               "error_user_msg" => "A user msg",
-              "error_user_title" => "usr title"
+              "error_user_title" => "usr title",
+              "fbtrace_id" => "fbtrace_id"
             }
             body.replace({"error" => error_data}.to_json)
 
+            expect(error.fb_error_trace_id).to eq(error_data["fbtrace_id"])
             expect(error.fb_error_type).to eq(error_data["type"])
             expect(error.fb_error_code).to eq(error_data["code"])
             expect(error.fb_error_subcode).to eq(error_data["error_subcode"])
@@ -97,7 +99,7 @@ module Koala
               "x-ad-account-usage" => { 'c' => 3, 'd' => 4 }.to_json,
               "x-app-usage" => { 'e' => 5, 'f' => 6 }.to_json
             )
-            expect(error.fb_error_trace_id).to eq(headers["x-fb-trace-id"])
+            expect(error.fb_error_debug_trace_id).to eq(headers["x-fb-trace-id"])
             expect(error.fb_error_debug).to eq(headers["x-fb-debug"])
             expect(error.fb_error_rev).to eq(headers["x-fb-rev"])
             expect(error.fb_buc_usage).to eq({ 'a' => 1, 'b' => 2 })

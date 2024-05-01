@@ -7,11 +7,18 @@ New features:
 
 Updated features:
 
+ * Add fbtrace_id, x-fb-rev, x-fb-debug to error messages and error class ([#668](https://github.com/arsduo/koala/pull/686))
+
 Removed features:
 
 Internal improvements:
 
+* Require base64 for ruby 3.4 support ([#688](https://github.com/arsduo/koala/pull/688))
+
 Testing improvements:
+
+* Fix CI for ruby 3.4 ([#688](https://github.com/arsduo/koala/pull/688))
+* Add latest rubies to CI ([#687](https://github.com/arsduo/koala/pull/687))
 
 Others:
 
