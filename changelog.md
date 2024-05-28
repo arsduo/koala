@@ -19,6 +19,7 @@ Testing improvements:
 
 * Fix CI for ruby 3.4 ([#688](https://github.com/arsduo/koala/pull/688))
 * Add latest rubies to CI ([#687](https://github.com/arsduo/koala/pull/687))
+* Bump GHA action plugins to avoid deprecation warnings ([#689](https://github.com/arsduo/koala/pull/689))
 
 Others:
 
