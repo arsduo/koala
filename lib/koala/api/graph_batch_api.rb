@@ -53,7 +53,16 @@ module Koala
           end
 
           original_api.graph_call("/", args, "post", http_options) do |response|
-            raise bad_response if response.nil?
+            raise bad_response('Facebook returned an empty body') if response.nil?
+
+            # when http_component is set we receive Koala::Http_service response object
+            # from graph_call so this needs to be parsed
+            # as generate_results method handles only JSON response
+            if http_options[:http_component] && http_options[:http_component] == :response
+              response = json_body(response.body)
+
+              raise bad_response('Facebook returned an invalid body') unless response.is_a?(Array)
+            end
 
             batch_results += generate_results(response, batch)
           end
@@ -81,9 +90,9 @@ module Koala
         end
       end
 
-      def bad_response
+      def bad_response(message)
         # Facebook sometimes reportedly returns an empty body at times
-        BadFacebookResponse.new(200, "", "Facebook returned an empty body")
+        BadFacebookResponse.new(200, '', message)
       end
 
       def result_from_response(response, options)
@@ -123,14 +132,17 @@ module Koala
         JSON.dump calls
       end
 
-      def json_body(response)
-        # quirks_mode is needed because Facebook sometimes returns a raw true or false value --
-        # in Ruby 2.4 we can drop that.
-        JSON.parse(response.fetch("body"), quirks_mode: true)
+      def json_body(body)
+        return if body.nil?
+
+        JSON.parse(body)
+      rescue JSON::ParserError => e
+        Koala::Utils.logger.error("#{e.class}: #{e.message} while parsing #{body}")
+        nil
       end
 
       def desired_component(component:, response:, headers:)
-        result = Koala::HTTPService::Response.new(response['status'], response['body'], headers)
+        result = Koala::HTTPService::Response.new(response['code'], response['body'], headers)
 
         # Get the HTTP component they want
         case component
@@ -138,6 +150,7 @@ module Koala
         # facebook returns the headers as an array of k/v pairs, but we want a regular hash
         when :headers then headers
         # (see note in regular api method about JSON parsing)
+        when :response then result
         else GraphCollection.evaluate(result, original_api)
         end
       end

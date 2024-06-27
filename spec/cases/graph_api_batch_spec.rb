@@ -383,28 +383,85 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         end
       end
 
-      describe "processing the request" do
-        it "returns the result headers as a hash if http_component is headers" do
+      describe 'processing the request' do
+        let(:response_status) { 203 }
+        let(:response_body) { '{\"id\":\"1234\"}'.gsub('\\', '') }
+        let(:response_headers) { { 'Content-Type' => 'text/javascript; charset=UTF-8' } }
+
+        it 'returns the result headers as a hash if http_component is headers' do
           allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
           result = @api.batch do |batch_api|
             batch_api.get_object(KoalaTest.user1, {}, :http_component => :headers)
           end
-          expect(result[0]).to eq({"Content-Type" => "text/javascript; charset=UTF-8"})
+          expect(response_headers).to eq(result[0])
         end
 
-        describe "if it errors" do
-          it "raises an APIError if the response is not 200" do
-            allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(500, "[]", {}))
+        it 'returns the complete response if http_component is response' do
+          allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, '[{"code":203,"headers":[{"name":"Content-Type","value":"text/javascript; charset=UTF-8"}],"body":"{\"id\":\"1234\"}"}]', {}))
+          result = @api.batch do |batch_api|
+            batch_api.get_object(KoalaTest.user1, {}, :http_component => :response)
+          end
+
+          expect(response_status).to eq(result[0].status)
+          expect(response_body).to eq(result[0].body)
+          expect(response_headers).to eq(result[0].headers)
+        end
+
+        describe 'if it errors' do
+          it 'raises an APIError if the response is not 200' do
+            allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(500, '[]', {}))
             expect {
-              Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
+              Koala::Facebook::API.new('foo').batch { |batch_api| batch_api.get_object('me') }
             }.to raise_exception(Koala::Facebook::APIError)
           end
 
-          it "raises a BadFacebookResponse if the body is empty" do
-            allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, "", {}))
+          it 'raises a BadFacebookResponse if the body is empty' do
+            allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, '', {}))
             expect {
-              Koala::Facebook::API.new("foo").batch {|batch_api| batch_api.get_object('me') }
-            }.to raise_exception(Koala::Facebook::BadFacebookResponse)
+              Koala::Facebook::API.new('foo').batch { |batch_api| batch_api.get_object('me') }
+            }.to raise_exception(Koala::Facebook::BadFacebookResponse, /Facebook returned an empty body \[HTTP 200\]/)
+          end
+
+          describe 'handle invalid body errors' do
+            describe 'with http_component set to :response' do
+              it 'raises a BadFacebookResponse if the body is non-empty, non-array' do
+                allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, '200', {}))
+                expect {
+                  Koala::Facebook::API.new('foo').batch(http_component: :response) do |batch_api|
+                    batch_api.get_object('me')
+                  end
+                }.to raise_exception(Koala::Facebook::BadFacebookResponse, /Facebook returned an invalid body \[HTTP 200\]/)
+              end
+
+              it 'raises a BadFacebookResponse if the body is invalid JSON' do
+                allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, '{"\"id\":\1234\"}"}', {}))
+                expect {
+                  Koala::Facebook::API.new('foo').batch(http_component: :response) do |batch_api|
+                    batch_api.get_object('me')
+                  end
+                }.to raise_exception(Koala::Facebook::BadFacebookResponse, /Facebook returned an invalid body \[HTTP 200\]/)
+              end
+            end
+
+            %i[headers status].each do |component|
+              describe "with http_component set to #{component}" do
+                it 'should not raise a BadFacebookResponse if the body is non-empty, non-array' do
+                  allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, '200', {}))
+                  expect {
+                    Koala::Facebook::API.new('foo').batch(http_component: component) { |batch_api| batch_api.get_object('me') }
+                  }.not_to raise_exception(Koala::Facebook::BadFacebookResponse, /Facebook returned an invalid body \[HTTP 200\]/)
+                end
+
+                it 'should not raise a BadFacebookResponse if the body is invalid JSON' do
+                  allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, '{"\"id\":\1234\"}"}', {}))
+                  expect {
+                    Koala::Facebook::API.new('foo').batch(http_component: component) do |batch_api|
+                      batch_api.get_object('me')
+                    end
+                  }.not_to raise_exception(Koala::Facebook::BadFacebookResponse, /Facebook returned an invalid body \[HTTP 200\]/)
+                end
+              end
+            end
           end
 
           context "with error info" do

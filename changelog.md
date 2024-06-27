@@ -8,6 +8,7 @@ New features:
 Updated features:
 
  * Add fbtrace_id, x-fb-rev, x-fb-debug to error messages and error class ([#668](https://github.com/arsduo/koala/pull/686))
+ * Handles the invalid JSON response from Facebook when the request's http_options[:http_component] is set to ':response' ([#689](https://github.com/arsduo/koala/pull/689))
 
 Removed features:
 
