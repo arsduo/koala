@@ -7,10 +7,21 @@ New features:
 
 Updated features:
 
+Removed features:
+
+Internal improvements:
+
+Testing improvements:
+
+Others:
+
+v3.6.0 (2024-06-27)
+==========
+
+Updated features:
+
  * Add fbtrace_id, x-fb-rev, x-fb-debug to error messages and error class ([#668](https://github.com/arsduo/koala/pull/686))
  * Handles the invalid JSON response from Facebook when the request's http_options[:http_component] is set to ':response' ([#689](https://github.com/arsduo/koala/pull/689))
-
-Removed features:
 
 Internal improvements:
 
@@ -21,8 +32,6 @@ Testing improvements:
 * Fix CI for ruby 3.4 ([#688](https://github.com/arsduo/koala/pull/688))
 * Add latest rubies to CI ([#687](https://github.com/arsduo/koala/pull/687))
 * Bump GHA action plugins to avoid deprecation warnings ([#689](https://github.com/arsduo/koala/pull/689))
-
-Others:
 
 v3.5.0 (2023-08-23)
 ======
