@@ -11,6 +11,8 @@ Removed features:
 
 Internal improvements:
 
+ * explicitly require ostruct for ruby >= 3.3.5 ([694](https://github.com/arsduo/koala/pull/694))
+
 Testing improvements:
 
 Others:
