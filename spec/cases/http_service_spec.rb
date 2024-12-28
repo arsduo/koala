@@ -238,8 +238,12 @@ describe Koala::HTTPService do
       it 'logs tokens' do
         allow(Koala.config).to receive(:mask_tokens) { false }
 
-        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleaccesstoken"}')
-        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleaccesstoken"}')
+        expect(Koala::Utils).to receive(:debug) do |log|
+          expect(log).to match(/STARTED => GET: \/foo params: {"an"\s?=>\s?:arg, "access_token"\s?=>\s?"myvisbleaccesstoken"}/)
+        end
+        expect(Koala::Utils).to receive(:debug) do |log|
+          expect(log).to match(/FINISHED => GET: \/foo params: {"an"\s?=>\s?:arg, "access_token"\s?=>\s?"myvisbleaccesstoken"}/)
+        end
 
         Koala::HTTPService.make_request(request)
       end
@@ -247,8 +251,12 @@ describe Koala::HTTPService do
       it 'doesnt log tokens' do
         allow(Koala.config).to receive(:mask_tokens) { true }
 
-        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleac*****token"}')
-        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleac*****token"}')
+        expect(Koala::Utils).to receive(:debug) do |log|
+          expect(log).to match(/STARTED => GET: \/foo params: {"an"\s?=>\s?:arg, "access_token"\s?=>\s?"myvisbleac[*]{5}token"}/)
+        end
+        expect(Koala::Utils).to receive(:debug) do |log|
+          expect(log).to match(/FINISHED => GET: \/foo params: {"an"\s?=>\s?:arg, "access_token"\s?=>\s?"myvisbleac[*]{5}token"}/)
+        end
 
         Koala::HTTPService.make_request(request)
       end
@@ -258,8 +266,12 @@ describe Koala::HTTPService do
 
         allow(Koala.config).to receive(:mask_tokens) { true }
 
-        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
-        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
+        expect(Koala::Utils).to receive(:debug) do |log|
+          expect(log).to match(/STARTED => GET: \/debug_token params: {"input_token"\s?=>\s?"myvisiblea[*]{5}token", "access_token"\s?=>\s?"myvisiblea[*]{5}token"}/)
+        end
+        expect(Koala::Utils).to receive(:debug) do |log|
+          expect(log).to match(/FINISHED => GET: \/debug_token params: {"input_token"\s?=>\s?"myvisiblea[*]{5}token", "access_token"\s?=>\s?"myvisiblea[*]{5}token"}/)
+        end
 
         Koala::HTTPService.make_request(request)
       end
