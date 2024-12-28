@@ -15,6 +15,8 @@ Internal improvements:
 
 Testing improvements:
 
+ * Add ruby 3.4 to CI ([696](https://github.com/arsduo/koala/pull/696))
+
 Others:
 
 v3.6.0 (2024-06-27)
