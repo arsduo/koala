@@ -238,8 +238,8 @@ describe Koala::HTTPService do
       it 'logs tokens' do
         allow(Koala.config).to receive(:mask_tokens) { false }
 
-        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleaccesstoken"}')
-        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleaccesstoken"}')
+        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an" => :arg, "access_token" => "myvisbleaccesstoken"}')
+        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an" => :arg, "access_token" => "myvisbleaccesstoken"}')
 
         Koala::HTTPService.make_request(request)
       end
@@ -247,8 +247,8 @@ describe Koala::HTTPService do
       it 'doesnt log tokens' do
         allow(Koala.config).to receive(:mask_tokens) { true }
 
-        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleac*****token"}')
-        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an"=>:arg, "access_token"=>"myvisbleac*****token"}')
+        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /foo params: {"an" => :arg, "access_token" => "myvisbleac*****token"}')
+        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /foo params: {"an" => :arg, "access_token" => "myvisbleac*****token"}')
 
         Koala::HTTPService.make_request(request)
       end
@@ -258,8 +258,8 @@ describe Koala::HTTPService do
 
         allow(Koala.config).to receive(:mask_tokens) { true }
 
-        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
-        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /debug_token params: {"input_token"=>"myvisiblea*****token", "access_token"=>"myvisiblea*****token"}')
+        expect(Koala::Utils).to receive(:debug).with('STARTED => GET: /debug_token params: {"input_token" => "myvisiblea*****token", "access_token" => "myvisiblea*****token"}')
+        expect(Koala::Utils).to receive(:debug).with('FINISHED => GET: /debug_token params: {"input_token" => "myvisiblea*****token", "access_token" => "myvisiblea*****token"}')
 
         Koala::HTTPService.make_request(request)
       end
