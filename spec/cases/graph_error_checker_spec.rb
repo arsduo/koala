@@ -112,7 +112,7 @@ module Koala
               "x-app-usage" => '{invalid:json}'
             )
 
-            expect(Koala::Utils.logger).to receive(:error).with(/JSON::ParserError:.*unexpected token at '{invalid:json}' while parsing x-app-usage = {invalid:json}/)
+            expect(Koala::Utils.logger).to receive(:error).with("JSON::ParserError: expected object key, got 'invalid:json}' at line 1 column 2 while parsing x-app-usage = {invalid:json}")
             expect(error.fb_app_usage).to eq(nil)
           end
 
