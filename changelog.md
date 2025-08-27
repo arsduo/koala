@@ -11,6 +11,15 @@ Removed features:
 
 Internal improvements:
 
+Testing improvements:
+
+Others:
+
+v3.7.0 (2025-08-27)
+==========
+
+Internal improvements:
+
  * explicitly require ostruct for ruby >= 3.3.5 ([694](https://github.com/arsduo/koala/pull/694))
  * explicitly require cgi for ruby >= 3.5.0 ([702](https://github.com/arsduo/koala/pull/702))
 
@@ -19,8 +28,6 @@ Testing improvements:
  * Add ruby 3.4 to CI ([696](https://github.com/arsduo/koala/pull/696))
  * Fix json assertions in CI ([701](https://github.com/arsduo/koala/pull/701))
  * Fix ruby 3.5 CI ([702](https://github.com/arsduo/koala/pull/702))
-
-Others:
 
 v3.6.0 (2024-06-27)
 ==========
