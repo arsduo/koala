@@ -16,6 +16,7 @@ Internal improvements:
 Testing improvements:
 
  * Add ruby 3.4 to CI ([696](https://github.com/arsduo/koala/pull/696))
+ * Fix json assertions in CI ([701](https://github.com/arsduo/koala/pull/701))
 
 Others:
 
