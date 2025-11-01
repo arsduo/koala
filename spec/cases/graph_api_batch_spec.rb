@@ -2,6 +2,7 @@ require 'spec_helper'
 require 'json' unless Hash.respond_to?(:to_json)
 
 describe "Koala::Facebook::GraphAPI in batch mode" do
+  DEFAULT_RESPONSE = [{code: 200, headers: [{name: "Content-Type", value: "text/javascript; charset=UTF-8"}], body: "{\"id\":\"1234\"}"}]
 
   before :each do
     @api = Koala::Facebook::API.new(@token)
@@ -270,7 +271,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
   describe "GraphAPI batch interface" do
     it "returns nothing for a batch operation" do
-      allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, "[]", {}))
+      allow(Koala).to receive(:make_request).and_return(Koala::HTTPService::Response.new(200, DEFAULT_RESPONSE.to_json, {}))
       @api.batch do |batch_api|
         expect(batch_api.get_object('me')).to be_nil
       end
@@ -278,7 +279,7 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
     describe "#batch" do
       before :each do
-        @fake_response = Koala::HTTPService::Response.new(200, "[]", {})
+        @fake_response = Koala::HTTPService::Response.new(200, DEFAULT_RESPONSE.to_json, {})
         allow(Koala).to receive(:make_request).and_return(@fake_response)
       end
 
@@ -296,7 +297,11 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
         it "includes the first operation's access token as the main one in the args" do
           access_token = "foo"
-          expect(Koala).to receive(:make_request).with(anything, hash_including("access_token" => access_token), anything, anything).and_return(@fake_response)
+          expect(Koala).to receive(:make_request).with(anything, hash_including("access_token" => access_token), anything, anything) do |_request, args, _verb, _options|
+            request_count = JSON.parse(args['batch']).length
+            Koala::HTTPService::Response.new(200, (DEFAULT_RESPONSE * request_count).to_json, {})
+          end
+
           Koala::Facebook::API.new(access_token).batch do |batch_api|
             batch_api.get_object('me')
             batch_api.get_object('me', {}, {'access_token' => 'bar'})
@@ -308,7 +313,11 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
             access_token = "foo"
             app_secret = "baz"
             app_secret_digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), app_secret, access_token)
-            expect(Koala).to receive(:make_request).with(anything, hash_including("access_token" => access_token, "appsecret_proof" => app_secret_digest), anything, anything).and_return(@fake_response)
+            expect(Koala).to receive(:make_request).with(anything, hash_including("access_token" => access_token, "appsecret_proof" => app_secret_digest), anything, anything)do |_request, args, _verb, _options|
+              request_count = JSON.parse(args['batch']).length
+              Koala::HTTPService::Response.new(200, (DEFAULT_RESPONSE * request_count).to_json, {})
+            end
+
             Koala::Facebook::API.new(access_token, app_secret).batch do |batch_api|
               batch_api.get_object('me')
               batch_api.get_object('me', {}, {'access_token' => 'bar'})
@@ -324,7 +333,11 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
 
           # two requests should generate two batch operations
           expected = JSON.dump([op.to_batch_params(access_token, nil), op.to_batch_params(access_token, nil)])
-          expect(Koala).to receive(:make_request).with(anything, hash_including("batch" => expected), anything, anything).and_return(@fake_response)
+          expect(Koala).to receive(:make_request).with(anything, hash_including("batch" => expected), anything, anything) do |_request, args, _verb, _options|
+            request_count = JSON.parse(args['batch']).length
+            Koala::HTTPService::Response.new(200, (DEFAULT_RESPONSE * request_count).to_json, {})
+          end
+
           Koala::Facebook::API.new(access_token).batch do |batch_api|
             batch_api.get_object('me')
             batch_api.get_object('me')
@@ -338,6 +351,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           @key = "file0_0"
           @uploadable_io = double("UploadableIO")
           batch_op = double("Koala Batch Operation", :files => {@key => @uploadable_io}, :to_batch_params => {}, :access_token => "foo")
+          allow(batch_op).to receive(:post_processing).and_return(nil)
+          allow(batch_op).to receive(:http_options).and_return({})
           allow(Koala::Facebook::GraphBatchAPI::BatchOperation).to receive(:new).and_return(batch_op)
 
           expect(Koala).to receive(:make_request).with(anything, hash_including(@key => @uploadable_io), anything, anything).and_return(@fake_response)
@@ -352,7 +367,8 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
           expect(Koala).to receive(:make_request) do |url, args, method, options|
             # test the batch operations to make sure they appear in the right order
             expect((args ||= {})["batch"]).to match(/.*me\/farglebarg.*otheruser\/bababa/)
-            @fake_response
+            request_count = JSON.parse(args['batch']).length
+            Koala::HTTPService::Response.new(200, (DEFAULT_RESPONSE * request_count).to_json, {})
           end
           Koala::Facebook::API.new(access_token).batch do |batch_api|
             batch_api.get_connections('me', "farglebarg")
@@ -504,7 +520,10 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
         first_count = 20
         second_count = 10
 
-        allow(Koala).to receive(:make_request).and_return(@fake_response)
+        allow(Koala).to receive(:make_request) do |_request, args, _verb, _options|
+          request_count = JSON.parse(args['batch']).length
+          Koala::HTTPService::Response.new(200, (DEFAULT_RESPONSE * request_count).to_json, {})
+        end
 
         thread1 = Thread.new do
           @api.batch do |batch_api|
@@ -531,12 +550,16 @@ describe "Koala::Facebook::GraphAPI in batch mode" do
   end
 
   describe '#big_batches' do
+    before :all do
+      @random = Random.new
+    end
     before :each do
-      payload = [{code: 200, headers: [{name: "Content-Type", value: "text/javascript; charset=UTF-8"}], body: "{\"id\":\"1234\"}"}]
       allow(Koala).to receive(:make_request) do |_request, args, _verb, _options|
         request_count = JSON.parse(args['batch']).length
         expect(request_count).to be <= 50   # check FB's limit
-        Koala::HTTPService::Response.new(200, (payload * request_count).to_json, {})
+        # simulate FB's result truncation
+        response_count = request_count > 35 ? request_count - @random.rand(15) : request_count
+        Koala::HTTPService::Response.new(200, (DEFAULT_RESPONSE * response_count).to_json, {})
       end
     end
 
