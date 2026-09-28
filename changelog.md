@@ -13,6 +13,8 @@ Internal improvements:
 
 Testing improvements:
 
+ * Remove obsolete Code Climate coverage reporting from CI
+
 Others:
 
 v3.7.0 (2025-08-27)
