@@ -11,9 +11,7 @@ module Koala
       end
 
       def data
-        # quirks_mode is needed because Facebook sometimes returns a raw true or false value --
-        # in Ruby 2.4 we can drop that.
-        @data ||= JSON.parse(body, quirks_mode: true) unless body.empty?
+        @data ||= JSON.parse(body) unless body.empty?
       end
     end
   end
