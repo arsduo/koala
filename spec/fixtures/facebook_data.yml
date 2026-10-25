@@ -1,22 +1,8 @@
-# Testing data
-
-# IMPORTANT NOTE: live tests will run against a test users automatically
-# If you want to run them against a real user or test users on a different account, you can
-# by enter an OAuth token, code, and session_key (for real users) or changing the app_id and secret (for test users)
-# (note for real users: this will leave some photos and videos posted to your wall, since they can't be deleted through the API)
-
-# These values are configured to work with a test app. If you want, you can change this to work with your own app.
-
-# Your OAuth token should have the read_stream, publish_stream, user_photos, user_videos, and read_insights permissions.
-oauth_token:
+# Static data for mocked responses and OAuth parsing tests.
 
 # for testing the OAuth class
 # baseline app
 oauth_test_data:
-  # the following two values are not needed for most of the test suite, but the relevant tests will not run if they're not present
-  code:
-  session_key:
-
   # These values will work out of the box
   app_id: 119908831367602
   secret: e45e55a333eec232d4206d2703de1307
@@ -25,8 +11,7 @@ oauth_test_data:
   raw_token_string: "access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.&expires=6621"
   raw_offline_access_token_string: access_token=119908831367602|2.6GneoQbnEqtSiPppZzDU4Q__.3600.1273366800-2905623|3OLa3w0x1K4C1S5cOgbs07TytAk.
   valid_cookies:
-    # note: the tests stub the time class so these default cookies are always valid (if you're using the default app)
-    # if not you may want to remove the stubbing to test expiration
+    # The tests stub the time class so these cookies are always valid.
     fbs_119908831367602: '"access_token=119908831367602|2.LKE7ksSPOx0V_8mHPr2NHQ__.3600.1273363200-2905623|CMpi0AYbn03Oukzv94AUha2qbO4.&expires=1273363200&secret=lT_9zm5r5IbJ6Aa5O54nFw__&session_key=2.LKE7ksSPOx0V_8mHPr2NHQ__.3600.1273363200-2905623&sig=9515e93113921f9476a4efbdd4a3c746&uid=2905623"'
   offline_access_cookies:
     # note: I've revoked the offline access for security reasons, so you can't make calls against this :)
@@ -36,7 +21,6 @@ oauth_test_data:
 
 
   # These values from the OAuth Playground (see above) will work out of the box
-  # You can update this to live data if desired
   # request_secret is optional and will fall back to the secret above if absent
   signed_params: "zWRm0gd5oHW_jzXP_WA9CirO7c5CLHotn-SKRqH2NmU.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEzMDE5MjIwMDAsImlzc3VlZF9hdCI6MTMwMTkxNzI5OSwib2F1dGhfdG9rZW4iOiIxMTk5MDg4MzEzNjc2MDJ8Mi56VkZfNk5yTUVMSHVKYTRnSVU5dEt3X18uMzYwMC4xMzAxOTIyMDAwLTI5MDU2MjN8emdxUHNyMkJHOUxvT0s5a2VrR2dSVVJaeDBrIiwidXNlciI6eyJjb3VudHJ5IjoiZGUiLCJsb2NhbGUiOiJkZV9ERSIsImFnZSI6eyJtaW4iOjIxfX0sInVzZXJfaWQiOiIyOTA1NjIzIn0"
   signed_params_result:
@@ -58,6 +42,3 @@ subscription_test_data:
     "hub.challenge": "1290024882"
     "hub.verify_token": "myverificationtoken|1f54545d5f722733e17faae15377928f"
     "hub.mode": "subscribe"
-
-vcr_data:
-  oauth_token: CAACEdEose0cBAKuiUM40KZBEsq2l0iggaMGZBPI74svGQRMmZCPXb7eZCYPhNUbVXnnYZCjXKFKIc7HgYllr4RDIKrANHm6kKncOx0Y3UpDqLliRGZAnSEUypyFworUnBMOQJBlAuB1wlwYJZB7LIZCobCcnT2q9QwrZBpK3qAZB3u7ZAJaZAdsMZBsyALkAXatoj75leWXhgXfT1QiJHZBGoRlz07Q85z1dZBReK4ZD

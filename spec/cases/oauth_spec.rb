@@ -375,40 +375,36 @@ describe "Koala::Facebook::OAuth" do
 
     describe 'for generating a client code' do
       describe '#generate_client_code' do
-        if KoalaTest.mock_interface? || KoalaTest.oauth_token
-          it 'makes a request using the correct endpoint' do
-            expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"code": "fake_client_code"}', {}))
-            @oauth.generate_client_code(KoalaTest.oauth_token)
-          end
+        it 'makes a request using the correct endpoint' do
+          expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"code": "fake_client_code"}', {}))
+          @oauth.generate_client_code(KoalaTest.oauth_token)
+        end
 
-          it 'gets a valid client code returned' do
-            expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"code": "fake_client_code"}', {}))
-            result = @oauth.generate_client_code(KoalaTest.oauth_token)
-            expect(result).to be_a(String)
-            expect(result).to eq('fake_client_code')
-          end
+        it 'gets a valid client code returned' do
+          expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"code": "fake_client_code"}', {}))
+          result = @oauth.generate_client_code(KoalaTest.oauth_token)
+          expect(result).to be_a(String)
+          expect(result).to eq('fake_client_code')
+        end
 
-          it 'raises a BadFacebookResponse error when empty response body is returned' do
-            expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '', {}))
-            expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::Facebook::BadFacebookResponse)
-          end
+        it 'raises a BadFacebookResponse error when empty response body is returned' do
+          expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '', {}))
+          expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::Facebook::BadFacebookResponse)
+        end
 
-          it 'raises an OAuthTokenRequestError when empty response body is returned' do
-            expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(400, '', {}))
-            expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::Facebook::OAuthTokenRequestError)
-          end
+        it 'raises an OAuthTokenRequestError when empty response body is returned' do
+          expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(400, '', {}))
+          expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::Facebook::OAuthTokenRequestError)
+        end
 
-          it 'raises a ServerError when empty response body is returned' do
-            expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(500, '', {}))
-            expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::Facebook::ServerError)
-          end
+        it 'raises a ServerError when empty response body is returned' do
+          expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(500, '', {}))
+          expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::Facebook::ServerError)
+        end
 
-          it 'raises a KoalaError when empty response body is returned' do
-            expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"client_code":"should_not_be_returned"}', {}))
-            expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::KoalaError)
-          end
-        else
-          pending "Some OAuth token exchange tests will not be run since the access token field in facebook_data.yml is blank."
+        it 'raises a KoalaError when empty response body is returned' do
+          expect(Koala).to receive(:make_request).with('/oauth/client_code', anything, 'get', anything).and_return(Koala::HTTPService::Response.new(200, '{"client_code":"should_not_be_returned"}', {}))
+          expect { @oauth.generate_client_code(KoalaTest.oauth_token) }.to raise_error(Koala::KoalaError)
         end
       end
     end
@@ -459,51 +455,42 @@ describe "Koala::Facebook::OAuth" do
           })
         end
 
-        if KoalaTest.code
-          it "properly gets and parses an access token token results into a hash" do
-            result = @oauth.get_access_token_info(@code)
-            expect(result).to be_a(Hash)
-          end
+        it "properly gets and parses an access token token results into a hash" do
+          result = @oauth.get_access_token_info(@code)
+          expect(result).to be_a(Hash)
+        end
 
-          it "properly includes the access token results" do
-            result = @oauth.get_access_token_info(@code)
-            expect(result["access_token"]).to be_truthy
-          end
+        it "properly includes the access token results" do
+          result = @oauth.get_access_token_info(@code)
+          expect(result["access_token"]).to be_truthy
+        end
 
-          it "raises an error when get_access_token is called with a bad code" do
-            expect { @oauth.get_access_token_info("foo") }.to raise_error(Koala::Facebook::OAuthTokenRequestError)
-          end
+        it "raises an error when get_access_token is called with a bad code" do
+          expect { @oauth.get_access_token_info("foo") }.to raise_error(Koala::Facebook::OAuthTokenRequestError)
         end
       end
 
       describe "#get_access_token" do
-        # TODO refactor these to be proper tests with stubs and tests against real data
         it "passes on any options provided to make_request" do
           options = {:a => 2}
           expect(Koala).to receive(:make_request).with(anything, anything, anything, hash_including(options)).and_return(Koala::HTTPService::Response.new(200, "", {}))
           @oauth.get_access_token(@code, options)
         end
 
-        if KoalaTest.code
-          it "uses get_access_token_info to get and parse an access token token results" do
-            result = @oauth.get_access_token(@code)
-            expect(result).to be_a(String)
-          end
-
-          it "returns the access token as a string" do
-            result = @oauth.get_access_token(@code)
-            original = @oauth.get_access_token_info(@code)
-            expect(result).to eq(original["access_token"])
-          end
-
-          it "raises an error when get_access_token is called with a bad code" do
-            expect { @oauth.get_access_token("foo") }.to raise_error(Koala::Facebook::OAuthTokenRequestError)
-          end
+        it "uses get_access_token_info to get and parse an access token token results" do
+          result = @oauth.get_access_token(@code)
+          expect(result).to be_a(String)
         end
-      end
 
-      unless KoalaTest.code
-        it "Some OAuth code tests will not be run since the code field in facebook_data.yml is blank."
+        it "returns the access token as a string" do
+          result = @oauth.get_access_token(@code)
+          original = @oauth.get_access_token_info(@code)
+          expect(result).to eq(original["access_token"])
+        end
+
+        it "raises an error when get_access_token is called with a bad code" do
+          expect { @oauth.get_access_token("foo") }.to raise_error(Koala::Facebook::OAuthTokenRequestError)
+        end
       end
 
       describe "get_app_access_token_info" do
@@ -544,18 +531,14 @@ describe "Koala::Facebook::OAuth" do
       end
 
       describe "exchange_access_token_info" do
-        if KoalaTest.mock_interface? || KoalaTest.oauth_token
-          it "properly gets and parses an app's access token as a hash" do
-            result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
-            expect(result).to be_a(Hash)
-          end
+        it "properly gets and parses an app's access token as a hash" do
+          result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
+          expect(result).to be_a(Hash)
+        end
 
-          it "includes the access token" do
-            result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
-            expect(result["access_token"]).not_to be_nil
-          end
-        else
-          pending "Some OAuth token exchange tests will not be run since the access token field in facebook_data.yml is blank."
+        it "includes the access token" do
+          result = @oauth.exchange_access_token_info(KoalaTest.oauth_token)
+          expect(result["access_token"]).not_to be_nil
         end
 
         it "passes on any options provided to make_request" do
@@ -603,13 +586,9 @@ describe "Koala::Facebook::OAuth" do
         # fetch_token_string
         # somewhat duplicative with the tests for get_access_token and get_app_access_token
         # but no harm in thoroughness
-        if KoalaTest.code
-          it "fetches a proper token string from Facebook when given a code" do
-            result = @oauth.send(:fetch_token_string, :code => @code, :redirect_uri => @callback_url)
-            expect(result).to match(/^access_token/)
-          end
-        else
-          it "fetch_token_string code test will not be run since the code field in facebook_data.yml is blank."
+        it "fetches a proper token string from Facebook when given a code" do
+          result = @oauth.send(:fetch_token_string, :code => @code, :redirect_uri => @callback_url)
+          expect(result).to match(/^access_token/)
         end
 
         it "fetches a proper token string from Facebook when asked for the app token" do

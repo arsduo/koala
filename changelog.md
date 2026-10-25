@@ -13,6 +13,7 @@ Internal improvements:
 
 Testing improvements:
 
+ * Remove live Facebook API testing and its environment flags; use only mocked responses and recorded HTTP interactions
  * Reset Koala's global configuration before initializing TestUsers specs to avoid order-dependent failures
 
 Others:

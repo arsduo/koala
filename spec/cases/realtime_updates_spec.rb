@@ -11,7 +11,7 @@ describe "Koala::Facebook::RealtimeUpdates" do
 
     # check OAuth data
     unless @app_id && @secret && @callback_url && @app_access_token
-      raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!"
+      raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback fixtures to run subscription tests!"
     end
 
     # get subscription data

@@ -12,19 +12,7 @@ describe "Koala::Facebook::TestUsers" do
 
     # check OAuth data
     unless @app_id && @secret && @app_access_token
-      raise Exception, "Must supply OAuth app id, secret, app_access_token, and callback to run live subscription tests!"
-    end
-  end
-
-  after :each do
-    # clean up any test users
-    # Facebook only allows us 500 test users per app, so we have to clean up
-    # This would be a good place to clean up and accumulate all of them for
-    # later deletion.
-    unless KoalaTest.mock_interface? || @stubbed
-      ((@network || []) + [@user1, @user2]).each do |u|
-        puts "Unable to delete test user #{u.inspect}" if u && !(@test_users.delete(u) rescue false)
-      end
+      raise Exception, "Must supply OAuth app id, secret, and app_access_token fixtures to run test user tests!"
     end
   end
 
@@ -178,7 +166,6 @@ describe "Koala::Facebook::TestUsers" do
       end
 
       it "accepts http options" do
-        @stubbed = true
         options = {:some_http_option => true}
         expect(@test_users.api).to receive(:graph_call).with(anything, anything, anything, options)
         @test_users.list(options)
@@ -208,7 +195,6 @@ describe "Koala::Facebook::TestUsers" do
       it "lets you specify http options that get passed through to the graph call" do
         options = {:some_http_option => true}
         # technically this goes through delete_object, but this makes it less brittle
-        @stubbed = true
         expect(@test_users.api).to receive(:graph_call).with(anything, anything, anything, options)
         @test_users.delete("user", options)
       end
@@ -268,7 +254,6 @@ describe "Koala::Facebook::TestUsers" do
 
       it "accepts an options hash" do
         options = {:some_http_option => true}
-        @stubbed = true
         expect(@test_users2.api).to receive(:graph_call).with(anything, anything, anything, options)
         @test_users2.update("foo", @updates, options)
       end
@@ -305,7 +290,6 @@ describe "Koala::Facebook::TestUsers" do
       it "accepts http options passed to both calls" do
         options = {:some_http_option => true}
         # should come twice, once for each user
-        @stubbed = true
         expect(Koala.http_service).to receive(:make_request).twice do |request|
           expect(request.raw_options).to eq(options)
           Koala::HTTPService::Response.new(200, "{}", {})
@@ -315,7 +299,6 @@ describe "Koala::Facebook::TestUsers" do
 
       it "includes the secret, generating the appsecret_proof in both calls if provided" do
         # should come twice, once for each user
-        @stubbed = true
         test_users = Koala::Facebook::TestUsers.new({:secret => @secret, :app_id => @app_id})
         expect(Koala.http_service).to receive(:make_request).twice do |request|
           expect(request.post_args).to include("appsecret_proof")
@@ -334,17 +317,13 @@ describe "Koala::Facebook::TestUsers" do
 
   describe "when creating a network of friends" do
     before :each do
-      @network = []
-
-      if KoalaTest.mock_interface?
-        id_counter = 999999900
-        allow(@test_users).to receive(:create) do
-          id_counter += 1
-          {"id" => id_counter, "access_token" => @token, "login_url" => "https://www.facebook.com/platform/test_account.."}
-        end
-        allow(@test_users).to receive(:befriend).and_return(true)
-        allow(@test_users).to receive(:delete).and_return(true)
+      id_counter = 999999900
+      allow(@test_users).to receive(:create) do
+        id_counter += 1
+        {"id" => id_counter, "access_token" => @token, "login_url" => "https://www.facebook.com/platform/test_account.."}
       end
+      allow(@test_users).to receive(:befriend).and_return(true)
+      allow(@test_users).to receive(:delete).and_return(true)
     end
 
     describe "tests that create users" do

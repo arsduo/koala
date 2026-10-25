@@ -5,7 +5,7 @@ Koala [![Version](https://img.shields.io/gem/v/koala.svg)](https://rubygems.org/
 * Lightweight: Koala should be as light and simple as Facebook’s own libraries, providing API accessors and returning simple JSON.
 * Fast: Koala should, out of the box, be quick. Out of the box, we use Facebook's faster read-only servers when possible and if available, the Typhoeus gem to make snappy Facebook requests.  Of course, that brings us to our next topic:
 * Flexible: Koala should be useful to everyone, regardless of their current configuration.  We support all currently-supported Ruby versions (MRI 2.1-2.4) and Koala should work on JRuby and Rubinius.
-* Tested: Koala should have complete test coverage, so you can rely on it.  Our test coverage is complete and can be run against either mocked responses or the live Facebook servers; we're also on [Travis CI](http://travis-ci.org/arsduo/koala/).
+* Tested: Koala should have complete test coverage, so you can rely on it. Our tests use mocked responses and recorded HTTP interactions; we're also on [GitHub Actions](https://github.com/arsduo/koala/actions).
 
 **Found a bug? Interested in contributing?** Check out the Maintenance section below!
 
@@ -247,21 +247,11 @@ Some resources to help you as you play with Koala and the Graph API:
 Testing
 -------
 
-Unit tests are provided for all of Koala's methods.  By default, these tests run against mock responses and hence are ready out of the box:
+Unit tests are provided for all of Koala's methods. Tests use mocked responses and recorded HTTP interactions, without contacting Facebook or requiring credentials:
 ```bash
 # From anywhere in the project directory:
 bundle exec rake spec
 ```
-
-You can also run live tests against Facebook's servers:
-```bash
-# Again from anywhere in the project directory:
-LIVE=true bundle exec rake spec
-# you can also test against Facebook's beta tier
-LIVE=true BETA=true bundle exec rake spec
-```
-
-By default, the live tests are run against test users, so you can run them as frequently as you want.  If you want to run them against a real user, however, you can fill in the OAuth token, code, and access\_token values in spec/fixtures/facebook_data.yml.  See the wiki for more details.
 
 Maintenance
 -----------
