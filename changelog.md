@@ -13,6 +13,8 @@ Internal improvements:
 
 Testing improvements:
 
+ * Reset Koala's global configuration before initializing TestUsers specs to avoid order-dependent failures
+
 Others:
 
 v3.8.0 (2026-10-25)
