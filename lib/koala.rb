@@ -28,7 +28,7 @@ module Koala
   class << self
     # Control which HTTP service framework Koala uses.
     # Primarily used to switch between the mock-request framework used in testing
-    # and the live framework used in real life (and live testing).
+    # and the HTTP framework used in real applications.
     # In theory, you could write your own HTTPService module if you need different functionality,
     # but since the switch to {https://github.com/arsduo/koala/wiki/HTTP-Services Faraday} almost all such goals can be accomplished with middleware.
     attr_accessor :http_service

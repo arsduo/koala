@@ -355,13 +355,11 @@ shared_examples_for "Koala GraphAPI with an access token" do
   # Page Access Token Support
   describe "#get_page_access_token" do
     it "gets the page object with the access_token field" do
-      # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
       expect(@api).to receive(:api).with("my_page", hash_including({:fields => "access_token"}), "get", anything).and_return(dummy_response)
       @api.get_page_access_token("my_page")
     end
 
     it "merges in any other arguments" do
-      # we can't test this live since test users (or random real users) can't be guaranteed to have pages to manage
       args = {:a => 3}
       expect(@api).to receive(:api).with("my_page", hash_including(args), "get", anything).and_return(dummy_response)
       @api.get_page_access_token("my_page", args)

@@ -6,8 +6,7 @@ module Koala
     # Create and manage test users for your application.
     # A test user is a user account associated with an app created for the purpose
     # of testing the functionality of that app.
-    # You can use test users for manual or automated testing --
-    # Koala's live test suite uses test users to verify the library works with Facebook.
+    # You can use test users for manual or automated testing.
     #
     # @note the test user API is fairly slow compared to other interfaces
     #       (which makes sense -- it's creating whole new user accounts!).
