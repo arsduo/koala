@@ -7,6 +7,23 @@ New features:
 
 Updated features:
 
+Removed features:
+
+Internal improvements:
+
+Testing improvements:
+
+Others:
+
+v3.8.0 (2026-10-25)
+==========
+
+**Key breaking changes:**
+
+New features:
+
+Updated features:
+
  * Support json 3 by no longer passing the removed `quirks_mode` option to `JSON.parse` (json >= 2.0 is now required)
 
 Removed features:
