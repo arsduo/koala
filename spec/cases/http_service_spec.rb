@@ -191,6 +191,26 @@ describe Koala::HTTPService do
       end
     end
 
+    it "uses the request configuration for token masking without exposing it in HTTP options" do
+      allow_any_instance_of(Faraday::Connection).to receive(:get).and_return(mock_http_response)
+      configuration = Koala.config.dup
+      configuration.mask_tokens = false
+      request = Koala::HTTPService::Request.new(
+        path: "/foo",
+        verb: "get",
+        args: {"access_token" => "client-secret-token"},
+        configuration: configuration
+      )
+      messages = []
+      allow(Koala::Utils.logger).to receive(:debug) { |message| messages << message }
+
+      Koala::HTTPService.make_request(request)
+
+      expect(messages.join).to include("client-secret-token")
+      expect(request.options).not_to have_key(:configuration)
+      expect(request.raw_options).not_to have_key(:configuration)
+    end
+
     it "uses the default builder block if HTTPService.faraday_middleware block is not defined" do
       block = Proc.new { |builder|
         builder.request :multipart

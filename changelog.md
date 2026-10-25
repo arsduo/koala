@@ -3,7 +3,11 @@ Unreleased
 
 **Key breaking changes:**
 
+ * Custom `Koala.make_request` wrappers must accept and forward an optional fifth configuration argument when using the new per-client `config:` option; existing clients without `config:` retain four-argument calls
+
 New features:
+
+ * Add support for Instagram and Threads Graph API hosts alongside Facebook through per-client configuration via `config:`; platform-specific authentication is not included
 
 Updated features:
 

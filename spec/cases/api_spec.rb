@@ -26,6 +26,199 @@ describe "Koala::Facebook::API" do
     expect(Koala::Facebook::API.new.app_secret).to eq(app_secret)
   end
 
+  describe "client-specific configuration" do
+    it "keeps the legacy three positional arguments and preserves explicit nils" do
+      Koala.configure do |config|
+        config.access_token = "global-token"
+        config.app_secret = "global-secret"
+        config.rate_limit_hook = :global_hook
+      end
+
+      api = Koala::Facebook::API.new(nil, nil, nil)
+      expect(api.access_token).to be_nil
+      expect(api.app_secret).to be_nil
+      expect(api.rate_limit_hook).to be_nil
+    end
+
+    it "uses the supplied configuration as defaults without duplicating or mutating it" do
+      config = Koala::Configuration.new
+      config.access_token = "client-token"
+      config.app_secret = "client-secret"
+      config.rate_limit_hook = :client_hook
+      original_values = [config.access_token, config.app_secret, config.rate_limit_hook]
+
+      api = Koala::Facebook::API.new(config: config)
+
+      expect([api.access_token, api.app_secret, api.rate_limit_hook]).to eq(original_values)
+      expect(config).to have_attributes(access_token: "client-token", app_secret: "client-secret", rate_limit_hook: :client_hook)
+    end
+
+    it "keeps global request configuration live while capturing credential defaults at initialization" do
+      Koala.configure do |config|
+        config.access_token = "initial-token"
+        config.graph_server = "initial.example.com"
+      end
+      api = Koala::Facebook::API.new
+
+      Koala.configure do |config|
+        config.access_token = "later-token"
+        config.graph_server = "later.example.com"
+      end
+
+      expect(api.access_token).to eq("initial-token")
+      requests = []
+      service = Object.new
+      service.define_singleton_method(:make_request) do |request|
+        requests << request
+        Koala::HTTPService::Response.new(200, "{}", {})
+      end
+      old_service = Koala.http_service
+      Koala.http_service = service
+
+      begin
+        api.api("me")
+      ensure
+        Koala.http_service = old_service
+      end
+
+      expect(requests.last.server).to eq("https://later.example.com")
+    end
+
+    it "continues to use the live global configuration after reset_config" do
+      api = Koala::Facebook::API.new
+      Koala.reset_config
+      Koala.config.graph_server = "reset.example.com"
+      requests = []
+      service = Object.new
+      service.define_singleton_method(:make_request) do |request|
+        requests << request
+        Koala::HTTPService::Response.new(200, "{}", {})
+      end
+      old_service = Koala.http_service
+      Koala.http_service = service
+
+      begin
+        api.api("me")
+      ensure
+        Koala.http_service = old_service
+      end
+
+      expect(requests.last.server).to eq("https://reset.example.com")
+    end
+
+    it "uses client-specific defaults for form arguments" do
+      config = Koala::Configuration.new
+      config.preserve_form_arguments = true
+      api = Koala::Facebook::API.new(config: config)
+      response = Koala::HTTPService::Response.new(200, "", {})
+      expect(Koala).to receive(:make_request).with("/me", {"ids" => [1, 2]}, "get", {}, config).and_return(response)
+
+      api.api("me", {"ids" => [1, 2]})
+    end
+
+    it "keeps explicit client configuration isolated across interleaved requests" do
+      first_config = Koala.config.dup
+      first_config.graph_server = "graph.instagram.com"
+      second_config = Koala.config.dup
+      second_config.graph_server = "graph.threads.net"
+      requests = []
+      service = Object.new
+      service.define_singleton_method(:make_request) do |request|
+        requests << request
+        Koala::HTTPService::Response.new(200, "{}", {})
+      end
+      old_service = Koala.http_service
+      Koala.http_service = service
+
+      begin
+        Koala::Facebook::API.new(config: first_config).api("me")
+        Koala::Facebook::API.new(config: second_config).api("me")
+      ensure
+        Koala.http_service = old_service
+      end
+
+      expect(requests.map(&:server)).to eq(["https://graph.instagram.com", "https://graph.threads.net"])
+      expect(requests.map(&:raw_options)).to eq([{}, {}])
+    end
+
+    it "keeps explicit client configuration isolated across concurrent requests" do
+      configs = ["graph.instagram.com", "graph.threads.net"].map do |host|
+        Koala.config.dup.tap { |config| config.graph_server = host }
+      end
+      servers = Queue.new
+      service = Object.new
+      service.define_singleton_method(:make_request) do |request|
+        servers << request.server
+        Koala::HTTPService::Response.new(200, "{}", {})
+      end
+      old_service = Koala.http_service
+      Koala.http_service = service
+
+      begin
+        threads = configs.map do |config|
+          Thread.new { Koala::Facebook::API.new(config: config).api("me") }
+        end
+        threads.each(&:value)
+      ensure
+        Koala.http_service = old_service
+      end
+
+      expect([servers.pop, servers.pop]).to match_array(["https://graph.instagram.com", "https://graph.threads.net"])
+    end
+
+    it "passes configuration through the existing one-request custom service contract" do
+      config = Koala.config.dup
+      config.graph_server = "graph.instagram.com"
+      service = Object.new
+      allow(service).to receive(:make_request) do |request|
+        expect(request.configuration).to equal(config)
+        Koala::HTTPService::Response.new(200, "{}", {})
+      end
+      old_service = Koala.http_service
+      Koala.http_service = service
+
+      begin
+        Koala::Facebook::API.new(config: config).api("me")
+      ensure
+        Koala.http_service = old_service
+      end
+    end
+
+    it "preserves appsecret proofs for clients with explicit configuration" do
+      token = "client-token"
+      secret = "client-secret"
+      config = Koala::Configuration.new
+      api = Koala::Facebook::API.new(token, secret, nil, config: config)
+      expected_proof = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), secret, token)
+      response = Koala::HTTPService::Response.new(200, "", {})
+      expect(Koala).to receive(:make_request).with("/me", hash_including("appsecret_proof" => expected_proof), "get", {}, config).and_return(response)
+
+      api.api("me", {}, "get", appsecret_proof: true)
+    end
+
+    it "keeps configuration on pageable results and batch calls" do
+      config = Koala.config.dup
+      config.graph_server = "graph.instagram.com"
+      config.access_token = "client-token"
+      api = Koala::Facebook::API.new(config: config)
+      collection = Koala::Facebook::API::GraphCollection.new(
+        Koala::HTTPService::Response.new(200, {"data" => [], "paging" => {"next" => "https://example.com/v2/me?access_token=token"}}.to_json, {}),
+        api
+      )
+      requests = []
+      allow(Koala).to receive(:make_request) do |path, args, verb, options, request_config|
+        requests << [path, args, verb, options, request_config]
+        Koala::HTTPService::Response.new(200, '{"data":[]}', {})
+      end
+
+      collection.next_page
+      api.batch { |batch| batch.get_object("me") }
+
+      expect(requests.length).to eq(2)
+      expect(requests.map(&:last)).to all(equal(config))
+    end
+  end
+
   it "doesn't include an access token if none was given" do
     expect(Koala).to receive(:make_request).with(
       anything,
