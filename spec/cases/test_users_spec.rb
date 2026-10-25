@@ -7,6 +7,7 @@ describe "Koala::Facebook::TestUsers" do
     @secret = KoalaTest.secret
     @app_access_token = KoalaTest.app_access_token
 
+    Koala.reset_config
     @test_users = Koala::Facebook::TestUsers.new({:app_access_token => @app_access_token, :app_id => @app_id})
 
     # check OAuth data
