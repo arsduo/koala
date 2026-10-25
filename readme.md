@@ -90,6 +90,36 @@ Koala.config.api_version = "v2.0"
 @graph.get_object("me", {}, api_version: "v2.0")
 ```
 
+An API client can also use its own configuration without changing the global defaults.
+This is useful when an application talks to more than one Graph API host:
+
+```ruby
+instagram_config = Koala.config.dup
+instagram_config.graph_server = "graph.instagram.com"
+instagram = Koala::Facebook::API.new(config: instagram_config)
+
+threads_config = Koala.config.dup
+threads_config.graph_server = "graph.threads.net"
+threads = Koala::Facebook::API.new(config: threads_config)
+```
+
+When a client-specific configuration is supplied, its credentials and rate-limit hook are used as
+defaults when the corresponding positional arguments are omitted. Explicit positional `nil` values
+remain `nil`. The configuration object is used as provided and is not modified. Clients created
+without `config:` continue to use the current global request configuration, including after
+`Koala.reset_config`; their credential defaults are still captured when the client is initialized.
+Per-request options such as `api_version` continue to override the configured default.
+
+If your application wraps or replaces `Koala.make_request`, the wrapper must accept and
+forward an optional fifth positional argument (the configuration) to support clients
+using `config:`. Wrappers requiring exactly four arguments will raise `ArgumentError`
+for these clients. Clients without `config:` retain the existing four-argument call.
+Custom HTTP services still receive a single request object via `make_request(request)`.
+
+This setting only changes Koala's Graph API request behavior (including the Graph API host and
+request formatting). It does not add Instagram Login, Threads authentication, or platform-specific
+OAuth, TestUsers, or RealtimeUpdates support.
+
 The response of most requests is the JSON data returned from the Facebook servers as a Hash.
 
 When retrieving data that returns an array of results (for example, when calling `API#get_connections` or `API#search`)

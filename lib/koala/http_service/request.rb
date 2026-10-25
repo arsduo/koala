@@ -1,7 +1,7 @@
 module Koala
   module HTTPService
     class Request
-      attr_reader :raw_path, :raw_args, :raw_verb, :raw_options
+      attr_reader :raw_path, :raw_args, :raw_verb, :raw_options, :configuration
 
       # @param path the server path for this request
       # @param args (see Koala::Facebook::API#api)
@@ -9,16 +9,18 @@ module Koala
       #             If not get or post, this will be turned into a POST request with the appropriate :method
       #             specified in the arguments.
       # @param options various flags to indicate which server to use. (see Koala::Facebook::API#api)
+      # @param configuration optional configuration for this Graph API request
       # @param options
       # @option options :video use the server designated for video uploads
       # @option options :beta use the beta tier
       # @option options :use_ssl force https, even if not needed
       # @option options :json whether or not to send JSON to Facebook
-      def initialize(path:, verb:, args: {}, options: {})
+      def initialize(path:, verb:, args: {}, options: {}, configuration: nil)
         @raw_path = path
         @raw_args = args
         @raw_verb = verb
         @raw_options = options
+        @configuration = configuration
       end
 
       # Determines which type of request to send to Facebook. Facebook natively accepts GETs and POSTs, for others we have to include the method in the post body.
@@ -34,7 +36,7 @@ module Koala
       def path
         # if an api_version is specified and the path does not already contain
         # one, prepend it to the path
-        api_version = raw_options[:api_version] || Koala.config.api_version
+        api_version = raw_options[:api_version] || config.api_version
         if api_version && !path_contains_api_version?
           begins_with_slash = raw_path[0] == "/"
           divider = begins_with_slash ? "" : "/"
@@ -85,17 +87,21 @@ module Koala
       #
       # @return a complete server address with protocol
       def server
-        uri = "#{options[:use_ssl] ? "https" : "http"}://#{Koala.config.graph_server}"
+        uri = "#{options[:use_ssl] ? "https" : "http"}://#{config.graph_server}"
         # if we want to use the beta tier or the video server, make those substitutions as
         # appropriate
         replace_server_component(
-          replace_server_component(uri, options[:video], Koala.config.video_replace),
+          replace_server_component(uri, options[:video], config.video_replace),
           options[:beta],
-          Koala.config.beta_replace
+          config.beta_replace
         )
       end
 
       protected
+
+      def config
+        configuration || Koala.config
+      end
 
       # The arguments to include in the request.
       def args
@@ -126,7 +132,7 @@ module Koala
 
       def replace_server_component(host, condition_met, replacement)
         return host unless condition_met
-        host.gsub(Koala.config.host_path_matcher, replacement)
+        host.gsub(config.host_path_matcher, replacement)
       end
     end
   end

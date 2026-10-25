@@ -51,7 +51,8 @@ module Koala
 
       filtered_args = request.raw_args.dup.transform_keys(&:to_s)
 
-      if Koala.config.mask_tokens
+      config = request.configuration || Koala.config
+      if config.mask_tokens
         %w(access_token input_token).each do |arg_token|
           if (token = filtered_args[arg_token])
             filtered_args[arg_token] = token[0, 10] + '*****' + token[-5, 5]

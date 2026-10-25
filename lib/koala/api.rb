@@ -6,6 +6,9 @@ require 'openssl'
 module Koala
   module Facebook
     class API
+      UNSET_CONFIGURATION = Object.new.freeze
+      private_constant :UNSET_CONFIGURATION
+
       # Creates a new API client.
       # @param [String] access_token access token
       # @param [String] app_secret app secret, for tying your access tokens to your app secret
@@ -14,12 +17,15 @@ module Koala
       #                 false as an option to the API call. (See
       #                 https://developers.facebook.com/docs/graph-api/securing-requests/)
       # @param [Block]  rate_limit_hook block called with limits received in facebook response headers
+      # @param [Koala::Configuration] config optional configuration for this client
       # @note If no access token is provided, you can only access some public information.
       # @return [Koala::Facebook::API] the API client
-      def initialize(access_token = Koala.config.access_token, app_secret = Koala.config.app_secret, rate_limit_hook = Koala.config.rate_limit_hook)
-        @access_token = access_token
-        @app_secret = app_secret
-        @rate_limit_hook = rate_limit_hook
+      def initialize(access_token = UNSET_CONFIGURATION, app_secret = UNSET_CONFIGURATION, rate_limit_hook = UNSET_CONFIGURATION, config: UNSET_CONFIGURATION)
+        @configuration = config
+        defaults = config.equal?(UNSET_CONFIGURATION) || config.nil? ? Koala.config : config
+        @access_token = access_token.equal?(UNSET_CONFIGURATION) ? defaults.access_token : access_token
+        @app_secret = app_secret.equal?(UNSET_CONFIGURATION) ? defaults.app_secret : app_secret
+        @rate_limit_hook = rate_limit_hook.equal?(UNSET_CONFIGURATION) ? defaults.rate_limit_hook : rate_limit_hook
       end
 
       attr_reader :access_token, :app_secret, :rate_limit_hook
@@ -119,7 +125,11 @@ module Koala
         path = "/#{path}" unless path.to_s =~ /^\//
 
         # make the request via the provided service
-        result = Koala.make_request(path, args, verb, options)
+        result = if @configuration.equal?(UNSET_CONFIGURATION) || @configuration.nil?
+          Koala.make_request(path, args, verb, options)
+        else
+          Koala.make_request(path, args, verb, options, @configuration)
+        end
 
         if result.status.to_i >= 500
           raise Koala::Facebook::ServerError.new(result.status.to_i, result.body)
@@ -149,7 +159,11 @@ module Koala
       end
 
       def preserve_form_arguments?(options)
-        options[:format] == :json || options[:preserve_form_arguments] || Koala.config.preserve_form_arguments
+        options[:format] == :json || options[:preserve_form_arguments] || configuration.preserve_form_arguments
+      end
+
+      def configuration
+        @configuration.equal?(UNSET_CONFIGURATION) || @configuration.nil? ? Koala.config : @configuration
       end
 
       def check_response(http_status, body, headers)

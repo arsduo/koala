@@ -219,6 +219,46 @@ module Koala
               end
             end
 
+            context "with a client-specific configuration" do
+              let(:configuration) do
+                Koala::Configuration.new.tap do |config|
+                  config.graph_server = "graph.instagram.com"
+                  config.host_path_matcher = /\.instagram/
+                  config.video_replace = "-video.instagram"
+                  config.beta_replace = ".beta.instagram"
+                  config.api_version = "v99.0"
+                end
+              end
+
+              it "uses the configured host and API version without adding internal options" do
+                configured_request = Request.new(path: "/me", verb: "get", configuration: configuration)
+                versioned_request = Request.new(path: "/me", verb: "get", options: {api_version: "v20.0"}, configuration: configuration)
+
+                expect(configured_request.server).to eq("https://graph.instagram.com")
+                expect(configured_request.path).to eq("/v99.0/me")
+                expect(versioned_request.path).to eq("/v20.0/me")
+                expect(configured_request.raw_options).to eq({})
+              end
+
+              it "uses the configured beta and video host replacements" do
+                beta_request = Request.new(path: "/me", verb: "get", options: {beta: true}, configuration: configuration)
+                video_request = Request.new(path: "/me", verb: "get", options: {video: true}, configuration: configuration)
+
+                expect(beta_request.server).to eq("https://graph.beta.instagram.com")
+                expect(video_request.server).to eq("https://graph-video.instagram.com")
+              end
+
+              it "does not rewrite a non-Facebook host when the default matcher does not match" do
+                non_facebook_config = Koala::Configuration.new
+                non_facebook_config.graph_server = "graph.instagram.com"
+                beta_request = Request.new(path: "/me", verb: "get", options: {beta: true}, configuration: non_facebook_config)
+                video_request = Request.new(path: "/me", verb: "get", options: {video: true}, configuration: non_facebook_config)
+
+                expect(beta_request.server).to eq("https://graph.instagram.com")
+                expect(video_request.server).to eq("https://graph.instagram.com")
+              end
+            end
+
             context "if options[:use_ssl] is false" do
               let(:options) { {use_ssl: false} }
 
