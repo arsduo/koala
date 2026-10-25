@@ -7,17 +7,24 @@ New features:
 
 Updated features:
 
- * Support json 3 by no longer passing the removed `quirks_mode` option to `JSON.parse` (json >= 2.0 is now required)
-
 Removed features:
 
 Internal improvements:
 
 Testing improvements:
 
- * Remove obsolete Code Climate coverage reporting from CI
-
 Others:
+
+v3.8.0 (2026-10-25)
+==========
+
+Updated features:
+
+ * Support json 3 by no longer passing the removed `quirks_mode` option to `JSON.parse` (json >= 2.0 is now required)
+
+Testing improvements:
+
+ * Remove obsolete Code Climate coverage reporting from CI
 
 v3.7.0 (2025-08-27)
 ==========
